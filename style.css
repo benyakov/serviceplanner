@@ -1,0 +1,26 @@
+ul.odd { background-color: #FFF; }
+ul.even { background-color: #EEE; }
+p.hymnlist { 
+    font-size: smaller;
+    margin: 0.2em 0 0.2em 2em;
+}
+.verified { border: thin solid green; }
+.unverified { 
+    border: thin solid red; 
+    background-color: #FFEEEE;
+    border: medium solid red;
+}
+.message { 
+    color: black;
+    background-color: #EEEEFF;
+    border: medium solid blue;
+}
+.errormessage { 
+    color: black;
+    background-color: #FFEEEE;
+    border: medium solid red;
+}
+tr.heading { 
+    background-color: #DDD; 
+    color: black; 
+}

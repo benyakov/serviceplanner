@@ -1,0 +1,16 @@
+This service planning web application is Copyright (c) 2009 Jesse Jacobsen.
+It is licensed under the GNU General Public License, version 2.
+For restrictions on distribution, see the file COPYING.
+
+Installation
+------------
+
+- Note that there is no guarantee.  Make backups.  See COPYING.
+- Procure a webserver with PHP and mysql database access.
+- Upload and extract the application files to their own directory 
+- Copy db-connection.php.sample to db-connection.php and edit it.
+- Point your web browser to http://domain.name/directory/setupdb.php
+- Use
+- Email the author at jmatjac /at/ gmail -dot- com with your feedback.
+
+More docs to come...
