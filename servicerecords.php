@@ -1,6 +1,9 @@
+<?
+require("functions.php");
+?>
 <html>
 <?=html_head("Service Planning Records")?>
 <body>
-    <? include("services/records-table.php"); ?>
+    <? include("records-table.php"); ?>
 </body>
 </html>
