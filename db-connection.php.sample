@@ -1,0 +1,9 @@
+<?
+// Put the host address, user name, password, and db name inside the ""
+$dbhost = "";
+$dbuser = "";
+$dbpw = "";
+$dbname = "";
+mysql_connect($dbhost, $dbuser, $dbpw) or die(mysql_error());
+mysql_select_db($dbname) or die(mysql_error());
+?>
