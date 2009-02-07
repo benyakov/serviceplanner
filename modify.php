@@ -12,12 +12,12 @@ require("db-connection.php");
     <p><a href="enter.php">Enter New Records</a></p>
     <p><a href="hymns.php">Upcoming Hymns</a></p>
 <h1>Modify Service Planning Records</h1>
-<?php 
-$sql = "SELECT DATE_FORMAT(days.caldate, '%e %b %Y') as date, 
-    hymns.book, hymns.number, hymns.note, hymns.location, 
-    days.name as dayname, days.rite, days.pkey as id, names.title 
+<?php
+$sql = "SELECT DATE_FORMAT(days.caldate, '%e %b %Y') as date,
+    hymns.book, hymns.number, hymns.note, hymns.location,
+    days.name as dayname, days.rite, days.pkey as id, names.title
     FROM hymns LEFT OUTER JOIN days ON (hymns.service = days.pkey)
-    LEFT OUTER JOIN names ON (hymns.number = names.number) 
+    LEFT OUTER JOIN names ON (hymns.number = names.number)
     AND (hymns.book = names.book)
     ORDER BY days.caldate DESC, hymns.location, hymns.sequence";
 $result = mysql_query($sql) or die(mysql_error()) ;

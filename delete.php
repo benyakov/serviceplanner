@@ -2,13 +2,13 @@
 session_start();
 require("functions.php");
 $this_script = $_SERVER['HTTP_HOST'].$_SERVER['SCRIPT_NAME'] ;
-if (! array_key_exists("stage", $_GET)) 
-{ 
+if (! array_key_exists("stage", $_GET))
+{
     // Put items to delete into an array.
     $todelete = array();
-    foreach ($_POST as $posted=>$value) 
+    foreach ($_POST as $posted=>$value)
     {
-        if (preg_match('/(\d+)_(.+)/', $posted, $matches)) 
+        if (preg_match('/(\d+)_(.+)/', $posted, $matches))
         {
             $todelete[] = array("index" => $matches[1], "loc" => $matches[2]);
         }
@@ -25,13 +25,13 @@ if (! array_key_exists("stage", $_GET))
         require("db-connection.php");
         foreach ($todelete as $deletion)
         {
-            $sql = "SELECT DATE_FORMAT(days.caldate, '%e %b %Y') as date, 
+            $sql = "SELECT DATE_FORMAT(days.caldate, '%e %b %Y') as date,
                 hymns.book, hymns.number, hymns.note,
-                hymns.location, days.name as dayname, days.rite, names.title 
+                hymns.location, days.name as dayname, days.rite, names.title
                 FROM hymns LEFT OUTER JOIN days ON (hymns.service = days.pkey)
-                LEFT OUTER JOIN names ON (hymns.number = names.number) 
+                LEFT OUTER JOIN names ON (hymns.number = names.number)
                     AND (hymns.book = names.book)
-                WHERE days.pkey = ${deletion['index']} 
+                WHERE days.pkey = ${deletion['index']}
                     AND hymns.location = '${deletion['loc']}'
                 ORDER BY days.caldate DESC, location";
             $result = mysql_query($sql) or die(mysql_error());

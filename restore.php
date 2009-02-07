@@ -9,7 +9,7 @@ if (! array_key_exists("stage", $_GET)) {
     <body>
     <h1>Restore from Database Backup</h1>
     <p>Please select the backup (dump) file.</p>
-    <form action="http://<?=$this_script?>?stage=2" enctype="multipart/form-data" 
+    <form action="http://<?=$this_script?>?stage=2" enctype="multipart/form-data"
         method="POST">
     <input type="file" name="backup_file" size="50">
     <input type="submit" value="Send"><input type="reset">
