@@ -9,11 +9,11 @@ function display_records_table($result)
     $date = "";
     $name = "";
     $location = "";
-    while ($row = mysql_fetch_assoc($result)) 
+    while ($row = mysql_fetch_assoc($result))
     {
         if (!  ($row['date'] == $date &&
                 $row['dayname'] == $name &&
-                $row['location'] == $location)) 
+                $row['location'] == $location))
         {// Display the heading line
             echo "<tr class=\"heading\"><td>${row['date']} ${row['location']}</td>
                 <td colspan=3>${row['dayname']}: ${row['rite']}</td></tr>\n";
@@ -31,7 +31,7 @@ function display_records_table($result)
 
 
 function modify_records_table($result, $action)
-{ // Show a table of the data in the query $result 
+{ // Show a table of the data in the query $result
   // with links to edit each record, and checkboxes to delete records.
     ?><form action="<?=$action?>" method="POST">
       <input type="submit" value="Delete"><input type="reset" value="Clear">
@@ -42,16 +42,18 @@ function modify_records_table($result, $action)
     $date = "";
     $name = "";
     $location = "";
-    while ($row = mysql_fetch_assoc($result)) 
+    while ($row = mysql_fetch_assoc($result))
     {
         if (!  ($row['date'] == $date &&
                 $row['dayname'] == $name &&
-                $row['location'] == $location)) 
+                $row['location'] == $location))
         {// Display the heading line
             echo "<tr class=\"heading\"><td>
             <input type=\"checkbox\" name=\"${row['id']}_${row['location']}\" id=\"check_${row['id']}_${row['location']}\">
             ${row['date']} ${row['location']}</td>
-            <td colspan=3><a href=\"edit.php?id=${row['id']}\">Edit</a> ${row['dayname']}: ${row['rite']}</td></tr>\n";
+            <td colspan=3><a href=\"edit.php?id=${row['id']}\">Edit</a> |
+            <a href=\"sermon.php?id=${row['id']}\">Sermon</a> |
+            ${row['dayname']}: ${row['rite']}</td></tr>\n";
             $date = $row['date'];
             $name = $row['dayname'];
             $location = $row['location'];
