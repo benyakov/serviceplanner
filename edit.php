@@ -5,7 +5,7 @@ require("functions.php");
 require("options.php");
 $this_script = $_SERVER['HTTP_HOST'].$_SERVER['SCRIPT_NAME'] ;
 html_head("Edit a Service");
-if (! array_key_exists("stage", $_GET)) 
+if (! array_key_exists("stage", $_GET))
 {
     ?>
     <body>
@@ -18,22 +18,22 @@ if (! array_key_exists("stage", $_GET))
         $sql = "SELECT DATE_FORMAT(days.caldate, '%e %b %Y') as date,
             hymns.book, hymns.number, hymns.note, hymns.pkey as hymnid,
             hymns.location, hymns.sequence,
-            days.name as dayname, days.rite, names.title 
+            days.name as dayname, days.rite, names.title
             FROM hymns LEFT OUTER JOIN days ON (hymns.service = days.pkey)
-            LEFT OUTER JOIN names ON (hymns.number = names.number) 
+            LEFT OUTER JOIN names ON (hymns.number = names.number)
             AND (hymns.book = names.book)
             WHERE days.pkey = '${_GET['id']}'
             ORDER BY days.caldate DESC, hymns.location, hymns.sequence";
         $result = mysql_query($sql) or die(mysql_error());
-        $row = mysql_fetch_assoc($result); 
+        $row = mysql_fetch_assoc($result);
         ?>
-        <form action="http://<?=$this_script?>?stage=2" method="POST"> 
+        <form action="http://<?=$this_script?>?stage=2" method="POST">
         <input type="submit" value="Commit"><input type="reset">
         <input type="hidden" id="id" name="id" value="<?=$_GET['id']?>">
         <dl>
             <dt>Date</dt>
             <dd>
-                <input type="text" id="date" name="date" 
+                <input type="text" id="date" name="date"
                  value="<?=$row['date']?>">
             </dd>
             <dt>Day Name</dt>
@@ -51,7 +51,7 @@ if (! array_key_exists("stage", $_GET))
         <tr><th>Del</th><th>Seq</th><th>Book</th><th>#</th><th>Note</th>
             <th>Location</th><th>Title</th></tr>
         <?
-        while ($row) 
+        while ($row)
         {
             ?>
             <tr>
@@ -64,11 +64,11 @@ if (! array_key_exists("stage", $_GET))
                         size="2" name="sequence_<?=$row['hymnid']?>"
                         value="<?=$row['sequence']?>">
                 </td>
-                <td> 
+                <td>
                     <select id="book_<?=$row['hymnid']?>" name="book_<?=$row['hymnid']?>">
                     <? foreach ($option_hymnbooks as $hymnbook) { ?>
-                        <option <? 
-                            if ($hymnbook == $row['book']) echo "selected"; 
+                        <option <?
+                            if ($hymnbook == $row['book']) echo "selected";
                                 ?>><?=$hymnbook?></option>
                     <? } ?>
                     </select>
@@ -76,20 +76,20 @@ if (! array_key_exists("stage", $_GET))
                 <td><input type="text" id="number_<?=$row['hymnid']?>" size="5"
                     name="number_<?=$row['hymnid']?>" value="<?=$row['number']?>">
                 </td>
-                <td><input type="text" id="note_<?=$row['hymnid']?>" size="30" 
-                     maxlength="100" name="note_<?=$row['hymnid']?>" 
+                <td><input type="text" id="note_<?=$row['hymnid']?>" size="30"
+                     maxlength="100" name="note_<?=$row['hymnid']?>"
                      value="<?=$row['note']?>">
                 </td>
                 <td><input type="text" id="location_<?=$row['hymnid']?>"
                     name="location_<?=$row['hymnid']?>" value="<?=$row['location']?>">
                 </td>
-                <td><input type="text" id="title_<?=$row['hymnid']?>" size="50" 
-                     maxlength="50" name="title_<?=$row['hymnid']?>" 
+                <td><input type="text" id="title_<?=$row['hymnid']?>" size="50"
+                     maxlength="50" name="title_<?=$row['hymnid']?>"
                      value="<?=$row['title']?>">
                 </td>
             </tr>
             <?
-            $row = mysql_fetch_assoc($result); 
+            $row = mysql_fetch_assoc($result);
         }
         ?>
         </table>
@@ -107,7 +107,7 @@ if (! array_key_exists("stage", $_GET))
     $todays = array();
     $todelete = array();
     $id = "";
-    foreach ($_POST as $key => $value) 
+    foreach ($_POST as $key => $value)
     {
         if (in_array($key, array("date", "dayname", "rite")))
         {
@@ -121,7 +121,7 @@ if (! array_key_exists("stage", $_GET))
             } else {
                 $tohymns[$matches[2]][$matches[1]] = $value;
             }
-        } 
+        }
     }
 
     // Update hymn names
@@ -156,7 +156,7 @@ if (! array_key_exists("stage", $_GET))
         if (in_array($hymnid, $todelete)) { continue; }
         $hymn = mysql_esc_array($h);
         $sql = "UPDATE hymns SET number='${hymn['number']}',
-            note='${hymn['note']}', location='${hymn['location']}', 
+            note='${hymn['note']}', location='${hymn['location']}',
             book='${hymn['book']}', sequence='${hymn['sequence']}'
             WHERE pkey = '${hymnid}'";
         mysql_query($sql) or die(mysql_error());

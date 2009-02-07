@@ -7,7 +7,7 @@ Installation
 
 - Note that there is no guarantee.  Make backups.  See COPYING.
 - Procure a webserver with PHP and mysql database access.
-- Upload and extract the application files to their own directory 
+- Upload and extract the application files to their own directory
 - Copy db-connection.php.sample to db-connection.php and edit it.
 - Point your web browser to http://domain.name/directory/setupdb.php
 - Use

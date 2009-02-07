@@ -4,7 +4,7 @@ $install_path = "/services/";
 
 // List of possible hymnbooks to draw from
 $option_hymnbooks = array(
-    "TLH", 
+    "TLH",
     "ELH"
 );
 

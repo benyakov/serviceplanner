@@ -3,7 +3,7 @@ require("functions.php");
 session_start();
 $this_script = $_SERVER['HTTP_HOST'].$_SERVER['SCRIPT_NAME'] ;
 
-function errormsg($msg) 
+function errormsg($msg)
 { // Head back to start with an error message.
     global $this_script;
     header("Location: http://${this_script}?error=".urlencode($msg));
@@ -14,11 +14,11 @@ function entered_hymns($ary)
 { // Process initially entered hymn form data into an array.
   // result is like this $array[item#][book|number|note] = value
     $entered_hymns = array();
-    foreach ($ary as $key => $value) 
+    foreach ($ary as $key => $value)
     {
-        if (preg_match('/^(book|number|note)_(\d)/', $key, $matches)) 
+        if (preg_match('/^(book|number|note)_(\d)/', $key, $matches))
         {
-            if (array_key_exists($matches[2], $entered_hymns)) 
+            if (array_key_exists($matches[2], $entered_hymns))
             {
                 $entered_hymns[$matches[2]][$matches[1]] = $value;
             } else {
@@ -29,7 +29,7 @@ function entered_hymns($ary)
     return $entered_hymns;
 }
 
-if (! array_key_exists('stage', $_GET)) 
+if (! array_key_exists('stage', $_GET))
 { # Initial entry form
     if (array_key_exists('stage1', $_SESSION))
     {
@@ -85,17 +85,17 @@ if (! array_key_exists('stage', $_GET))
     </form>
 </body>
 </html>
-<? 
+<?
 } elseif (2 == $_GET['stage']) {
     // Check for missing data
     // print_r($_GET); print_r($_POST); exit(0);
     require("options.php");
     $_SESSION['stage1'] = $_POST;
-    if (! (array_key_exists('date', $_POST) 
+    if (! (array_key_exists('date', $_POST)
             && $_POST['date'])) {
         errormsg("Please enter a date.");
     }
-    if (! (array_key_exists('location', $_POST) 
+    if (! (array_key_exists('location', $_POST)
             && $_POST['location'])) {
         errormsg("Please enter a location.");
     }
@@ -128,12 +128,12 @@ if (! array_key_exists('stage', $_GET))
         WHERE days.caldate = '${date}'";
     $result = mysql_query($sql) or die(mysql_error());
     echo "<ul>\n";
-    if (mysql_fetch_row($result)) 
+    if (mysql_fetch_row($result))
     {
         /// Service already entered.  Ask if entered hymns s/b appended
         // Get the max sequence number at this location
         $sql = "SELECT MAX(hymns.sequence) as maxseq
-            FROM hymns JOIN days ON (hymns.service = days.pkey) 
+            FROM hymns JOIN days ON (hymns.service = days.pkey)
             WHERE days.caldate = '${date}'
                 AND hymns.location = '${location}'
             GROUP BY (hymns.service)";
@@ -142,25 +142,25 @@ if (! array_key_exists('stage', $_GET))
         $maxseq = $row[0];
         // Get the list of entered hymns for this date, all services/locations.
         $sql = "SELECT hymns.book, hymns.number, hymns.note, hymns.location,
-            days.name as dayname, days.rite, days.pkey as service, 
+            days.name as dayname, days.rite, days.pkey as service,
             names.title
-            FROM hymns JOIN days ON (hymns.service = days.pkey) 
-            LEFT JOIN names ON (hymns.number = names.number 
-                AND hymns.book = names.book) 
-            WHERE days.caldate = '${date}' 
+            FROM hymns JOIN days ON (hymns.service = days.pkey)
+            LEFT JOIN names ON (hymns.number = names.number
+                AND hymns.book = names.book)
+            WHERE days.caldate = '${date}'
             ORDER BY dayname, location";
         $result = mysql_query($sql) or die(mysql_error());
         $dayname = "";
-        while ($row = mysql_fetch_assoc($result)) 
+        while ($row = mysql_fetch_assoc($result))
         {
-            if ($dayname != $row['dayname']) 
+            if ($dayname != $row['dayname'])
             {
                 if ("" != $dayname) echo "</li>"; // close prior <li>
-                echo "<li><input type=\"radio\" name=\"services\" 
-                    value=\"${row['service']}_${maxseq}\"> 
+                echo "<li><input type=\"radio\" name=\"services\"
+                    value=\"${row['service']}_${maxseq}\">
                     Add to '${row['dayname']}' using '${row['rite']}'\n";
                 $dayname = $row['dayname'];
-            } 
+            }
             echo "<p class=\"hymnlist\">${row['location']}: ".
                 "${row['book']} ${row['number']} ".
                 "${row['note']} <em>${row['title']}</em></p>\n" ;
@@ -175,10 +175,10 @@ if (! array_key_exists('stage', $_GET))
     $entered_hymns = entered_hymns($_POST);
     // Output array to confirm/enter hymn titles
     echo "<ul>\n";
-    foreach ($entered_hymns as $hymn) 
+    foreach ($entered_hymns as $hymn)
     {
         if (! $hymn['number']) { continue; }
-        $sql = "SELECT title FROM names 
+        $sql = "SELECT title FROM names
             WHERE number = '${hymn['number']}'
             AND book = '${hymn['book']}'";
         $result = mysql_query($sql) or die(mysql_error());
@@ -189,7 +189,7 @@ if (! array_key_exists('stage', $_GET))
         } else {
             if (array_key_exists('stage2', $_SESSION)
                 && array_key_exists("${hymn['book']}_${hymn['number']}",
-                $_SESSION['stage2'])) 
+                $_SESSION['stage2']))
             {
                 $title = $_SESSION['stage2']["${hymn['book']}_${hymn['number']}"];
             } else {
@@ -231,7 +231,7 @@ if (! array_key_exists('stage', $_GET))
     require("db-connection.php");
     require("options.php");
     //// Add a new service, if needed.
-?> 
+?>
     <html><?=html_head("Results")?>
     <body>
     <p><a href="records.php">See Records</a> |
@@ -245,11 +245,11 @@ if (! array_key_exists('stage', $_GET))
     if (! array_key_exists("services", $_POST)) {
         errormsg("Forgot to choose a service. Please try again.");
     }
-    if ("new" == $_POST["services"]) 
+    if ("new" == $_POST["services"])
     {
         $dayname = mysql_esc($_SESSION['stage1']['liturgical_name']);
         $rite = mysql_esc($_SESSION['stage1']['rite']);
-        $sql = "INSERT INTO days (caldate, name, rite) 
+        $sql = "INSERT INTO days (caldate, name, rite)
             VALUES ('${date}', '${dayname}', '${rite}')";
         mysql_query($sql) or die(mysql_error());
         // Grab the pkey of the newly inserted row.
@@ -270,7 +270,7 @@ if (! array_key_exists('stage', $_GET))
     // Build an array of hymnbook_hymnnumber items from $_POST
     $hymns = array();
     $altbooks = implode("|", $option_hymnbooks);
-    foreach ($_POST as $key => $value) 
+    foreach ($_POST as $key => $value)
     {
         if (preg_match("/(${altbooks})_(\d+)/", $key, $matches))
         {
@@ -278,7 +278,7 @@ if (! array_key_exists('stage', $_GET))
         }
     }
     // Insert each hymn
-    foreach ($hymns as $ahymn) 
+    foreach ($hymns as $ahymn)
     {
         $h = mysql_esc_array($ahymn);
         // Check to see if the hymn is already entered.
@@ -292,7 +292,7 @@ if (! array_key_exists('stage', $_GET))
             $sql = "UPDATE names SET title='${h[2]}'
                 WHERE book='${h[0]}' AND number='${h[1]}'";
             mysql_query($sql) or die(mysql_error());
-            if (mysql_affected_rows()) 
+            if (mysql_affected_rows())
             {
                 ?><li>Updated name '<?=$h[2]?>' for <?="${h[0]} ${h[1]}"?>.</li>
             <?
