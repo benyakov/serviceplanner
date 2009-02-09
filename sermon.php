@@ -38,7 +38,8 @@ if (! array_key_exists('stage', $_GET)) {
         </form>
         <h2>Hymns for This Service</h2>
         <p class="explanation">Hymns are grouped by location.
-        Deleting the service at any location will delete hymns at all locations.
+        Deleting the service at any location will delete this sermon plan,
+        as well as all associated hymns at every location.
         To delete only certain hymns,
         <a href="edit.php?id=<?=$id?>">edit the service</a>.</p>
     <?

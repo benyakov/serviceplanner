@@ -44,4 +44,12 @@ textarea#notes {
 input.entryline {
     margin: 1ex;
 }
-
+tr.table_topline td {
+    border-top: thin solid black;
+}
+.table_leftborder {
+    border-left: thin solid black;
+}
+.table_preformat {
+    padding: 1ex;
+}

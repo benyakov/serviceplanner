@@ -1,7 +1,1 @@
-- Add finish the interface for sermon planning:
-    - sermon.php for editing/seeing a single one with other service plans
-        with a link to edit the hymns instead
-    - sermons.php for seeing a list of what's there,
-        with links to edit the sermon plan or the hymns,
-        or to create a new sermon plan for an existing or new service.
 - Use the CSS-tabbed interface from the calendar for page switching.
