@@ -1,6 +1,55 @@
-<html><head><title>Sermon</title></head>
+<?
+require("functions.php");
+require("db-connection.php");
+$this_script = $_SERVER['HTTP_HOST'].$_SERVER['SCRIPT_NAME'] ;
+?>
+<html>
+<?=html_head("Edit a Sermon Plan")?>
 <body>
-<h1>Under Construction... </h1>
-<p>Edit plans for a particular sermon.</p>
+    <? if ($_GET['message']) { ?>
+        <p class="message"><?=htmlspecialchars($_GET['message'])?></p>
+    <? } ?>
+    <p><a href="records.php">Browse Records Records</a></p>
+    <p><a href="enter.php">Enter New Service Records</a></p>
+    <p><a href="modify.php">Modify Service Records</a></p>
+    <p><a href="hymns.php">Upcoming Hymns</a></p>
+    <h1>Edit a Sermon Plan</h1>
+<?
+    $sql = "SELECT bibletext, outline, notes
+        FROM sermons WHERE service='${_GET['id']}'";
+    $result = mysql_query($sql) or die(mysql_error());
+    $row = mysql_fetch_assoc($result);
+?>
+    <form action="http://<?=$this_script?>?stage=2" method="POST">
+    <p>
+    <label for="bibletext">Text:</label>
+    <input type="text" id="bibletext" name="bibletext"
+    size="80" maxlength="80"><br />
+    <label for="outline">Outline:</label><br />
+    <textarea id="outline" name="outline">
+        <?=$row['outline']?>
+    </textarea><br />
+    <label for="notes">Notes:</label><br />
+    <textarea id="notes" name="notes">
+        <?=$row['notes']?>
+    </textarea><br />
+    <input type="submit" value="Commit"><input type="reset">
+    </form>
+    <h2>Hymns for This Service</h2>
+<?
+$id = mysql_esc($_GET['id']);
+$sql = "SELECT DATE_FORMAT(days.caldate, '%e %b %Y') as date,
+    hymns.book, hymns.number, hymns.note, hymns.location,
+    days.name as dayname, days.rite, names.title
+    FROM hymns LEFT OUTER JOIN days ON (hymns.service = days.pkey)
+    LEFT OUTER JOIN names ON (hymns.number = names.number)
+    AND (hymns.book = names.book)
+    WHERE days.pkey = '${id}'
+    ORDER BY days.caldate DESC, hymns.location, hymns.sequence";
+$result = mysql_query($sql) or die(mysql_error()) ;
+modify_records_table($result, "delete.php");
+?>
+
+
 </body>
 </html>

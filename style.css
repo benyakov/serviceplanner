@@ -24,3 +24,10 @@ tr.heading {
     background-color: #DDD;
     color: black;
 }
+
+textarea#outline,
+textarea#notes {
+    height: 8em;
+    width: 72em;
+}
+

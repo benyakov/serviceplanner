@@ -6,7 +6,7 @@ require("db-connection.php");
 <?=html_head("Modify Service Planning Records")?>
 <body>
     <? if ($_GET['message']) { ?>
-        <p class="message"><?=$_GET['message']?></p>
+        <p class="message"><?=htmlspecialchars($_GET['message'])?></p>
     <? } ?>
     <p><a href="records.php">Browse Records</a></p>
     <p><a href="enter.php">Enter New Records</a></p>

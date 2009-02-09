@@ -45,7 +45,7 @@ if (! array_key_exists('stage', $_GET))
     <p><a href="records.php">Records</a><p>
 
     <? if ($_GET['error']) { ?>
-        <p class="errormessage"><?=$_GET['error']?></p>
+        <p class="errormessage"><?=htmlspecialchars($_GET['error'])?></p>
     <? } ?>
     <h1>Service Entry Form</h1>
     <form action="http://<?=$this_script.'?stage=2'?>" method="POST">
@@ -108,7 +108,7 @@ if (! array_key_exists('stage', $_GET))
     <?=html_head("Confirmation (Entry Step 2)")?>
     <body>
     <? if ($_GET['error']) { ?>
-        <p class="errormessage"><?=$_GET['error']?></p>
+        <p class="errormessage"><?=htmlspecialchars($_GET['error'])?></p>
     <? } ?>
     <p><a href="enter.php">Back to start</a></p>
     <h1>Confirmation (Entry Step 2)</h1>
