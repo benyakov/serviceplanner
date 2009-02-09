@@ -73,9 +73,12 @@ function modify_records_table($result, $action)
 function html_head ($title)
 {
     require_once("options.php");
-    return ("<head>
+    return ("
+    <head>
     <title>${title}</title>
-    <link type=\"text/css\" rel=\"stylesheet\" href=\"${install_path}style.css\"> </head>");
+    <link type=\"text/css\" rel=\"stylesheet\" href=\"${install_path}style.css\">
+    <link type=\"text/css\" rel=\"stylesheet\" media=\"print\" href=\"${install_path}print.css\">
+    </head>");
 }
 
 function mysql_esc_array($ary)

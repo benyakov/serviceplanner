@@ -15,6 +15,7 @@ if (! array_key_exists('stage', $_GET)) {
         <p><a href="enter.php">Enter New Service Records</a></p>
         <p><a href="modify.php">Modify Service Records</a></p>
         <p><a href="hymns.php">Upcoming Hymns</a></p>
+        <p><a href="sermonreport.php?id=<?=${id}?>">Sermon Report</a></p>
         <h1>Edit a Sermon Plan</h1>
     <?
         $sql = "SELECT bibletext, outline, notes
