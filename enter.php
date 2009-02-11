@@ -142,8 +142,12 @@ if (! array_key_exists('stage', $_GET))
                 AND hymns.location = '${location}'
             GROUP BY (hymns.service)";
         $result = mysql_query($sql) or die(mysql_error());
-        $row = mysql_fetch_array($result);
-        $maxseq = $row[0];
+        if ($row = mysql_fetch_array($result))
+        {
+            $maxseq = $row[0];
+        } else {
+            $maxseq = 0;
+        }
         // Get the list of entered hymns for this date, all services/locations.
         $sql = "SELECT hymns.book, hymns.number, hymns.note, hymns.location,
             days.name as dayname, days.rite, days.pkey as service,
@@ -239,6 +243,7 @@ if (! array_key_exists('stage', $_GET))
 ?>
     <html><?=html_head("Results")?>
     <body>
+    <div id="content_container">
     <p><a href="records.php">See Records</a> |
         <a href="enter.php">Enter another service</a></p>
     <h1>Results</h1>
@@ -327,6 +332,7 @@ if (! array_key_exists('stage', $_GET))
         <ol><li><?=implode("</li><li>", $saved)?></li></ol>
       </li>
     </ol>
+    </div>
 </body>
 </html>
 <?
