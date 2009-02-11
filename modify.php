@@ -1,6 +1,8 @@
 <?
 require("functions.php");
 require("db-connection.php");
+require("options.php");
+$script_basename = basename($_SERVER['SCRIPT_NAME'], ".php") ;
 ?>
 <html>
 <?=html_head("Modify Service Planning Records")?>
@@ -8,9 +10,8 @@ require("db-connection.php");
     <? if ($_GET['message']) { ?>
         <p class="message"><?=htmlspecialchars($_GET['message'])?></p>
     <? } ?>
-    <p><a href="records.php">Browse Records</a></p>
-    <p><a href="enter.php">Enter New Records</a></p>
-    <p><a href="hymns.php">Upcoming Hymns</a></p>
+    <?=sitetabs($sitetabs, $script_basename)?>
+    <div id="content_container">
 <h1>Modify Service Planning Records</h1>
 <p class="explanation">Hymns are grouped by location.  Deleting the service at
 any location will delete hymns at all locations for that service.  To delete
@@ -26,5 +27,6 @@ $sql = "SELECT DATE_FORMAT(days.caldate, '%e %b %Y') as date,
 $result = mysql_query($sql) or die(mysql_error()) ;
 modify_records_table($result, "delete.php");
 ?>
+</div>
 </body>
 </html>

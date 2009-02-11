@@ -11,11 +11,10 @@ if (! array_key_exists('stage', $_GET)) {
         <? if ($_GET['message']) { ?>
             <p class="message"><?=htmlspecialchars($_GET['message'])?></p>
         <? } ?>
-        <p><a href="records.php">Browse Records Records</a></p>
-        <p><a href="enter.php">Enter New Service Records</a></p>
-        <p><a href="modify.php">Modify Service Records</a></p>
-        <p><a href="hymns.php">Upcoming Hymns</a></p>
-        <p><a href="sermonreport.php?id=<?=${id}?>">Sermon Report</a></p>
+        <div id="content_container">
+        <p><a href="sermonreport.php?id=<?=${id}?>">Printable Sermon Report</a>
+        | <a href="sermons.php">Browse All Sermon Plans</a>
+        | <a href="modify.php">Back to Service Listing</a></p>
         <h1>Edit a Sermon Plan</h1>
     <?
         $sql = "SELECT bibletext, outline, notes
@@ -54,6 +53,7 @@ if (! array_key_exists('stage', $_GET)) {
     $result = mysql_query($sql) or die(mysql_error()) ;
     modify_records_table($result, "delete.php");
     ?>
+    </div>
     </body>
     </html>
 <?

@@ -4,16 +4,15 @@ require("db-connection.php");
 require("functions.php");
 require("options.php");
 $this_script = $_SERVER['HTTP_HOST'].$_SERVER['SCRIPT_NAME'] ;
-html_head("Edit a Service");
+echo html_head("Edit a Service");
 if (! array_key_exists("stage", $_GET))
 {
+    $backlink = "modify.php";
     ?>
     <body>
     <h1>Edit a Service</h1>
-        <p><a href="records.php">Records</a><p>
-        <p><a href="enter.php">Enter New Records</a></p>
-        <p><a href="modify.php">Modify Records</a></p>
-        <p><a href="hymns.php">Upcoming Hymns</a></p>
+    <div id="content_container">
+    <p><a href="<?=$backlink?>">Cancel Edit</a><p>
     <?
         $sql = "SELECT DATE_FORMAT(days.caldate, '%e %b %Y') as date,
             hymns.book, hymns.number, hymns.note, hymns.pkey as hymnid,
@@ -95,6 +94,8 @@ if (! array_key_exists("stage", $_GET))
         </table>
         <input type="submit" value="Commit"><input type="reset">
         </form>
+        <p><a href="<?=$backlink?>">Cancel Edit</a><p>
+        </div>
     </body>
     </html>
     <?

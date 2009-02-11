@@ -1,7 +1,9 @@
 <?php
 require("functions.php");
+require("options.php");
 session_start();
 $this_script = $_SERVER['HTTP_HOST'].$_SERVER['SCRIPT_NAME'] ;
+$script_basename = basename($_SERVER['SCRIPT_NAME'], ".php") ;
 
 function errormsg($msg)
 { // Head back to start with an error message.
@@ -42,11 +44,11 @@ if (! array_key_exists('stage', $_GET))
 <html>
 <?=html_head("Service Entry Form: ${this_script}")?>
 <body>
-    <p><a href="records.php">Records</a><p>
-
     <? if ($_GET['error']) { ?>
         <p class="errormessage"><?=htmlspecialchars($_GET['error'])?></p>
     <? } ?>
+    <?=sitetabs($sitetabs, $script_basename)?>
+    <div id="content_container">
     <h1>Service Entry Form</h1>
     <form action="http://<?=$this_script.'?stage=2'?>" method="POST">
     <ul>
@@ -83,6 +85,7 @@ if (! array_key_exists('stage', $_GET))
     </ol>
     <input type="submit" value="Send"><input type="reset">
     </form>
+    </div>
 </body>
 </html>
 <?
@@ -111,6 +114,7 @@ if (! array_key_exists('stage', $_GET))
         <p class="errormessage"><?=htmlspecialchars($_GET['error'])?></p>
     <? } ?>
     <p><a href="enter.php">Back to start</a></p>
+    <div id="content_container">
     <h1>Confirmation (Entry Step 2)</h1>
     <dl>
         <dt>Date</dt><dd><?=$_POST['date']?></dd>
@@ -222,6 +226,7 @@ if (! array_key_exists('stage', $_GET))
     </table>
     <input type="submit" value="Send"><input type="reset">
     </form>
+    </div>
     </body>
     </html>
     <?

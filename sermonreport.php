@@ -5,11 +5,10 @@ require("db-connection.php");
     <html>
     <?=html_head("Edit a Sermon Plan")?>
     <body>
+        <div id="content_container">
         <span class="nonprinting">
-        <p><a href="records.php">Browse Records Records</a></p>
-        <p><a href="enter.php">Enter New Service Records</a></p>
-        <p><a href="modify.php">Modify Service Records</a></p>
-        <p><a href="hymns.php">Upcoming Hymns</a></p>
+        <p><a href="sermon.php?id=<?=$_GET['id']?>">Edit This Plan</a>
+        | <a href="sermons.php">Browse All Sermon Plans</a></p>
         </span>
         <h1>Sermon Plan</h1>
     <?
@@ -35,5 +34,6 @@ require("db-connection.php");
             <dt>Notes<dt>
             <dd><pre><?=$row['notes']?></pre></dd>
         </dl>
+        </div>
     </body>
 </html>

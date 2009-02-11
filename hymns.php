@@ -5,7 +5,9 @@ require("db-connection.php");
 <html>
 <?=html_head("Upcoming Hymns")?>
 <body>
+
 <h1>Upcoming Hymns</h1>
+<div id="content_container">
 <?php
 $sql = "SELECT DATE_FORMAT(days.caldate, '%e %b %Y') as date,
     hymns.book, hymns.number, hymns.note, hymns.location,
@@ -19,5 +21,6 @@ $sql = "SELECT DATE_FORMAT(days.caldate, '%e %b %Y') as date,
 $result = mysql_query($sql) or die(mysql_error()) ;
 display_records_table($result);
 ?>
+</div>
 </body>
 </html>

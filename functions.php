@@ -2,7 +2,7 @@
 
 function display_records_table($result)
 { // Show a table of the data in the query $result
-    ?><table>
+    ?><table id="records_listing">
         <tr class="heading"><th>Date &amp; Location</th><th colspan=3>Liturgical Day Name: Service/Rite</th></tr>
         <tr><td>&nbsp;</td><th>Book &amp; #</th><th>Note</th><th>Title</th></tr>
     <?
@@ -35,7 +35,7 @@ function modify_records_table($result, $action)
   // with links to edit each record, and checkboxes to delete records.
     ?><form action="<?=$action?>" method="POST">
       <input type="submit" value="Delete"><input type="reset" value="Clear">
-      <table>
+      <table id="modify_listing">
         <tr class="heading"><th>Date &amp; Location</th><th colspan=3>Liturgical Day Name: Service/Rite</th></tr>
         <tr><td>&nbsp;</td><th>Book &amp; #</th><th>Note</th><th>Title</th></tr>
     <?
@@ -70,7 +70,7 @@ function modify_records_table($result, $action)
     <?
 }
 
-function html_head ($title)
+function html_head($title)
 {
     require_once("options.php");
     return ("
@@ -91,5 +91,22 @@ function mysql_esc($str)
     return mysql_real_escape_string($str);
 }
 
+function sitetabs($sitetabs, $action) {
+    $tabs = array_fill_keys(array_keys($sitetabs), 0);
+    $tabs[$action] = 1;
+    echo "<div id=\"sitetabs_background\">";
+    echo "<ul id=\"sitetabs\">\n<li class=\"sitetabs-spacer\">&nbsp;</li>";
+    foreach ($tabs as $name => $activated) {
+        if ($activated) {
+            $class = ' class="activated"';
+        } else {
+            $class = "";
+        }
+        $tabtext = $sitetabs[$name];
+        echo "<li$class><a href=\"${name}.php\">$tabtext</a></li>\n";
+        echo "<li class=\"sitetabs-spacer\">&nbsp;</li>";
+    }
+    echo "</ul></div>\n";
+}
 
 ?>

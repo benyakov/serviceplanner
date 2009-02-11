@@ -1,3 +1,9 @@
+body {
+    padding-top: 0;
+    background-color: black;
+    color: white;
+}
+
 ul.odd { background-color: #FFF; }
 ul.even { background-color: #EEE; }
 p.hymnlist {
@@ -44,6 +50,24 @@ textarea#notes {
 input.entryline {
     margin: 1ex;
 }
+
+div#content_container {
+    border: thin solid black;
+    border-top: none;
+    margin-top: 0;
+    padding-top: 0;
+    padding: 1ex;
+    background-color: white;
+    color: black;
+}
+
+table#modify_listing,
+table#records_listing,
+table#sermonplan_listing {
+    background-color: transparent;
+    color: black;
+}
+
 tr.table_topline td {
     border-top: thin solid black;
 }
@@ -53,3 +77,47 @@ tr.table_topline td {
 .table_preformat {
     padding: 1ex;
 }
+
+/**** site tabs ****/
+
+ul#sitetabs {
+    font-size: 10pt; font-family: sans-serif;
+    font-weight: bold;
+    display: table;
+    margin: 0pt; padding: 0pt;
+    background-color: black;
+    width: 100%;
+}
+ul#sitetabs A {
+    text-decoration: none; color: black;
+    display: block;
+    width: 100%; text-align: center;
+}
+ul#sitetabs > li {
+    display: table-cell; display: table-cell;
+    margin: 0pt;
+    padding-bottom: 0pt;
+    text-align: center;
+    border: 2px solid #888;
+    color: #555;
+    background-color: #BBB;
+}
+ul#sitetabs > li.sitetabs-spacer  {
+    border: none;
+    border-bottom: 2px solid #888;
+    background-color: transparent;
+    width: 1em;
+}
+ul#sitetabs > li.activated   {
+    border-bottom: none;
+    color: black;
+    background-color: white;
+}
+div#sitetabs_background {
+    background-color: black;
+    padding-top: 1ex;
+    padding-bottom: 0;
+    border: none;
+    margin: 0;
+}
+

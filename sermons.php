@@ -2,6 +2,8 @@
 <?
 require("functions.php");
 require("db-connection.php");
+require("options.php");
+$script_basename = basename($_SERVER['SCRIPT_NAME'], ".php") ;
 echo html_head("Sermon Plans");
 $sql = "SELECT sermons.bibletext, sermons.outline, sermons.notes,
     sermons.service, DATE_FORMAT(days.caldate, '%e %b %Y') as date,
@@ -10,12 +12,10 @@ $sql = "SELECT sermons.bibletext, sermons.outline, sermons.notes,
 $result = mysql_query($sql) or die(mysql_error());
 ?>
 <body>
-    <p><a href="records.php">Browse Records Records</a></p>
-    <p><a href="enter.php">Enter New Service Records</a></p>
-    <p><a href="modify.php">Modify Service Records</a></p>
-    <p><a href="hymns.php">Upcoming Hymns</a></p>
+    <?=sitetabs($sitetabs, $script_basename)?>
+    <div id="content_container">
     <h1>Sermon Plans</h1>
-    <table>
+    <table id="sermonplan_listing">
     <tr class="heading"><th>Date</th><th>Day</th><th>Text</th><th>Rite</th></tr>
     <tr class="heading"><th colspan="3">Outline</th><th>Notes</th></tr>
     <?
@@ -37,5 +37,6 @@ while ($row = mysql_fetch_assoc($result))
 }
 ?>
     </table>
+    </div>
 </body>
 </html>

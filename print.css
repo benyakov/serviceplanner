@@ -1,3 +1,18 @@
+body {
+    color: black;
+    background-color: white;
+}
+
 .nonprinting {
     display: none;
 }
+
+ul#sitetabs,
+div#sitetabs_background {
+    display: none;
+}
+
+div#content_container {
+    border: none;
+}
+
