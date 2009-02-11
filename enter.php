@@ -102,10 +102,6 @@ if (! array_key_exists('stage', $_GET))
             && $_POST['location'])) {
         errormsg("Please enter a location.");
     }
-    if (! (array_key_exists('liturgical_name', $_POST)
-            && $_POST['liturgical_name'])) {
-        errormsg("Please enter a liturgical name.");
-    }
     ?>
     <html>
     <?=html_head("Confirmation (Entry Step 2)")?>
