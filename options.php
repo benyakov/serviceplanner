@@ -1,6 +1,8 @@
 <?
 // Path from web server's document root where this is installed.
-$install_path = "/services/";
+// This is only needed if you symlink to hymns.php or servicerecords.php
+// from another place in your webserver's document tree.
+$install_path = "";
 
 // List of possible hymnbooks to draw from
 $option_hymnbooks = array(
