@@ -6,29 +6,41 @@ $dumpfile="createtables.sql";
 //$result = system($cmdline, $return);
 $dumplines = file($dumpfile, FILE_IGNORE_NEW_LINES);
 // Separate SQL statements into an array.
+$query = array();
 $queries = array();
 foreach ($dumplines as $line)
 {
     if (preg_match('/^CREATE/', $line)) // A new query
     {
-        if ($count($queries))
+        if (count($query) > 0)
         {
-            array_push($queries, implode(" ", $query));
-            $query = array();
+            $queries[] = implode("\n", $query);
         }
-        array_push($query,
-            // If needed, add a prefix to the table names
-            preg_replace(
-                    array(
-                        '/^(CREATE TABLE `)([^`]+)',
-                        '/(REFERENCES `)([^`]+)'
-                    ), "\\1${dbp}\\2", $line));
+        $query = array();
     }
+    // If needed, add a prefix to the table names
+    $query[] = preg_replace(
+                array(
+                    '/^(CREATE TABLE `)([^`]+)/',
+                    '/(REFERENCES `)([^`]+)/',
+                    '/(CONSTRAINT `)([^`]+)/'
+                ), "\\1${dbp}\\2", $line);
 }
-array_push($queries, implode(" ", $query));
+$queries[] = implode("\n", $query);
 // Execute each SQL query.
 foreach ($queries as $query) {
-    mysql_query($query) or die(mysql_error());
+    $result = mysql_query($query);
+    if (! $result)
+    {
+        ?>
+        <html><head><title>Setup Failed</title></head>
+        <body><h1>Setup Failed</h1>
+        <p>Failed SQL Query:</p>
+        <pre><?=$query?></pre>
+        </body></html>
+        <?
+        exit(1);
+    }
 }
 
 header("Location: records.php?message=".urlencode("Setup succeeded."));
