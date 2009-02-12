@@ -24,7 +24,7 @@ $option_used_history = 5;
 $sitetabs = array(
     "records"=>"Service Records"
     ,"modify"=>"Modify Services"
-    ,"enter"=>"Enter New Service"
+    ,"enter"=>"Add Service/Hymns"
     ,"sermons"=>"Sermon Plans"
     ,"admin"=>"Housekeeping"
 );

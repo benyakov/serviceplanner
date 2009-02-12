@@ -12,10 +12,12 @@ require("db-connection.php");
         </span>
         <h1>Sermon Plan</h1>
     <?
-        $sql = "SELECT sermons.bibletext, sermons.outline, sermons.notes,
-            DATE_FORMAT(days.caldate, '%e %b %Y') as date,
-            days.name, days.rite
-            FROM sermons JOIN days ON (sermons.service=days.pkey)
+        $sql = "SELECT ${dbp}sermons.bibletext, ${dbp}sermons.outline,
+            ${dbp}sermons.notes,
+            DATE_FORMAT(${dbp}days.caldate, '%e %b %Y') as date,
+            ${dbp}days.name, ${dbp}days.rite
+            FROM ${dbp}sermons
+                JOIN ${dbp}days ON (${dbp}sermons.service=${dbp}days.pkey)
             WHERE service='${_GET['id']}'";
         $result = mysql_query($sql) or die(mysql_error());
         $row = mysql_fetch_assoc($result);

@@ -40,6 +40,12 @@ if (! array_key_exists('stage', $_GET))
         $s = array();
     }
     require("options.php");
+    if (array_key_exists("date", $_GET))
+    {
+        $date = $_GET['date'];
+    } else {
+        $date = $s['date'];
+    }
 ?>
 <html>
 <?=html_head("Service Entry Form: ${this_script}")?>
@@ -54,7 +60,7 @@ if (! array_key_exists('stage', $_GET))
     <ul>
     <li>
         <label for="date">Date (as DDMonYYYY):</label>
-        <input type="text" id="date" name="date" value="<?=$s['date']?>">
+        <input type="text" id="date" name="date" value="<?=$date?>">
     </li>
     <li>
         <label for="location">Location:</label>
@@ -124,19 +130,21 @@ if (! array_key_exists('stage', $_GET))
     $location = mysql_esc($_POST['location']);
     $date = strftime("%Y-%m-%d", strtotime($_POST['date']));
     $_SESSION['stage1']['date'] = $date;
-    $sql = "SELECT 1 FROM hymns JOIN days ON (hymns.service = days.pkey)
-        WHERE days.caldate = '${date}'";
+    $sql = "SELECT 1 FROM ${dbp}hymns
+        JOIN ${dbp}days ON (${dbp}hymns.service = ${dbp}days.pkey)
+        WHERE ${dbp}days.caldate = '${date}'";
     $result = mysql_query($sql) or die(mysql_error());
     echo "<ul>\n";
     if (mysql_fetch_row($result))
     {
         /// Service already entered.  Ask if entered hymns s/b appended
         // Get the max sequence number at this location
-        $sql = "SELECT MAX(hymns.sequence) as maxseq
-            FROM hymns JOIN days ON (hymns.service = days.pkey)
-            WHERE days.caldate = '${date}'
-                AND hymns.location = '${location}'
-            GROUP BY (hymns.service)";
+        $sql = "SELECT MAX(${dbp}hymns.sequence) as maxseq
+            FROM ${dbp}hymns JOIN ${dbp}days
+            ON (${dbp}hymns.service = ${dbp}days.pkey)
+            WHERE ${dbp}days.caldate = '${date}'
+                AND ${dbp}hymns.location = '${location}'
+            GROUP BY (${dbp}hymns.service)";
         $result = mysql_query($sql) or die(mysql_error());
         if ($row = mysql_fetch_array($result))
         {
@@ -145,13 +153,14 @@ if (! array_key_exists('stage', $_GET))
             $maxseq = 0;
         }
         // Get the list of entered hymns for this date, all services/locations.
-        $sql = "SELECT hymns.book, hymns.number, hymns.note, hymns.location,
-            days.name as dayname, days.rite, days.pkey as service,
-            names.title
-            FROM hymns JOIN days ON (hymns.service = days.pkey)
-            LEFT JOIN names ON (hymns.number = names.number
-                AND hymns.book = names.book)
-            WHERE days.caldate = '${date}'
+        $sql = "SELECT ${dbp}hymns.book, ${dbp}hymns.number, ${dbp}hymns.note,
+            ${dbp}hymns.location, ${dbp}days.name as dayname, ${dbp}days.rite,
+            ${dbp}days.pkey as service, ${dbp}names.title
+            FROM ${dbp}hymns
+            JOIN ${dbp}days ON (${dbp}hymns.service = ${dbp}days.pkey)
+            LEFT JOIN ${dbp}names ON (${dbp}hymns.number = ${dbp}names.number
+                AND ${dbp}hymns.book = ${dbp}names.book)
+            WHERE ${dbp}days.caldate = '${date}'
             ORDER BY dayname, location";
         $result = mysql_query($sql) or die(mysql_error());
         $dayname = "";
@@ -182,7 +191,7 @@ if (! array_key_exists('stage', $_GET))
     foreach ($entered_hymns as $hymn)
     {
         if (! $hymn['number']) { continue; }
-        $sql = "SELECT title FROM names
+        $sql = "SELECT title FROM ${dbp}names
             WHERE number = '${hymn['number']}'
             AND book = '${hymn['book']}'";
         $result = mysql_query($sql) or die(mysql_error());
@@ -255,7 +264,7 @@ if (! array_key_exists('stage', $_GET))
     {
         $dayname = mysql_esc($_SESSION['stage1']['liturgical_name']);
         $rite = mysql_esc($_SESSION['stage1']['rite']);
-        $sql = "INSERT INTO days (caldate, name, rite)
+        $sql = "INSERT INTO ${dbp}days (caldate, name, rite)
             VALUES ('${date}', '${dayname}', '${rite}')";
         mysql_query($sql) or die(mysql_error());
         // Grab the pkey of the newly inserted row.
@@ -288,14 +297,14 @@ if (! array_key_exists('stage', $_GET))
     {
         $h = mysql_esc_array($ahymn);
         // Check to see if the hymn is already entered.
-        $sql = "INSERT INTO names (book, number, title)
+        $sql = "INSERT INTO ${dbp}names (book, number, title)
             VALUES ('${h[0]}', '${h[1]}', '${h[2]}')";
         if (mysql_query($sql))
         {
             ?><li>Saved name '<?=$h[2]?>' for <?="${h[0]} ${h[1]}"?>.</li>
             <?
         } else {
-            $sql = "UPDATE names SET title='${h[2]}'
+            $sql = "UPDATE ${dbp}names SET title='${h[2]}'
                 WHERE book='${h[0]}' AND number='${h[1]}'";
             mysql_query($sql) or die(mysql_error());
             if (mysql_affected_rows())
@@ -321,7 +330,8 @@ if (! array_key_exists('stage', $_GET))
             '${hymn['number']}', '${hymn['note']}', '${realsequence}')";
         $saved[] = "${ahymn['book']} ${ahymn['number']} (${hymn['note']})";
     }
-    $sql = "INSERT INTO hymns (service, location, book, number, note, sequence)
+    $sql = "INSERT INTO ${dbp}hymns
+        (service, location, book, number, note, sequence)
         VALUES ".implode(", ", $sqlhymns);
     mysql_query($sql) or die(mysql_error());
     ?><li>Saved hymns :

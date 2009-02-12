@@ -17,13 +17,16 @@ $script_basename = basename($_SERVER['SCRIPT_NAME'], ".php") ;
 any location will delete hymns at all locations for that service.  To delete
 only certain hymns, edit the service.</p>
 <?php
-$sql = "SELECT DATE_FORMAT(days.caldate, '%e %b %Y') as date,
-    hymns.book, hymns.number, hymns.note, hymns.location,
-    days.name as dayname, days.rite, days.pkey as id, names.title
-    FROM hymns LEFT OUTER JOIN days ON (hymns.service = days.pkey)
-    LEFT OUTER JOIN names ON (hymns.number = names.number)
-    AND (hymns.book = names.book)
-    ORDER BY days.caldate DESC, hymns.location, hymns.sequence";
+$sql = "SELECT DATE_FORMAT(${dbp}days.caldate, '%e %b %Y') as date,
+    ${dbp}hymns.book, ${dbp}hymns.number, ${dbp}hymns.note,
+    ${dbp}hymns.location, ${dbp}days.name as dayname, ${dbp}days.rite,
+    ${dbp}days.pkey as id, ${dbp}names.title
+    FROM ${dbp}hymns
+    LEFT OUTER JOIN ${dbp}days ON (${dbp}hymns.service = ${dbp}days.pkey)
+    LEFT OUTER JOIN ${dbp}names ON (${dbp}hymns.number = ${dbp}names.number)
+        AND (${dbp}hymns.book = ${dbp}names.book)
+    ORDER BY ${dbp}days.caldate DESC, ${dbp}hymns.location,
+        ${dbp}hymns.sequence";
 $result = mysql_query($sql) or die(mysql_error()) ;
 modify_records_table($result, "delete.php");
 ?>

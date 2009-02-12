@@ -5,10 +5,12 @@ require("db-connection.php");
 require("options.php");
 $script_basename = basename($_SERVER['SCRIPT_NAME'], ".php") ;
 echo html_head("Sermon Plans");
-$sql = "SELECT sermons.bibletext, sermons.outline, sermons.notes,
-    sermons.service, DATE_FORMAT(days.caldate, '%e %b %Y') as date,
-    days.name, days.rite
-    FROM sermons JOIN days ON (sermons.service=days.pkey)";
+$sql = "SELECT ${dbp}sermons.bibletext, ${dbp}sermons.outline,
+    ${dbp}sermons.notes, ${dbp}sermons.service,
+    DATE_FORMAT(${dbp}days.caldate, '%e %b %Y') as date,
+    ${dbp}days.name, ${dbp}days.rite
+    FROM ${dbp}sermons JOIN ${dbp}days
+        ON (${dbp}sermons.service=${dbp}days.pkey)";
 $result = mysql_query($sql) or die(mysql_error());
 ?>
 <body>

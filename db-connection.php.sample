@@ -4,6 +4,9 @@ $dbhost = "";
 $dbuser = "";
 $dbpw = "";
 $dbname = "";
+// $dbp allows multiple installations to share one database.
+// It's used as a prefix for the names of all the tables.
+$dbp = "";
 mysql_connect($dbhost, $dbuser, $dbpw) or die(mysql_error());
 mysql_select_db($dbname) or die(mysql_error());
 ?>

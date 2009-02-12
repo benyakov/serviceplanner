@@ -14,15 +14,19 @@ if (! array_key_exists("stage", $_GET))
     <div id="content_container">
     <p><a href="<?=$backlink?>">Cancel Edit</a><p>
     <?
-        $sql = "SELECT DATE_FORMAT(days.caldate, '%e %b %Y') as date,
-            hymns.book, hymns.number, hymns.note, hymns.pkey as hymnid,
-            hymns.location, hymns.sequence,
-            days.name as dayname, days.rite, names.title
-            FROM hymns LEFT OUTER JOIN days ON (hymns.service = days.pkey)
-            LEFT OUTER JOIN names ON (hymns.number = names.number)
-            AND (hymns.book = names.book)
-            WHERE days.pkey = '${_GET['id']}'
-            ORDER BY days.caldate DESC, hymns.location, hymns.sequence";
+        $sql = "SELECT DATE_FORMAT(${dbp}days.caldate, '%e %b %Y') as date,
+            ${dbp}hymns.book, ${dbp}hymns.number, ${dbp}hymns.note,
+            ${dbp}hymns.pkey as hymnid, ${dbp}hymns.location,
+            ${dbp}hymns.sequence, ${dbp}days.name as dayname, ${dbp}days.rite,
+            ${dbp}names.title
+            FROM ${dbp}hymns
+            LEFT OUTER JOIN ${dbp}days ON (${dbp}hymns.service=${dbp}days.pkey)
+            LEFT OUTER JOIN ${dbp}names
+                ON (${dbp}hymns.number=${dbp}names.number)
+                AND (${dbp}hymns.book=${dbp}names.book)
+            WHERE ${dbp}days.pkey = '${_GET['id']}'
+            ORDER BY ${dbp}days.caldate DESC, ${dbp}hymns.location,
+                ${dbp}hymns.sequence";
         $result = mysql_query($sql) or die(mysql_error());
         $row = mysql_fetch_assoc($result);
         ?>
@@ -46,6 +50,7 @@ if (! array_key_exists("stage", $_GET))
                  value="<?=$row['rite']?>" size="50" maxlength="50">
             </dd>
         </dl>
+        <p><a href="enter.php?date=<?=str_replace(' ', '', $row['date'])?>">Add Hymns at Any Location</a></p>
         <table>
         <tr><th>Del</th><th>Seq</th><th>Book</th><th>#</th><th>Note</th>
             <th>Location</th><th>Title</th></tr>
@@ -131,11 +136,11 @@ if (! array_key_exists("stage", $_GET))
         $title = mysql_esc($value);
         $number = mysql_esc($tohymns[$key]["number"]);
         $book = mysql_esc($tohymns[$key]["book"]);
-        $sql = "INSERT INTO names (title, number, book)
+        $sql = "INSERT INTO ${dbp}names (title, number, book)
             VALUES ('${title}', '${number}', '{$book}')";
         if (! mysql_query($sql))
         {
-            $sql = "UPDATE names SET title = '${title}'
+            $sql = "UPDATE ${dbp}names SET title = '${title}'
                 WHERE number = '${number}'
                 AND book = '${book}'";
             mysql_query($sql) or die(mysql_error());
@@ -146,7 +151,7 @@ if (! array_key_exists("stage", $_GET))
     $name = mysql_esc($todays['dayname']);
     $rite = mysql_esc($todays['rite']);
     $id = $_POST['id'];
-    $sql = "UPDATE days SET caldate='${date}',
+    $sql = "UPDATE ${dbp}days SET caldate='${date}',
         name='${name}', rite='${rite}'
         WHERE pkey = '${id}'";
     mysql_query($sql) or die(mysql_error());
@@ -156,7 +161,7 @@ if (! array_key_exists("stage", $_GET))
     {
         if (in_array($hymnid, $todelete)) { continue; }
         $hymn = mysql_esc_array($h);
-        $sql = "UPDATE hymns SET number='${hymn['number']}',
+        $sql = "UPDATE ${dbp}hymns SET number='${hymn['number']}',
             note='${hymn['note']}', location='${hymn['location']}',
             book='${hymn['book']}', sequence='${hymn['sequence']}'
             WHERE pkey = '${hymnid}'";
@@ -165,7 +170,7 @@ if (! array_key_exists("stage", $_GET))
 
     // Delete tagged hymns
     foreach ($todelete as $hymnid) {
-        $sql = "DELETE FROM hymns WHERE pkey = '${hymnid}'";
+        $sql = "DELETE FROM ${dbp}hymns WHERE pkey = '${hymnid}'";
         mysql_query($sql) or die(mysql_error());
     }
     header("Location: modify.php?message=".urlencode("Edit complete."));

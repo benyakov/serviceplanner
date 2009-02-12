@@ -2,16 +2,29 @@ This service planning web application is Copyright (c) 2009 Jesse Jacobsen.
 It is licensed under the GNU General Public License, version 2.
 For restrictions on distribution, see the file COPYING.
 
-Installation
-------------
+Installation and Use
+--------------------
 
-- Note that there is no guarantee.  Make backups.  See COPYING.
-- Procure a webserver with PHP and mysql database access.
-- Upload and extract the application files to their own directory
-- Copy db-connection.php.sample to db-connection.php and edit it.
-- Edit options.php and change whatever you need to change.
-- Point your web browser to http://domain.name/directory/setupdb.php
-- Use
-- Email the author at jmatjac /at/ gmail -dot- com with your feedback.
+1. Note that there is no guarantee.  Make backups.  See COPYING.
+2. Procure a webserver with PHP and mysql database access.
+3. Upload and extract the application files to their own directory
+4. Copy db-connection.php.sample to db-connection.php and edit.  Docs inside.
+5. Edit options.php and change whatever you need to change.  Docs inside.
+6. Make a symlink in the installation directory called "index.php",
+   pointing either to hymns.php or servicerecords.php.
+7. Point your web browser to http://domain.name/directory/setupdb.php
+8. Enjoy.  You could start at http://domain.name/directory/enter.php
+9. Email the author at jmatjac /at/ gmail -dot- com with your feedback.
+
+Notes
+-----
+
+Setup, backups and restores are done with mysql utilities that should be
+available on the web server.  For convenience, these are run in a
+somewhat insecure way, which could allow someone with sufficient access
+to the web server to see your mysql user name and login.  It's not a bad
+problem, but keep that in mind when you decide how often to back up.
+
+See the Housekeeping tab for some notes and suggestions.
 
 More docs to come...

@@ -25,15 +25,17 @@ if (! array_key_exists("stage", $_GET))
         require("db-connection.php");
         foreach ($todelete as $deletion)
         {
-            $sql = "SELECT DATE_FORMAT(days.caldate, '%e %b %Y') as date,
-                hymns.book, hymns.number, hymns.note,
-                hymns.location, days.name as dayname, days.rite, names.title
-                FROM hymns LEFT OUTER JOIN days ON (hymns.service = days.pkey)
-                LEFT OUTER JOIN names ON (hymns.number = names.number)
-                    AND (hymns.book = names.book)
-                WHERE days.pkey = ${deletion['index']}
-                    AND hymns.location = '${deletion['loc']}'
-                ORDER BY days.caldate DESC, location";
+            $sql = "SELECT DATE_FORMAT(${dbp}days.caldate, '%e %b %Y') as date,
+                ${dbp}hymns.book, ${dbp}hymns.number, ${dbp}hymns.note,
+                ${dbp}hymns.location, ${dbp}days.name as dayname,
+                ${dbp}days.rite, ${dbp}names.title
+                FROM ${dbp}hymns
+                LEFT OUTER JOIN ${dbp}days ON (${dbp}hymns.service=${dbp}days.pkey)
+                LEFT OUTER JOIN ${dbp}names ON (${dbp}hymns.number=${dbp}names.number)
+                    AND (${dbp}hymns.book=${dbp}names.book)
+                WHERE ${dbp}days.pkey = ${deletion['index']}
+                    AND ${dbp}hymns.location = '${deletion['loc']}'
+                ORDER BY ${dbp}days.caldate DESC, location";
             $result = mysql_query($sql) or die(mysql_error());
             echo "<li>\n";
             display_records_table($result);
@@ -53,22 +55,23 @@ if (! array_key_exists("stage", $_GET))
     foreach ($_SESSION['stage1'] as $todelete)
     {
         // Check to see if service has hymns at another location
-        $sql = "SELECT number FROM hymns JOIN days
-                ON (hymns.service = days.pkey)
-                WHERE hymns.location != '${todelete['loc']}'
-                  AND days.pkey = ${todelete['index']}";
+        $sql = "SELECT number FROM ${dbp}hymns JOIN ${dbp}days
+                ON (${dbp}hymns.service = ${dbp}days.pkey)
+                WHERE ${dbp}hymns.location != '${todelete['loc']}'
+                  AND ${dbp}days.pkey = ${todelete['index']}";
         $result = mysql_query($sql) or die(mysql_error());
 
         if (! mysql_fetch_array($result))
         { // If not, delete the service (should cascade to hymns)
-            $sql = "DELETE FROM days
+            $sql = "DELETE FROM ${dbp}days
                 WHERE pkey = ${todelete['index']}";
             mysql_query($sql) or die(mysql_error());
         } else { // If so, delete only the hymns.
-            $sql = "DELETE FROM hymns
-                USING hymns JOIN days ON (hymns.service = days.pkey)
-                WHERE days.pkey = ${todelete['index']}
-                  AND hymns.location = ${todelete['location']}";
+            $sql = "DELETE FROM ${dbp}hymns
+                USING ${dbp}hymns JOIN ${dbp}days
+                    ON (${dbp}hymns.service = ${dbp}days.pkey)
+                WHERE ${dbp}days.pkey = ${todelete['index']}
+                  AND ${dbp}hymns.location = ${todelete['location']}";
             mysql_query($sql) or die (mysql_error());
         }
 
