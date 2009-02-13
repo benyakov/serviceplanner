@@ -8,7 +8,7 @@ if (! array_key_exists("stage", $_GET))
     $todelete = array();
     foreach ($_POST as $posted=>$value)
     {
-        if (preg_match('/(\d+)_(.+)/', $posted, $matches))
+        if (preg_match('/(\d+)_(.*)/', $posted, $matches))
         {
             $todelete[] = array("index" => $matches[1], "loc" => $matches[2]);
         }
@@ -18,7 +18,8 @@ if (! array_key_exists("stage", $_GET))
     <html>
     <?=html_head("Delete Confirmation")?>
     <body>
-        <p><a href=\"records.php\">Records</a><p>
+        <div id="content_container">
+        <p><a href="modify.php">Abort</a><p>
         <h1>Confirm Deletions</h1>
         <ol>
         <?
@@ -30,11 +31,10 @@ if (! array_key_exists("stage", $_GET))
                 ${dbp}hymns.location, ${dbp}days.name as dayname,
                 ${dbp}days.rite, ${dbp}names.title
                 FROM ${dbp}hymns
-                LEFT OUTER JOIN ${dbp}days ON (${dbp}hymns.service=${dbp}days.pkey)
+                RIGHT OUTER JOIN ${dbp}days ON (${dbp}hymns.service=${dbp}days.pkey)
                 LEFT OUTER JOIN ${dbp}names ON (${dbp}hymns.number=${dbp}names.number)
                     AND (${dbp}hymns.book=${dbp}names.book)
-                WHERE ${dbp}days.pkey = ${deletion['index']}
-                    AND ${dbp}hymns.location = '${deletion['loc']}'
+                WHERE ${dbp}days.pkey = '${deletion['index']}'
                 ORDER BY ${dbp}days.caldate DESC, location";
             $result = mysql_query($sql) or die(mysql_error());
             echo "<li>\n";
@@ -46,6 +46,7 @@ if (! array_key_exists("stage", $_GET))
         <form action="http://<?=$this_script."?stage=2"?>" method="POST">
         <input type="submit" value="Confirm">
         </form>
+        </div>
     </body>
     </html>
     <?
