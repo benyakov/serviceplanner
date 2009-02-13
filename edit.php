@@ -1,12 +1,12 @@
-<html>
 <?
 require("db-connection.php");
 require("functions.php");
 require("options.php");
 $this_script = $_SERVER['HTTP_HOST'].$_SERVER['SCRIPT_NAME'] ;
-echo html_head("Edit a Service");
 if (! array_key_exists("stage", $_GET))
 {
+    echo "<html>\n";
+    echo html_head("Edit a Service");
     $backlink = "modify.php";
     ?>
     <body>
