@@ -210,12 +210,13 @@ if (! array_key_exists('stage', $_GET))
             }
             $extra = 'class="unverified"';
         }
-        $sql2 = "SELECT DATE_FORMAT(days.caldate, '%e %b %Y') as date,
-            hymns.location
-            FROM hymns JOIN days ON (days.pkey = hymns.service)
-            WHERE hymns.number = '${hymn['number']}'
-              AND hymns.book = '${hymn['book']}'
-            ORDER BY days.caldate DESC LIMIT ${option_used_history}";
+        $sql2 = "SELECT DATE_FORMAT(${dbp}days.caldate, '%e %b %Y') as date,
+            ${dbp}hymns.location
+            FROM ${dbp}hymns
+            JOIN ${dbp}days ON (${dbp}days.pkey = ${dbp}hymns.service)
+            WHERE ${dbp}hymns.number = '${hymn['number']}'
+              AND ${dbp}hymns.book = '${hymn['book']}'
+            ORDER BY ${dbp}days.caldate DESC LIMIT ${option_used_history}";
         $result2 = mysql_query($sql2) or die(mysql_error());
         $lastusedary = array();
         while ($last = mysql_fetch_array($result2))
