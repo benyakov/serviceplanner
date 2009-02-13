@@ -1,9 +1,6 @@
 <?
 require("db-connection.php");
 $dumpfile="createtables.sql";
-//$cmdline = "mysql -u ${dbuser} -p${dbpw} -h ${dbhost} ${dbname} ".
-    "-e 'source ${dumpfile}';";
-//$result = system($cmdline, $return);
 $dumplines = file($dumpfile, FILE_IGNORE_NEW_LINES);
 // Separate SQL statements into an array.
 $query = array();
