@@ -4,14 +4,14 @@ $tabledescfile = "createtables.sql";
 $tabledesclines = file($tabledescfile, FILE_IGNORE_NEW_LINES);
 function gettablename ($line)
 {
-    if (preg_match('/TABLE (\w+)/', $line, $matches)
+    if (preg_match('/TABLE (\w+)/', $line, $matches))
     {
         return $matches[1];
     } else {
         return False;
     }
 }
-$tablenamelines = array_filter(gettablename, $tabledesclines);
+$tablenamelines = array_filter($tabledesclines, gettablename);
 $tablenames = array_map(gettablename, $tablenamelines);
 function addtableprefix ($name)
 {
