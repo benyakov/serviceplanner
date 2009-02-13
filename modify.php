@@ -14,11 +14,9 @@ $script_basename = basename($_SERVER['SCRIPT_NAME'], ".php") ;
     <div id="content_container">
 <h1>Modify Service Planning Records</h1>
 <p class="explanation">This listing of hymns allows you to delete whole
-services, with all associated hymns at all locations. Hymns are grouped by
-location, but deleting the service at any location will delete hymns at
-<b>all</b> locations for that service.  To delete only certain hymns, edit the
-service using the "Edit" link.  To create or edit a sermon plan for that
-service, use the "Sermon" link.</p>
+services, with all associated hymns at that location. To delete only certain
+hymns, edit the service using the "Edit" link.  To create or edit a sermon plan
+for that service, use the "Sermon" link.</p>
 <?php
 $sql = "SELECT DATE_FORMAT(${dbp}days.caldate, '%e %b %Y') as date,
     ${dbp}hymns.book, ${dbp}hymns.number, ${dbp}hymns.note,

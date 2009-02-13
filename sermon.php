@@ -37,10 +37,8 @@ if (! array_key_exists('stage', $_GET)) {
         </form>
         <h2>Hymns for This Service</h2>
         <p class="explanation">You can delete the whole service, hymns, sermon
-        plan, and all, from here.  Note that this will delete hymns for
-        <b>all</b> locations for this service, though they may be listed
-        separately here.  To edit this service or modify the chosen hymns
-        individually, use the link below.</p>
+        plan, and all, from here.  To edit this service or modify the chosen
+        hymns individually, use the link below.</p>
         <a href="edit.php?id=<?=$id?>">Edit the Service</a>.</p>
     <?
     $sql = "SELECT DATE_FORMAT(${dbp}days.caldate, '%e %b %Y') as date,

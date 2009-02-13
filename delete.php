@@ -26,6 +26,12 @@ if (! array_key_exists("stage", $_GET))
         require("db-connection.php");
         foreach ($todelete as $deletion)
         {
+            if (0 == strlen($deletion['loc']))
+            {
+                $whereclause = "";
+            } else {
+                $whereclause = "AND ${dbp}hymns.location = '${deletion['loc']}'";
+            }
             $sql = "SELECT DATE_FORMAT(${dbp}days.caldate, '%e %b %Y') as date,
                 ${dbp}hymns.book, ${dbp}hymns.number, ${dbp}hymns.note,
                 ${dbp}hymns.location, ${dbp}days.name as dayname,
@@ -35,6 +41,7 @@ if (! array_key_exists("stage", $_GET))
                 LEFT OUTER JOIN ${dbp}names ON (${dbp}hymns.number=${dbp}names.number)
                     AND (${dbp}hymns.book=${dbp}names.book)
                 WHERE ${dbp}days.pkey = '${deletion['index']}'
+                    ${whereclause}
                 ORDER BY ${dbp}days.caldate DESC, location";
             $result = mysql_query($sql) or die(mysql_error());
             echo "<li>\n";
@@ -72,7 +79,7 @@ if (! array_key_exists("stage", $_GET))
                 USING ${dbp}hymns JOIN ${dbp}days
                     ON (${dbp}hymns.service = ${dbp}days.pkey)
                 WHERE ${dbp}days.pkey = ${todelete['index']}
-                  AND ${dbp}hymns.location = ${todelete['location']}";
+                  AND ${dbp}hymns.location = '${todelete['loc']}'";
             mysql_query($sql) or die (mysql_error());
         }
 
