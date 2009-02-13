@@ -36,11 +36,12 @@ if (! array_key_exists('stage', $_GET)) {
         <input type="submit" value="Commit"><input type="reset">
         </form>
         <h2>Hymns for This Service</h2>
-        <p class="explanation">Hymns are grouped by location.
-        Deleting the service at any location will delete this sermon plan,
-        as well as all associated hymns at every location.
-        To delete only certain hymns,
-        <a href="edit.php?id=<?=$id?>">edit the service</a>.</p>
+        <p class="explanation">You can delete the whole service, hymns, sermon
+        plan, and all, from here.  Note that this will delete hymns for
+        <b>all</b> locations for this service, though they may be listed
+        separately here.  To edit this service or modify the chosen hymns
+        individually, use the link below.</p>
+        <a href="edit.php?id=<?=$id?>">Edit the Service</a>.</p>
     <?
     $sql = "SELECT DATE_FORMAT(${dbp}days.caldate, '%e %b %Y') as date,
         ${dbp}hymns.book, ${dbp}hymns.number, ${dbp}hymns.note,

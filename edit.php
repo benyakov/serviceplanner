@@ -10,8 +10,11 @@ if (! array_key_exists("stage", $_GET))
     $backlink = "modify.php";
     ?>
     <body>
-    <h1>Edit a Service</h1>
     <div id="content_container">
+    <h1>Edit a Service</h1>
+    <p class="explanation">You can change any service- or hymn-related
+    information on this page.  To add hymns to a service that are not
+    already listed here, use the "Add Hymns" link.</p>
     <p><a href="<?=$backlink?>">Cancel Edit</a><p>
     <?
         $sql = "SELECT DATE_FORMAT(${dbp}days.caldate, '%e %b %Y') as date,
@@ -20,7 +23,7 @@ if (! array_key_exists("stage", $_GET))
             ${dbp}hymns.sequence, ${dbp}days.name as dayname, ${dbp}days.rite,
             ${dbp}names.title
             FROM ${dbp}hymns
-            LEFT OUTER JOIN ${dbp}days ON (${dbp}hymns.service=${dbp}days.pkey)
+            RIGHT OUTER JOIN ${dbp}days ON (${dbp}hymns.service=${dbp}days.pkey)
             LEFT OUTER JOIN ${dbp}names
                 ON (${dbp}hymns.number=${dbp}names.number)
                 AND (${dbp}hymns.book=${dbp}names.book)
@@ -52,11 +55,16 @@ if (! array_key_exists("stage", $_GET))
         </dl>
         <p><a href="enter.php?date=<?=str_replace(' ', '', $row['date'])?>">Add Hymns at Any Location</a></p>
         <table>
-        <tr><th>Del</th><th>Seq</th><th>Book</th><th>#</th><th>Note</th>
+        <tr class="heading"><th>Del</th><th>Seq</th><th>Book</th><th>#</th><th>Note</th>
             <th>Location</th><th>Title</th></tr>
         <?
         while ($row)
         {
+            if ('' == $row['number'])
+            {
+                $row = mysql_fetch_assoc($result);
+                continue;
+            }
             ?>
             <tr>
                 <td>

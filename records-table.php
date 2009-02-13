@@ -9,7 +9,7 @@ $sql = "SELECT DATE_FORMAT(${dbp}days.caldate, '%e %b %Y') as date,
     ${dbp}hymns.location, ${dbp}days.name as dayname, ${dbp}days.rite,
     ${dbp}names.title
     FROM ${dbp}hymns
-    LEFT OUTER JOIN ${dbp}days ON (${dbp}hymns.service = ${dbp}days.pkey)
+    RIGHT OUTER JOIN ${dbp}days ON (${dbp}hymns.service = ${dbp}days.pkey)
     LEFT OUTER JOIN ${dbp}names ON (${dbp}hymns.number = ${dbp}names.number)
         AND (${dbp}hymns.book = ${dbp}names.book)
     ORDER BY ${dbp}days.caldate DESC, ${dbp}hymns.location,

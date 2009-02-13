@@ -31,6 +31,19 @@ function entered_hymns($ary)
     return $entered_hymns;
 }
 
+function entered_hymncount($ary)
+{ // Return the number of actual entered hymns in $ary
+    $count = 0;
+    foreach ($ary as $hymn)
+    {
+        if (0 < strlen($hymn['number']))
+        {
+            $count++;
+        }
+    }
+    return $count;
+}
+
 if (! array_key_exists('stage', $_GET))
 { # Initial entry form
     if (array_key_exists('stage1', $_SESSION))
@@ -56,6 +69,12 @@ if (! array_key_exists('stage', $_GET))
     <?=sitetabs($sitetabs, $script_basename)?>
     <div id="content_container">
     <h1>Service Entry Form</h1>
+    <p class="explanation">This form allows you to enter a new service,
+    optionally including several hymns for use at a certain location.  (The
+    possible hymnbooks, and the number of hymn lines can be configured in the
+    file "options.php" on the webserver.)  After you submit this page, you will
+    be asked to confirm whether you intend to create a new service or add hymns
+    to an existing service.</p>
     <form action="http://<?=$this_script.'?stage=2'?>" method="POST">
     <ul>
     <li>
@@ -118,6 +137,13 @@ if (! array_key_exists('stage', $_GET))
     <p><a href="enter.php">Back to start</a></p>
     <div id="content_container">
     <h1>Confirmation (Entry Step 2)</h1>
+    <p class="explanation">In this final step for entering a service, you are
+    presented with a list of existing services on the date you chose, together
+    with the option of creating a new one.  Please confirm what you'd like to
+    do. If the hymn titles for your chosen hymns have already been entered, you
+    can see those here.  If they haven't, you have the chance to enter the
+    titles.  You can always change them later by editing this service from the
+    "Modify Services" tab.</p>
     <dl>
         <dt>Date</dt><dd><?=$_POST['date']?></dd>
         <dt>Location</dt><dd><?=$_POST['location']?></dd>
@@ -186,54 +212,58 @@ if (! array_key_exists('stage', $_GET))
     echo "<h2>Confirm or Enter Hymn Titles</h2>\n";
     // Combine entered pieces into an array.
     $entered_hymns = entered_hymns($_POST);
-    // Output array to confirm/enter hymn titles
-    echo "<ul>\n";
-    foreach ($entered_hymns as $hymn)
+    if (0 == entered_hymncount($entered_hymns))
     {
-        if (! $hymn['number']) { continue; }
-        $sql = "SELECT title FROM ${dbp}names
-            WHERE number = '${hymn['number']}'
-            AND book = '${hymn['book']}'";
-        $result = mysql_query($sql) or die(mysql_error());
-        if ($titlerec = mysql_fetch_row($result))
+        echo "<p>No hymns entered.</p>";
+    } else {
+        // Output array to confirm/enter hymn titles
+        echo "<ul>\n";
+        foreach ($entered_hymns as $hymn)
         {
-            $title = $titlerec[0];
-            $extra = 'class="verified"';
-        } else {
-            if (array_key_exists('stage2', $_SESSION)
-                && array_key_exists("${hymn['book']}_${hymn['number']}",
-                $_SESSION['stage2']))
+            if (! $hymn['number']) { continue; }
+            $sql = "SELECT title FROM ${dbp}names
+                WHERE number = '${hymn['number']}'
+                AND book = '${hymn['book']}'";
+            $result = mysql_query($sql) or die(mysql_error());
+            if ($titlerec = mysql_fetch_row($result))
             {
-                $title = $_SESSION['stage2']["${hymn['book']}_${hymn['number']}"];
+                $title = $titlerec[0];
+                $extra = 'class="verified"';
             } else {
-                $title = "No title found. Please enter one.";
+                if (array_key_exists('stage2', $_SESSION)
+                    && array_key_exists("${hymn['book']}_${hymn['number']}",
+                    $_SESSION['stage2']))
+                {
+                    $title = $_SESSION['stage2']["${hymn['book']}_${hymn['number']}"];
+                } else {
+                    $title = "No title found. Please enter one.";
+                }
+                $extra = 'class="unverified"';
             }
-            $extra = 'class="unverified"';
+            $sql2 = "SELECT DATE_FORMAT(${dbp}days.caldate, '%e %b %Y') as date,
+                ${dbp}hymns.location
+                FROM ${dbp}hymns
+                JOIN ${dbp}days ON (${dbp}days.pkey = ${dbp}hymns.service)
+                WHERE ${dbp}hymns.number = '${hymn['number']}'
+                  AND ${dbp}hymns.book = '${hymn['book']}'
+                ORDER BY ${dbp}days.caldate DESC LIMIT ${option_used_history}";
+            $result2 = mysql_query($sql2) or die(mysql_error());
+            $lastusedary = array();
+            while ($last = mysql_fetch_array($result2))
+            {
+                $lastusedary[] = $last[0].($last[1]?"@${last[1]}":"");
+            }
+            $lastused = implode(", ", $lastusedary);
+            $lastused = $lastused ? $lastused : "No record.";
+            echo "<li ${extra}>${hymn['book']} ${hymn['number']} ${hymn['note']} ".
+                "<input type=\"text\" id=\"${hymn['book']}_${hymn['number']}\"
+                    name=\"${hymn['book']}_${hymn['number']}\"
+                    value=\"${title}\" size=\"50\" maxlength=\"50\"> ".
+                    "Last Used: ${lastused}</li>\n";
         }
-        $sql2 = "SELECT DATE_FORMAT(${dbp}days.caldate, '%e %b %Y') as date,
-            ${dbp}hymns.location
-            FROM ${dbp}hymns
-            JOIN ${dbp}days ON (${dbp}days.pkey = ${dbp}hymns.service)
-            WHERE ${dbp}hymns.number = '${hymn['number']}'
-              AND ${dbp}hymns.book = '${hymn['book']}'
-            ORDER BY ${dbp}days.caldate DESC LIMIT ${option_used_history}";
-        $result2 = mysql_query($sql2) or die(mysql_error());
-        $lastusedary = array();
-        while ($last = mysql_fetch_array($result2))
-        {
-            $lastusedary[] = $last[0].($last[1]?"@${last[1]}":"");
-        }
-        $lastused = implode(", ", $lastusedary);
-        $lastused = $lastused ? $lastused : "No record.";
-        echo "<li ${extra}>${hymn['book']} ${hymn['number']} ${hymn['note']} ".
-            "<input type=\"text\" id=\"${hymn['book']}_${hymn['number']}\"
-                name=\"${hymn['book']}_${hymn['number']}\"
-                value=\"${title}\" size=\"50\" maxlength=\"50\"> ".
-                "Last Used: ${lastused}</li>\n";
+        echo "</ul>\n";
     }
     ?>
-        </ul>
-    </table>
     <input type="submit" value="Send"><input type="reset">
     </form>
     </div>
@@ -320,25 +350,30 @@ if (! array_key_exists('stage', $_GET))
     }
     //// Enter hymns and location on selected date
     $hymns = entered_hymns($_SESSION['stage1']);
-    $sqlhymns = array();
-    $saved = array();
-    foreach ($hymns as $sequence => $ahymn)
+    if (0 < entered_hymncount($hymns))
     {
-        if (! $ahymn['number']) continue;
-        $hymn = mysql_esc_array($ahymn);
-        $realsequence = $sequence + $maxseq;
-        $sqlhymns[] = "('${serviceid}', '${location}', '${hymn['book']}',
-            '${hymn['number']}', '${hymn['note']}', '${realsequence}')";
-        $saved[] = "${ahymn['book']} ${ahymn['number']} (${hymn['note']})";
+        $sqlhymns = array();
+        $saved = array();
+        foreach ($hymns as $sequence => $ahymn)
+        {
+            if (! $ahymn['number']) continue;
+            $hymn = mysql_esc_array($ahymn);
+            $realsequence = $sequence + $maxseq;
+            $sqlhymns[] = "('${serviceid}', '${location}', '${hymn['book']}',
+                '${hymn['number']}', '${hymn['note']}', '${realsequence}')";
+            $saved[] = "${ahymn['book']} ${ahymn['number']} (${hymn['note']})";
+        }
+        $sql = "INSERT INTO ${dbp}hymns
+            (service, location, book, number, note, sequence)
+            VALUES ".implode(", ", $sqlhymns);
+        mysql_query($sql) or die(mysql_error());
+        ?><li>Saved hymns :
+            <ol><li><?=implode("</li><li>", $saved)?></li></ol>
+          </li>
+        </ol>
+        <?
     }
-    $sql = "INSERT INTO ${dbp}hymns
-        (service, location, book, number, note, sequence)
-        VALUES ".implode(", ", $sqlhymns);
-    mysql_query($sql) or die(mysql_error());
-    ?><li>Saved hymns :
-        <ol><li><?=implode("</li><li>", $saved)?></li></ol>
-      </li>
-    </ol>
+    ?>
     </div>
 </body>
 </html>

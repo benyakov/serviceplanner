@@ -17,6 +17,10 @@ $result = mysql_query($sql) or die(mysql_error());
     <?=sitetabs($sitetabs, $script_basename)?>
     <div id="content_container">
     <h1>Sermon Plans</h1>
+    <p class="explanation">This is a listing of sermon plans you have created.
+    To create a sermon plan, first create a service
+    with zero or more hymns.  On the tab to modify services is a link
+    to create or edit a sermon plan associated with it.</p>
     <table id="sermonplan_listing">
     <tr class="heading"><th>Date</th><th>Day</th><th>Text</th><th>Rite</th></tr>
     <tr class="heading"><th colspan="3">Outline</th><th>Notes</th></tr>
@@ -32,7 +36,7 @@ while ($row = mysql_fetch_assoc($result))
             <a href="sermon.php?id=<?=$row['service']?>">Edit</a>
         </td>
         <td class="table_leftborder table_preformat">
-            <pre><?=$row['notes']?></pre>
+            <?=$row['notes']?>
         </td>
     </tr>
 <?
