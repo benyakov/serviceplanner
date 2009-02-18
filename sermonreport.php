@@ -30,11 +30,11 @@ require("db-connection.php");
             <dt>Rite</dt>
             <dd><?=$row['rite']?></dd>
             <dt>Text</dt>
-            <dd><?=$row['text']?></dd>
+            <dd><?=$row['bibletext']?></dd>
             <dt>Outline<dt>
             <dd><pre><?=$row['outline']?></pre></dd>
             <dt>Notes<dt>
-            <dd><pre><?=$row['notes']?></pre></dd>
+            <dd><?=translate_markup($row['notes'])?></dd>
         </dl>
         </div>
     </body>

@@ -36,7 +36,7 @@ while ($row = mysql_fetch_assoc($result))
             <a href="sermon.php?id=<?=$row['service']?>">Edit</a>
         </td>
         <td class="table_leftborder table_preformat">
-            <?=$row['notes']?>
+            <?=translate_markup($row['notes'])?>
         </td>
     </tr>
 <?

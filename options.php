@@ -31,4 +31,13 @@ $sitetabs = array(
     ,"admin"=>"Housekeeping"
 );
 
+// Location of a PHP "library" directory on the web server where you might
+// have e.g. markup-processing packages installed.
+// For example, If you download Markdown
+// (http://michelf.com/projects/php-markdown/) and place markdown.php or
+// a link to it in a specific directory, you can point to that directory
+// with $phplibrary.  Then, sermon notes will automatically be formatted
+// using Markdown when displayed.
+$phplibrary = "../../php/";
+
 ?>

@@ -109,4 +109,15 @@ function sitetabs($sitetabs, $action) {
     echo "</ul></div>\n";
 }
 
+function translate_markup($text)
+{
+    global $phplibrary;
+    require("options.php");
+    if (include_once($phplibrary."markdown.php"))
+    {
+        return Markdown($text);
+    } else {
+        return $text;
+    }
+}
 ?>
