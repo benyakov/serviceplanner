@@ -10,7 +10,8 @@ $sql = "SELECT ${dbp}sermons.bibletext, ${dbp}sermons.outline,
     DATE_FORMAT(${dbp}days.caldate, '%e %b %Y') as date,
     ${dbp}days.name, ${dbp}days.rite
     FROM ${dbp}sermons JOIN ${dbp}days
-        ON (${dbp}sermons.service=${dbp}days.pkey)";
+        ON (${dbp}sermons.service=${dbp}days.pkey)
+    ORDER BY days.caldate DESC";
 $result = mysql_query($sql) or die(mysql_error());
 ?>
 <body>
