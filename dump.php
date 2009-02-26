@@ -21,7 +21,8 @@ function addtableprefix ($name)
 $finaltablenames = array_map(addtableprefix, $tablenames);
 $tablenamestring = implode(" ", $finaltablenames);
 header("Content-type: text/plain");
-header("Content-disposition: attachment; filename=services.dump");
+$timestamp = date("dMY-Hi");
+header("Content-disposition: attachment; filename=services-${timestamp}.dump");
 // Including the password here is insecure on a shared machine
 // because the invocation will appear in the list of processes.
 // But it's easy.
