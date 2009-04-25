@@ -91,34 +91,27 @@ ul#sitetabs {
 ul#sitetabs A {
     text-decoration: none; color: black;
     display: block;
-    width: 100%; text-align: center;
-}
-ul#sitetabs > li {
-    display: table-cell; display: table-cell;
-    margin: 0pt;
-    padding-bottom: 0pt;
-    text-align: center;
+    width: 90%; text-align: center;
+    margin-bottom: -2px;
     border: 2px solid #888;
     color: #555;
     background-color: #BBB;
 }
-ul#sitetabs > li.sitetabs-spacer  {
-    border: none;
-    border-bottom: 2px solid #888;
-    background-color: transparent;
-    width: 1em;
+ul#sitetabs > li {
+    display: table-cell; display: table-cell;
+    margin: 0pt;
+    text-align: center;
 }
-ul#sitetabs > li.activated   {
-    border-bottom: none;
+ul#sitetabs > li.activated A  {
     color: black;
     background-color: white;
+    border-bottom: 2px solid white;
 }
 div#sitetabs_background {
     background-color: black;
     padding-top: 1ex;
     padding-bottom: 0;
     border: none;
-    border-bottom: 2px solid #888;
     margin: 0;
 }
 
