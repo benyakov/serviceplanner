@@ -95,7 +95,7 @@ function sitetabs($sitetabs, $action) {
     $tabs = array_fill_keys(array_keys($sitetabs), 0);
     $tabs[$action] = 1;
     echo "<div id=\"sitetabs_background\">";
-    echo "<ul id=\"sitetabs\">\n<li class=\"sitetabs-spacer\">&nbsp;</li>";
+    echo "<ul id=\"sitetabs\">\n";
     foreach ($tabs as $name => $activated) {
         if ($activated) {
             $class = ' class="activated"';
@@ -104,7 +104,6 @@ function sitetabs($sitetabs, $action) {
         }
         $tabtext = $sitetabs[$name];
         echo "<li$class><a href=\"${name}.php\">$tabtext</a></li>\n";
-        echo "<li class=\"sitetabs-spacer\">&nbsp;</li>";
     }
     echo "</ul></div>\n";
 }

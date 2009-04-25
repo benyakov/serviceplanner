@@ -118,6 +118,7 @@ div#sitetabs_background {
     padding-top: 1ex;
     padding-bottom: 0;
     border: none;
+    border-bottom: 2px solid #888;
     margin: 0;
 }
 
