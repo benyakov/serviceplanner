@@ -114,4 +114,6 @@ div#sitetabs_background {
     border: none;
     margin: 0;
 }
-
+div#goto_now {
+    float: right;
+}

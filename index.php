@@ -1,13 +1,32 @@
 <?
 require("functions.php");
+require("options.php");
+if ((! file_exists("db-connection.php") and
+    (! is_link($_SERVER['SCRIPT_FILENAME']))))
+{   ?>
+    <html><?=html_head("Unconfigured Service Planner")?><body>
+    <h1>Unconfigured</h1>
+    <p>This is an unconfigured installation of the service planner.
+    To configure it, make the appropriate settings in db_connection.php on
+    the web server.
+    A documented sample file is provided.</p>
+    </body></html>
+    <?
+    exit();
+}
 require("db-connection.php");
+$script_basename = basename($_SERVER['SCRIPT_NAME'], ".php") ;
 ?>
 <html>
 <?=html_head("Upcoming Hymns")?>
 <body>
-
-<h1>Upcoming Hymns</h1>
+<?
+if (! is_link($_SERVER['SCRIPT_FILENAME']))
+{
+    echo sitetabs($sitetabs, $script_basename);
+}   ?>
 <div id="content_container">
+<h1>Upcoming Hymns</h1>
 <?php
 $sql = "SELECT DATE_FORMAT(${dbp}days.caldate, '%e %b %Y') as date,
     ${dbp}hymns.book, ${dbp}hymns.number, ${dbp}hymns.note,

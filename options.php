@@ -1,9 +1,4 @@
 <?
-// Path from web server's document root where this is installed.
-// This is only needed if you symlink to hymns.php or servicerecords.php
-// from another place in your webserver's document tree.
-$install_path = "";
-
 // List of possible hymnbooks to draw from
 $option_hymnbooks = array(
     "TLH",
@@ -24,7 +19,8 @@ $option_used_history = 5;
 // or you can modify the values in the array (not the keys) to change
 // the text displayed on the tabs.
 $sitetabs = array(
-    "records"=>"Service Records"
+    "index"=>"Upcoming Hymns"
+    ,"records"=>"Service Records"
     ,"modify"=>"Modify Services"
     ,"enter"=>"Add Service/Hymns"
     ,"sermons"=>"Sermon Plans"

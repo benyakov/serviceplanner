@@ -15,7 +15,13 @@ function display_records_table($result)
                 $row['dayname'] == $name &&
                 $row['location'] == $location))
         {// Display the heading line
-            echo "<tr class=\"heading\"><td>${row['date']} ${row['location']}</td>
+            if (is_within_week($row['date']))
+            {
+                $datetext = "<a name=\"now\">${row['date']}</a>";
+            } else {
+                $datetext = $row['date'];
+            }
+            echo "<tr class=\"heading\"><td>${datetext} ${row['location']}</td>
                 <td colspan=3>${row['dayname']}: ${row['rite']}</td></tr>\n";
             $date = $row['date'];
             $name = $row['dayname'];
@@ -48,9 +54,15 @@ function modify_records_table($result, $action)
                 $row['dayname'] == $name &&
                 $row['location'] == $location))
         {// Display the heading line
+            if (is_within_week($row['date']))
+            {
+                $datetext = "<a name=\"now\">${row['date']}</a>";
+            } else {
+                $datetext = $row['date'];
+            }
             echo "<tr class=\"heading\"><td>
             <input type=\"checkbox\" name=\"${row['id']}_${row['location']}\" id=\"check_${row['id']}_${row['location']}\">
-            ${row['date']} ${row['location']}</td>
+            ${datetext} ${row['location']}</td>
             <td colspan=3><a href=\"edit.php?id=${row['id']}\">Edit</a> |
             <a href=\"sermon.php?id=${row['id']}\">Sermon</a> |
             ${row['dayname']}: ${row['rite']}</td></tr>\n";
@@ -61,7 +73,7 @@ function modify_records_table($result, $action)
         // Display this hymn
         echo "<tr><td>&nbsp;</td>
             <td>${row['book']} ${row['number']}</td>
-            <td>${row['note']}</td><td>${row['title']}</td>";
+            <td>${row['note']}</td><td>${row['title']}</td></tr>\n";
     }
     ?>
     </table>
@@ -72,12 +84,17 @@ function modify_records_table($result, $action)
 
 function html_head($title)
 {
-    require_once("options.php");
+    if (is_link($_SERVER['SCRIPT_FILENAME']))
+    {   // Find the installation for css and other links
+        $here = dirname(readlink($_SERVER['SCRIPT_FILENAME']));
+    } else {
+    $here = dirname($_SERVER['SCRIPT_NAME']);
+    }
     return ("
     <head>
     <title>${title}</title>
-    <link type=\"text/css\" rel=\"stylesheet\" href=\"${install_path}style.css\">
-    <link type=\"text/css\" rel=\"stylesheet\" media=\"print\" href=\"${install_path}print.css\">
+    <link type=\"text/css\" rel=\"stylesheet\" href=\"${here}/style.css\">
+    <link type=\"text/css\" rel=\"stylesheet\" media=\"print\" href=\"${here}/print.css\">
     </head>");
 }
 
@@ -118,5 +135,13 @@ function translate_markup($text)
     } else {
         return $text;
     }
+}
+
+function is_within_week($dbdate)
+{   // True if the given date is within a week *after* today.
+    $db = strtotime($dbdate);
+    $now = getdate(time());
+    $weekahead = mktime(0,0,0,$now['mon'],$now['mday']+8,$now['year']);
+    if ($db <= $weekahead) return True; else return False;
 }
 ?>
