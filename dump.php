@@ -26,5 +26,12 @@ header("Content-disposition: attachment; filename=services-${timestamp}.dump");
 // Including the password here is insecure on a shared machine
 // because the invocation will appear in the list of processes.
 // But it's easy.
-passthru("mysqldump -u ${dbuser} -p${dbpw} -h ${dbhost} ${dbname} ${tablenamestring}");
+$fp = fopen(".my.cnf", "w");
+fwrite($fp, "[client]
+user=\"${dbuser}\"
+password=\"${dbpw}\"\n") ;
+fclose($fp);
+chmod(".my.cnf", 0600);
+passthru("mysqldump --defaults-file=.my.cnf -h ${dbhost} ${dbname} ${tablenamestring}");
+unlink(".my.cnf");
 ?>
