@@ -47,6 +47,11 @@ textarea#notes {
     width: 45em;
     margin: 1ex;
 }
+select,
+input {
+    background-color: black;
+    color: #EFF;
+}
 input.entryline {
     margin: 1ex;
 }
@@ -61,6 +66,7 @@ div#content_container {
     color: black;
 }
 
+table#xref_listing,
 table#modify_listing,
 table#records_listing,
 table#sermonplan_listing {
@@ -117,4 +123,25 @@ div#sitetabs_background {
 }
 div#goto_now {
     float: right;
+}
+
+a.sortlink {
+    width: 100%;
+    border: thin solid blue;
+    background-color: #DDD;
+    color: blue;
+    font-weight: bold;
+    font-size: larger;
+    padding-left: 3px;
+    padding-right: 3px;
+}
+
+a.sortlink :visited {
+    color: blue
+}
+
+a.sortlink :hover {
+    color: #DDD;
+    background-color: blue;
+    text-decoration: none;
 }

@@ -1,0 +1,105 @@
+<?php
+
+require('db-connection.php');
+
+function linksort($text, $sort) {
+    // Return a link requesting the given sort
+    return "<a class=\"sortlink\" href=\"${_SERVER['PHP_SELF']}?sort=${sort}\">${text}</a>";
+}
+
+$sql = "SELECT 1 FROM ${dbp}xref";
+if (! mysql_query($sql)) {
+    /**** To create the cross reference table ****/
+
+    $sql = "CREATE TABLE `${dbp}xref` (
+        `title` varchar(80),
+        `text` varchar(60),
+        `elh` smallint,
+        `tlh` smallint,
+        `lw` smallint,
+        `lbw` smallint,
+        `cw` smallint,
+        `hs98` smallint,
+        `pkey` int(10) unsigned NOT NULL auto_increment,
+        KEY `pkey` (`pkey`)
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8" ;
+    mysql_query($sql) or die(mysql_error());
+
+    $fh = fopen("hymnindex.csv", "r");
+    $headings = fgetcsv($fh);
+    while (($record = fgetcsv($fh, 250)) != FALSE) {
+        $r = array();
+        $record[0] = mysql_real_escape_string($record[0]);
+        $record[1] = mysql_real_escape_string($record[1]);
+        foreach ($record as $field) {
+            $f = trim($field);
+            if (! $f) {
+                $f = "NULL";
+            } else {
+                $f = "'$f'";
+            }
+            $r[] = $f;
+        }
+        $sql = "INSERT INTO ${dbp}xref (title, text, elh, tlh, lw, lbw, cw, hs98)
+            VALUES (${r[0]}, ${r[1]}, ${r[2]}, ${r[3]}, ${r[4]}, ${r[5]}, ${r[6]}, ${r[7]})";
+        mysql_query($sql) or die(mysql_error()."\n".__FILE__.":".__LINE__);
+    }
+}
+/* To Display the cross-reference table */
+
+require("functions.php");
+
+if (array_key_exists('sort', $_GET)) {
+    $sort_by = " ORDER BY ${_GET['sort']}";
+} else {
+    $sort_by = "";
+}
+$sql = "SELECT * FROM ${dbp}xref${sort_by}" ;
+$result = mysql_query($sql) or die(mysql_error());
+require("options.php");
+$script_basename = basename($_SERVER['SCRIPT_NAME'], ".php") ;
+?>
+<html>
+<?=html_head("Service Planning Records")?>
+<body>
+<?= sitetabs($sitetabs, $script_basename); ?>
+<div id="content_container">
+<h1>Cross Reference Table</h1>
+<table id="xref_listing">
+<thead>
+<tr>
+<td><?=linksort("Title", "title")?></td>
+<td><?=linksort("Text", "text")?></td>
+<td><?=linksort("ELH", "elh")?></td>
+<td><?=linksort("TLH", "tlh")?></td>
+<td><?=linksort("LW", "lw")?></td>
+<td><?=linksort("LBW", "lbw")?></td>
+<td><?=linksort("CW", "cw")?></td>
+<td><?=linksort("HS '98", "hs98")?></td>
+</tr>
+</thead>
+<tbody>
+<?
+while ($row = mysql_fetch_assoc($result)) {
+    $r = array();
+    foreach ($row as $k => $v) {
+        if (is_null($v)) { $v = ''; }
+        $r[$k] = $v;
+    }
+    echo "<tr>
+        <td>${r['title']}</td>
+        <td>${r['text']}</td>
+        <td>${r['elh']}</td>
+        <td>${r['tlh']}</td>
+        <td>${r['lw']}</td>
+        <td>${r['lbw']}</td>
+        <td>${r['cw']}</td>
+        <td>${r['hs98']}</td>
+        </tr>";
+}
+?>
+</tbody>
+</table>
+</div>
+</body>
+</html>

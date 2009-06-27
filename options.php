@@ -24,6 +24,7 @@ $sitetabs = array(
     ,"modify"=>"Modify Services"
     ,"enter"=>"Add Service/Hymns"
     ,"sermons"=>"Sermon Plans"
+    ,"hymnindex"=>"Cross Ref"
     ,"admin"=>"Housekeeping"
 );
 
