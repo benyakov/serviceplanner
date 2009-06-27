@@ -7,6 +7,17 @@ function linksort($text, $sort) {
     return "<a class=\"sortlink\" href=\"${_SERVER['PHP_SELF']}?sort=${sort}\">${text}</a>";
 }
 
+function togglebg($current) {
+    // Toggle between alternating background by returning the other class
+    $light = " class=\"odd\"";
+    $dark = " class=\"even\"";
+    if ($current == $light) {
+        return $dark;
+    } else {
+        return $light;
+    }
+}
+
 $sql = "SELECT 1 FROM ${dbp}xref";
 if (! mysql_query($sql)) {
     /**** To create the cross reference table ****/
@@ -87,6 +98,8 @@ $script_basename = basename($_SERVER['SCRIPT_NAME'], ".php") ;
 <?
 $marked_sortstart = FALSE;
 $sortmarker = "";
+$cursortvalue = "";
+$sortrowbg = "";
 while ($row = mysql_fetch_assoc($result)) {
     $r = array();
     foreach ($row as $k => $v) {
@@ -94,6 +107,10 @@ while ($row = mysql_fetch_assoc($result)) {
         $r[$k] = $v;
     }
     if (array_key_exists($sorted_on, $r)) {
+        if ($cursortvalue != $r[$sorted_on]) {
+            $sortrowbg = togglebg($sortrowbg);
+            $cursortvalue = $r[$sorted_on];
+        }
         if ((! $marked_sortstart) && $r[$sorted_on]) {
             $sortmarker = "<a name=\"sortstart\" />";
             $marked_sortstart = TRUE;
@@ -101,7 +118,7 @@ while ($row = mysql_fetch_assoc($result)) {
             $sortmarker = "";
         }
     }
-    echo "<tr>
+    echo "<tr${sortrowbg}>
         <td>${sortmarker}${r['title']}</td>
         <td>${r['text']}</td>
         <td>${r['elh']}</td>

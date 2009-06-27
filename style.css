@@ -4,8 +4,8 @@ body {
     color: white;
 }
 
-ul.odd { background-color: #FFF; }
-ul.even { background-color: #EEE; }
+.odd { background-color: #FFF; }
+.even { background-color: #EEE; }
 p.hymnlist {
     font-size: smaller;
     margin: 0.2em 0 0.2em 2em;
