@@ -81,7 +81,7 @@ $script_basename = basename($_SERVER['SCRIPT_NAME'], ".php") ;
 <div id="goto_now"><a href="#sortstart">Jump to Beginning of Sorted</a></div>
 <?  } ?>
 <h1>Cross Reference Table</h1>
-<table id="xref_listing">
+<table id="xref_listing" cols="8">
 <thead>
 <tr>
 <td><?=linksort("Title", "title")?></td>
@@ -119,14 +119,14 @@ while ($row = mysql_fetch_assoc($result)) {
         }
     }
     echo "<tr${sortrowbg}>
-        <td>${sortmarker}${r['title']}</td>
-        <td>${r['text']}</td>
-        <td>${r['elh']}</td>
-        <td>${r['tlh']}</td>
-        <td>${r['lw']}</td>
-        <td>${r['lbw']}</td>
-        <td>${r['cw']}</td>
-        <td>${r['hs98']}</td>
+        <td class=\"title\">${sortmarker}${r['title']}</td>
+        <td class=\"text\">${r['text']}</td>
+        <td class=\"elh\">${r['elh']}</td>
+        <td class=\"tlh\">${r['tlh']}</td>
+        <td class=\"lw\">${r['lw']}</td>
+        <td class=\"lbw\">${r['lbw']}</td>
+        <td class=\"cw\">${r['cw']}</td>
+        <td class=\"hs98\">${r['hs98']}</td>
         </tr>";
 }
 ?>

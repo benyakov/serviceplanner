@@ -72,6 +72,7 @@ table#records_listing,
 table#sermonplan_listing {
     background-color: transparent;
     color: black;
+    border-collapse: collapse;
 }
 
 tr.table_topline td {
@@ -146,3 +147,28 @@ a.sortlink :hover {
     background-color: blue;
     text-decoration: none;
 }
+
+.elh {
+    color: black;
+}
+
+.tlh {
+    color: #008;
+}
+
+.lw {
+    color: #00E;
+}
+
+.lbw {
+    color: green;
+}
+
+.cw {
+    color: #C00;
+}
+
+.hs98 {
+    color: #777;
+}
+
