@@ -51,8 +51,10 @@ require("functions.php");
 
 if (array_key_exists('sort', $_GET)) {
     $sort_by = " ORDER BY ${_GET['sort']}";
+    $sorted_on = $_GET['sort'];
 } else {
     $sort_by = "";
+    $sorted_on = "";
 }
 $sql = "SELECT * FROM ${dbp}xref${sort_by}" ;
 $result = mysql_query($sql) or die(mysql_error());
@@ -64,6 +66,9 @@ $script_basename = basename($_SERVER['SCRIPT_NAME'], ".php") ;
 <body>
 <?= sitetabs($sitetabs, $script_basename); ?>
 <div id="content_container">
+<?  if ($sorted_on) { ?>
+<div id="goto_now"><a href="#sortstart">Jump to Beginning of Sorted</a></div>
+<?  } ?>
 <h1>Cross Reference Table</h1>
 <table id="xref_listing">
 <thead>
@@ -80,14 +85,24 @@ $script_basename = basename($_SERVER['SCRIPT_NAME'], ".php") ;
 </thead>
 <tbody>
 <?
+$marked_sortstart = FALSE;
+$sortmarker = "";
 while ($row = mysql_fetch_assoc($result)) {
     $r = array();
     foreach ($row as $k => $v) {
         if (is_null($v)) { $v = ''; }
         $r[$k] = $v;
     }
+    if (array_key_exists($sorted_on, $r)) {
+        if ((! $marked_sortstart) && $r[$sorted_on]) {
+            $sortmarker = "<a name=\"sortstart\" />";
+            $marked_sortstart = TRUE;
+        } else {
+            $sortmarker = "";
+        }
+    }
     echo "<tr>
-        <td>${r['title']}</td>
+        <td>${sortmarker}${r['title']}</td>
         <td>${r['text']}</td>
         <td>${r['elh']}</td>
         <td>${r['tlh']}</td>

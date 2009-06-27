@@ -121,7 +121,7 @@ div#sitetabs_background {
     border: none;
     margin: 0;
 }
-div#goto_now {
+#goto_now {
     float: right;
 }
 
@@ -131,9 +131,10 @@ a.sortlink {
     background-color: #DDD;
     color: blue;
     font-weight: bold;
-    font-size: larger;
+    font-size: 10pt;
     padding-left: 3px;
     padding-right: 3px;
+    text-decoration: none;
 }
 
 a.sortlink :visited {
