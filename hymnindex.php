@@ -73,7 +73,7 @@ require("options.php");
 $script_basename = basename($_SERVER['SCRIPT_NAME'], ".php") ;
 ?>
 <html>
-<?=html_head("Service Planning Records")?>
+<?=html_head("Hymn Cross Reference")?>
 <body>
 <?= sitetabs($sitetabs, $script_basename); ?>
 <div id="content_container">
