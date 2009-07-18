@@ -156,8 +156,8 @@ if (! array_key_exists('stage', $_GET))
     $location = mysql_esc($_POST['location']);
     $date = strftime("%Y-%m-%d", strtotime($_POST['date']));
     $_SESSION['stage1']['date'] = $date;
-    $sql = "SELECT 1 FROM ${dbp}hymns
-        JOIN ${dbp}days ON (${dbp}hymns.service = ${dbp}days.pkey)
+    $sql = "SELECT 1 FROM ${dbp}days
+        LEFT JOIN ${dbp}hymns ON (${dbp}hymns.service = ${dbp}days.pkey)
         WHERE ${dbp}days.caldate = '${date}'";
     $result = mysql_query($sql) or die(mysql_error());
     echo "<ul>\n";
@@ -166,7 +166,7 @@ if (! array_key_exists('stage', $_GET))
         /// Service already entered.  Ask if entered hymns s/b appended
         // Get the max sequence number at this location
         $sql = "SELECT MAX(${dbp}hymns.sequence) as maxseq
-            FROM ${dbp}hymns JOIN ${dbp}days
+            FROM ${dbp}days JOIN ${dbp}hymns
             ON (${dbp}hymns.service = ${dbp}days.pkey)
             WHERE ${dbp}days.caldate = '${date}'
                 AND ${dbp}hymns.location = '${location}'
@@ -182,8 +182,8 @@ if (! array_key_exists('stage', $_GET))
         $sql = "SELECT ${dbp}hymns.book, ${dbp}hymns.number, ${dbp}hymns.note,
             ${dbp}hymns.location, ${dbp}days.name as dayname, ${dbp}days.rite,
             ${dbp}days.pkey as service, ${dbp}names.title
-            FROM ${dbp}hymns
-            JOIN ${dbp}days ON (${dbp}hymns.service = ${dbp}days.pkey)
+            FROM ${dbp}days
+            LEFT JOIN ${dbp}hymns ON (${dbp}hymns.service = ${dbp}days.pkey)
             LEFT JOIN ${dbp}names ON (${dbp}hymns.number = ${dbp}names.number
                 AND ${dbp}hymns.book = ${dbp}names.book)
             WHERE ${dbp}days.caldate = '${date}'
@@ -200,9 +200,12 @@ if (! array_key_exists('stage', $_GET))
                     Add to '${row['dayname']}' using '${row['rite']}'\n";
                 $dayname = $row['dayname'];
             }
-            echo "<p class=\"hymnlist\">${row['location']}: ".
-                "${row['book']} ${row['number']} ".
-                "${row['note']} <em>${row['title']}</em></p>\n" ;
+            if ($row['number'])
+            {
+                echo "<p class=\"hymnlist\">${row['location']}: ".
+                    "${row['book']} ${row['number']} ".
+                    "${row['note']} <em>${row['title']}</em></p>\n" ;
+            }
         }
         echo "</li>\n";
     }
