@@ -11,7 +11,7 @@ $sql = "SELECT ${dbp}sermons.bibletext, ${dbp}sermons.outline,
     ${dbp}days.name, ${dbp}days.rite
     FROM ${dbp}sermons JOIN ${dbp}days
         ON (${dbp}sermons.service=${dbp}days.pkey)
-    ORDER BY days.caldate DESC";
+    ORDER BY ${dbp}days.caldate DESC";
 $result = mysql_query($sql) or die(mysql_error());
 ?>
 <body>
