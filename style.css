@@ -85,6 +85,14 @@ tr.table_topline td {
     padding: 1ex;
 }
 
+td.note {
+    width: 8em;
+}
+
+td.title {
+    font-style: italic;
+}
+
 /**** site tabs ****/
 
 ul#sitetabs {

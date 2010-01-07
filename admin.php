@@ -22,11 +22,23 @@ $script_basename = basename($_SERVER['SCRIPT_NAME'], ".php") ;
     but so far I'm not convinced it's necessary.  For now, keep backups.</p>
 
     <p>To make the information available to others in the public, it is
-    recommended that you provide links to the files (linked here) <a
-    href="hymns.php">hymns.php</a> and <a
-    href="servicerecords.php">servicerecords.php</a> only.  (These can be web
-    page links or symbolic links from some public place on the web server.)
-    Those two intentionally lack links to the rest of the interface.</p>
+    recommended that you make links to the files (linked here) <a
+    href="index.php">index.php</a> and <a
+    href="servicerecords.php">servicerecords.php</a> only.</p>
+
+    <p>The first file linked above will show a page without the navigation tabs
+    or the ability to change things, <em>but only</em> if it is accessed from
+    <em>outside</em> the installation of this application on the web server.
+    That can be accomplished on a Unix system by creating a symbolic link to
+    it, for example, from the parent directory of the installation like this:
+    "<tt>ln -s services/index.php hymns.php</tt>".  Then the URL <em>to the new
+symbolic link</em> can be given to others, e.g. organists.</p>
+
+    <p>The second file linked above can be distributed directly as a web page
+    link, or via a symbolic link created in the manner described above.
+    However, it's probably a better idea to create a symbolic link for that,
+    too, lest anyone find the pages that modify the database by playing with
+    the URL.</p>
 
     <ul>
     <li><a href="setupdb.php">Initial Database Setup</a> FYI only.  Don't run

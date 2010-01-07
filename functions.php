@@ -30,7 +30,7 @@ function display_records_table($result)
         // Display this hymn
         echo "<tr><td>&nbsp;</td>
             <td>${row['book']} ${row['number']}</td>
-            <td>${row['note']}</td><td>${row['title']}</td>";
+            <td class=\"note\">${row['note']}</td><td class=\"title\">${row['title']}</td>";
     }
     echo "</table>\n";
 }
@@ -73,7 +73,7 @@ function modify_records_table($result, $action)
         // Display this hymn
         echo "<tr><td>&nbsp;</td>
             <td>${row['book']} ${row['number']}</td>
-            <td>${row['note']}</td><td>${row['title']}</td></tr>\n";
+            <td class=\"note\">${row['note']}</td><td class=\"title\">${row['title']}</td></tr>\n";
     }
     ?>
     </table>
