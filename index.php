@@ -37,7 +37,7 @@ $sql = "SELECT DATE_FORMAT(${dbp}days.caldate, '%e %b %Y') as date,
     LEFT OUTER JOIN ${dbp}names ON (${dbp}hymns.number = ${dbp}names.number)
         AND (${dbp}hymns.book = ${dbp}names.book)
     WHERE ${dbp}days.caldate >= CURDATE()
-    ORDER BY ${dbp}hymns.service, ${dbp}days.caldate,
+    ORDER BY ${dbp}days.caldate, ${dbp}hymns.service,
         ${dbp}hymns.location, ${dbp}hymns.sequence";
 
 $result = mysql_query($sql) or die(mysql_error()) ;
