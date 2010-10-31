@@ -279,15 +279,9 @@ if (! array_key_exists('stage', $_GET))
     require("db-connection.php");
     require("options.php");
     //// Add a new service, if needed.
-?>
-    <html><?=html_head("Results")?>
-    <body>
-    <div id="content_container">
-    <p><a href="records.php">See Records</a> |
-        <a href="enter.php">Enter another service</a></p>
+    $feedback='
     <h1>Results</h1>
-    <ol>
-<?
+    <ol>\n';
     $date = $_SESSION['stage1']['date'];
     $location = mysql_esc($_SESSION['stage1']['location']);
     $maxseq = 0; // For adding hymns to an existing service
@@ -306,8 +300,7 @@ if (! array_key_exists('stage', $_GET))
         $result = mysql_query($sql) or die(mysql_error());
         $row = mysql_fetch_row($result);
         $serviceid = $row[0];
-        ?><li>Saved a new service on <?=$date?> for <?=$dayname?>.</li>
-        <?
+        $feedback .= "<li>Saved a new service on <?={$date}?> for <?={$dayname}?>.</li>\n";
     } else {
         // If an existing service is selected, grab its pkey and maxseq.
         preg_match('/(\d+)_(\d+)/', $_POST["services"], $matches);
@@ -335,19 +328,16 @@ if (! array_key_exists('stage', $_GET))
             VALUES ('${h[0]}', '${h[1]}', '${h[2]}')";
         if (mysql_query($sql))
         {
-            ?><li>Saved name '<?=$h[2]?>' for <?="${h[0]} ${h[1]}"?>.</li>
-            <?
+            $feedback .= "<li>Saved name '{$h[2]}' for {$h[0]} {$h[1]}.</li>\n";
         } else {
             $sql = "UPDATE ${dbp}names SET title='${h[2]}'
                 WHERE book='${h[0]}' AND number='${h[1]}'";
             mysql_query($sql) or die(mysql_error());
             if (mysql_affected_rows())
             {
-                ?><li>Updated name '<?=$h[2]?>' for <?="${h[0]} ${h[1]}"?>.</li>
-            <?
+                $feedback .="<li>Updated name '{$h[2]}' for {$h[0]} {$h[1]}.</li>\n";
             } else {
-                ?><li>Title for hymn <?="${h[0]} ${h[1]}"?> unchanged.</li>
-            <?
+                $feedback .="<li>Title for hymn "{$h[0]} {$h[1]}" unchanged.</li>\n";
             }
         }
     }
@@ -370,18 +360,13 @@ if (! array_key_exists('stage', $_GET))
             (service, location, book, number, note, sequence)
             VALUES ".implode(", ", $sqlhymns);
         mysql_query($sql) or die(mysql_error());
-        ?><li>Saved hymns :
-            <ol><li><?=implode("</li><li>", $saved)?></li></ol>
+        $feedback .="<li>Saved hymns :
+            <ol><li>" . implode("</li><li>", $saved) . "</li></ol>
           </li>
-        </ol>
-        <?
+        </ol>\n";
     }
-    ?>
-    </div>
-</body>
-</html>
-<?
-unset($_SESSION['stage1']);
-unset($_SESSION['stage2']);
+    unset($_SESSION['stage1']);
+    unset($_SESSION['stage2']);
+    http_redirect("modify.php?message=" . urlencode($feedback));
 }
 ?>
