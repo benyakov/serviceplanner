@@ -298,7 +298,7 @@ if (! array_key_exists('stage', $_GET))
         $result = mysql_query($sql) or die(mysql_error());
         $row = mysql_fetch_row($result);
         $serviceid = $row[0];
-        $feedback .= "<li>Saved a new service on <?={$date}?> for <?={$dayname}?>.</li>";
+        $feedback .= "<li>Saved a new service on '{$date}' for '{$dayname}'.</li>";
     } else {
         // If an existing service is selected, grab its pkey and maxseq.
         preg_match('/(\d+)_(\d+)/', $_POST["services"], $matches);
