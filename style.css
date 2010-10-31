@@ -41,6 +41,14 @@ tr.heading {
     color: black;
 }
 
+tr.heading th {
+    padding: .7ex 0 .7ex 0;
+}
+
+tr.even {
+    background-color: #F5F5F5;
+}
+
 textarea#outline,
 textarea#notes {
     height: 8em;
@@ -56,7 +64,7 @@ input.entryline {
     margin: 1ex;
 }
 
-div#content_container {
+div#content-container {
     border: thin solid black;
     border-top: none;
     -moz-border-radius: 5px;
@@ -70,27 +78,32 @@ div#content_container {
     color: black;
 }
 
-table#xref_listing,
-table#modify_listing,
-table#records_listing,
-table#sermonplan_listing {
+table#xref-listing,
+table#modify-listing,
+table#records-listing,
+table#sermonplan-listing {
     background-color: transparent;
     color: black;
     border-collapse: collapse;
 }
 
-tr.table_topline td {
+tr.table-topline td {
     border-top: thin solid black;
 }
-.table_leftborder {
+.table-leftborder {
     border-left: thin solid black;
 }
-.table_preformat {
+.table-preformat {
     padding: 1ex;
 }
 
+td.hymn-number {
+    padding: 0 1em 0 1em;
+    text-align: right;
+}
+
 td.note {
-    width: 8em;
+    width: 12em;
 }
 
 td.title {
@@ -131,14 +144,14 @@ ul#sitetabs > li.activated A  {
     background-color: white;
     border-bottom: 2px solid white;
 }
-div#sitetabs_background {
+div#sitetabs-background {
     background-color: black;
     padding-top: 1ex;
     padding-bottom: 0;
     border: none;
     margin: 0;
 }
-#goto_now {
+#goto-now {
     float: right;
 }
 

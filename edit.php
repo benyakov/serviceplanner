@@ -10,7 +10,7 @@ if (! array_key_exists("stage", $_GET))
     $backlink = "modify.php";
     ?>
     <body>
-    <div id="content_container">
+    <div id="content-container">
     <h1>Edit a Service</h1>
     <p class="explanation">You can change any service- or hymn-related
     information on this page.  To add hymns to a service that are not

@@ -18,7 +18,7 @@ if (! array_key_exists("stage", $_GET))
     <html>
     <?=html_head("Delete Confirmation")?>
     <body>
-        <div id="content_container">
+        <div id="content-container">
         <p><a href="modify.php">Abort</a><p>
         <h1>Confirm Deletions</h1>
         <ol>

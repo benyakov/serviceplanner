@@ -5,7 +5,7 @@ require("db-connection.php");
     <html>
     <?=html_head("Edit a Sermon Plan")?>
     <body>
-        <div id="content_container">
+        <div id="content-container">
         <span class="nonprinting">
         <p><a href="sermon.php?id=<?=$_GET['id']?>">Edit This Plan</a>
         | <a href="sermons.php">Browse All Sermon Plans</a></p>

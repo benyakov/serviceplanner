@@ -7,7 +7,7 @@ $script_basename = basename($_SERVER['SCRIPT_NAME'], ".php") ;
 <?=html_head("Housekeeping")?>
 <body>
     <?=sitetabs($sitetabs, $script_basename)?>
-    <div id="content_container">
+    <div id="content-container">
     <h1>Housekeeping</h1>
     <p>This page contains the links for backing up the database, restoring it,
     and the initial setup of the database.   It is recommended that you back up

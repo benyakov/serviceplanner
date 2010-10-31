@@ -2,13 +2,14 @@
 
 function display_records_table($result)
 { // Show a table of the data in the query $result
-    ?><table id="records_listing">
-        <tr class="heading"><th>Date &amp; Location</th><th colspan=3>Liturgical Day Name: Service/Rite</th></tr>
-        <tr><td>&nbsp;</td><th>Book &amp; #</th><th>Note</th><th>Title</th></tr>
+    ?><table id="records-listing">
+        <tr class="heading"><th>Date &amp; Location</th><th colspan=2>Liturgical Day Name: Service/Rite</th></tr>
+        <tr><th>Book &amp; #</th><th>Note</th><th>Title</th></tr>
     <?
     $date = "";
     $name = "";
     $location = "";
+    $rowcount = 1;
     while ($row = mysql_fetch_assoc($result))
     {
         if (!  ($row['date'] == $date &&
@@ -22,15 +23,20 @@ function display_records_table($result)
                 $datetext = $row['date'];
             }
             echo "<tr class=\"heading\"><td>${datetext} ${row['location']}</td>
-                <td colspan=3>${row['dayname']}: ${row['rite']}</td></tr>\n";
+                <td colspan=2>${row['dayname']}: ${row['rite']}</td></tr>\n";
             $date = $row['date'];
             $name = $row['dayname'];
             $location = $row['location'];
         }
         // Display this hymn
-        echo "<tr><td>&nbsp;</td>
-            <td>${row['book']} ${row['number']}</td>
+        if (0 == $rowcount % 2) {
+            $oddness = " class=\"even\"";
+        } else {
+            $oddness = "";
+        }
+        echo "<tr{$oddness}><td class=\"hymn-number\">${row['book']} ${row['number']}</td>
             <td class=\"note\">${row['note']}</td><td class=\"title\">${row['title']}</td>";
+        $rowcount += 1;
     }
     echo "</table>\n";
 }
@@ -41,13 +47,14 @@ function modify_records_table($result, $action)
   // with links to edit each record, and checkboxes to delete records.
     ?><form action="<?=$action?>" method="POST">
       <input type="submit" value="Delete"><input type="reset" value="Clear">
-      <table id="modify_listing">
-        <tr class="heading"><th>Date &amp; Location</th><th colspan=3>Liturgical Day Name: Service/Rite</th></tr>
-        <tr><td>&nbsp;</td><th>Book &amp; #</th><th>Note</th><th>Title</th></tr>
+      <table id="modify-listing">
+        <tr class="heading"><th>Date &amp; Location</th><th colspan=2>Liturgical Day Name: Service/Rite</th></tr>
+        <tr><th>Book &amp; #</th><th>Note</th><th>Title</th></tr>
     <?
     $date = "";
     $name = "";
     $location = "";
+    $rowcount = 1;
     while ($row = mysql_fetch_assoc($result))
     {
         if (!  ($row['date'] == $date &&
@@ -63,7 +70,7 @@ function modify_records_table($result, $action)
             echo "<tr class=\"heading\"><td>
             <input type=\"checkbox\" name=\"${row['id']}_${row['location']}\" id=\"check_${row['id']}_${row['location']}\">
             ${datetext} ${row['location']}</td>
-            <td colspan=3><a href=\"edit.php?id=${row['id']}\">Edit</a> |
+            <td colspan=2><a href=\"edit.php?id=${row['id']}\">Edit</a> |
             <a href=\"sermon.php?id=${row['id']}\">Sermon</a> |
             ${row['dayname']}: ${row['rite']}</td></tr>\n";
             $date = $row['date'];
@@ -71,9 +78,14 @@ function modify_records_table($result, $action)
             $location = $row['location'];
         }
         // Display this hymn
-        echo "<tr><td>&nbsp;</td>
-            <td>${row['book']} ${row['number']}</td>
+        if (0 == $rowcount % 2) {
+            $oddness = " class=\"even\"";
+        } else {
+            $oddness = "";
+        }
+        echo "<tr{$oddness}><td class=\"hymn-number\">${row['book']} ${row['number']}</td>
             <td class=\"note\">${row['note']}</td><td class=\"title\">${row['title']}</td></tr>\n";
+        $rowcount += 1;
     }
     ?>
     </table>
@@ -111,7 +123,7 @@ function mysql_esc($str)
 function sitetabs($sitetabs, $action) {
     $tabs = array_fill_keys(array_keys($sitetabs), 0);
     $tabs[$action] = 1;
-    echo "<div id=\"sitetabs_background\">";
+    echo "<div id=\"sitetabs-background\">";
     echo "<ul id=\"sitetabs\">\n";
     foreach ($tabs as $name => $activated) {
         if ($activated) {

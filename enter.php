@@ -67,7 +67,7 @@ if (! array_key_exists('stage', $_GET))
         <p class="errormessage"><?=htmlspecialchars($_GET['error'])?></p>
     <? } ?>
     <?=sitetabs($sitetabs, $script_basename)?>
-    <div id="content_container">
+    <div id="content-container">
     <h1>Service Entry Form</h1>
     <p class="explanation">This form allows you to enter a new service,
     optionally including several hymns for use at a certain location.  (The
@@ -135,7 +135,7 @@ if (! array_key_exists('stage', $_GET))
         <p class="errormessage"><?=htmlspecialchars($_GET['error'])?></p>
     <? } ?>
     <p><a href="enter.php">Back to start</a></p>
-    <div id="content_container">
+    <div id="content-container">
     <h1>Confirmation (Entry Step 2)</h1>
     <p class="explanation">In this final step for entering a service, you are
     presented with a list of existing services on the date you chose, together

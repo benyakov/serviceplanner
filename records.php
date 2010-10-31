@@ -10,8 +10,8 @@ $script_basename = basename($_SERVER['SCRIPT_NAME'], ".php") ;
         <div class="message"><?=htmlspecialchars($_GET['message'])?></div>
     <? }
     echo sitetabs($sitetabs, $script_basename);
-    ?><div id="content_container">
-    <div id="goto_now"><a href="#now">Jump to This Week</a></div>
+    ?><div id="content-container">
+    <div id="goto-now"><a href="#now">Jump to This Week</a></div>
     <?
     include("records-table.php");
     ?>

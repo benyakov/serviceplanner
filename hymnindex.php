@@ -76,12 +76,12 @@ $script_basename = basename($_SERVER['SCRIPT_NAME'], ".php") ;
 <?=html_head("Hymn Cross Reference")?>
 <body>
 <?= sitetabs($sitetabs, $script_basename); ?>
-<div id="content_container">
+<div id="content-container">
 <?  if ($sorted_on) { ?>
-<div id="goto_now"><a href="#sortstart">Jump to Beginning of Sorted</a></div>
+<div id="goto-now"><a href="#sortstart">Jump to Beginning of Sorted</a></div>
 <?  } ?>
 <h1>Cross Reference Table</h1>
-<table id="xref_listing" cols="8">
+<table id="xref-listing" cols="8">
 <thead>
 <tr>
 <td><?=linksort("Title", "title")?></td>

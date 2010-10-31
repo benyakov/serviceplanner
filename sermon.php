@@ -11,7 +11,7 @@ if (! array_key_exists('stage', $_GET)) {
         <? if ($_GET['message']) { ?>
             <p class="message"><?=htmlspecialchars($_GET['message'])?></p>
         <? } ?>
-        <div id="content_container">
+        <div id="content-container">
         <p><a href="sermonreport.php?id=<?=${id}?>">Printable Sermon Report</a>
         | <a href="sermons.php">Browse All Sermon Plans</a>
         | <a href="modify.php">Back to Service Listing</a></p>

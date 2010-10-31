@@ -8,11 +8,11 @@ body {
 }
 
 ul#sitetabs,
-div#sitetabs_background {
+div#sitetabs-background {
     display: none;
 }
 
-div#content_container {
+div#content-container {
     border: none;
 }
 

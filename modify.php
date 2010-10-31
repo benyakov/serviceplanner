@@ -11,8 +11,8 @@ $script_basename = basename($_SERVER['SCRIPT_NAME'], ".php") ;
         <div class="message"><?=$_GET['message']?></div>
     <? } ?>
     <?=sitetabs($sitetabs, $script_basename)?>
-    <div id="content_container">
-    <div id="goto_now"><a href="#now">Jump to This Week</a></div>
+    <div id="content-container">
+    <div id="goto-now"><a href="#now">Jump to This Week</a></div>
 <h1>Modify Service Planning Records</h1>
 <p class="explanation">This listing of hymns allows you to delete whole
 services, with all associated hymns at that location. To delete only certain

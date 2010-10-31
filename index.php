@@ -25,7 +25,7 @@ if (! is_link($_SERVER['SCRIPT_FILENAME']))
 {
     echo sitetabs($sitetabs, $script_basename);
 }   ?>
-<div id="content_container">
+<div id="content-container">
 <h1>Upcoming Hymns</h1>
 <?php
 $sql = "SELECT DATE_FORMAT(${dbp}days.caldate, '%e %b %Y') as date,
