@@ -8,7 +8,7 @@ $script_basename = basename($_SERVER['SCRIPT_NAME'], ".php") ;
 <?=html_head("Modify Service Planning Records")?>
 <body>
     <? if ($_GET['message']) { ?>
-        <p class="message"><?=htmlspecialchars($_GET['message'])?></p>
+        <div class="message"><?=$_GET['message']?></div>
     <? } ?>
     <?=sitetabs($sitetabs, $script_basename)?>
     <div id="content_container">
