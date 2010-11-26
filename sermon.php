@@ -16,6 +16,10 @@ if (! array_key_exists('stage', $_GET)) {
         | <a href="sermons.php">Browse All Sermon Plans</a>
         | <a href="modify.php">Back to Service Listing</a></p>
         <h1>Edit a Sermon Plan</h1>
+        <p class="explanation">You can delete the whole service, hymns, sermon
+        plan, and all, from here.  To edit this service or modify the chosen
+        hymns individually, use the link below.</p>
+        <a href="edit.php?id=<?=$id?>">Edit the Service</a>.</p>
     <?
         $sql = "SELECT DATE_FORMAT(${dbp}days.caldate, '%e %b %Y') as date,
             ${dbp}hymns.book, ${dbp}hymns.number, ${dbp}hymns.note,
@@ -49,11 +53,6 @@ if (! array_key_exists('stage', $_GET)) {
         <textarea id="notes" name="notes"><?=trim($row['notes'])?></textarea><br />
         <input type="submit" value="Commit"><input type="reset">
         </form>
-        <h2>Hymns for This Service</h2>
-        <p class="explanation">You can delete the whole service, hymns, sermon
-        plan, and all, from here.  To edit this service or modify the chosen
-        hymns individually, use the link below.</p>
-        <a href="edit.php?id=<?=$id?>">Edit the Service</a>.</p>
     </div>
     </body>
     </html>
