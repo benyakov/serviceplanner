@@ -1,8 +1,11 @@
 <?
 // List of possible hymnbooks to draw from
 $option_hymnbooks = array(
+    "ELH",
     "TLH",
-    "ELH"
+    "CW",
+    "LSB",
+    "LW"
 );
 
 // How many hymns can be entered at once
@@ -37,4 +40,8 @@ $sitetabs = array(
 // using Markdown when displayed.
 $phplibrary = "../../php/";
 
+// Default limit for the comprehensive (not future) service listings.
+// When this has not been manually set by the user, this will be the number
+// of hymns included in the list.
+$listinglimit = 200;
 ?>

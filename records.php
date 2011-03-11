@@ -1,6 +1,8 @@
 <?
 require("functions.php");
 require("options.php");
+require("setup-session.php");
+$this_script = $_SERVER['HTTP_HOST'].$_SERVER['SCRIPT_NAME'] ;
 $script_basename = basename($_SERVER['SCRIPT_NAME'], ".php") ;
 ?>
 <html>

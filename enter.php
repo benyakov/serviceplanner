@@ -1,7 +1,7 @@
 <?php
 require("functions.php");
 require("options.php");
-session_start();
+require("setup-session.php");
 $this_script = $_SERVER['HTTP_HOST'].$_SERVER['SCRIPT_NAME'] ;
 $script_basename = basename($_SERVER['SCRIPT_NAME'], ".php") ;
 
@@ -46,9 +46,9 @@ function entered_hymncount($ary)
 
 if (! array_key_exists('stage', $_GET))
 { # Initial entry form
-    if (array_key_exists('stage1', $_SESSION))
+    if (array_key_exists('stage1', $_SESSION[$sprefix]))
     {
-        $s = $_SESSION['stage1'];
+        $s = $_SESSION[$sprefix]['stage1'];
     } else {
         $s = array();
     }
@@ -118,7 +118,7 @@ if (! array_key_exists('stage', $_GET))
     // Check for missing data
     // print_r($_GET); print_r($_POST); exit(0);
     require("options.php");
-    $_SESSION['stage1'] = $_POST;
+    $_SESSION[$sprefix]['stage1'] = $_POST;
     if (! (array_key_exists('date', $_POST)
             && $_POST['date'])) {
         errormsg("Please enter a date.");
@@ -155,7 +155,7 @@ if (! array_key_exists('stage', $_GET))
     require("db-connection.php");
     $location = mysql_esc($_POST['location']);
     $date = strftime("%Y-%m-%d", strtotime($_POST['date']));
-    $_SESSION['stage1']['date'] = $date;
+    $_SESSION[$sprefix]['stage1']['date'] = $date;
     $sql = "SELECT 1 FROM ${dbp}days
         LEFT JOIN ${dbp}hymns ON (${dbp}hymns.service = ${dbp}days.pkey)
         WHERE ${dbp}days.caldate = '${date}'";
@@ -233,11 +233,11 @@ if (! array_key_exists('stage', $_GET))
                 $title = $titlerec[0];
                 $extra = 'class="verified"';
             } else {
-                if (array_key_exists('stage2', $_SESSION)
+                if (array_key_exists('stage2', $_SESSION[$sprefix])
                     && array_key_exists("${hymn['book']}_${hymn['number']}",
-                    $_SESSION['stage2']))
+                    $_SESSION[$sprefix]['stage2']))
                 {
-                    $title = $_SESSION['stage2']["${hymn['book']}_${hymn['number']}"];
+                    $title = $_SESSION[$sprefix]['stage2']["${hymn['book']}_${hymn['number']}"];
                 } else {
                     $title = "No title found. Please enter one.";
                 }
@@ -275,21 +275,21 @@ if (! array_key_exists('stage', $_GET))
     <?
 } elseif (3 == $_GET['stage']) {
     // Insert data into db
-    $_SESSION['stage2'] = $_POST;
+    $_SESSION[$sprefix]['stage2'] = $_POST;
     require("db-connection.php");
     require("options.php");
     //// Add a new service, if needed.
     $feedback='<ol>';
-    $date = $_SESSION['stage1']['date'];
-    $location = mysql_esc($_SESSION['stage1']['location']);
+    $date = $_SESSION[$sprefix]['stage1']['date'];
+    $location = mysql_esc($_SESSION[$sprefix]['stage1']['location']);
     $maxseq = 0; // For adding hymns to an existing service
     if (! array_key_exists("services", $_POST)) {
         errormsg("Forgot to choose a service. Please try again.");
     }
     if ("new" == $_POST["services"])
     {
-        $dayname = mysql_esc($_SESSION['stage1']['liturgical_name']);
-        $rite = mysql_esc($_SESSION['stage1']['rite']);
+        $dayname = mysql_esc($_SESSION[$sprefix]['stage1']['liturgical_name']);
+        $rite = mysql_esc($_SESSION[$sprefix]['stage1']['rite']);
         $sql = "INSERT INTO ${dbp}days (caldate, name, rite)
             VALUES ('${date}', '${dayname}', '${rite}')";
         mysql_query($sql) or die(mysql_error());
@@ -340,7 +340,7 @@ if (! array_key_exists('stage', $_GET))
         }
     }
     //// Enter hymns and location on selected date
-    $hymns = entered_hymns($_SESSION['stage1']);
+    $hymns = entered_hymns($_SESSION[$sprefix]['stage1']);
     if (0 < entered_hymncount($hymns))
     {
         $sqlhymns = array();
@@ -360,8 +360,8 @@ if (! array_key_exists('stage', $_GET))
         mysql_query($sql) or die(mysql_error());
         $feedback .="<li>Saved hymns: <ol><li>" . implode("</li><li>", $saved) . "</li></ol></li></ol>\n";
     }
-    unset($_SESSION['stage1']);
-    unset($_SESSION['stage2']);
+    unset($_SESSION[$sprefix]['stage1']);
+    unset($_SESSION[$sprefix]['stage2']);
     header("Location: modify.php?message=" . urlencode($feedback));
 }
 ?>

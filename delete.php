@@ -1,5 +1,5 @@
 <?
-session_start();
+require("setup-session.php");
 require("functions.php");
 $this_script = $_SERVER['HTTP_HOST'].$_SERVER['SCRIPT_NAME'] ;
 if (! array_key_exists("stage", $_GET))
@@ -13,7 +13,7 @@ if (! array_key_exists("stage", $_GET))
             $todelete[] = array("index" => $matches[1], "loc" => $matches[2]);
         }
     }
-    $_SESSION['stage1'] = $todelete;
+    $_SESSION[$sprefix]['stage1'] = $todelete;
     ?>
     <html>
     <?=html_head("Delete Confirmation")?>
@@ -60,7 +60,7 @@ if (! array_key_exists("stage", $_GET))
 } elseif ("2" == $_GET['stage']) {
     //// Delete and acknowledge deletion.
     require("db-connection.php");
-    foreach ($_SESSION['stage1'] as $todelete)
+    foreach ($_SESSION[$sprefix]['stage1'] as $todelete)
     {
         // Check to see if service has hymns at another location
         $sql = "SELECT number FROM ${dbp}hymns JOIN ${dbp}days
