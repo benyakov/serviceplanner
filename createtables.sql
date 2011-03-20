@@ -3,6 +3,7 @@ CREATE TABLE `days` (
   `caldate` date default NULL,
   `name` varchar(50) default NULL,
   `rite` varchar(50) default NULL,
+  `servicenotes` text default NULL,
   KEY `pkey` (`pkey`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
 CREATE TABLE `hymns` (
