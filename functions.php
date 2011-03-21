@@ -22,8 +22,12 @@ function display_records_table($result)
             } else {
                 $datetext = $row['date'];
             }
-            echo "<tr class=\"heading\"><td>${datetext} ${row['location']}</td>
-                <td colspan=2>${row['dayname']}: ${row['rite']}</td></tr>\n";
+            echo "<tr class=\"heading\"><td>{$datetext} {$row['location']}</td>
+                <td colspan=2>{$row['dayname']}: {$row['rite']}</td></tr>\n";
+            if ($row['servicenotes']) {
+                echo "<tr class=\"heading\"><td colspan=3>".
+                     "{$row['servicenotes']}</td></tr>\n";
+            }
             $date = $row['date'];
             $name = $row['dayname'];
             $location = $row['location'];
@@ -34,8 +38,8 @@ function display_records_table($result)
         } else {
             $oddness = "";
         }
-        echo "<tr{$oddness}><td class=\"hymn-number\">${row['book']} ${row['number']}</td>
-            <td class=\"note\">${row['note']}</td><td class=\"title\">${row['title']}</td>";
+        echo "<tr{$oddness}><td class=\"hymn-number\">{$row['book']} {$row['number']}</td>
+            <td class=\"note\">{$row['note']}</td><td class=\"title\">{$row['title']}</td>";
         $rowcount += 1;
     }
     echo "</table>\n";
@@ -63,7 +67,7 @@ function modify_records_table($result, $action)
         {// Display the heading line
             if (is_within_week($row['date']))
             {
-                $datetext = "<a name=\"now\">${row['date']}</a>";
+                $datetext = "<a name=\"now\">{$row['date']}</a>";
             } else {
                 $datetext = $row['date'];
             }
@@ -77,6 +81,10 @@ function modify_records_table($result, $action)
             $date = $row['date'];
             $name = $row['dayname'];
             $location = $row['location'];
+            if ($row['servicenotes']) {
+                echo "<tr class=\"heading\"><td colspan=3>".
+                     "{$row['servicenotes']}</td></tr>\n";
+            }
         }
         // Display this hymn
         if (0 == $rowcount % 2) {
@@ -84,8 +92,8 @@ function modify_records_table($result, $action)
         } else {
             $oddness = "";
         }
-        echo "<tr{$oddness}><td class=\"hymn-number\">${row['book']} ${row['number']}</td>
-            <td class=\"note\">${row['note']}</td><td class=\"title\">${row['title']}</td></tr>\n";
+        echo "<tr{$oddness}><td class=\"hymn-number\">{$row['book']} {$row['number']}</td>
+            <td class=\"note\">{$row['note']}</td><td class=\"title\">{$row['title']}</td></tr>\n";
         $rowcount += 1;
     }
     ?>
@@ -106,8 +114,8 @@ function html_head($title)
     return ("
     <head>
     <title>${title}</title>
-    <link type=\"text/css\" rel=\"stylesheet\" href=\"${here}/style.css\">
-    <link type=\"text/css\" rel=\"stylesheet\" media=\"print\" href=\"${here}/print.css\">
+    <link type=\"text/css\" rel=\"stylesheet\" href=\"{$here}/style.css\">
+    <link type=\"text/css\" rel=\"stylesheet\" media=\"print\" href=\"{$here}/print.css\">
     </head>");
 }
 
@@ -133,7 +141,7 @@ function sitetabs($sitetabs, $action) {
             $class = "";
         }
         $tabtext = $sitetabs[$name];
-        echo "<li$class><a href=\"${name}.php\">$tabtext</a></li>\n";
+        echo "<li{$class}><a href=\"{$name}.php\">{$tabtext}</a></li>\n";
     }
     echo "</ul></div>\n";
 }

@@ -44,7 +44,7 @@ for that service, use the "Sermon" link.</p>
 $sql = "SELECT DATE_FORMAT({$dbp}days.caldate, '%e %b %Y') as date,
     {$dbp}hymns.book, {$dbp}hymns.number, {$dbp}hymns.note,
     {$dbp}hymns.location, {$dbp}days.name as dayname, {$dbp}days.rite,
-    {$dbp}days.pkey as id, {$dbp}names.title
+    {$dbp}days.pkey as id, {$dbp}days.servicenotes, {$dbp}names.title
     FROM {$dbp}hymns
     RIGHT OUTER JOIN {$dbp}days ON ({$dbp}hymns.service = {$dbp}days.pkey)
     LEFT OUTER JOIN {$dbp}names ON ({$dbp}hymns.number = {$dbp}names.number)

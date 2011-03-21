@@ -17,19 +17,19 @@ if (! array_key_exists("stage", $_GET))
     already listed here, use the "Add Hymns" link.</p>
     <p><a href="<?=$backlink?>">Cancel Edit</a><p>
     <?
-        $sql = "SELECT DATE_FORMAT(${dbp}days.caldate, '%e %b %Y') as date,
-            ${dbp}hymns.book, ${dbp}hymns.number, ${dbp}hymns.note,
-            ${dbp}hymns.pkey as hymnid, ${dbp}hymns.location,
-            ${dbp}hymns.sequence, ${dbp}days.name as dayname, ${dbp}days.rite,
-            ${dbp}names.title
-            FROM ${dbp}hymns
-            RIGHT OUTER JOIN ${dbp}days ON (${dbp}hymns.service=${dbp}days.pkey)
-            LEFT OUTER JOIN ${dbp}names
-                ON (${dbp}hymns.number=${dbp}names.number)
-                AND (${dbp}hymns.book=${dbp}names.book)
-            WHERE ${dbp}days.pkey = '${_GET['id']}'
-            ORDER BY ${dbp}days.caldate DESC, ${dbp}hymns.location,
-                ${dbp}hymns.sequence";
+        $sql = "SELECT DATE_FORMAT({$dbp}days.caldate, '%e %b %Y') as date,
+            {$dbp}hymns.book, {$dbp}hymns.number, {$dbp}hymns.note,
+            {$dbp}hymns.pkey as hymnid, {$dbp}hymns.location,
+            {$dbp}hymns.sequence, {$dbp}days.name as dayname, {$dbp}days.rite,
+            {$dbp}days.servicenotes, {$dbp}names.title
+            FROM {$dbp}hymns
+            RIGHT OUTER JOIN {$dbp}days ON ({$dbp}hymns.service={$dbp}days.pkey)
+            LEFT OUTER JOIN {$dbp}names
+                ON ({$dbp}hymns.number={$dbp}names.number)
+                AND ({$dbp}hymns.book={$dbp}names.book)
+            WHERE {$dbp}days.pkey = '{$_GET['id']}'
+            ORDER BY {$dbp}days.caldate DESC, {$dbp}hymns.location,
+                {$dbp}hymns.sequence";
         $result = mysql_query($sql) or die(mysql_error());
         $row = mysql_fetch_assoc($result);
         ?>
@@ -51,6 +51,10 @@ if (! array_key_exists("stage", $_GET))
             <dd>
                 <input type="text" id="rite" name="rite"
                  value="<?=$row['rite']?>" size="50" maxlength="50">
+            </dd>
+            <dt>Service Notes</dt>
+            <dd>
+                <textarea id="servicenotes" name="servicenotes"><?=trim($row['servicenotes'])?></textarea>
             </dd>
         </dl>
         <p><a href="enter.php?date=<?=str_replace(' ', '', $row['date'])?>">Add Hymns at Any Location</a></p>
@@ -123,7 +127,7 @@ if (! array_key_exists("stage", $_GET))
     $id = "";
     foreach ($_POST as $key => $value)
     {
-        if (in_array($key, array("date", "dayname", "rite")))
+        if (in_array($key, array("date", "dayname", "rite", "servicenotes")))
         {
             $todays[$key] = $value;
         } elseif (preg_match('/delete_(\d+)/', $key, $matches)) {
@@ -158,10 +162,12 @@ if (! array_key_exists("stage", $_GET))
     $date = strftime("%Y-%m-%d", strtotime($todays['date']));
     $name = mysql_esc($todays['dayname']);
     $rite = mysql_esc($todays['rite']);
+    $servicenotes = mysql_esc($todays['servicenotes']);
     $id = $_POST['id'];
-    $sql = "UPDATE ${dbp}days SET caldate='${date}',
-        name='${name}', rite='${rite}'
-        WHERE pkey = '${id}'";
+    $sql = "UPDATE `{$dbp}days` SET `caldate`='{$date}',
+        `name`='{$name}', `rite`='{$rite}',
+        `servicenotes`='{$servicenotes}'
+        WHERE `pkey` = '{$id}'";
     mysql_query($sql) or die(mysql_error());
 
     // Update hymns

@@ -93,7 +93,7 @@ if (! array_key_exists('stage', $_GET))
         <label for="rite">Rite or Order:</label>
         <input type="text" id="rite" name="rite" size="50" maxlength="50" value="<?=$s['rite']?>">
     </li>
-    <li>
+    <li class="vcenter">
         <label for="servicenotes">Service Notes:</label>
         <textarea id="servicenotes" name="servicenotes"><?=trim($s['servicenotes'])?></textarea>
     </li>

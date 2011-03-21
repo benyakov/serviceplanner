@@ -50,11 +50,13 @@ tr.even {
 }
 
 textarea#outline,
-textarea#notes {
+textarea#notes,
+textarea#servicenotes{
     height: 8em;
     width: 45em;
     margin: 1ex;
 }
+
 select,
 input {
     background-color: black;
@@ -201,3 +203,6 @@ a.sortlink :hover {
     color: #777;
 }
 
+.vcenter * {
+    vertical-align: middle;
+}
