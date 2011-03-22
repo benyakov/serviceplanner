@@ -56,6 +56,12 @@ textarea#servicenotes{
     width: 45em;
     margin: 1ex;
 }
+td.servicenote {
+    padding: 2px 2px 2px 1em;
+    border-top: thin dashed black;
+    font-size: 80%;
+}
+
 
 select,
 input {
