@@ -151,7 +151,7 @@ if (! array_key_exists('stage', $_GET))
     <dl>
         <dt>Date</dt><dd><?=$_POST['date']?></dd>
         <dt>Location</dt><dd><?=$_POST['location']?></dd>
-        <dt>Notes</dt><dd><?=$_POST['servicenotes']?></dd>
+        <dt>Notes</dt><dd><?=translate_markup($_POST['servicenotes'])?></dd>
     </dl>
     <form action="http://<?=$this_script."?stage=3"?>" method="POST">
     <h2>Choose the Service</h2>
@@ -164,7 +164,7 @@ if (! array_key_exists('stage', $_GET))
     $sql = "SELECT 1 FROM {$dbp}days
         LEFT JOIN {$dbp}hymns ON ({$dbp}hymns.service = {$dbp}days.pkey)
         WHERE {$dbp}days.caldate = '{$date}'";
-    $result = mysql_query($sql) or die(mysql_error());
+    $result = mysql_query($sql) or die(mysql_error().$sql);
     echo "<ul>\n";
     if (mysql_fetch_row($result))
     {
@@ -176,7 +176,7 @@ if (! array_key_exists('stage', $_GET))
             WHERE {$dbp}days.caldate = '{$date}'
                 AND {$dbp}hymns.location = '{$location}'
             GROUP BY ({$dbp}hymns.service)";
-        $result = mysql_query($sql) or die(mysql_error());
+        $result = mysql_query($sql) or die(mysql_error().$sql);
         if ($row = mysql_fetch_array($result))
         {
             $maxseq = $row[0];
@@ -187,14 +187,14 @@ if (! array_key_exists('stage', $_GET))
         $sql = "SELECT {$dbp}hymns.book, {$dbp}hymns.number, {$dbp}hymns.note,
             {$dbp}hymns.location, {$dbp}days.servicenotes,
             {$dbp}days.name as dayname, {$dbp}days.rite,
-            {$dbp}days.pkey as service, {$dbp}names.title,
+            {$dbp}days.pkey as service, {$dbp}names.title
             FROM {$dbp}days
             LEFT JOIN {$dbp}hymns ON ({$dbp}hymns.service = {$dbp}days.pkey)
             LEFT JOIN {$dbp}names ON ({$dbp}hymns.number = {$dbp}names.number
                 AND {$dbp}hymns.book = {$dbp}names.book)
             WHERE {$dbp}days.caldate = '{$date}'
             ORDER BY dayname, location";
-        $result = mysql_query($sql) or die(mysql_error());
+        $result = mysql_query($sql) or die(mysql_error().$sql);
         $dayname = "";
         while ($row = mysql_fetch_assoc($result))
         {
@@ -205,7 +205,7 @@ if (! array_key_exists('stage', $_GET))
                     value=\"{$row['service']}_{$maxseq}\">
                     Add to '{$row['dayname']}' using '{$row['rite']}'\n";
                 if ($row['servicenotes']) {
-                    echo "<blockquote>{$row['servicenotes']}</blockquote>\n";
+                    echo "<div>".translate_markup($row['servicenotes'])."</div>\n";
                 }
                 $dayname = $row['dayname'];
             }
