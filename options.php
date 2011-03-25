@@ -39,6 +39,11 @@ $sitetabs = array(
 // with $phplibrary.  Then, sermon notes will automatically be formatted
 // using Markdown when displayed.
 $phplibrary = "../../php/";
+// The next 3 lines make a relative library path absolute.
+// Just leave them alone, unless you know what you're doing.
+$phplibrary = (substr($phplibrary, 0, 1)=="/")?
+    $phplibrary:
+    (realpath(dirname(__FILE__))."/{$phplibrary}");
 
 // Default limit for the comprehensive (not future) service listings.
 // When this has not been manually set by the user, this will be the number
