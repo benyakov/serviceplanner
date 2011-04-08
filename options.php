@@ -31,6 +31,12 @@ $sitetabs = array(
     ,"admin"=>"Housekeeping"
 );
 
+
+// Default limit for the comprehensive (not future) service listings.
+// When this has not been manually set by the user, this will be the number
+// of hymns included in the list.
+$listinglimit = 200;
+
 // Location of a PHP "library" directory on the web server where you might
 // have e.g. markup-processing packages installed.
 // For example, If you download Markdown
@@ -38,15 +44,12 @@ $sitetabs = array(
 // a link to it in a specific directory, you can point to that directory
 // with $phplibrary.  Then, sermon notes will automatically be formatted
 // using Markdown when displayed.
-$phplibrary = "../../php/";
-// The next 3 lines make a relative library path absolute.
-// Just leave them alone, unless you know what you're doing.
-$phplibrary = (substr($phplibrary, 0, 1)=="/")?
-    $phplibrary:
-    (realpath(dirname(__FILE__))."/{$phplibrary}");
+$phplibrary = "../../php";
+// Do not change this unless you know what you're doing.
+// It takes a relative $phplibrary and makes it absolute,
+// which allows the path to work even when this application is symlinked.
+if (strpos($phplibrary, '/') != 0) {
+    $phplibrary = dirname(__FILE__) . DIRECTORY_SEPARATOR . $phplibrary;
+}
 
-// Default limit for the comprehensive (not future) service listings.
-// When this has not been manually set by the user, this will be the number
-// of hymns included in the list.
-$listinglimit = 200;
 ?>

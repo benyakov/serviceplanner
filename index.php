@@ -1,6 +1,7 @@
 <?
-require("functions.php");
+require("setup-session.php");
 require("options.php");
+require("functions.php");
 if ((! file_exists("db-connection.php") and
     (! is_link($_SERVER['SCRIPT_FILENAME']))))
 {   ?>
