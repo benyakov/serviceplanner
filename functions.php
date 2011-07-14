@@ -123,7 +123,7 @@ function html_head($title)
 
 function mysql_esc_array($ary)
 { // reduce ugliness (Note: connect to mysql before using.)
-    return array_map(mysql_real_escape_string, $ary);
+    return array_map("mysql_real_escape_string", $ary);
 }
 
 function mysql_esc($str)
