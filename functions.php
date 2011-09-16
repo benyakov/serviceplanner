@@ -115,7 +115,7 @@ function html_head($title)
         $rv[] = get_style("{$here}/style");
         $rv[] = "</style>";
         $rv[] = "<style type=\"text/css\" media=\"print\">";
-        $rv[] = git_style("{$here}/print");
+        $rv[] = get_style("{$here}/print");
         $rv[] = "</style>";
     } else {
         $here = dirname($_SERVER['SCRIPT_NAME']);
