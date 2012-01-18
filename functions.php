@@ -107,23 +107,28 @@ function modify_records_table($result, $action)
 
 function html_head($title)
 {
+    $rv[] = "<head><title>{$title}</title>";
     if (is_link($_SERVER['SCRIPT_FILENAME']))
     {   // Find the installation for css and other links
         $here = dirname(readlink($_SERVER['SCRIPT_FILENAME']));
+        $rv[] = "<style type=\"text/css\">";
+        $rv[] = get_style("{$here}/style");
+        $rv[] = "</style>";
+        $rv[] = "<style type=\"text/css\" media=\"print\">";
+        $rv[] = get_style("{$here}/print");
+        $rv[] = "</style>";
     } else {
-    $here = dirname($_SERVER['SCRIPT_NAME']);
+        $here = dirname($_SERVER['SCRIPT_NAME']);
+        $rv[] = "<link type=\"text/css\" rel=\"stylesheet\" href=\"{$here}/style.css\">
+        <link type=\"text/css\" rel=\"stylesheet\" media=\"print\" href=\"{$here}/print.css\">";
     }
-    return ("
-    <head>
-    <title>${title}</title>
-    <link type=\"text/css\" rel=\"stylesheet\" href=\"{$here}/style.css\">
-    <link type=\"text/css\" rel=\"stylesheet\" media=\"print\" href=\"{$here}/print.css\">
-    </head>");
+    $rv[] = "</head>";
+    return implode("\n", $rv);
 }
 
 function mysql_esc_array($ary)
 { // reduce ugliness (Note: connect to mysql before using.)
-    return array_map(mysql_real_escape_string, $ary);
+    return array_map("mysql_real_escape_string", $ary);
 }
 
 function mysql_esc($str)
@@ -167,5 +172,13 @@ function is_within_week($dbdate)
     $now = getdate(time());
     $weekahead = mktime(0,0,0,$now['mon'],$now['mday']+8,$now['year']);
     if ($db <= $weekahead) return True; else return False;
+}
+
+function get_style($filename)
+{   // Include the style file indicated, adding ".css"
+    $file = "{$filename}.css";
+    if (file_exists($file)) {
+        return file_get_contents($file);
+    }
 }
 ?>

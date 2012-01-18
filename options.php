@@ -49,8 +49,7 @@ $phplibrary = "../../php";
 // It takes a relative $phplibrary and makes it absolute,
 // which allows the path to work even when this application is symlinked.
 if (strpos($phplibrary, '/') != 0) {
-    include_once("setup-session.php");
-    $phplibrary = $sprefix . DIRECTORY_SEPARATOR . $phplibrary;
+    $phplibrary = dirname(__FILE__) . DIRECTORY_SEPARATOR . $phplibrary;
 }
 
 ?>
