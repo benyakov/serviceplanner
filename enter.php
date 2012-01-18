@@ -60,14 +60,18 @@ if (! array_key_exists('stage', $_GET))
         $date = $s['date'];
     }
 ?>
+<!DOCTYPE HTML>
 <html>
 <?=html_head("Service Entry Form: ${this_script}")?>
 <body>
+    <header>
     <? if ($_GET['error']) { ?>
         <p class="errormessage"><?=htmlspecialchars($_GET['error'])?></p>
     <? } ?>
+    </header>
     <?=sitetabs($sitetabs, $script_basename)?>
-    <div id="content-container">
+    <article id="content-container">
+    <header>
     <h1>Service Entry Form</h1>
     <p class="explanation">This form allows you to enter a new service,
     optionally including several hymns for use at a certain location.  (The
@@ -75,11 +79,12 @@ if (! array_key_exists('stage', $_GET))
     file "options.php" on the webserver.)  After you submit this page, you will
     be asked to confirm whether you intend to create a new service or add hymns
     to an existing service.</p>
-    <form action="http://<?=$this_script.'?stage=2'?>" method="POST">
+    </header>
+    <form action="http://<?=$this_script.'?stage=2'?>">
     <ul>
     <li>
         <label for="date">Date (as DDMonYYYY):</label>
-        <input type="text" id="date" name="date" value="<?=$date?>">
+        <input type="date" id="date" name="date" value="<?=$date?>">
     </li>
     <li>
         <label for="location">Location:</label>
@@ -114,7 +119,7 @@ if (! array_key_exists('stage', $_GET))
     </ol>
     <input type="submit" value="Send"><input type="reset">
     </form>
-    </div>
+    </article>
 </body>
 </html>
 <?
@@ -135,11 +140,13 @@ if (! array_key_exists('stage', $_GET))
     <html>
     <?=html_head("Confirmation (Entry Step 2)")?>
     <body>
+    <header>
     <? if ($_GET['error']) { ?>
         <p class="errormessage"><?=htmlspecialchars($_GET['error'])?></p>
     <? } ?>
     <p><a href="enter.php">Back to start</a></p>
-    <div id="content-container">
+    </header>
+    <article id="content-container">
     <h1>Confirmation (Entry Step 2)</h1>
     <p class="explanation">In this final step for entering a service, you are
     presented with a list of existing services on the date you chose, together
@@ -153,7 +160,8 @@ if (! array_key_exists('stage', $_GET))
         <dt>Location</dt><dd><?=$_POST['location']?></dd>
         <dt>Notes</dt><dd><?=translate_markup($_POST['servicenotes'])?></dd>
     </dl>
-    <form action="http://<?=$this_script."?stage=3"?>" method="POST">
+    <form action="http://<?=$this_script."?stage=3"?>">
+    <section>
     <h2>Choose the Service</h2>
     <?
     // Check to see if this service is already entered.
@@ -222,6 +230,10 @@ if (! array_key_exists('stage', $_GET))
         " Enter '{$_POST['liturgical_name']}' as a new service, using
         '{$_POST['rite']}'.</li>\n";
     echo "</ul>\n";
+?>
+    </section>
+    <section>
+<?
     echo "<h2>Confirm or Enter Hymn Titles</h2>\n";
     // Combine entered pieces into an array.
     $entered_hymns = entered_hymns($_POST);
@@ -280,9 +292,10 @@ if (! array_key_exists('stage', $_GET))
         echo "</ul>\n";
     }
     ?>
+    </section>
     <input type="submit" value="Send"><input type="reset">
     </form>
-    </div>
+    </article>
     </body>
     </html>
     <?
