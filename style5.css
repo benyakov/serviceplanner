@@ -1,0 +1,15 @@
+
+article#content-container {
+    border: thin solid black;
+    border-top: none;
+    -moz-border-radius: 5px;
+    -moz-border-radius: 5px;
+    border-radius: 5px;
+    border-radius: 5px;
+    margin-top: 0;
+    padding-top: 0;
+    padding: 1ex;
+    background-color: white;
+    color: black;
+}
+
