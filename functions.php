@@ -121,6 +121,7 @@ function html_head($title)
         $here = dirname($_SERVER['SCRIPT_NAME']);
         $rv[] = "<link type=\"text/css\" rel=\"stylesheet\" href=\"{$here}/style.css\">
         <link type=\"text/css\" rel=\"stylesheet\" media=\"print\" href=\"{$here}/print.css\">";
+        $rv[] = "<script type=\"text/javascript\" src=\"{$here}/ecmascript.js\"></script>";
     }
     $rv[] = "</head>";
     return implode("\n", $rv);

@@ -104,7 +104,7 @@ if (! array_key_exists('stage', $_GET))
     </li>
     </ul>
     <h2>Hymns to Enter (Book, Number, Note)</h2>
-    <ol>
+    <ol name="hymnlist">
     <? for ($i=1; $i<=$option_hymncount; $i++) { ?>
     <li class="<?= $i%2==0?"even":"odd" ?>">
         <select id="book_<?=$i?>" name="book_<?=$i?>">
@@ -117,6 +117,7 @@ if (! array_key_exists('stage', $_GET))
     </li>
     <? } ?>
     </ol>
+    <a class="jsonly" href="javascript: void();" onclick="addHymn()">Add another hymn.</a>
     <input type="submit" value="Send"><input type="reset">
     </form>
     </article>
