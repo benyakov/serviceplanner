@@ -119,8 +119,10 @@ function html_head($title)
         $rv[] = "</style>";
     } else {
         $here = dirname($_SERVER['SCRIPT_NAME']);
-        $rv[] = "<link type=\"text/css\" rel=\"stylesheet\" href=\"{$here}/style.css\">
-        <link type=\"text/css\" rel=\"stylesheet\" media=\"print\" href=\"{$here}/print.css\">";
+        $rv[] = "<link type=\"text/css\" rel=\"stylesheet\" href=\"{$here}/style.css\">";
+        $rv[] = "<link type=\"text/css\" rel=\"stylesheet\" media=\"print\" href=\"{$here}/print.css\">";
+        $rv[] = "<link type=\"text/css\" rel=\"stylesheet\" href=\"{$here}/style5.css\">";
+        $rv[] = "<script type=\"text/javascript\" src=\"http://ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery.min.js\"></script>";
         $rv[] = "<script type=\"text/javascript\" src=\"{$here}/ecmascript.js\"></script>";
     }
     $rv[] = "</head>";
