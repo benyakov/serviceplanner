@@ -73,10 +73,10 @@ if (! array_key_exists('stage', $_GET)) {
     be asked to confirm whether you intend to create a new service or add hymns
     to an existing service.</p>
     </header>
-    <form action="http://<?=$this_script.'?stage=2'?>">
+    <form action="http://<?=$this_script.'?stage=2'?>" method="post">
     <ul>
     <li>
-        <label for="date">Date (as DDMonYYYY):</label>
+        <label for="date">Date:</label>
         <input type="date" id="date" name="date" value="<?=$date?>">
     </li>
     <li>
@@ -154,7 +154,7 @@ if (! array_key_exists('stage', $_GET)) {
         <dt>Location</dt><dd><?=$_POST['location']?></dd>
         <dt>Notes</dt><dd><?=translate_markup($_POST['servicenotes'])?></dd>
     </dl>
-    <form action="http://<?=$this_script."?stage=3"?>">
+    <form action="http://<?=$this_script."?stage=3"?>" method="post">
     <section>
     <h2>Choose the Service</h2>
     <?
