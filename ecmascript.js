@@ -15,6 +15,6 @@ function showJsOnly() {
 $(document).ready(function() {
     showJsOnly();
     $("#date").focus(function() {
-        $("#date").datepicker();
+        $(this).datepicker();
     })
 })
