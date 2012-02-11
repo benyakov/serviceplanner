@@ -62,7 +62,7 @@ if (! array_key_exists('stage', $_GET))
 ?>
 <!DOCTYPE HTML>
 <html>
-<?=html_head("Service Entry Form: ${this_script}")?>
+<?=html_head("Service Entry Form: ${this_script}", $five=true)?>
 <body>
     <header>
     <? if ($_GET['error']) { ?>
@@ -80,7 +80,7 @@ if (! array_key_exists('stage', $_GET))
     be asked to confirm whether you intend to create a new service or add hymns
     to an existing service.</p>
     </header>
-    <form action="http://<?=$this_script.'?stage=2'?>">
+    <form action="http://<?=$this_script.'?stage=2'?>" method=post>
     <ul>
     <li>
         <label for="date">Date (as DDMonYYYY):</label>
@@ -138,7 +138,7 @@ if (! array_key_exists('stage', $_GET))
     }
     ?>
     <html>
-    <?=html_head("Confirmation (Entry Step 2)")?>
+    <?=html_head("Confirmation (Entry Step 2)", $five=true)?>
     <body>
     <header>
     <? if ($_GET['error']) { ?>
@@ -160,7 +160,7 @@ if (! array_key_exists('stage', $_GET))
         <dt>Location</dt><dd><?=$_POST['location']?></dd>
         <dt>Notes</dt><dd><?=translate_markup($_POST['servicenotes'])?></dd>
     </dl>
-    <form action="http://<?=$this_script."?stage=3"?>">
+    <form action="http://<?=$this_script."?stage=3"?>" method=post>
     <section>
     <h2>Choose the Service</h2>
     <?
@@ -246,7 +246,7 @@ if (! array_key_exists('stage', $_GET))
         foreach ($entered_hymns as $hymn)
         {
             if (! $hymn['number']) { continue; }
-            $sql = "SELECT title FROM ${dbp}names
+            $sql = "SELECT `title` FROM `${dbp}names`
                 WHERE number = '${hymn['number']}'
                 AND book = '${hymn['book']}'";
             $result = mysql_query($sql) or die(mysql_error());
@@ -266,6 +266,7 @@ if (! array_key_exists('stage', $_GET))
                 }
                 $extra = 'class="unverified"';
             }
+            $title = preg_replace("/\"/", "&#34;", $title);
             $sql2 = "SELECT DATE_FORMAT({$dbp}days.caldate, '%e %b %Y') as
                 date,
                 {$dbp}hymns.location

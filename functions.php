@@ -105,7 +105,7 @@ function modify_records_table($result, $action)
     <?
 }
 
-function html_head($title)
+function html_head($title, $five=false)
 {
     $rv[] = "<head><title>{$title}</title>";
     if (is_link($_SERVER['SCRIPT_FILENAME']))
@@ -121,6 +121,10 @@ function html_head($title)
         $here = dirname($_SERVER['SCRIPT_NAME']);
         $rv[] = "<link type=\"text/css\" rel=\"stylesheet\" href=\"{$here}/style.css\">
         <link type=\"text/css\" rel=\"stylesheet\" media=\"print\" href=\"{$here}/print.css\">";
+        if ($five) {
+            $rv[] = "<link type=\"text/css\" rel=\"stylesheet\" href=\"{$here}/style5.css\">
+                <link type=\"text/css\" rel=\"stylesheet\" media=\"print\" href=\"{$here}/print5.css\">";
+        }
     }
     $rv[] = "</head>";
     return implode("\n", $rv);
