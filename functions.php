@@ -107,6 +107,7 @@ function modify_records_table($result, $action)
 
 function html_head($title, $five=false)
 {
+    $rv[] = '<meta charset="utf-8" />';
     $rv[] = "<head><title>{$title}</title>";
     if (is_link($_SERVER['SCRIPT_FILENAME']))
     {   // Find the installation for css and other links
@@ -146,7 +147,7 @@ function mysql_esc($str)
 function sitetabs($sitetabs, $action) {
     $tabs = array_fill_keys(array_keys($sitetabs), 0);
     $tabs[$action] = 1;
-    echo "<div id=\"sitetabs-background\">";
+    echo "<nav><div id=\"sitetabs-background\">";
     echo "<ul id=\"sitetabs\">\n";
     foreach ($tabs as $name => $activated) {
         if ($activated) {
@@ -157,7 +158,7 @@ function sitetabs($sitetabs, $action) {
         $tabtext = $sitetabs[$name];
         echo "<li{$class}><a href=\"{$name}.php\">{$tabtext}</a></li>\n";
     }
-    echo "</ul></div>\n";
+    echo "</ul></div></nav>\n";
 }
 
 function translate_markup($text)

@@ -53,13 +53,14 @@ textarea#outline,
 textarea#notes,
 textarea#servicenotes{
     height: 8em;
-    width: 45em;
+    width: 40em;
     margin: 1ex;
 }
-td.servicenote {
+.servicenote {
     padding: 2px 2px 2px 1em;
     border-top: thin dashed black;
     font-size: 80%;
+    white-space: pre;
 }
 
 
@@ -70,6 +71,16 @@ input {
 }
 input.entryline {
     margin: 1ex;
+}
+input.hymn-number {
+    width: 3em;
+}
+input.hymn-note {
+    width: 30em;
+}
+input.hymn-title {
+    width: 50em;
+    display: none;
 }
 
 div#content-container {

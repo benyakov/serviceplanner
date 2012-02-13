@@ -54,8 +54,17 @@ if (! array_key_exists('stage', $_GET)) {
     }
 ?>
 <!DOCTYPE HTML>
-<html>
+<html lang="en">
 <?=html_head("Service Entry Form: ${this_script}", $five=true)?>
+    <script type="text/javascript">
+    $(document).ready(function() {
+        $("#existing-services").hide();
+        showJsOnly();
+        $("#date").datepicker({showOn:"both"});
+        $("#date").keyup(updateExisting)
+            .change(updateExisting);
+    })
+    </script>
 <body>
     <header>
     <? if ($_GET['error']) { ?>
@@ -63,7 +72,7 @@ if (! array_key_exists('stage', $_GET)) {
     <? } ?>
     </header>
     <?=sitetabs($sitetabs, $script_basename)?>
-    <article id="content-container">
+    <div id="content-container">
     <header>
     <h1>Service Entry Form</h1>
     <p class="explanation">This form allows you to enter a new service,
@@ -74,46 +83,59 @@ if (! array_key_exists('stage', $_GET)) {
     to an existing service.</p>
     </header>
     <form action="http://<?=$this_script.'?stage=2'?>" method="post">
+    <section id="existing-services">
+    </section>
+    <section id="service-items">
     <ul>
     <li>
         <label for="date">Date:</label>
-        <input type="date" id="date" name="date" value="<?=$date?>">
+        <input tabindex="1" type="date" id="date"
+            name="date" value="<?=$date?>">
     </li>
     <li>
         <label for="location">Location:</label>
-        <input type="text" id="location" name="location" value="<?=$s['location']?>">
+        <input tabindex="25" type="text"
+            id="location" name="location" value="<?=$s['location']?>">
     </li>
     <li>
         <label for="liturgical_name">Liturgical Name:</label>
-        <input type="text" id="liturgical_name" name="liturgical_name" size="50" maxlength="50" value="<?=$s['liturgical_name']?>">
+        <input tabindex="26" type="text"
+            id="liturgical_name" name="liturgical_name" size="50"
+            maxlength="50" value="<?=$s['liturgical_name']?>">
     </li>
     <li>
         <label for="rite">Rite or Order:</label>
-        <input type="text" id="rite" name="rite" size="50" maxlength="50" value="<?=$s['rite']?>">
+        <input tabindex="27" type="text" id="rite" name="rite"
+            size="50" maxlength="50" value="<?=$s['rite']?>">
     </li>
     <li class="vcenter">
         <label for="servicenotes">Service Notes:</label>
-        <textarea id="servicenotes" name="servicenotes"><?=trim($s['servicenotes'])?></textarea>
+        <textarea tabindex="28" id="servicenotes"
+            name="servicenotes"><?=trim($s['servicenotes'])?></textarea>
     </li>
     </ul>
+    </section>
     <h2>Hymns to Enter (Book, Number, Note)</h2>
     <ol id="hymnentries">
-    <? for ($i=1; $i<=$option_hymncount; $i++) { ?>
+    <? for ($i=1; $i<=$option_hymncount; $i++) {
+        $tabindex = $i*4 + 51; ?>
     <li class="<?= $i%2==0?"even":"odd" ?>">
-        <select id="book_<?=$i?>" name="book_<?=$i?>">
+        <select tabindex="<?=$tabindex?>" id="book_<?=$i?>" name="book_<?=$i?>">
         <? foreach ($option_hymnbooks as $hymnbook) { ?>
             <option <? if ($hymnbook == $s["book_".$i]) echo "selected"; ?>><?=$hymnbook?></option>
         <? } ?>
         </select>
-        <input type="text" id="number_<?=$i?>" name="number_<?=$i?>" value="<?=$s["number_".$i]?>" size="5">
-        <input type="text" id="note_<?=$i?>" name="note_<?=$i?>" size="80" maxlength="100" value="<?=$s["note_".$i]?>">
+        <input tabindex="<?=$tabindex+1?>" type="text" id="number_<?=$i?>" name="number_<?=$i?>" value="<?=$s["number_".$i]?>" class="hymn-number">
+        <input tabindex="<?=$tabindex+2?>" type="text" id="note_<?=$i?>" name="note_<?=$i?>" class="hymn-note" maxlength="100" value="<?=$s["note_".$i]?>">
+        <input tabindex="<?=$tabindex+3?>" type="text" id="title_<?=$i?>" name="title_<?=$i?>" class="hymn-title">
     </li>
     <? } ?>
     </ol>
-    <a class="jsonly" href="javascript: void(0);" onclick="addHymn()">Add another hymn.</a>
-    <input type="submit" value="Send"><input type="reset">
+    <a class="jsonly" tabindex="200"
+        href="javascript: void(0);" onclick="addHymn()">Add another hymn.</a>
+    <input tabindex="201" type="submit" value="Send"><input tabindex="202" type="reset">
     </form>
-    </article>
+    </div>
 </body>
 </html>
 <?
@@ -140,7 +162,7 @@ if (! array_key_exists('stage', $_GET)) {
     <? } ?>
     <p><a href="enter.php">Back to start</a></p>
     </header>
-    <article id="content-container">
+    <div id="content-container">
     <h1>Confirmation (Entry Step 2)</h1>
     <p class="explanation">In this final step for entering a service, you are
     presented with a list of existing services on the date you chose, together
@@ -281,7 +303,7 @@ if (! array_key_exists('stage', $_GET)) {
     </section>
     <input type="submit" value="Send"><input type="reset">
     </form>
-    </article>
+    </div>
     </body>
     </html>
     <?

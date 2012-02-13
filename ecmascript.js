@@ -2,9 +2,23 @@ function addHymn() {
     $("#hymnentries > li").eq(-1).clone().appendTo("#hymnentries");
     var oldBookId = $("#hymnentries > li").eq(-1).children().attr("id");
     var hymnIndex = Number(oldBookId.split("_")[1]) + 1;
-    $("#hymnentries > li").eq(-1).children().filter('[id^="book"]').attr("id", "book_"+hymnIndex).attr("name", "book_"+hymnIndex);
-    $("#hymnentries > li").eq(-1).children().filter('[id^="number"]').attr("id", "number_"+hymnIndex).attr("name", "number_"+hymnIndex);
-    $("#hymnentries > li").eq(-1).children().filter('[id^="note"]').attr("id", "note_"+hymnIndex).attr("name", "number_"+hymnIndex);
+    var tabindexStart = Number($("#hymnentries >li").eq(-1).children().filter('[id^="book"]').attr("tabindex"));
+    $("#hymnentries > li").eq(-1).children().filter('[id^="book"]')
+        .attr("id", "book_"+hymnIndex)
+        .attr("name", "book_"+hymnIndex)
+        .attr("tabindex", tabindexStart+4);
+    $("#hymnentries > li").eq(-1).children().filter('[id^="number"]')
+        .attr("id", "number_"+hymnIndex)
+        .attr("name", "number_"+hymnIndex)
+        .attr("tabindex", tabindexStart+5);
+    $("#hymnentries > li").eq(-1).children().filter('[id^="note"]')
+        .attr("id", "note_"+hymnIndex)
+        .attr("name", "note_"+hymnIndex)
+        .attr("tabindex", tabindexStart+6);
+    $("#hymnentries > li").eq(-1).children().filter('[id^="title"]')
+        .attr("id", "title_"+hymnIndex)
+        .attr("name", "title_"+hymnIndex)
+        .attr("tabindex", tabindexStart+7);
     $("#hymnentries > li").eq(-1).toggleClass('even odd');
 }
 
@@ -12,7 +26,29 @@ function showJsOnly() {
     $(".jsonly").removeClass("jsonly");
 }
 
-$(document).ready(function() {
-    showJsOnly();
-    $("#date").datepicker({showOn:"both"});
-})
+function updateExisting() {
+    var dateEntered = Date.parse($("#date").val())/1000;
+    if (! dateEntered) {
+        return;
+    }
+    var xhr = $.get("existing.php", { date: dateEntered },
+            function(newBloc) {
+                $("#existing-services").html(newBloc).show();
+                $('.existingservice').change(function() {
+                    if ($(this).prop('checked')) {
+                        $('.existingservice').not(this)
+                            .prop('checked', false)
+                            .prop('disabled', true);
+                        $("#liturgical_name").prop('disabled', true);
+                        $("#rite").prop('disabled', true);
+                        $("#servicenotes").prop('disabled', true);
+                    } else {
+                        $('.existingservice').prop('disabled', false);
+                        $("#liturgical_name").prop('disabled', false);
+                        $("#rite").prop('disabled', false);
+                        $("#servicenotes").prop('disabled', false);
+                    }
+                })
+            })
+}
+
