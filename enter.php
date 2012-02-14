@@ -5,33 +5,6 @@ require("setup-session.php");
 $this_script = $_SERVER['HTTP_HOST'].$_SERVER['SCRIPT_NAME'] ;
 $script_basename = basename($_SERVER['SCRIPT_NAME'], ".php") ;
 
-function entered_hymns($ary) {
-    // Process initially entered hymn form data into an array.
-    // result is like this $array[item#][book|number|note] = value
-    $entered_hymns = array();
-    foreach ($ary as $key => $value) {
-        if (preg_match('/^(book|number|note)_(\d)/', $key, $matches)) {
-            if (array_key_exists($matches[2], $entered_hymns)) {
-                $entered_hymns[$matches[2]][$matches[1]] = $value;
-            } else {
-                $entered_hymns[$matches[2]] = array($matches[1] => $value);
-            }
-        }
-    }
-    return $entered_hymns;
-}
-
-function entered_hymncount($ary) {
-    // Return the number of actual entered hymns in $ary
-    $count = 0;
-    foreach ($ary as $hymn) {
-        if (0 < strlen($hymn['number'])) {
-            $count++;
-        }
-    }
-    return $count;
-}
-
 if (array_key_exists("date", $_GET)) {
     $date = $_GET['date'];
 } else {
@@ -89,7 +62,7 @@ if (array_key_exists("date", $_POST)) {
     <li>
         <label for="liturgical_name">Liturgical Name:</label>
         <input tabindex="26" type="text"
-            id="liturgical_name" name="liturgical_name" size="50"
+            id="liturgicalname" name="liturgicalname" size="50"
             maxlength="50" value="<?=$s['liturgical_name']?>">
     </li>
     <li>
@@ -135,7 +108,6 @@ function existing($str) {
     else return false;
 }
 function processFormData() {
-// Old stage 3
     // Insert data into db
     require("db-connection.php");
     //// Add a new service, if needed.
@@ -149,12 +121,10 @@ function processFormData() {
     } else {
         $serviceid = false;
     }
-    // START HERE
-    $maxseq = 0; // For adding hymns to an existing service
-    if ("new" == $_POST["services"]) {
-        $dayname = mysql_esc($_SESSION[$sprefix]['stage1']['liturgical_name']);
-        $rite = mysql_esc($_SESSION[$sprefix]['stage1']['rite']);
-        $servicenotes = mysql_esc($_SESSION[$sprefix]['stage1']['servicenotes']);
+    if (! $serviceid) { // Create a new service
+        $dayname = mysql_esc($_POST['liturgicalname']);
+        $rite = mysql_esc($_POST['rite']);
+        $servicenotes = mysql_esc($_POST['servicenotes']);
         $sql = "INSERT INTO {$dbp}days (caldate, name, rite, servicenotes)
             VALUES ('{$date}', '{$dayname}', '{$rite}', '{$servicenotes}')";
         mysql_query($sql) or die(mysql_error());
@@ -169,53 +139,59 @@ function processFormData() {
     ////  Enter new/updated hymn titles (2 steps for clarity)
     // Build an array of hymnbook_hymnnumber items from $_POST
     $hymns = array();
-    $altbooks = implode("|", $option_hymnbooks);
+    $altfields = "book|number|note|title";
     foreach ($_POST as $key => $value) {
-        if (preg_match("/(${altbooks})_(\d+)/", $key, $matches)) {
-            $hymns[] = array($matches[1], $matches[2], $value);
+        if (preg_match("/({$altfields})_(\d+)/", $key, $matches) {
+            if (! array_key_exists($hymns, $matches[2])) {
+                $hymns[$matches[2]] = array();
+            } else {
+                $hymns[$matches[2]][$matches[1]] = $value;
+            }
         }
     }
-    // Insert each hymn
+    // Insert each hymn title
     foreach ($hymns as $ahymn) {
         $h = mysql_esc_array($ahymn);
         // Check to see if the hymn is already entered.
-        $sql = "INSERT INTO ${dbp}names (book, number, title)
-            VALUES ('{$h[0]}', '{$h[1]}', '{$h[2]}')";
+        $sql = "INSERT INTO {$dbp}names (book, number, title)
+            VALUES ('{$h["book"]}', '{$h["number"]}', '{$h["title"]}')";
         if (mysql_query($sql)) {
-            $feedback .= "<li>Saved name '{$h[2]}' for {$h[0]} {$h[1]}.</li>";
+            $feedback .= "<li>Saved name '{$h["title"]}' for {$h["book"]} {$h["number"]}.</li>";
         } else {
-            $sql = "UPDATE ${dbp}names SET title='${h[2]}'
-                WHERE book='${h[0]}' AND number='${h[1]}'";
+            $sql = "UPDATE {$dbp}names SET title='${h["title"]}'
+                WHERE book='${h["book"]}' AND number='${h["number"]}'";
             mysql_query($sql) or die(mysql_error());
             if (mysql_affected_rows()) {
-                $feedback .="<li>Updated name '{$h[2]}' for {$h[0]} {$h[1]}.</li>";
+                $feedback .="<li>Updated name '{$h["title"]}' for {$h["book"]} {$h["number"]}.</li>";
             } else {
-                $feedback .="<li>Title for hymn \"{$h[0]} {$h[1]}\" unchanged.</li>";
+                $feedback .="<li>Title for hymn \"{$h["book"]} {$h["number"]}\" unchanged.</li>";
             }
         }
     }
     //// Enter hymns and location on selected date
-    $hymns = entered_hymns($_SESSION[$sprefix]['stage1']);
     if (0 < entered_hymncount($hymns)) {
         $sqlhymns = array();
         $saved = array();
+        $sql = "SELECT MAX(`sequence`) FROM `{$dbp}hymns`
+            WHERE `service`='{$serviceid}
+            GROUP BY `service`";
+        $result = mysql_query($sql) or die(mysql_error());
+        $sequenceMax = array_pop(mysql_fetch_row($result));
         foreach ($hymns as $sequence => $ahymn)
         {
             if (! $ahymn['number']) continue;
             $hymn = mysql_esc_array($ahymn);
-            $realsequence = $sequence + $maxseq;
+            $realsequence = $sequence + $sequenceMax;
             $sqlhymns[] = "('{$serviceid}', '{$location}', '{$hymn['book']}',
                 '{$hymn['number']}', '{$hymn['note']}', '{$realsequence}')";
-            $saved[] = "{$ahymn['book']} {$ahymn['number']} ({$hymn['note']})";
+            $saved[] = "{$ahymn['book']} {$ahymn['number']}";
         }
-        $sql = "INSERT INTO ${dbp}hymns
+        $sql = "INSERT INTO `{$dbp}hymns`
             (service, location, book, number, note, sequence)
             VALUES ".implode(", ", $sqlhymns);
         mysql_query($sql) or die(mysql_error());
         $feedback .="<li>Saved hymns: <ol><li>" . implode("</li><li>", $saved) . "</li></ol></li></ol>\n";
     }
-    unset($_SESSION[$sprefix]['stage1']);
-    unset($_SESSION[$sprefix]['stage2']);
     header("Location: modify.php?message=" . urlencode($feedback));
 }
 ?>
