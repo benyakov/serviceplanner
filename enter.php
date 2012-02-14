@@ -5,13 +5,6 @@ require("setup-session.php");
 $this_script = $_SERVER['HTTP_HOST'].$_SERVER['SCRIPT_NAME'] ;
 $script_basename = basename($_SERVER['SCRIPT_NAME'], ".php") ;
 
-function errormsg($msg) {
-    // Head back to start with an error message.
-    global $this_script;
-    header("Location: http://${this_script}?error=".urlencode($msg));
-    exit(0);
-}
-
 function entered_hymns($ary) {
     // Process initially entered hymn form data into an array.
     // result is like this $array[item#][book|number|note] = value
@@ -39,19 +32,14 @@ function entered_hymncount($ary) {
     return $count;
 }
 
-if (! array_key_exists('stage', $_GET)) {
-    # Initial entry form
-    if (array_key_exists('stage1', $_SESSION[$sprefix])) {
-        $s = $_SESSION[$sprefix]['stage1'];
-    } else {
-        $s = array();
-    }
-    require("options.php");
-    if (array_key_exists("date", $_GET)) {
-        $date = $_GET['date'];
-    } else {
-        $date = $s['date'];
-    }
+if (array_key_exists("date", $_GET)) {
+    $date = $_GET['date'];
+} else {
+    $date = $s['date'];
+}
+if (array_key_exists("date", $_POST)) {
+    processFormData();
+}
 ?>
 <!DOCTYPE HTML>
 <html lang="en">
@@ -63,6 +51,8 @@ if (! array_key_exists('stage', $_GET)) {
         $("#date").datepicker({showOn:"both"});
         $("#date").keyup(updateExisting)
             .change(updateExisting);
+        $(".hymn-number").keyup(fetchHymnTitle)
+            .blur(fetchHymnTitle);
     })
     </script>
 <body>
@@ -76,11 +66,9 @@ if (! array_key_exists('stage', $_GET)) {
     <header>
     <h1>Service Entry Form</h1>
     <p class="explanation">This form allows you to enter a new service,
-    optionally including several hymns for use at a certain location.  (The
-    possible hymnbooks, and the number of hymn lines can be configured in the
-    file "options.php" on the webserver.)  After you submit this page, you will
-    be asked to confirm whether you intend to create a new service or add hymns
-    to an existing service.</p>
+    or to add hymns to an existing service.
+    The available hymnbooks can be configured in the
+    file "options.php" on the webserver. </p>
     </header>
     <form action="http://<?=$this_script.'?stage=2'?>" method="post">
     <section id="existing-services">
@@ -90,12 +78,12 @@ if (! array_key_exists('stage', $_GET)) {
     <li>
         <label for="date">Date:</label>
         <input tabindex="1" type="date" id="date"
-            name="date" value="<?=$date?>">
+            name="date" value="<?=$date?>" autofocus required>
     </li>
     <li>
         <label for="location">Location:</label>
-        <input tabindex="25" type="text"
-            id="location" name="location" value="<?=$s['location']?>">
+        <input tabindex="25" type="text" required
+            id="location" name="location" value="<?=$s['location']?>" >
     </li>
     <li>
         <label for="liturgical_name">Liturgical Name:</label>
@@ -125,7 +113,7 @@ if (! array_key_exists('stage', $_GET)) {
             <option <? if ($hymnbook == $s["book_".$i]) echo "selected"; ?>><?=$hymnbook?></option>
         <? } ?>
         </select>
-        <input tabindex="<?=$tabindex+1?>" type="text" id="number_<?=$i?>" name="number_<?=$i?>" value="<?=$s["number_".$i]?>" class="hymn-number">
+        <input tabindex="<?=$tabindex+1?>" type="number" min="1" id="number_<?=$i?>" name="number_<?=$i?>" value="<?=$s["number_".$i]?>" class="hymn-number">
         <input tabindex="<?=$tabindex+2?>" type="text" id="note_<?=$i?>" name="note_<?=$i?>" class="hymn-note" maxlength="100" value="<?=$s["note_".$i]?>">
         <input tabindex="<?=$tabindex+3?>" type="text" id="title_<?=$i?>" name="title_<?=$i?>" class="hymn-title">
     </li>
@@ -133,147 +121,16 @@ if (! array_key_exists('stage', $_GET)) {
     </ol>
     <a class="jsonly" tabindex="200"
         href="javascript: void(0);" onclick="addHymn()">Add another hymn.</a>
-    <input tabindex="201" type="submit" value="Send"><input tabindex="202" type="reset">
+    <button tabindex="201" type="submit" value="Send">Send</button>
+    <button tabindex="202" type="reset">Reset</button>
     </form>
     </div>
 </body>
 </html>
 <?
-} elseif (2 == $_GET['stage']) {
+function processFormData() {
     // Check for missing data
-    // print_r($_GET); print_r($_POST); exit(0);
-    require("options.php");
-    $_SESSION[$sprefix]['stage1'] = $_POST;
-    if (! (array_key_exists('date', $_POST)
-            && $_POST['date'])) {
-        errormsg("Please enter a date.");
-    }
-    if (! (array_key_exists('location', $_POST)
-            && $_POST['location'])) {
-        errormsg("Please enter a location.");
-    }
-    ?>
-    <html>
-    <?=html_head("Confirmation (Entry Step 2)", $five=true)?>
-    <body>
-    <header>
-    <? if ($_GET['error']) { ?>
-        <p class="errormessage"><?=htmlspecialchars($_GET['error'])?></p>
-    <? } ?>
-    <p><a href="enter.php">Back to start</a></p>
-    </header>
-    <div id="content-container">
-    <h1>Confirmation (Entry Step 2)</h1>
-    <p class="explanation">In this final step for entering a service, you are
-    presented with a list of existing services on the date you chose, together
-    with the option of creating a new service.  Please confirm what you'd like
-    to do. If the hymn titles for your chosen hymns have already been entered,
-    you can see those here.  If they haven't, you have the chance to enter the
-    titles.  You can always change them later by editing this service from the
-    "Modify Services" tab.</p>
-    <dl>
-        <dt>Date</dt><dd><?=$_POST['date']?></dd>
-        <dt>Location</dt><dd><?=$_POST['location']?></dd>
-        <dt>Notes</dt><dd><?=translate_markup($_POST['servicenotes'])?></dd>
-    </dl>
-    <form action="http://<?=$this_script."?stage=3"?>" method="post">
-    <section>
-    <h2>Choose the Service</h2>
-    <?
-    // Check to see if this service is already entered.
-    require("db-connection.php");
-    $location = mysql_esc($_POST['location']);
-    $date = strftime("%Y-%m-%d", strtotime($_POST['date']));
-    $_SESSION[$sprefix]['stage1']['date'] = $date;
-    $sql = "SELECT 1 FROM {$dbp}days
-        LEFT JOIN {$dbp}hymns ON ({$dbp}hymns.service = {$dbp}days.pkey)
-        WHERE {$dbp}days.caldate = '{$date}'";
-    $result = mysql_query($sql) or die(mysql_error().$sql);
-    echo "<ul>\n";
-    if (mysql_fetch_row($result)) {
-        /// Service already entered.  Ask if entered hymns s/b appended
-        // Get the max sequence number at this location
-        $sql = "SELECT MAX({$dbp}hymns.sequence) as maxseq
-            FROM {$dbp}days JOIN {$dbp}hymns
-            ON ({$dbp}hymns.service = {$dbp}days.pkey)
-            WHERE {$dbp}days.caldate = '{$date}'
-                AND {$dbp}hymns.location = '{$location}'
-            GROUP BY ({$dbp}hymns.service)";
-        $result = mysql_query($sql) or die(mysql_error().$sql);
-        if ($row = mysql_fetch_array($result))
-        {
-            $maxseq = $row[0];
-        } else {
-            $maxseq = 0;
-        }
-        // Get the list of entered hymns for this date, all services/locations.
-        $sql = "SELECT {$dbp}hymns.book, {$dbp}hymns.number, {$dbp}hymns.note,
-            {$dbp}hymns.location, {$dbp}days.servicenotes,
-            {$dbp}days.name as dayname, {$dbp}days.rite,
-            {$dbp}days.pkey as service, {$dbp}names.title
-            FROM {$dbp}days
-            LEFT JOIN {$dbp}hymns ON ({$dbp}hymns.service = {$dbp}days.pkey)
-            LEFT JOIN {$dbp}names ON ({$dbp}hymns.number = {$dbp}names.number
-                AND {$dbp}hymns.book = {$dbp}names.book)
-            WHERE {$dbp}days.caldate = '{$date}'
-            ORDER BY dayname, location";
-        $result = mysql_query($sql) or die(mysql_error().$sql);
-        $dayname = "";
-        while ($row = mysql_fetch_assoc($result)) {
-            if ($dayname != $row['dayname']) {
-                if ("" != $dayname) echo "</li>"; // close prior <li>
-                echo "<li><input type=\"radio\" name=\"services\"
-                    value=\"{$row['service']}_{$maxseq}\">
-                    Add to '{$row['dayname']}' using '{$row['rite']}'\n";
-                if ($row['servicenotes']) {
-                    echo "<div>".translate_markup($row['servicenotes'])."</div>\n";
-                }
-                $dayname = $row['dayname'];
-            }
-            if ($row['number']) {
-                echo "<p class=\"hymnlist\">{$row['location']}: ".
-                    "{$row['book']} {$row['number']} ".
-                    "{$row['note']} <em>{$row['title']}</em></p>\n" ;
-            }
-        }
-        echo "</li>\n";
-    }
-    echo "<li><input type=\"radio\" name=\"services\" value=\"new\">".
-        " Enter '{$_POST['liturgical_name']}' as a new service, using
-        '{$_POST['rite']}'.</li>\n";
-    echo "</ul>\n";
-?>
-    </section>
-    <section>
-<?
-    echo "<h2>Confirm or Enter Hymn Titles</h2>\n";
-    // Combine entered pieces into an array.
-    $entered_hymns = entered_hymns($_POST);
-    if (0 == entered_hymncount($entered_hymns)) {
-        echo "<p>No hymns entered.</p>";
-    } else {
-        // Output array to confirm/enter hymn titles
-        echo "<ul>\n";
-        foreach ($entered_hymns as $hymn) {
-            if (! $hymn['number']) { continue; }
-            $sql = "SELECT `title` FROM `${dbp}names`
-                WHERE number = '${hymn['number']}'
-                AND book = '${hymn['book']}'";
-            $result = mysql_query($sql) or die(mysql_error());
-            if ($titlerec = mysql_fetch_row($result)) {
-                $title = $titlerec[0];
-                $extra = 'class="verified"';
-            } else {
-                if (array_key_exists('stage2', $_SESSION[$sprefix])
-                    && array_key_exists("${hymn['book']}_${hymn['number']}",
-                    $_SESSION[$sprefix]['stage2'])) {
-                    $title =
-                        $_SESSION[$sprefix]['stage2']["${hymn['book']}_${hymn['number']}"];
-                } else {
-                    $title = "No title found. Please enter one.";
-                }
-                $extra = 'class="unverified"';
-            }
+    print_r($_GET); print_r($_POST); exit(0);
             $title = preg_replace("/\"/", "&#34;", $title);
             $sql2 = "SELECT DATE_FORMAT({$dbp}days.caldate, '%e %b %Y') as
                 date,
@@ -298,16 +155,7 @@ if (! array_key_exists('stage', $_GET)) {
                     "Last Used: {$lastused}</li>\n";
         }
         echo "</ul>\n";
-    }
-    ?>
-    </section>
-    <input type="submit" value="Send"><input type="reset">
-    </form>
-    </div>
-    </body>
-    </html>
-    <?
-} elseif (3 == $_GET['stage']) {
+// Old stage 3
     // Insert data into db
     $_SESSION[$sprefix]['stage2'] = $_POST;
     require("db-connection.php");

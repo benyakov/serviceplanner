@@ -27,10 +27,8 @@ function showJsOnly() {
 }
 
 function updateExisting() {
-    var dateEntered = Date.parse($("#date").val())/1000;
-    if (! dateEntered) {
-        return;
-    }
+    var dateEntered = Date.parse($(this).val())/1000;
+    if (! dateEntered) return;
     var xhr = $.get("existing.php", { date: dateEntered },
             function(newBloc) {
                 $("#existing-services").html(newBloc).show();
@@ -49,6 +47,27 @@ function updateExisting() {
                         $("#servicenotes").prop('disabled', false);
                     }
                 })
+            })
+}
+
+function fetchHymnTitle() {
+    var hymnNumber = $(this).val();
+    var id = $(this).attr("id").split("_");
+    var entryNumber = id[1];
+    if (! hymnNumber) {
+        $("#title_"+entryNumber).val("").hide();
+        return;
+    }
+    var hymnBook = $("#book_"+entryNumber).val();
+    var xhr = $.get("hymntitle.php", { number: hymnNumber, book: hymnBook },
+            function(hymnTitle) {
+                if (hymnTitle) {
+                    $("#title_"+entryNumber).val(hymnTitle).show();
+                } else {
+                    $("#title_"+entryNumber).val("")
+                        .attr("placeholder", "Please enter a title.")
+                        .show();
+                }
             })
 }
 
