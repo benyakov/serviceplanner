@@ -19,6 +19,9 @@ function addHymn() {
         .attr("id", "title_"+hymnIndex)
         .attr("name", "title_"+hymnIndex)
         .attr("tabindex", tabindexStart+7);
+    $("#hymnentries > li").eq(-1).children().filter('[id^="past"]')
+        .text("")
+        .hide();
     $("#hymnentries > li").eq(-1).toggleClass('even odd');
 }
 
@@ -59,14 +62,29 @@ function fetchHymnTitle() {
         return;
     }
     var hymnBook = $("#book_"+entryNumber).val();
-    var xhr = $.get("hymntitle.php", { number: hymnNumber, book: hymnBook },
-            function(hymnTitle) {
+    var jqxhr = $.getJSON("hymntitle.php",
+            { number: hymnNumber, book: hymnBook },
+            function(result) {
+                var hymnTitle = result[0];
+                var pastServices = result[1];
                 if (hymnTitle) {
                     $("#title_"+entryNumber).val(hymnTitle).show();
                 } else {
                     $("#title_"+entryNumber).val("")
                         .attr("placeholder", "Please enter a title.")
                         .show();
+                }
+                var past = new Array;
+                for (service in pastServices) {
+                    if (service.date) {
+                        past.push(service.['date'] + " ("
+                            + service['location'] + ")");
+                    }
+                }
+                if (past) {
+                    $("#past_"+entryNumber).text(past.join(", ")).show();
+                } else {
+                    $("#past_"+entryNumber).text("").hide();
                 }
             })
 }

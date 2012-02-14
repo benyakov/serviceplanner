@@ -39,6 +39,7 @@ if (array_key_exists("date", $_GET)) {
 }
 if (array_key_exists("date", $_POST)) {
     processFormData();
+    exit(0);
 }
 ?>
 <!DOCTYPE HTML>
@@ -116,6 +117,7 @@ if (array_key_exists("date", $_POST)) {
         <input tabindex="<?=$tabindex+1?>" type="number" min="1" id="number_<?=$i?>" name="number_<?=$i?>" value="<?=$s["number_".$i]?>" class="hymn-number">
         <input tabindex="<?=$tabindex+2?>" type="text" id="note_<?=$i?>" name="note_<?=$i?>" class="hymn-note" maxlength="100" value="<?=$s["note_".$i]?>">
         <input tabindex="<?=$tabindex+3?>" type="text" id="title_<?=$i?>" name="title_<?=$i?>" class="hymn-title">
+        <div id="past_<?=$i?>" class="hymn-past"></div>
     </li>
     <? } ?>
     </ol>
@@ -128,46 +130,27 @@ if (array_key_exists("date", $_POST)) {
 </body>
 </html>
 <?
+function existing($str) {
+    if (strpos($str, "existing_")) return true;
+    else return false;
+}
 function processFormData() {
-    // Check for missing data
-    print_r($_GET); print_r($_POST); exit(0);
-            $title = preg_replace("/\"/", "&#34;", $title);
-            $sql2 = "SELECT DATE_FORMAT({$dbp}days.caldate, '%e %b %Y') as
-                date,
-                {$dbp}hymns.location
-                FROM {$dbp}hymns
-                JOIN {$dbp}days ON ({$dbp}days.pkey = {$dbp}hymns.service)
-                WHERE {$dbp}hymns.number = '{$hymn['number']}'
-                  AND {$dbp}hymns.book = '{$hymn['book']}'
-                ORDER BY {$dbp}days.caldate DESC LIMIT {$option_used_history}";
-            $result2 = mysql_query($sql2) or die(mysql_error());
-            $lastusedary = array();
-            while ($last = mysql_fetch_array($result2)) {
-                $lastusedary[] = $last[0].($last[1]?"@${last[1]}":"");
-            }
-            $lastused = implode(", ", $lastusedary);
-            $lastused = $lastused ? $lastused : "No record.";
-            echo "<li {$extra}>{$hymn['book']} {$hymn['number']}
-                {$hymn['note']} ".
-                "<input type=\"text\" id=\"{$hymn['book']}_{$hymn['number']}\"
-                    name=\"{$hymn['book']}_{$hymn['number']}\"
-                    value=\"{$title}\" size=\"50\" maxlength=\"50\"> ".
-                    "Last Used: {$lastused}</li>\n";
-        }
-        echo "</ul>\n";
 // Old stage 3
     // Insert data into db
-    $_SESSION[$sprefix]['stage2'] = $_POST;
     require("db-connection.php");
-    require("options.php");
     //// Add a new service, if needed.
     $feedback='<ol>';
-    $date = $_SESSION[$sprefix]['stage1']['date'];
-    $location = mysql_esc($_SESSION[$sprefix]['stage1']['location']);
-    $maxseq = 0; // For adding hymns to an existing service
-    if (! array_key_exists("services", $_POST)) {
-        errormsg("Forgot to choose a service. Please try again.");
+    $date = $_POST['date'];
+    $location = mysql_esc($_POST['location']);
+    $existingKey = array_shift(array_filter(array_keys($_POST), "existing"));
+    if ($existingKey) {
+        preg_match('/existing_(\d+)/', $existingKey, $matches);
+        $serviceid = $matches[1];
+    } else {
+        $serviceid = false;
     }
+    // START HERE
+    $maxseq = 0; // For adding hymns to an existing service
     if ("new" == $_POST["services"]) {
         $dayname = mysql_esc($_SESSION[$sprefix]['stage1']['liturgical_name']);
         $rite = mysql_esc($_SESSION[$sprefix]['stage1']['rite']);
@@ -182,13 +165,7 @@ function processFormData() {
         $serviceid = $row[0];
         $feedback .= "<li>Saved a new service on '{$date}' for
             '{$dayname}'.</li>";
-    } else {
-        // If an existing service is selected, grab its pkey and maxseq.
-        preg_match('/(\d+)_(\d+)/', $_POST["services"], $matches);
-        $serviceid = $matches[1];
-        $maxseq = $matches[2];
     }
-
     ////  Enter new/updated hymn titles (2 steps for clarity)
     // Build an array of hymnbook_hymnnumber items from $_POST
     $hymns = array();

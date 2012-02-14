@@ -82,6 +82,12 @@ input.hymn-title {
     width: 50em;
     display: none;
 }
+div.hymn-past {
+    width: 50em;
+    display: none;
+    font-family: sans-serif;
+    font-size: smaller;
+}
 
 div#content-container {
     border: thin solid black;
