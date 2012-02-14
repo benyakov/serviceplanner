@@ -77,7 +77,7 @@ function fetchHymnTitle() {
                 var past = new Array;
                 for (service in pastServices) {
                     if (service.date) {
-                        past.push(service.['date'] + " ("
+                        past.push(service['date'] + " ("
                             + service['location'] + ")");
                     }
                 }

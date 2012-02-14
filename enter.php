@@ -141,7 +141,7 @@ function processFormData() {
     $hymns = array();
     $altfields = "book|number|note|title";
     foreach ($_POST as $key => $value) {
-        if (preg_match("/({$altfields})_(\d+)/", $key, $matches) {
+        if (preg_match("/({$altfields})_(\d+)/", $key, $matches)) {
             if (! array_key_exists($hymns, $matches[2])) {
                 $hymns[$matches[2]] = array();
             } else {
