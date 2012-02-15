@@ -41,16 +41,16 @@ for that service, use the "Sermon" link.</p>
 <input type="submit" value="Apply">
 </form>
 <?
-$sql = "SELECT DATE_FORMAT({$dbp}days.caldate, '%e %b %Y') as date,
-    {$dbp}hymns.book, {$dbp}hymns.number, {$dbp}hymns.note,
-    {$dbp}hymns.location, {$dbp}days.name as dayname, {$dbp}days.rite,
-    {$dbp}days.pkey as id, {$dbp}days.servicenotes, {$dbp}names.title
-    FROM {$dbp}hymns
-    RIGHT OUTER JOIN {$dbp}days ON ({$dbp}hymns.service = {$dbp}days.pkey)
-    LEFT OUTER JOIN {$dbp}names ON ({$dbp}hymns.number = {$dbp}names.number)
-        AND ({$dbp}hymns.book = {$dbp}names.book)
-    ORDER BY {$dbp}days.caldate DESC, {$dbp}hymns.service DESC,
-        {$dbp}hymns.location, {$dbp}hymns.sequence
+$sql = "SELECT DATE_FORMAT(days.caldate, '%e %b %Y') as date,
+    hymns.book, hymns.number, hymns.note,
+    hymns.location, days.name as dayname, days.rite,
+    days.pkey as id, days.servicenotes, names.title
+    FROM {$dbp}hymns AS hymns
+    RIGHT OUTER JOIN {$dbp}days AS days ON (hymns.service = days.pkey)
+    LEFT OUTER JOIN {$dbp}names AS names ON (hymns.number = names.number)
+        AND (hymns.book = names.book)
+    ORDER BY days.caldate DESC, hymns.service DESC,
+        hymns.location, hymns.sequence
     {$limit}";
 $result = mysql_query($sql) or die(mysql_error()) ;
 modify_records_table($result, "delete.php");
