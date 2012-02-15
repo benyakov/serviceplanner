@@ -59,6 +59,7 @@ function fetchHymnTitle() {
     var entryNumber = id[1];
     if (! hymnNumber) {
         $("#title_"+entryNumber).val("").hide();
+        $("#past_"+entryNumber).text("").hide();
         return;
     }
     var hymnBook = $("#book_"+entryNumber).val();
@@ -75,10 +76,13 @@ function fetchHymnTitle() {
                         .show();
                 }
                 var past = new Array;
+                var locstr;
                 for (service in pastServices) {
-                    if (service.date) {
-                        past.push(service['date'] + " ("
-                            + service['location'] + ")");
+                    locstr = pastServices[service]['location']
+                        ?" (" + pastServices[service]['location'] + ")"
+                        :"";
+                    if (pastServices[service]['date']) {
+                        past.push(pastServices[service]['date'] + locstr);
                     }
                 }
                 if (past) {

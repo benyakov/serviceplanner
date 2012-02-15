@@ -7,8 +7,6 @@ $script_basename = basename($_SERVER['SCRIPT_NAME'], ".php") ;
 
 if (array_key_exists("date", $_GET)) {
     $date = $_GET['date'];
-} else {
-    $date = $s['date'];
 }
 if (array_key_exists("date", $_POST)) {
     processFormData();
@@ -44,7 +42,7 @@ if (array_key_exists("date", $_POST)) {
     The available hymnbooks can be configured in the
     file "options.php" on the webserver. </p>
     </header>
-    <form action="http://<?=$this_script.'?stage=2'?>" method="post">
+    <form action="http://<?=$this_script?>" method="post">
     <section id="existing-services">
     </section>
     <section id="service-items">
@@ -57,23 +55,23 @@ if (array_key_exists("date", $_POST)) {
     <li>
         <label for="location">Location:</label>
         <input tabindex="25" type="text" required
-            id="location" name="location" value="<?=$s['location']?>" >
+            id="location" name="location" value="" >
     </li>
     <li>
         <label for="liturgical_name">Liturgical Name:</label>
         <input tabindex="26" type="text"
             id="liturgicalname" name="liturgicalname" size="50"
-            maxlength="50" value="<?=$s['liturgical_name']?>">
+            maxlength="50" value="">
     </li>
     <li>
         <label for="rite">Rite or Order:</label>
         <input tabindex="27" type="text" id="rite" name="rite"
-            size="50" maxlength="50" value="<?=$s['rite']?>">
+            size="50" maxlength="50" value="">
     </li>
     <li class="vcenter">
         <label for="servicenotes">Service Notes:</label>
         <textarea tabindex="28" id="servicenotes"
-            name="servicenotes"><?=trim($s['servicenotes'])?></textarea>
+            name="servicenotes"></textarea>
     </li>
     </ul>
     </section>
@@ -84,11 +82,11 @@ if (array_key_exists("date", $_POST)) {
     <li class="<?= $i%2==0?"even":"odd" ?>">
         <select tabindex="<?=$tabindex?>" id="book_<?=$i?>" name="book_<?=$i?>">
         <? foreach ($option_hymnbooks as $hymnbook) { ?>
-            <option <? if ($hymnbook == $s["book_".$i]) echo "selected"; ?>><?=$hymnbook?></option>
+            <option><?=$hymnbook?></option>
         <? } ?>
         </select>
-        <input tabindex="<?=$tabindex+1?>" type="number" min="1" id="number_<?=$i?>" name="number_<?=$i?>" value="<?=$s["number_".$i]?>" class="hymn-number">
-        <input tabindex="<?=$tabindex+2?>" type="text" id="note_<?=$i?>" name="note_<?=$i?>" class="hymn-note" maxlength="100" value="<?=$s["note_".$i]?>">
+        <input tabindex="<?=$tabindex+1?>" type="number" min="1" id="number_<?=$i?>" name="number_<?=$i?>" value="" class="hymn-number">
+        <input tabindex="<?=$tabindex+2?>" type="text" id="note_<?=$i?>" name="note_<?=$i?>" class="hymn-note" maxlength="100" value="">
         <input tabindex="<?=$tabindex+3?>" type="text" id="title_<?=$i?>" name="title_<?=$i?>" class="hymn-title">
         <div id="past_<?=$i?>" class="hymn-past"></div>
     </li>
@@ -109,12 +107,13 @@ function existing($str) {
 }
 function processFormData() {
     // Insert data into db
+    // echo "POST:"; print_r($_POST); exit(0);
     require("db-connection.php");
     //// Add a new service, if needed.
     $feedback='<ol>';
-    $date = $_POST['date'];
+    $date = strftime("%Y-%m-%d", strtotime($_POST['date']));
     $location = mysql_esc($_POST['location']);
-    $existingKey = array_shift(array_filter(array_keys($_POST), "existing"));
+    $existingKey = array_pop(preg_grep('/^existing_/', array_keys($_POST)));
     if ($existingKey) {
         preg_match('/existing_(\d+)/', $existingKey, $matches);
         $serviceid = $matches[1];
@@ -142,13 +141,15 @@ function processFormData() {
     $altfields = "book|number|note|title";
     foreach ($_POST as $key => $value) {
         if (preg_match("/({$altfields})_(\d+)/", $key, $matches)) {
-            if (! array_key_exists($hymns, $matches[2])) {
-                $hymns[$matches[2]] = array();
+            if (! array_key_exists($matches[2], $hymns)) {
+                $hymns[$matches[2]] = array($matches[1]=>$value);
             } else {
                 $hymns[$matches[2]][$matches[1]] = $value;
             }
         }
     }
+    // Remove blank hymn entries
+    $hymns = array_filter($hymns, create_function('$s','return $s["number"];'));
     // Insert each hymn title
     foreach ($hymns as $ahymn) {
         $h = mysql_esc_array($ahymn);
@@ -160,6 +161,7 @@ function processFormData() {
         } else {
             $sql = "UPDATE {$dbp}names SET title='${h["title"]}'
                 WHERE book='${h["book"]}' AND number='${h["number"]}'";
+            $feedback.=$sql;
             mysql_query($sql) or die(mysql_error());
             if (mysql_affected_rows()) {
                 $feedback .="<li>Updated name '{$h["title"]}' for {$h["book"]} {$h["number"]}.</li>";
@@ -169,17 +171,17 @@ function processFormData() {
         }
     }
     //// Enter hymns and location on selected date
-    if (0 < entered_hymncount($hymns)) {
+    if ($hymns) {
         $sqlhymns = array();
         $saved = array();
         $sql = "SELECT MAX(`sequence`) FROM `{$dbp}hymns`
-            WHERE `service`='{$serviceid}
+            WHERE `service`='{$serviceid}'
             GROUP BY `service`";
         $result = mysql_query($sql) or die(mysql_error());
         $sequenceMax = array_pop(mysql_fetch_row($result));
         foreach ($hymns as $sequence => $ahymn)
         {
-            if (! $ahymn['number']) continue;
+            if (! intval($ahymn['number'])) continue;
             $hymn = mysql_esc_array($ahymn);
             $realsequence = $sequence + $sequenceMax;
             $sqlhymns[] = "('{$serviceid}', '{$location}', '{$hymn['book']}',
@@ -189,8 +191,10 @@ function processFormData() {
         $sql = "INSERT INTO `{$dbp}hymns`
             (service, location, book, number, note, sequence)
             VALUES ".implode(", ", $sqlhymns);
-        mysql_query($sql) or die(mysql_error());
-        $feedback .="<li>Saved hymns: <ol><li>" . implode("</li><li>", $saved) . "</li></ol></li></ol>\n";
+        $result = mysql_query($sql) or die(mysql_error());
+        if (mysql_affected_rows($result)) {
+            $feedback .="<li>Saved hymns: <ol><li>" . implode("</li><li>", $saved) . "</li></ol></li></ol>\n";
+        }
     }
     header("Location: modify.php?message=" . urlencode($feedback));
 }
