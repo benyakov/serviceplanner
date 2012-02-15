@@ -10,7 +10,8 @@ if (! array_key_exists("stage", $_GET))
     {
         if (preg_match('/(\d+)_(.*)/', $posted, $matches))
         {
-            $todelete[] = array("index" => $matches[1], "loc" => $matches[2]);
+            $todelete[] = array("index" => $matches[1],
+                "loc" => str_replace('_', ' ', $matches[2]));
         }
     }
     $_SESSION[$sprefix]['stage1'] = $todelete;
@@ -30,19 +31,22 @@ if (! array_key_exists("stage", $_GET))
             {
                 $whereclause = "";
             } else {
-                $whereclause = "AND ${dbp}hymns.location = '${deletion['loc']}'";
+                $whereclause = "AND hymns.location = '{$deletion['loc']}'";
             }
-            $sql = "SELECT DATE_FORMAT(${dbp}days.caldate, '%e %b %Y') as date,
-                ${dbp}hymns.book, ${dbp}hymns.number, ${dbp}hymns.note,
-                ${dbp}hymns.location, ${dbp}days.name as dayname,
-                ${dbp}days.rite, ${dbp}names.title
-                FROM ${dbp}hymns
-                RIGHT OUTER JOIN ${dbp}days ON (${dbp}hymns.service=${dbp}days.pkey)
-                LEFT OUTER JOIN ${dbp}names ON (${dbp}hymns.number=${dbp}names.number)
-                    AND (${dbp}hymns.book=${dbp}names.book)
-                WHERE ${dbp}days.pkey = '${deletion['index']}'
-                    ${whereclause}
-                ORDER BY ${dbp}days.caldate DESC, location";
+            $sql = "SELECT DATE_FORMAT(days.caldate, '%e %b %Y') as date,
+                hymns.book, hymns.number, hymns.note,
+                hymns.location, days.name as dayname, days.rite,
+                days.pkey as id, days.servicenotes, names.title
+                FROM {$dbp}hymns AS hymns
+                RIGHT OUTER JOIN {$dbp}days AS days
+                    ON (hymns.service = days.pkey)
+                LEFT OUTER JOIN {$dbp}names AS names
+                    ON (hymns.number = names.number)
+                        AND (hymns.book = names.book)
+                WHERE days.pkey = '${deletion['index']}'
+                ${whereclause}
+                ORDER BY days.caldate DESC, hymns.service DESC,
+                    hymns.location, hymns.sequence";
             $result = mysql_query($sql) or die(mysql_error());
             echo "<li>\n";
             display_records_table($result);
@@ -63,23 +67,25 @@ if (! array_key_exists("stage", $_GET))
     foreach ($_SESSION[$sprefix]['stage1'] as $todelete)
     {
         // Check to see if service has hymns at another location
-        $sql = "SELECT number FROM ${dbp}hymns JOIN ${dbp}days
-                ON (${dbp}hymns.service = ${dbp}days.pkey)
-                WHERE ${dbp}hymns.location != '${todelete['loc']}'
-                  AND ${dbp}days.pkey = ${todelete['index']}";
+        $sql = "SELECT number
+                FROM {$dbp}hymns as hymns
+                JOIN {$dbp}days as days
+                ON (hymns.service = days.pkey)
+                WHERE hymns.location != '{$todelete['loc']}'
+                  AND days.pkey = {$todelete['index']}";
         $result = mysql_query($sql) or die(mysql_error());
 
         if (! mysql_fetch_array($result))
         { // If not, delete the service (should cascade to hymns)
-            $sql = "DELETE FROM ${dbp}days
-                WHERE pkey = ${todelete['index']}";
+            $sql = "DELETE FROM `{$dbp}days`
+                WHERE `pkey` = '{$todelete['index']}'";
             mysql_query($sql) or die(mysql_error());
         } else { // If so, delete only the hymns.
-            $sql = "DELETE FROM ${dbp}hymns
-                USING ${dbp}hymns JOIN ${dbp}days
-                    ON (${dbp}hymns.service = ${dbp}days.pkey)
-                WHERE ${dbp}days.pkey = ${todelete['index']}
-                  AND ${dbp}hymns.location = '${todelete['loc']}'";
+            $sql = "DELETE FROM {$dbp}hymns as hymns
+                USING hymns JOIN ${dbp}days as days
+                    ON (hymns.service = days.pkey)
+                WHERE days.pkey = {$todelete['index']}
+                  AND hymns.location = '{$todelete['loc']}'";
             mysql_query($sql) or die (mysql_error());
         }
 

@@ -176,7 +176,8 @@ function processFormData() {
         $saved = array();
         $sql = "SELECT MAX(`sequence`) FROM `{$dbp}hymns`
             WHERE `service`='{$serviceid}'
-            GROUP BY `service`";
+            AND `location`='{$location}'
+            GROUP BY (`service`, `location`)";
         $result = mysql_query($sql) or die(mysql_error());
         $sequenceMax = array_pop(mysql_fetch_row($result));
         foreach ($hymns as $sequence => $ahymn)
@@ -196,6 +197,7 @@ function processFormData() {
             $feedback .="<li>Saved hymns: <ol><li>" . implode("</li><li>", $saved) . "</li></ol></li></ol>\n";
         }
     }
-    header("Location: modify.php?message=" . urlencode($feedback));
+    // ?message= can be tacked on to show what just happened.
+    header("Location: modify.php"); //?message=" . urlencode($feedback));
 }
 ?>

@@ -40,12 +40,12 @@ function updateExisting() {
                         $('.existingservice').not(this)
                             .prop('checked', false)
                             .prop('disabled', true);
-                        $("#liturgical_name").prop('disabled', true);
+                        $("#liturgicalname").prop('disabled', true);
                         $("#rite").prop('disabled', true);
                         $("#servicenotes").prop('disabled', true);
                     } else {
                         $('.existingservice').prop('disabled', false);
-                        $("#liturgical_name").prop('disabled', false);
+                        $("#liturgicalname").prop('disabled', false);
                         $("#rite").prop('disabled', false);
                         $("#servicenotes").prop('disabled', false);
                     }
