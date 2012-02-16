@@ -9,6 +9,14 @@ if (! array_key_exists("stage", $_GET))
     echo html_head("Edit a Service");
     $backlink = "modify.php";
     ?>
+    <script type="text/javascript">
+    $(document).ready(function() {
+        showJsOnly();
+        $("#date").datepicker({showOn:"both"});
+        $(".hymn-number").keyup(fetchHymnTitle)
+            .blur(fetchHymnTitle);
+    })
+    </script>
     <body>
     <div id="content-container">
     <h1>Edit a Service</h1>
@@ -89,7 +97,7 @@ if (! array_key_exists("stage", $_GET))
                     <? } ?>
                     </select>
                 </td>
-                <td><input type="text" id="number_<?=$row['hymnid']?>" size="5"
+                <td><input class="hymn-number" type="text" id="number_<?=$row['hymnid']?>" size="5"
                     name="number_<?=$row['hymnid']?>" value="<?=$row['number']?>">
                 </td>
                 <td><input type="text" id="note_<?=$row['hymnid']?>" size="30"
@@ -103,6 +111,10 @@ if (! array_key_exists("stage", $_GET))
                      maxlength="50" name="title_<?=$row['hymnid']?>"
                      value="<?=$row['title']?>">
                 </td>
+            </tr>
+            <tr>
+                <td colspan="4"></td>
+                <td colspan="3"><div class="hymn-past" id="past_<?=$row['hymnid']?>"></div></td>
             </tr>
             <?
             $row = mysql_fetch_assoc($result);
@@ -145,6 +157,7 @@ if (! array_key_exists("stage", $_GET))
     // Update hymn names
     foreach ($tonames as $key => $value)
     {
+        if (! $value) { continue; }
         $title = mysql_esc($value);
         $number = mysql_esc($tohymns[$key]["number"]);
         $book = mysql_esc($tohymns[$key]["book"]);

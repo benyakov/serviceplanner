@@ -152,6 +152,7 @@ function processFormData() {
     $hymns = array_filter($hymns, create_function('$s','return $s["number"];'));
     // Insert each hymn title
     foreach ($hymns as $ahymn) {
+        if (! $ahymn['title']) { continue; }
         $h = mysql_esc_array($ahymn);
         // Check to see if the hymn is already entered.
         $sql = "INSERT INTO {$dbp}names (book, number, title)
