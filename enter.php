@@ -21,10 +21,14 @@ if (array_key_exists("date", $_POST)) {
         $("#existing-services").hide();
         showJsOnly();
         $("#date").datepicker({showOn:"both"});
-        $("#date").keyup(updateExisting)
+        $("#date").keyup(function(){
+            $(this).doTimeout('update-existing', 250, updateExisting)
+        })
             .change(updateExisting);
-        $(".hymn-number").keyup(fetchHymnTitle)
-            .blur(fetchHymnTitle);
+        $(".hymn-number").keyup(function(){
+            $(this).doTimeout('fetch-hymn-title', 250, fetchHymnTitle)
+        })
+            .change(fetchHymnTitle);
     })
     </script>
 <body>
@@ -54,7 +58,7 @@ if (array_key_exists("date", $_POST)) {
     </li>
     <li>
         <label for="location">Location:</label>
-        <input tabindex="25" type="text" required
+        <input tabindex="2" type="text" required
             id="location" name="location" value="" >
     </li>
     <li>
@@ -176,8 +180,8 @@ function processFormData() {
         $saved = array();
         $sql = "SELECT MAX(`sequence`) FROM `{$dbp}hymns`
             WHERE `service`='{$serviceid}'
-            AND `location`='{$location}'
-            GROUP BY (`service`, `location`)";
+            AND `location`='{$location}'";
+            // GROUP BY (`service`, `location`)";
         $result = mysql_query($sql) or die(mysql_error());
         $sequenceMax = array_pop(mysql_fetch_row($result));
         foreach ($hymns as $sequence => $ahymn)
