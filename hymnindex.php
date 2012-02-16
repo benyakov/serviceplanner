@@ -27,10 +27,12 @@ if (! mysql_query($sql)) {
         `text` varchar(60),
         `elh` smallint,
         `tlh` smallint,
+        `lsb` smallint,
+        `cw` smallint,
         `lw` smallint,
         `lbw` smallint,
-        `cw` smallint,
         `hs98` smallint,
+        `wov` smallint,
         `pkey` int(10) unsigned NOT NULL auto_increment,
         KEY `pkey` (`pkey`)
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8" ;
@@ -51,7 +53,7 @@ if (! mysql_query($sql)) {
             }
             $r[] = $f;
         }
-        $sql = "INSERT INTO ${dbp}xref (title, text, elh, tlh, lw, lbw, cw, hs98)
+        $sql = "INSERT INTO ${dbp}xref (title, text, lsb, tlh, lw, lbw, elh, cw, wov, hs98)
             VALUES (${r[0]}, ${r[1]}, ${r[2]}, ${r[3]}, ${r[4]}, ${r[5]}, ${r[6]}, ${r[7]})";
         mysql_query($sql) or die(mysql_error()."\n".__FILE__.":".__LINE__);
     }
@@ -72,7 +74,7 @@ $result = mysql_query($sql) or die(mysql_error());
 require("options.php");
 $script_basename = basename($_SERVER['SCRIPT_NAME'], ".php") ;
 ?>
-<html>
+<html lang="en">
 <?=html_head("Hymn Cross Reference")?>
 <body>
 <?= sitetabs($sitetabs, $script_basename); ?>
@@ -88,10 +90,12 @@ $script_basename = basename($_SERVER['SCRIPT_NAME'], ".php") ;
 <td><?=linksort("Text", "text")?></td>
 <td><?=linksort("ELH", "elh")?></td>
 <td><?=linksort("TLH", "tlh")?></td>
+<td><?=linksort("LSB", "lsb")?></td>
+<td><?=linksort("CW", "cw")?></td>
 <td><?=linksort("LW", "lw")?></td>
 <td><?=linksort("LBW", "lbw")?></td>
-<td><?=linksort("CW", "cw")?></td>
 <td><?=linksort("HS '98", "hs98")?></td>
+<td><?=linksort("WOV", "wov")?></td>
 </tr>
 </thead>
 <tbody>
@@ -123,10 +127,12 @@ while ($row = mysql_fetch_assoc($result)) {
         <td class=\"text\">${r['text']}</td>
         <td class=\"elh\">${r['elh']}</td>
         <td class=\"tlh\">${r['tlh']}</td>
+        <td class=\"lsb\">${r['lsb']}</td>
+        <td class=\"cw\">${r['cw']}</td>
         <td class=\"lw\">${r['lw']}</td>
         <td class=\"lbw\">${r['lbw']}</td>
-        <td class=\"cw\">${r['cw']}</td>
         <td class=\"hs98\">${r['hs98']}</td>
+        <td class=\"wov\">${r['wov']}</td>
         </tr>";
 }
 ?>
