@@ -41,7 +41,7 @@ for that service, use the "Sermon" link.</p>
 <input type="submit" value="Apply">
 </form>
 <?
-$sql = "SELECT DATE_FORMAT(days.caldate, '%e %b %Y') as date,
+$sql = "SELECT DATE_FORMAT(days.caldate, '%c/%e/%Y') as date,
     hymns.book, hymns.number, hymns.note,
     hymns.location, days.name as dayname, days.rite,
     days.pkey as id, days.servicenotes, names.title

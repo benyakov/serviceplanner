@@ -127,7 +127,8 @@ function html_head($title, $five=false)
         }
         $rv[] = "<script type=\"text/javascript\" src=\"http://ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery.min.js\"></script>";
         $rv[] = "<link href=\"http://ajax.googleapis.com/ajax/libs/jqueryui/1.8/themes/base/jquery-ui.css\" rel=\"stylesheet\" type=\"text/css\"/>
-        <script type=\"text/javascript\" src=\"http://ajax.googleapis.com/ajax/libs/jqueryui/1.8/jquery-ui.min.js\"></script>";
+        <script type=\"text/javascript\" src=\"http://ajax.googleapis.com/ajax/libs/jqueryui/1.8/jquery-ui.min.js\"></script>
+        <script type=\"text/javascript\" src=\"jquery.ba-dotimeout.min.js\"></script>";
         $rv[] = "<script type=\"text/javascript\" src=\"{$here}/ecmascript.js\"></script>";
     }
     $rv[] = "</head>";

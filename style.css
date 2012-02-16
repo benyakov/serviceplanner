@@ -56,11 +56,10 @@ textarea#servicenotes{
     width: 40em;
     margin: 1ex;
 }
-.servicenote {
+div.servicenote {
     padding: 2px 2px 2px 1em;
     border-top: thin dashed black;
     font-size: 80%;
-    white-space: pre;
 }
 
 

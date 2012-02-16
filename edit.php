@@ -25,19 +25,17 @@ if (! array_key_exists("stage", $_GET))
     already listed here, use the "Add Hymns" link.</p>
     <p><a href="<?=$backlink?>">Cancel Edit</a><p>
     <?
-        $sql = "SELECT DATE_FORMAT({$dbp}days.caldate, '%e %b %Y') as date,
-            {$dbp}hymns.book, {$dbp}hymns.number, {$dbp}hymns.note,
-            {$dbp}hymns.pkey as hymnid, {$dbp}hymns.location,
-            {$dbp}hymns.sequence, {$dbp}days.name as dayname, {$dbp}days.rite,
-            {$dbp}days.servicenotes, {$dbp}names.title
-            FROM {$dbp}hymns
-            RIGHT OUTER JOIN {$dbp}days ON ({$dbp}hymns.service={$dbp}days.pkey)
-            LEFT OUTER JOIN {$dbp}names
-                ON ({$dbp}hymns.number={$dbp}names.number)
-                AND ({$dbp}hymns.book={$dbp}names.book)
-            WHERE {$dbp}days.pkey = '{$_GET['id']}'
-            ORDER BY {$dbp}days.caldate DESC, {$dbp}hymns.location,
-                {$dbp}hymns.sequence";
+        $sql = "SELECT DATE_FORMAT(days.caldate, '%c/%e/%Y') as date,
+            hymns.book, hymns.number, hymns.note,
+            hymns.pkey as hymnid, hymns.location,
+            hymns.sequence, days.name as dayname, days.rite,
+            days.servicenotes, names.title
+            FROM ${dbp}hymns AS hymns
+            RIGHT OUTER JOIN {$dbp}days AS days ON (hymns.service=days.pkey)
+            LEFT OUTER JOIN {$dbp}names AS names
+                ON (hymns.number=names.number) AND (hymns.book=names.book)
+            WHERE days.pkey = '{$_GET['id']}'
+            ORDER BY days.caldate DESC, hymns.location, hymns.sequence";
         $result = mysql_query($sql) or die(mysql_error());
         $row = mysql_fetch_assoc($result);
         ?>
