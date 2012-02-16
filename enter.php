@@ -13,7 +13,7 @@ if (array_key_exists("date", $_POST)) {
     exit(0);
 }
 ?>
-<!DOCTYPE HTML>
+<!DOCTYPE html>
 <html lang="en">
 <?=html_head("Service Entry Form: ${this_script}", $five=true)?>
     <script type="text/javascript">

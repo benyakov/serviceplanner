@@ -5,7 +5,7 @@ require("options.php");
 $this_script = $_SERVER['HTTP_HOST'].$_SERVER['SCRIPT_NAME'] ;
 if (! array_key_exists("stage", $_GET))
 {
-    echo "<html>\n";
+    echo "<!DOCTYPE html>\n<html lang="en">\n";
     echo html_head("Edit a Service");
     $backlink = "modify.php";
     ?>
@@ -14,7 +14,8 @@ if (! array_key_exists("stage", $_GET))
         showJsOnly();
         $("#date").datepicker({showOn:"both"});
         $(".hymn-number").keyup(fetchHymnTitle)
-            .blur(fetchHymnTitle);
+            .blur(fetchHymnTitle)
+            .blur();
     })
     </script>
     <body>
@@ -29,11 +30,9 @@ if (! array_key_exists("stage", $_GET))
             hymns.book, hymns.number, hymns.note,
             hymns.pkey as hymnid, hymns.location,
             hymns.sequence, days.name as dayname, days.rite,
-            days.servicenotes, names.title
+            days.servicenotes
             FROM ${dbp}hymns AS hymns
             RIGHT OUTER JOIN {$dbp}days AS days ON (hymns.service=days.pkey)
-            LEFT OUTER JOIN {$dbp}names AS names
-                ON (hymns.number=names.number) AND (hymns.book=names.book)
             WHERE days.pkey = '{$_GET['id']}'
             ORDER BY days.caldate DESC, hymns.location, hymns.sequence";
         $result = mysql_query($sql) or die(mysql_error());
@@ -46,7 +45,7 @@ if (! array_key_exists("stage", $_GET))
             <dt>Date</dt>
             <dd>
                 <input type="text" id="date" name="date"
-                 value="<?=$row['date']?>">
+                 value="<?=$row['date']?>" required>
             </dd>
             <dt>Day Name</dt>
             <dd>
@@ -82,7 +81,7 @@ if (! array_key_exists("stage", $_GET))
                         name="delete_<?=$row['hymnid']?>">
                 </td>
                 <td>
-                    <input type="text" id="sequence_<?=$row['hymnid']?>"
+                    <input type="number" id="sequence_<?=$row['hymnid']?>"
                         size="2" name="sequence_<?=$row['hymnid']?>"
                         value="<?=$row['sequence']?>">
                 </td>
@@ -95,7 +94,7 @@ if (! array_key_exists("stage", $_GET))
                     <? } ?>
                     </select>
                 </td>
-                <td><input class="hymn-number" type="text" id="number_<?=$row['hymnid']?>" size="5"
+                <td><input class="hymn-number" type="number" id="number_<?=$row['hymnid']?>" size="5"
                     name="number_<?=$row['hymnid']?>" value="<?=$row['number']?>">
                 </td>
                 <td><input type="text" id="note_<?=$row['hymnid']?>" size="30"
