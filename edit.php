@@ -7,7 +7,7 @@ if (! $auth) {
 $this_script = $_SERVER['HTTP_HOST'].$_SERVER['SCRIPT_NAME'] ;
 if (! array_key_exists("stage", $_GET))
 {
-    echo "<!DOCTYPE html>\n<html lang="en">\n";
+    echo "<!DOCTYPE html>\n<html lang=\"en\">\n";
     echo html_head("Edit a Service");
     $backlink = "modify.php";
     ?>

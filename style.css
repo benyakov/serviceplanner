@@ -211,6 +211,10 @@ a.sortlink :hover {
     color: #008;
 }
 
+.lsb {
+    color: #800;
+}
+
 .lw {
     color: #00E;
 }
@@ -225,6 +229,10 @@ a.sortlink :hover {
 
 .hs98 {
     color: #777;
+}
+
+.wov {
+    color: #555;
 }
 
 .vcenter * {
