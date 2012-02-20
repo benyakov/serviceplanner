@@ -1,7 +1,9 @@
 <?php
-require("functions.php");
-require("options.php");
-require("setup-session.php");
+require("init.php");
+if (! $auth) {
+    header("location: index.php");
+    exit(0);
+}
 $this_script = $_SERVER['HTTP_HOST'].$_SERVER['SCRIPT_NAME'] ;
 $script_basename = basename($_SERVER['SCRIPT_NAME'], ".php") ;
 
@@ -110,9 +112,7 @@ function existing($str) {
     else return false;
 }
 function processFormData() {
-    // Insert data into db
     // echo "POST:"; print_r($_POST); exit(0);
-    require("db-connection.php");
     //// Add a new service, if needed.
     $feedback='<ol>';
     $date = strftime("%Y-%m-%d", strtotime($_POST['date']));
@@ -125,16 +125,18 @@ function processFormData() {
         $serviceid = false;
     }
     if (! $serviceid) { // Create a new service
-        $dayname = mysql_esc($_POST['liturgicalname']);
-        $rite = mysql_esc($_POST['rite']);
-        $servicenotes = mysql_esc($_POST['servicenotes']);
-        $sql = "INSERT INTO {$dbp}days (caldate, name, rite, servicenotes)
-            VALUES ('{$date}', '{$dayname}', '{$rite}', '{$servicenotes}')";
-        mysql_query($sql) or die(mysql_error());
+        $q = $dbh->prepare("INSERT INTO {$dbp}days
+            (caldate, name, rite, servicenotes)
+            VALUES (:date, :dayname, :rite, :servicenotes)");
+        $q->bindParam("date", $date);
+        $q->bindParam("dayname", $_POST['liturgicalname']);
+        $q->bindParam("rite", $_POST['rite']);
+        $q->bindParam("servicenotes", $_POST['servicenotes']);
+        $q->execute() or die(array_pop($q->errorInfo()));
         // Grab the pkey of the newly inserted row.
-        $sql = "SELECT LAST_INSERT_ID()";
-        $result = mysql_query($sql) or die(mysql_error());
-        $row = mysql_fetch_row($result);
+        $q = $dbh->prepare("SELECT LAST_INSERT_ID()");
+        $q->execute() or die(array_pop($q->errorInfo()));
+        $row = $q->fetch($result);
         $serviceid = $row[0];
         $feedback .= "<li>Saved a new service on '{$date}' for
             '{$dayname}'.</li>";
@@ -155,19 +157,21 @@ function processFormData() {
     // Remove blank hymn entries
     $hymns = array_filter($hymns, create_function('$s','return $s["number"];'));
     // Insert each hymn title
-    foreach ($hymns as $ahymn) {
-        if (! $ahymn['title']) { continue; }
-        $h = mysql_esc_array($ahymn);
+    foreach ($hymns as $h) {
+        if (! $h['title']) { continue; }
         // Check to see if the hymn is already entered.
-        $sql = "INSERT INTO {$dbp}names (book, number, title)
-            VALUES ('{$h["book"]}', '{$h["number"]}', '{$h["title"]}')";
-        if (mysql_query($sql)) {
+        $q = $dbh->prepare("INSERT INTO {$dbp}names (book, number, title)
+            VALUES ('book', '{number}', '{title}')");
+        $q->bindParam(":book", $h["book"]);
+        $q->bindParam(":number",$h["number"]);
+        $q->bindParam(":title", $h["title"]);
+        if ($q->execute()) {
             $feedback .= "<li>Saved name '{$h["title"]}' for {$h["book"]} {$h["number"]}.</li>";
         } else {
             $sql = "UPDATE {$dbp}names SET title='${h["title"]}'
                 WHERE book='${h["book"]}' AND number='${h["number"]}'";
             $feedback.=$sql;
-            mysql_query($sql) or die(mysql_error());
+            mysql_query($sql) or die(array_pop($q->errorInfo()));
             if (mysql_affected_rows()) {
                 $feedback .="<li>Updated name '{$h["title"]}' for {$h["book"]} {$h["number"]}.</li>";
             } else {
@@ -179,26 +183,27 @@ function processFormData() {
     if ($hymns) {
         $sqlhymns = array();
         $saved = array();
-        $sql = "SELECT MAX(`sequence`) FROM `{$dbp}hymns`
+        $q = $dbh->prepare("SELECT MAX(`sequence`) FROM `{$dbp}hymns`
             WHERE `service`='{$serviceid}'
-            AND `location`='{$location}'";
-            // GROUP BY (`service`, `location`)";
-        $result = mysql_query($sql) or die(mysql_error());
-        $sequenceMax = array_pop(mysql_fetch_row($result));
+            AND `location`='{$location}'");
+        $q->execute() or die(array_pop($q->errorInfo()));
+        $sequenceMax = array_pop($q->fetch());
         foreach ($hymns as $sequence => $ahymn)
         {
             if (! intval($ahymn['number'])) continue;
             $hymn = mysql_esc_array($ahymn);
             $realsequence = $sequence + $sequenceMax;
-            $sqlhymns[] = "('{$serviceid}', '{$location}', '{$hymn['book']}',
-                '{$hymn['number']}', '{$hymn['note']}', '{$realsequence}')";
+            $sqlhymns[] = "('{$dbh->quote($serviceid)}',
+                '{$dbh->quote($location)}', '{$hymn['book']}',
+                '{$dbh->quote($hymn['number'])}',
+                '{$dbh->quote($hymn['note'])}', '{$realsequence}')";
             $saved[] = "{$ahymn['book']} {$ahymn['number']}";
         }
-        $sql = "INSERT INTO `{$dbp}hymns`
+        $q = $dbh->prepare("INSERT INTO `{$dbp}hymns`
             (service, location, book, number, note, sequence)
-            VALUES ".implode(", ", $sqlhymns);
-        $result = mysql_query($sql) or die(mysql_error());
-        if (mysql_affected_rows($result)) {
+            VALUES ".implode(", ", $sqlhymns));
+        $q->execute() or die(array_pop($q->errorInfo()));
+        if ($->rowCount()) {
             $feedback .="<li>Saved hymns: <ol><li>" . implode("</li><li>", $saved) . "</li></ol></li></ol>\n";
         }
     }

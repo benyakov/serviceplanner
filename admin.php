@@ -1,7 +1,8 @@
 <?
-require("functions.php");
-require("options.php");
-$script_basename = basename($_SERVER['SCRIPT_NAME'], ".php") ;
+require("init.php");
+if (! $auth) {
+    header('Location: index.html');
+}
 ?>
 <html>
 <?=html_head("Housekeeping")?>
@@ -14,12 +15,6 @@ $script_basename = basename($_SERVER['SCRIPT_NAME'], ".php") ;
     often.  You get to decide what that means.  It would also be a good idea to
     practice restoring at least once, to make sure it works.  (If it doesn't,
     your database may lose data.)</p>
-
-    <p>This is not a high security web application.  If someone knows how to
-    point their browser at the pages that modify the database, they can delete
-    or change everything you have there.  So don't link to those pages from
-    public-facing web sites.  Password-based security may come in the future,
-    but so far I'm not convinced it's necessary.  For now, keep backups.</p>
 
     <p>To make the information available to others in the public, it is
     recommended that you make links to the files (linked here) <a

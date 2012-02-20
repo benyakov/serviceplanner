@@ -1,6 +1,42 @@
 <?php
 
-function display_records_table($result)
+function auth($login = '', $passwd = '') {
+    global $dbp, $sprefix, $dbh;
+
+	$authdata = $_SESSION[$sprefix]['authdata'];
+
+	if ( is_array( $authdata ) ) {
+		$check = $authdata['login'];
+		$pw = $authdata['password'];
+		$register = false;
+	} elseif (!empty($login)) {
+		$check = $login;
+		$pw = md5($passwd);
+		$register = true;
+	} else {
+		return false;
+	}
+
+    $q = $dbh->prepare("SELECT * FROM `{$tablepre}users`
+        WHERE `username` = :check");
+    $q->bindParam(':check', $check);
+    $q->execute();
+	$row = $q->fetch(PDO::FETCH_ASSOC);
+	if ( $row["password"] == $pw ) {
+		if ($register) {
+            $_SESSION[$sprefix]["authdata"] = array(
+                "login"=>$row["username"],
+                "password"=>$row["password"],
+                "uid"=>$row["uid"]);
+		}
+		return true;
+	} else {
+        unset( $_SESSION[$sprefix]['authdata'] );
+        return false;
+    }
+}
+
+function display_records_table($q)
 { // Show a table of the data in the query $result
     ?><table id="records-listing">
         <tr class="heading"><th>Date &amp; Location</th><th colspan=2>Liturgical Day Name: Service/Rite</th></tr>
@@ -10,15 +46,14 @@ function display_records_table($result)
     $name = "";
     $location = "";
     $rowcount = 1;
-    while ($row = mysql_fetch_assoc($result))
-    {
+    while ($row = $q->fetch(PDO::FETCH_ASSOC)); {
         if (!  ($row['date'] == $date &&
                 $row['dayname'] == $name &&
                 $row['location'] == $location))
         {// Display the heading line
             if (is_within_week($row['date']))
             {
-                $datetext = "<a name=\"now\">${row['date']}</a>";
+                $datetext = "<a name=\"now\">{$row['date']}</a>";
             } else {
                 $datetext = $row['date'];
             }

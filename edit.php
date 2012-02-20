@@ -1,7 +1,9 @@
 <?
-require("db-connection.php");
-require("functions.php");
-require("options.php");
+require("init.php");
+if (! $auth) {
+    header("location: index.php");
+    exit(0);
+}
 $this_script = $_SERVER['HTTP_HOST'].$_SERVER['SCRIPT_NAME'] ;
 if (! array_key_exists("stage", $_GET))
 {
@@ -26,7 +28,8 @@ if (! array_key_exists("stage", $_GET))
     already listed here, use the "Add Hymns" link.</p>
     <p><a href="<?=$backlink?>">Cancel Edit</a><p>
     <?
-        $sql = "SELECT DATE_FORMAT(days.caldate, '%c/%e/%Y') as date,
+        $q = $dbh->prepare("SELECT
+            DATE_FORMAT(days.caldate, '%c/%e/%Y') as date,
             hymns.book, hymns.number, hymns.note,
             hymns.pkey as hymnid, hymns.location,
             hymns.sequence, days.name as dayname, days.rite,
@@ -34,9 +37,9 @@ if (! array_key_exists("stage", $_GET))
             FROM ${dbp}hymns AS hymns
             RIGHT OUTER JOIN {$dbp}days AS days ON (hymns.service=days.pkey)
             WHERE days.pkey = '{$_GET['id']}'
-            ORDER BY days.caldate DESC, hymns.location, hymns.sequence";
-        $result = mysql_query($sql) or die(mysql_error());
-        $row = mysql_fetch_assoc($result);
+            ORDER BY days.caldate DESC, hymns.location, hymns.sequence");
+        $q->execute() or die(array_pop($q->errorInfo()));
+        $row = $q->fetch(PDO::FETCH_ASSOC);
         ?>
         <form action="http://<?=$this_script?>?stage=2" method="POST">
         <input type="submit" value="Commit"><input type="reset">
@@ -71,7 +74,7 @@ if (! array_key_exists("stage", $_GET))
         {
             if ('' == $row['number'])
             {
-                $row = mysql_fetch_assoc($result);
+                $row = $q->fetch(PDO::FETCH_ASSOC);
                 continue;
             }
             ?>
@@ -114,7 +117,7 @@ if (! array_key_exists("stage", $_GET))
                 <td colspan="3"><div class="hymn-past" id="past_<?=$row['hymnid']?>"></div></td>
             </tr>
             <?
-            $row = mysql_fetch_assoc($result);
+            $row = $q->fetch(PDO::FETCH_ASSOC);
         }
         ?>
         </table>
@@ -134,10 +137,8 @@ if (! array_key_exists("stage", $_GET))
     $todays = array();
     $todelete = array();
     $id = "";
-    foreach ($_POST as $key => $value)
-    {
-        if (in_array($key, array("date", "dayname", "rite", "servicenotes")))
-        {
+    foreach ($_POST as $key => $value) {
+        if (in_array($key, array("date", "dayname", "rite", "servicenotes"))) {
             $todays[$key] = $value;
         } elseif (preg_match('/delete_(\d+)/', $key, $matches)) {
             $todelete[] = $matches[1];
@@ -152,50 +153,57 @@ if (! array_key_exists("stage", $_GET))
     }
 
     // Update hymn names
-    foreach ($tonames as $key => $value)
-    {
+    foreach ($tonames as $key => $value) {
         if (! $value) { continue; }
-        $title = mysql_esc($value);
-        $number = mysql_esc($tohymns[$key]["number"]);
-        $book = mysql_esc($tohymns[$key]["book"]);
-        $sql = "INSERT INTO ${dbp}names (title, number, book)
-            VALUES ('${title}', '${number}', '{$book}')";
-        if (! mysql_query($sql))
-        {
-            $sql = "UPDATE ${dbp}names SET title = '${title}'
-                WHERE number = '${number}'
-                AND book = '${book}'";
-            mysql_query($sql) or die(mysql_error());
+        $q = $dbh->prepare("INSERT INTO {$dbp}names (title, number, book)
+            VALUES (:title, :number, :book)");
+        $q->bindParam(":title", $value);
+        $q->bindParam(":number", $tohymns[$key]["number"]);
+        $q->bindParam(":book", $tohymns[$key]["book"]);
+        if (! $q->execute()) {
+            $qu = $dbh->prepare("UPDATE {$dbp}names SET title = :title
+                WHERE number = :number
+                AND book = :book");
+            $qu->bindParam(":title", $value);
+            $qu->bindParam(":number", $tohymns[$key]["number"]);
+            $qu->bindParam(":book", $tohymns[$key]["book"]);
+            $qu->execute() or die(array_pop($q->errorInfo()));
         }
     }
     // Update day information
-    $date = strftime("%Y-%m-%d", strtotime($todays['date']));
-    $name = mysql_esc($todays['dayname']);
-    $rite = mysql_esc($todays['rite']);
-    $servicenotes = mysql_esc($todays['servicenotes']);
-    $id = $_POST['id'];
-    $sql = "UPDATE `{$dbp}days` SET `caldate`='{$date}',
-        `name`='{$name}', `rite`='{$rite}',
-        `servicenotes`='{$servicenotes}'
-        WHERE `pkey` = '{$id}'";
-    mysql_query($sql) or die(mysql_error());
+    $q = $dbh->prepare("UPDATE `{$dbp}days` SET `caldate`=:date,
+        `name`=:name, `rite`=:rite,
+        `servicenotes`=:servicenotes
+        WHERE `pkey` = :id");
+    $q->bindParam(":date", strftime("%Y-%m-%d", strtotime($todays['date'])));
+    $q->bindParam(":name", $todays['dayname']);
+    $q->bindParam(":rite", $todays['rite']);
+    $q->bindParam(":servicenotes", $todays['servicenotes']);
+    $q->bindParam(":id", $_POST['id']);
+    $q->execute() or die(array_pop($q->errorInfo()));
 
     // Update hymns
-    foreach ($tohymns as $hymnid => $h)
-    {
+    foreach ($tohymns as $hymnid => $h) {
         if (in_array($hymnid, $todelete)) { continue; }
         $hymn = mysql_esc_array($h);
-        $sql = "UPDATE ${dbp}hymns SET number='${hymn['number']}',
-            note='${hymn['note']}', location='${hymn['location']}',
-            book='${hymn['book']}', sequence='${hymn['sequence']}'
-            WHERE pkey = '${hymnid}'";
-        mysql_query($sql) or die(mysql_error());
+        $q = $dbh->prepare("UPDATE {$dbp}hymns
+            SET number=:number,
+            note=:note, location=:location,
+            book=book, sequence=:sequence
+            WHERE pkey = :hymnid");
+        foreach ($h as $k=>$v) {
+            $q->bindParam(":{$k}", $v);
+        }
+        $q->bindParam(":hymnid", $hymnid);
+        $q->execute() or die(array_pop($q->errorInfo()));
     }
 
     // Delete tagged hymns
     foreach ($todelete as $hymnid) {
-        $sql = "DELETE FROM ${dbp}hymns WHERE pkey = '${hymnid}'";
-        mysql_query($sql) or die(mysql_error());
+        $q = $dbh->prepare("DELETE FROM {$dbp}hymns
+            WHERE pkey = :hymnid";
+        $q->bindParam(":hymnid", $hymnid);
+        $q->execute() or die(array_pop($q->errorInfo()));
     }
     header("Location: modify.php?message=".urlencode("Edit complete."));
     exit(0);

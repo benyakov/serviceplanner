@@ -1,22 +1,19 @@
 <?
-require("setup-session.php");
-require("functions.php");
+require("init.php");
 $this_script = $_SERVER['HTTP_HOST'].$_SERVER['SCRIPT_NAME'] ;
-if (! array_key_exists("stage", $_GET))
-{
+if (! array_key_exists("stage", $_GET)) {
     // Put items to delete into an array.
     $todelete = array();
-    foreach ($_POST as $posted=>$value)
-    {
-        if (preg_match('/(\d+)_(.*)/', $posted, $matches))
-        {
+    foreach ($_POST as $posted=>$value) {
+        if (preg_match('/(\d+)_(.*)/', $posted, $matches)) {
             $todelete[] = array("index" => $matches[1],
                 "loc" => str_replace('_', ' ', $matches[2]));
         }
     }
     $_SESSION[$sprefix]['stage1'] = $todelete;
     ?>
-    <html>
+    <!DOCTYPE html>
+    <html lang="en">
     <?=html_head("Delete Confirmation")?>
     <body>
         <div id="content-container">
@@ -24,11 +21,8 @@ if (! array_key_exists("stage", $_GET))
         <h1>Confirm Deletions</h1>
         <ol>
         <?
-        require("db-connection.php");
-        foreach ($todelete as $deletion)
-        {
-            if (0 == strlen($deletion['loc']))
-            {
+        foreach ($todelete as $deletion) {
+            if (0 == strlen($deletion['loc'])) {
                 $whereclause = "";
             } else {
                 $whereclause = "AND hymns.location = '{$deletion['loc']}'";
@@ -47,7 +41,7 @@ if (! array_key_exists("stage", $_GET))
                 ${whereclause}
                 ORDER BY days.caldate DESC, hymns.service DESC,
                     hymns.location, hymns.sequence";
-            $result = mysql_query($sql) or die(mysql_error());
+            $result = mysql_query($sql) or die(array_pop($q->errorInfo()));
             echo "<li>\n";
             display_records_table($result);
             echo "</li>\n";
@@ -64,29 +58,28 @@ if (! array_key_exists("stage", $_GET))
 } elseif ("2" == $_GET['stage']) {
     //// Delete and acknowledge deletion.
     require("db-connection.php");
-    foreach ($_SESSION[$sprefix]['stage1'] as $todelete)
-    {
+    foreach ($_SESSION[$sprefix]['stage1'] as $todelete) {
         // Check to see if service has hymns at another location
-        $sql = "SELECT number
+        $q = $dbh->prepare("SELECT number
                 FROM {$dbp}hymns as hymns
                 JOIN {$dbp}days as days
                 ON (hymns.service = days.pkey)
                 WHERE hymns.location != '{$todelete['loc']}'
-                  AND days.pkey = {$todelete['index']}";
-        $result = mysql_query($sql) or die(mysql_error());
+                  AND days.pkey = {$todelete['index']}");
+        $q->execute();
 
-        if (! mysql_fetch_array($result))
-        { // If not, delete the service (should cascade to hymns)
-            $sql = "DELETE FROM `{$dbp}days`
-                WHERE `pkey` = '{$todelete['index']}'";
-            mysql_query($sql) or die(mysql_error());
+        if (! $q->fetch())) {
+            // If not, delete the service (should cascade to hymns)
+            $q = $dbh->prepare("DELETE FROM `{$dbp}days`
+                WHERE `pkey` = '{$todelete['index']}'");
+            $q->execute() or die(array_pop($q->errorInfo()));
         } else { // If so, delete only the hymns.
-            $sql = "DELETE FROM {$dbp}hymns as hymns
+            $q = $dbh->prepare("DELETE FROM {$dbp}hymns as hymns
                 USING hymns JOIN ${dbp}days as days
                     ON (hymns.service = days.pkey)
                 WHERE days.pkey = {$todelete['index']}
-                  AND hymns.location = '{$todelete['loc']}'";
-            mysql_query($sql) or die (mysql_error());
+                  AND hymns.location = '{$todelete['loc']}'");
+            $q->execute() or die (array_pop($q->errorInfo()));
         }
 
     }

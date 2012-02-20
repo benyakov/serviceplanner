@@ -1,22 +1,5 @@
 <?
-require("setup-session.php");
-require("options.php");
-require("functions.php");
-if ((! file_exists("db-connection.php") and
-    (! is_link($_SERVER['SCRIPT_FILENAME']))))
-{   ?>
-    <html><?=html_head("Unconfigured Service Planner")?><body>
-    <h1>Unconfigured</h1>
-    <p>This is an unconfigured installation of the service planner.
-    To configure it, make the appropriate settings in db_connection.php on
-    the web server.
-    A documented sample file is provided.</p>
-    </body></html>
-    <?
-    exit();
-}
-require("db-connection.php");
-$script_basename = basename($_SERVER['SCRIPT_NAME'], ".php") ;
+require("init.php");
 ?>
 <html>
 <?=html_head("Upcoming Hymns")?>
@@ -29,20 +12,22 @@ if (! is_link($_SERVER['SCRIPT_FILENAME']))
 <div id="content-container">
 <h1>Upcoming Hymns</h1>
 <?php
-$sql = "SELECT DATE_FORMAT({$dbp}days.caldate, '%e %b %Y') as date,
-    {$dbp}hymns.book, {$dbp}hymns.number, {$dbp}hymns.note,
-    {$dbp}hymns.location, {$dbp}days.name as dayname, {$dbp}days.rite,
-    {$dbp}days.servicenotes, {$dbp}names.title
-    FROM {$dbp}hymns
-    LEFT OUTER JOIN {$dbp}days ON ({$dbp}hymns.service = {$dbp}days.pkey)
-    LEFT OUTER JOIN {$dbp}names ON ({$dbp}hymns.number = {$dbp}names.number)
-        AND ({$dbp}hymns.book = {$dbp}names.book)
-    WHERE {$dbp}days.caldate >= CURDATE()
-    ORDER BY {$dbp}days.caldate, {$dbp}hymns.service,
-        {$dbp}hymns.location, {$dbp}hymns.sequence";
+$q = $dbh->prepare("SELECT DATE_FORMAT(days.caldate, '%e %b %Y') as date,
+    hymns.book, hymns.number, hymns.note,
+    hymns.location, days.name as dayname, days.rite,
+    days.servicenotes, names.title
+    FROM {$dbp}hymns AS hymns
+    LEFT OUTER JOIN {$dbp}days AS days
+        ON (hymns.service = days.pkey)
+    LEFT OUTER JOIN {$dbp}names AS names
+        ON (hymns.number = names.number)
+        AND (hymns.book = names.book)
+    WHERE days.caldate >= CURDATE()
+    ORDER BY days.caldate, hymns.service,
+        hymns.location, hymns.sequence");
+$q->execute() or die(array_pop($q->errorInfo()));
 
-$result = mysql_query($sql) or die(mysql_error()) ;
-display_records_table($result);
+display_records_table($q);
 ?>
 </div>
 </body>
