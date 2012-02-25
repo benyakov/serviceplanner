@@ -21,13 +21,15 @@ if (! array_key_exists("stage", $_GET)) {
         <h1>Confirm Deletions</h1>
         <ol>
         <?
+        $dbh->beginTransaction();
         foreach ($todelete as $deletion) {
             if (0 == strlen($deletion['loc'])) {
                 $whereclause = "";
             } else {
                 $whereclause = "AND hymns.location = '{$deletion['loc']}'";
             }
-            $sql = "SELECT DATE_FORMAT(days.caldate, '%e %b %Y') as date,
+            $q = $dbh->query("
+                SELECT DATE_FORMAT(days.caldate, '%e %b %Y') as date,
                 hymns.book, hymns.number, hymns.note,
                 hymns.location, days.name as dayname, days.rite,
                 days.pkey as id, days.servicenotes, names.title
@@ -37,15 +39,16 @@ if (! array_key_exists("stage", $_GET)) {
                 LEFT OUTER JOIN {$dbp}names AS names
                     ON (hymns.number = names.number)
                         AND (hymns.book = names.book)
-                WHERE days.pkey = '${deletion['index']}'
-                ${whereclause}
+                WHERE days.pkey = '{$deletion['index']}'
+                {$whereclause}
                 ORDER BY days.caldate DESC, hymns.service DESC,
-                    hymns.location, hymns.sequence";
-            $result = mysql_query($sql) or die(array_pop($q->errorInfo()));
+                    hymns.location, hymns.sequence")
+                or dieWithRollback($q, ".");
             echo "<li>\n";
-            display_records_table($result);
+            display_records_table($q);
             echo "</li>\n";
         }
+        $dbh->commit();
         ?>
         </ol>
         <form action="http://<?=$this_script."?stage=2"?>" method="POST">
@@ -57,7 +60,7 @@ if (! array_key_exists("stage", $_GET)) {
     <?
 } elseif ("2" == $_GET['stage']) {
     //// Delete and acknowledge deletion.
-    require("db-connection.php");
+    $dbh->beginTransaction();
     foreach ($_SESSION[$sprefix]['stage1'] as $todelete) {
         // Check to see if service has hymns at another location
         $q = $dbh->prepare("SELECT number
@@ -75,14 +78,15 @@ if (! array_key_exists("stage", $_GET)) {
             $q->execute() or die(array_pop($q->errorInfo()));
         } else { // If so, delete only the hymns.
             $q = $dbh->prepare("DELETE FROM {$dbp}hymns as hymns
-                USING hymns JOIN ${dbp}days as days
+                USING hymns JOIN {$dbp}days as days
                     ON (hymns.service = days.pkey)
                 WHERE days.pkey = {$todelete['index']}
                   AND hymns.location = '{$todelete['loc']}'");
-            $q->execute() or die (array_pop($q->errorInfo()));
+            $q->execute() or dieWithRollback($q, ".");
         }
 
     }
+    $dbh->commit();
     header("Location: modify.php?message=".urlencode("Deletion(s) complete."));
     exit(0);
 }

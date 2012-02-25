@@ -36,8 +36,8 @@ function auth($login = '', $passwd = '') {
     }
 }
 
-function display_records_table($q)
-{ // Show a table of the data in the query $result
+function display_records_table($q) {
+    // Show a table of the data in the query $result
     ?><table id="records-listing">
         <tr class="heading"><th>Date &amp; Location</th><th colspan=2>Liturgical Day Name: Service/Rite</th></tr>
         <tr><th>Book &amp; #</th><th>Note</th><th>Title</th></tr>
@@ -82,8 +82,8 @@ function display_records_table($q)
 }
 
 
-function modify_records_table($result, $action)
-{ // Show a table of the data in the query $result
+function modify_records_table($q, $action) {
+    // Show a table of the data in the query $q
   // with links to edit each record, and checkboxes to delete records.
     ?><form action="<?=$action?>" method="POST">
       <input type="submit" value="Delete"><input type="reset" value="Clear">
@@ -95,12 +95,11 @@ function modify_records_table($result, $action)
     $name = "";
     $location = "";
     $rowcount = 1;
-    while ($row = mysql_fetch_assoc($result))
-    {
+    while ($row = $q->fetch(PDO::FETCH_ASSOC)) {
         if (!  ($row['date'] == $date &&
                 $row['dayname'] == $name &&
-                $row['location'] == $location))
-        {// Display the heading line
+                $row['location'] == $location)) {
+            // Display the heading line
             if (is_within_week($row['date']))
             {
                 $datetext = "<a name=\"now\">{$row['date']}</a>";
@@ -140,8 +139,7 @@ function modify_records_table($result, $action)
     <?
 }
 
-function html_head($title, $five=false)
-{
+function html_head($title, $five=false) {
     $rv[] = '<meta charset="utf-8" />';
     $rv[] = "<head><title>{$title}</title>";
     if (is_link($_SERVER['SCRIPT_FILENAME']))
@@ -170,13 +168,13 @@ function html_head($title, $five=false)
     return implode("\n", $rv);
 }
 
-function mysql_esc_array($ary)
-{ // reduce ugliness (Note: connect to mysql before using.)
+function mysql_esc_array($ary) {
+    // reduce ugliness (Note: connect to mysql before using.)
     return array_map("mysql_real_escape_string", $ary);
 }
 
-function mysql_esc($str)
-{ // further reduce ugliness (Note: connect to mysql before using.)
+function mysql_esc($str) {
+    // further reduce ugliness (Note: connect to mysql before using.)
     return mysql_real_escape_string($str);
 }
 
@@ -197,8 +195,7 @@ function sitetabs($sitetabs, $action) {
     echo "</ul></div></nav>\n";
 }
 
-function translate_markup($text)
-{
+function translate_markup($text) {
     global $phplibrary;
     require("setup-session.php");
     require("options.php");
@@ -210,19 +207,32 @@ function translate_markup($text)
     }
 }
 
-function is_within_week($dbdate)
-{   // True if the given date is within a week *after* today.
+function is_within_week($dbdate) {
+    // True if the given date is within a week *after* today.
     $db = strtotime($dbdate);
     $now = getdate(time());
     $weekahead = mktime(0,0,0,$now['mon'],$now['mday']+8,$now['year']);
     if ($db <= $weekahead) return True; else return False;
 }
 
-function get_style($filename)
-{   // Include the style file indicated, adding ".css"
+function get_style($filename) {
+    // Include the style file indicated, adding ".css"
     $file = "{$filename}.css";
     if (file_exists($file)) {
         return file_get_contents($file);
     }
+}
+
+function dieWithRollback($q, $errorstr = "") {
+    // Rollback the db and die with errorInfo and errorstr
+    // If errorstr evaluates false, don't return anything.
+    global $dbh;
+    if ($errorstr && $q) {
+        $error = array_pop($q->errorInfo()) . " " . $errorstr;
+    } else {
+        $error = "";
+    }
+    $dbh->rollback();
+    die($error);
 }
 ?>

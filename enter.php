@@ -114,6 +114,8 @@ function existing($str) {
 function processFormData() {
     // echo "POST:"; print_r($_POST); exit(0);
     //// Add a new service, if needed.
+    global $dbh;
+    $dbh->beginTransaction();
     $feedback='<ol>';
     $date = strftime("%Y-%m-%d", strtotime($_POST['date']));
     $location = mysql_esc($_POST['location']);
@@ -132,10 +134,10 @@ function processFormData() {
         $q->bindParam("dayname", $_POST['liturgicalname']);
         $q->bindParam("rite", $_POST['rite']);
         $q->bindParam("servicenotes", $_POST['servicenotes']);
-        $q->execute() or die(array_pop($q->errorInfo()));
+        $q->execute() or dieWithRollback($q, ".");
         // Grab the pkey of the newly inserted row.
         $q = $dbh->prepare("SELECT LAST_INSERT_ID()");
-        $q->execute() or die(array_pop($q->errorInfo()));
+        $q->execute() or dieWithRollback($q, ".");
         $row = $q->fetch($result);
         $serviceid = $row[0];
         $feedback .= "<li>Saved a new service on '{$date}' for
@@ -171,7 +173,7 @@ function processFormData() {
             $sql = "UPDATE {$dbp}names SET title='${h["title"]}'
                 WHERE book='${h["book"]}' AND number='${h["number"]}'";
             $feedback.=$sql;
-            mysql_query($sql) or die(array_pop($q->errorInfo()));
+            mysql_query($sql) or dieWithRollback($q, ".");
             if (mysql_affected_rows()) {
                 $feedback .="<li>Updated name '{$h["title"]}' for {$h["book"]} {$h["number"]}.</li>";
             } else {
@@ -186,7 +188,7 @@ function processFormData() {
         $q = $dbh->prepare("SELECT MAX(`sequence`) FROM `{$dbp}hymns`
             WHERE `service`='{$serviceid}'
             AND `location`='{$location}'");
-        $q->execute() or die(array_pop($q->errorInfo()));
+        $q->execute() or dieWithRollback($q, ".");
         $sequenceMax = array_pop($q->fetch());
         foreach ($hymns as $sequence => $ahymn)
         {
@@ -202,11 +204,12 @@ function processFormData() {
         $q = $dbh->prepare("INSERT INTO `{$dbp}hymns`
             (service, location, book, number, note, sequence)
             VALUES ".implode(", ", $sqlhymns));
-        $q->execute() or die(array_pop($q->errorInfo()));
+        $q->execute() or dieWithRollback($q, ".");
         if ($->rowCount()) {
             $feedback .="<li>Saved hymns: <ol><li>" . implode("</li><li>", $saved) . "</li></ol></li></ol>\n";
         }
     }
+    $dbh->commit();
     // ?message= can be tacked on to show what just happened.
     header("Location: modify.php"); //?message=" . urlencode($feedback));
 }

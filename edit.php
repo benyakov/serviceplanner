@@ -132,6 +132,7 @@ if (! array_key_exists("stage", $_GET))
     //// Commit changes to db
     // Pull out changes for each table into separate arrays
 
+    $dbh->beginTransaction();
     $tohymns = array();
     $tonames = array();
     $todays = array();
@@ -167,7 +168,7 @@ if (! array_key_exists("stage", $_GET))
             $qu->bindParam(":title", $value);
             $qu->bindParam(":number", $tohymns[$key]["number"]);
             $qu->bindParam(":book", $tohymns[$key]["book"]);
-            $qu->execute() or die(array_pop($q->errorInfo()));
+            $qu->execute() or dieWithRollback($q, $q->queryString);
         }
     }
     // Update day information
@@ -180,7 +181,7 @@ if (! array_key_exists("stage", $_GET))
     $q->bindParam(":rite", $todays['rite']);
     $q->bindParam(":servicenotes", $todays['servicenotes']);
     $q->bindParam(":id", $_POST['id']);
-    $q->execute() or die(array_pop($q->errorInfo()));
+    $q->execute() or dieWithRollback($q, $q->queryString);
 
     // Update hymns
     foreach ($tohymns as $hymnid => $h) {
@@ -195,7 +196,7 @@ if (! array_key_exists("stage", $_GET))
             $q->bindParam(":{$k}", $v);
         }
         $q->bindParam(":hymnid", $hymnid);
-        $q->execute() or die(array_pop($q->errorInfo()));
+        $q->execute() or dieWithRollback($q, $q->queryString);
     }
 
     // Delete tagged hymns
@@ -203,7 +204,7 @@ if (! array_key_exists("stage", $_GET))
         $q = $dbh->prepare("DELETE FROM {$dbp}hymns
             WHERE pkey = :hymnid";
         $q->bindParam(":hymnid", $hymnid);
-        $q->execute() or die(array_pop($q->errorInfo()));
+        $q->execute() or dieWithRollback($q, $q->queryString);
     }
     header("Location: modify.php?message=".urlencode("Edit complete."));
     exit(0);

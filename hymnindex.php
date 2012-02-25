@@ -1,6 +1,6 @@
 <?php
 
-require('db-connection.php');
+require('init.php');
 
 function linksort($text, $sort) {
     // Return a link requesting the given sort
@@ -18,11 +18,10 @@ function togglebg($current) {
     }
 }
 
-$sql = "SELECT 1 FROM ${dbp}xref";
-if (! mysql_query($sql)) {
+if (! $dbh->query("SELECT 1 FROM {$dbp}xref")) {
     /**** To create the cross reference table ****/
 
-    $sql = "CREATE TABLE `${dbp}xref` (
+    $q = $dbh->prepare("CREATE TABLE `{$dbp}xref` (
         `title` varchar(80),
         `text` varchar(60),
         `elh` smallint,
@@ -35,9 +34,10 @@ if (! mysql_query($sql)) {
         `wov` smallint,
         `pkey` int(10) unsigned NOT NULL auto_increment,
         KEY `pkey` (`pkey`)
-    ) ENGINE=InnoDB DEFAULT CHARSET=utf8" ;
-    mysql_query($sql) or die(mysql_error());
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8") ;
+    $q->execute() or die(array_pop($q->errorInfo()));
 
+    $dbh->beginTransaction();
     $fh = fopen("hymnindex.csv", "r");
     $headings = fgetcsv($fh);
     while (($record = fgetcsv($fh, 250)) != FALSE) {
@@ -53,25 +53,22 @@ if (! mysql_query($sql)) {
             }
             $r[] = $f;
         }
-        $sql = "INSERT INTO ${dbp}xref (title, text, lsb, tlh, lw, lbw, elh, cw, wov, hs98)
-            VALUES (${r[0]}, ${r[1]}, ${r[2]}, ${r[3]}, ${r[4]}, ${r[5]}, ${r[6]}, ${r[7]}, ${r[8]}, ${r[9]})";
-        mysql_query($sql) or die(mysql_error()."\n".__FILE__.":".__LINE__);
+        $q = $dbh->prepare("INSERT INTO {$dbp}xref (title, text, lsb, tlh, lw, lbw, elh, cw, wov, hs98)
+            VALUES ({$r[0]}, {$r[1]}, {$r[2]}, {$r[3]}, {$r[4]}, {$r[5]}, {$r[6]}, {$r[7]}, {$r[8]}, {$r[9]})");
+        $q->execute() or dieWithRollback($q, "\n".__FILE__.":".__LINE__);
     }
+    $dbh->commit();
 }
 /* To Display the cross-reference table */
 
-require("functions.php");
-
 if (array_key_exists('sort', $_GET)) {
-    $sort_by = " ORDER BY ${_GET['sort']}";
+    $sort_by = " ORDER BY {$_GET['sort']}";
     $sorted_on = $_GET['sort'];
 } else {
     $sort_by = "";
     $sorted_on = "";
 }
-$sql = "SELECT * FROM ${dbp}xref${sort_by}" ;
-$result = mysql_query($sql) or die(mysql_error());
-require("options.php");
+$q = $dbh->query("SELECT * FROM {$dbp}xref{$sort_by}") ;
 $script_basename = basename($_SERVER['SCRIPT_NAME'], ".php") ;
 ?>
 <html lang="en">
@@ -104,7 +101,7 @@ $marked_sortstart = FALSE;
 $sortmarker = "";
 $cursortvalue = "";
 $sortrowbg = "";
-while ($row = mysql_fetch_assoc($result)) {
+while ($row = $q->fetch(PDO::FETCH_ASSOC)) {
     $r = array();
     foreach ($row as $k => $v) {
         if (is_null($v)) { $v = ''; }
@@ -123,16 +120,16 @@ while ($row = mysql_fetch_assoc($result)) {
         }
     }
     echo "<tr${sortrowbg}>
-        <td class=\"title\">${sortmarker}${r['title']}</td>
-        <td class=\"text\">${r['text']}</td>
-        <td class=\"elh\">${r['elh']}</td>
-        <td class=\"tlh\">${r['tlh']}</td>
-        <td class=\"lsb\">${r['lsb']}</td>
-        <td class=\"cw\">${r['cw']}</td>
-        <td class=\"lw\">${r['lw']}</td>
-        <td class=\"lbw\">${r['lbw']}</td>
-        <td class=\"hs98\">${r['hs98']}</td>
-        <td class=\"wov\">${r['wov']}</td>
+        <td class=\"title\">{$sortmarker}${r['title']}</td>
+        <td class=\"text\">{$r['text']}</td>
+        <td class=\"elh\">{$r['elh']}</td>
+        <td class=\"tlh\">{$r['tlh']}</td>
+        <td class=\"lsb\">{$r['lsb']}</td>
+        <td class=\"cw\">{$r['cw']}</td>
+        <td class=\"lw\">{$r['lw']}</td>
+        <td class=\"lbw\">{$r['lbw']}</td>
+        <td class=\"hs98\">{$r['hs98']}</td>
+        <td class=\"wov\">{$r['wov']}</td>
         </tr>";
 }
 ?>

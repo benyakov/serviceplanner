@@ -1,5 +1,9 @@
 <?
-require("db-connection.php");
+require("init.php");
+if (! $auth) {
+    header("Location: index.php");
+    exit(0);
+}
 $tabledescfile = "createtables.sql";
 $tabledesclines = file($tabledescfile, FILE_IGNORE_NEW_LINES);
 function gettablename ($line) {
