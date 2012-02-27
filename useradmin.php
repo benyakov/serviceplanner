@@ -199,10 +199,30 @@ function changePW($authcode="") {
         $id = $_SESSION[$sprefix]['authdata']['uid'];
     }
 ?>
-    <html><head>
+    <!DOCTYPE html>
+    <html lang="en"><head>
     <title><?=__('changepw')?></title>
     <link rel="stylesheet" type="text/css" href="css/adminpgs.css">
-<?require("./passwordvalidate.php")?>
+    <script type=text/javascript>
+    function validate(f, next) {
+        var regex = /\W+/;
+        var pw = f.pw.value;
+        var str = "";
+        if (pw == "") { str += "\n<?=__('pwblank')?>"; }
+        if (pw != f.pwconfirm.value) { str += "\n<?=__('pwmatch')?>"; }
+        if (pw.length < 4) { str += "\n<?=__('pwlength')?>"; }
+        if (regex.test(pw)) { str += "\n<?=__('pwchars')?>"; }
+
+        if (str == "") {
+            f.method = "post";
+            f.action = "http://<?=$serverdir?>/useradmin.php?flag="+next;
+            f.submit();
+        } else {
+            alert(str);
+            return false;
+        }
+    }
+    </script>
     </head></body>
     <form onSubmit="return validate(this, 'updatepw');">
     <input type="hidden" name="id" value="<?= $id ?>">
@@ -273,7 +293,8 @@ function editUserForm($elementValues="", $mode="Add",
 
     }
 ?>
-    <html><head>
+    <!DOCTYPE html>
+    <html lang="en"><head>
     <title>Flexical:  <?=$mode?> Calendar User</title>
     <link rel="stylesheet" type="text/css" href="css/adminpgs.css">
 
@@ -381,7 +402,8 @@ function editUserForm($elementValues="", $mode="Add",
 function userList() {
     global $authdata, $tablepre, $dbh;
 ?>
-    <html><head><title>Calendar User List</title>
+    <!DOCTYPE html>
+    <html lang="en"><head><title>Calendar User List</title>
     <link rel="stylesheet" type="text/css" href="css/adminpgs.css">
 
     <script language="JavaScript">

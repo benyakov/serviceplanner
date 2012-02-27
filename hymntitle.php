@@ -1,9 +1,5 @@
 <?
-require("db-connection.php");
-require("functions.php");
-require("options.php");
-require("setup-session.php");
-
+require("./init.php");
 header('Cache-Control: no-cache, must-revalidate');
 header('Expires: Mon, 01 Jan 1996 00:00:00 GMT');
 header("Content-type: application/json");

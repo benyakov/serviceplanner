@@ -1,5 +1,5 @@
 <?php
-require("init.php");
+require("./init.php");
 if (! $auth) {
     header("location: index.php");
     exit(0);

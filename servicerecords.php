@@ -1,6 +1,5 @@
 <?
-require("functions.php");
-require("setup-session.php");
+require("./init.php");
 $this_script = $_SERVER['HTTP_HOST'].$_SERVER['SCRIPT_NAME'] ;
 ?>
 <html>

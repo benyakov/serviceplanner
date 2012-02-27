@@ -1,6 +1,9 @@
 <? // Select a dump file to upload, then execute it.
-require("functions.php");
-require("db-connection.php");
+require("./init.php");
+if (! $auth) {
+    header("location: index.php");
+    exit(0);
+}
 $this_script = $_SERVER['HTTP_HOST'].$_SERVER['SCRIPT_NAME'] ;
 echo "<html>\n";
 html_head("Restore from Database Backup");

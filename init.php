@@ -7,7 +7,7 @@ if ((! file_exists("db-connection.php") and
         header('Location: utility/setup-dbconfig.php');
         exit(0);
 }
-require("db-connection.php");
+require("./db-connection.php");
 $auth = auth();
 $script_basename = basename($_SERVER['PHP_SELF'], ".php") ;
 $serverdir = dirname($script_basename);

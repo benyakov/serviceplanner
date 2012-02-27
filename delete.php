@@ -1,5 +1,5 @@
 <?
-require("init.php");
+require("./init.php");
 $this_script = $_SERVER['HTTP_HOST'].$_SERVER['SCRIPT_NAME'] ;
 if (! array_key_exists("stage", $_GET)) {
     // Put items to delete into an array.

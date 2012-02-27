@@ -1,18 +1,21 @@
-<html>
+<!DOCTYPE html>
+<html lang="en">
 <?
-require("functions.php");
-require("db-connection.php");
-require("options.php");
+require("./init.php");
+if (! $auth) {
+    header("location: index.php");
+    exit(0);
+}
 $script_basename = basename($_SERVER['SCRIPT_NAME'], ".php") ;
 echo html_head("Sermon Plans");
-$sql = "SELECT ${dbp}sermons.bibletext, ${dbp}sermons.outline,
-    ${dbp}sermons.notes, ${dbp}sermons.service,
-    DATE_FORMAT(${dbp}days.caldate, '%e %b %Y') as date,
-    ${dbp}days.name, ${dbp}days.rite
-    FROM ${dbp}sermons JOIN ${dbp}days
-        ON (${dbp}sermons.service=${dbp}days.pkey)
-    ORDER BY ${dbp}days.caldate DESC";
-$result = mysql_query($sql) or die(mysql_error());
+$q = $dbh->query("SELECT sermons.bibletext, sermons.outline,
+    sermons.notes, sermons.service,
+    DATE_FORMAT(days.caldate, '%e %b %Y') as date,
+    days.name, days.rite
+    FROM {$dbp}sermons AS sermons JOIN {$dbp}days AS days
+        ON (sermons.service=days.pkey)
+    ORDER BY days.caldate DESC");
+$q->execute() or die(array_pop($q->errorInfo));
 ?>
 <body>
     <?=sitetabs($sitetabs, $script_basename)?>
@@ -26,7 +29,7 @@ $result = mysql_query($sql) or die(mysql_error());
     <tr class="heading"><th>Date</th><th>Day</th><th>Text</th><th>Rite</th></tr>
     <tr class="heading"><th colspan="3">Outline</th><th>Notes</th></tr>
     <?
-while ($row = mysql_fetch_assoc($result))
+while ($row = $q->fetch(PDO::FETCH_ASSOC))
 {
 ?>
     <tr class="table-topline">
