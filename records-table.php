@@ -1,6 +1,4 @@
 <?php
-require_once("functions.php");
-require_once("db-connection.php");
 if (array_key_exists('listinglimit', $_GET) &&
     is_numeric($_GET['listinglimit'])) {
     $_SESSION[$sprefix]["listinglimit"] = $_GET['listinglimit'];
@@ -24,17 +22,18 @@ if (is_numeric($_SESSION[$sprefix]["listinglimit"])) {
 <input type="submit" value="Apply">
 </form>
 <?php
-$sql = "SELECT DATE_FORMAT({$dbp}days.caldate, '%e %b %Y') as date,
-    {$dbp}hymns.book, {$dbp}hymns.number, {$dbp}hymns.note,
-    {$dbp}hymns.location, {$dbp}days.name as dayname, {$dbp}days.rite,
-    {$dbp}days.servicenotes, {$dbp}names.title
-    FROM {$dbp}hymns
-    RIGHT OUTER JOIN {$dbp}days ON ({$dbp}hymns.service = {$dbp}days.pkey)
-    LEFT OUTER JOIN {$dbp}names ON ({$dbp}hymns.number = {$dbp}names.number)
-        AND ({$dbp}hymns.book = {$dbp}names.book)
-    ORDER BY {$dbp}days.caldate DESC, {$dbp}hymns.service DESC,
-        {$dbp}hymns.location, {$dbp}hymns.sequence
-    {$limit}";
-$result = mysql_query($sql) or die(mysql_error()) ;
-display_records_table($result);
+$q = $dbh->query("SELECT DATE_FORMAT(days.caldate, '%e %b %Y') as date,
+    hymns.book, hymns.number, hymns.note, hymns.location,
+    days.name as dayname, days.rite, days.servicenotes,
+    names.title
+    FROM {$dbp}hymns as hymns
+    RIGHT OUTER JOIN {$dbp}days AS days
+        ON (hymns.service = days.pkey)
+    LEFT OUTER JOIN {$dbp}names AS names
+        ON (hymns.number = names.number)
+        AND (hymns.book = names.book)
+    ORDER BY days.caldate DESC, hymns.service DESC,
+        hymns.location, hymns.sequence
+    {$limit}");
+display_records_table($q);
 ?>

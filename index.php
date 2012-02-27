@@ -1,7 +1,8 @@
 <?
 require("init.php");
 ?>
-<html>
+<!DOCTYPE html>
+<html lang="en">
 <?=html_head("Upcoming Hymns")?>
 <body>
 <?

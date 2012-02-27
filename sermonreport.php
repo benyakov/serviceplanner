@@ -1,6 +1,5 @@
 <?
-require("functions.php");
-require("db-connection.php");
+require("init.php");
 ?>
     <html>
     <?=html_head("Edit a Sermon Plan")?>
@@ -12,15 +11,16 @@ require("db-connection.php");
         </span>
         <h1>Sermon Plan</h1>
     <?
-        $sql = "SELECT ${dbp}sermons.bibletext, ${dbp}sermons.outline,
-            ${dbp}sermons.notes,
-            DATE_FORMAT(${dbp}days.caldate, '%e %b %Y') as date,
-            ${dbp}days.name, ${dbp}days.rite
-            FROM ${dbp}sermons
-                JOIN ${dbp}days ON (${dbp}sermons.service=${dbp}days.pkey)
-            WHERE service='${_GET['id']}'";
-        $result = mysql_query($sql) or die(mysql_error());
-        $row = mysql_fetch_assoc($result);
+        $q = $dbh->prepare("SELECT sermons.bibletext, sermons.outline,
+            sermons.notes, DATE_FORMAT(days.caldate, '%e %b %Y') as date,
+            days.name, days.rite
+            FROM {$dbp}sermons AS sermons
+            JOIN {$dbp}days AS DAYS
+                ON (sermons.service=days.pkey)
+            WHERE service=:id");
+        $q->bindParam('id', $_GET['id']);
+        $q->execute() or die(array_pop($q->errorInfo()));
+        $row = $q->fetch(PDO::FETCH_ASSOC);
     ?>
         <dl>
             <dt>Date</dt>

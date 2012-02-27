@@ -1,8 +1,9 @@
 <?
-require("functions.php");
-require("db-connection.php");
-require("options.php");
-require("setup-session.php");
+require("init.php");
+if (! $auth) {
+    header("location: index.php");
+    exit(0);
+}
 $this_script = $_SERVER['HTTP_HOST'].$_SERVER['SCRIPT_NAME'] ;
 $script_basename = basename($_SERVER['SCRIPT_NAME'], ".php") ;
 if (array_key_exists('listinglimit', $_GET) &&
@@ -20,7 +21,8 @@ if (is_numeric($_SESSION[$sprefix]["listinglimit"])) {
     $limit = " LIMIT {$_SESSION[$sprefix]["listinglimit"]}";
 }
 ?>
-<html>
+<!DOCTYPE html>
+<html lang="en">
 <?=html_head("Modify Service Planning Records")?>
 <body>
     <? if ($_GET['message']) { ?>
@@ -41,7 +43,7 @@ for that service, use the "Sermon" link.</p>
 <input type="submit" value="Apply">
 </form>
 <?
-$sql = "SELECT DATE_FORMAT(days.caldate, '%c/%e/%Y') as date,
+$q = $dbh->query("SELECT DATE_FORMAT(days.caldate, '%c/%e/%Y') as date,
     hymns.book, hymns.number, hymns.note,
     hymns.location, days.name as dayname, days.rite,
     days.pkey as id, days.servicenotes, names.title
@@ -51,9 +53,8 @@ $sql = "SELECT DATE_FORMAT(days.caldate, '%c/%e/%Y') as date,
         AND (hymns.book = names.book)
     ORDER BY days.caldate DESC, hymns.service DESC,
         hymns.location, hymns.sequence
-    {$limit}";
-$result = mysql_query($sql) or die(mysql_error()) ;
-modify_records_table($result, "delete.php");
+    {$limit}");
+modify_records_table($q, "delete.php");
 ?>
 </div>
 </body>
