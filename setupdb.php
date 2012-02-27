@@ -1,5 +1,9 @@
 <?
-require("db-connection.php");
+require("./init.php");
+if (! $auth) {
+    header("location: index.php");
+    exit(0);
+}
 $dumpfile="createtables.sql";
 $dumplines = file($dumpfile, FILE_IGNORE_NEW_LINES);
 // Separate SQL statements into an array.

@@ -1,8 +1,5 @@
 <?
-require("db-connection.php");
-require("functions.php");
-require("options.php");
-require("setup-session.php");
+require("./init.php");
 $date = date("Y-m-d", $_GET['date']);
 $q = $dbh->query("SELECT name as dayname, rite, pkey as service, servicenotes
     FROM {$dbp}days

@@ -197,8 +197,6 @@ function sitetabs($sitetabs, $action) {
 
 function translate_markup($text) {
     global $phplibrary;
-    require("setup-session.php");
-    require("options.php");
     if (include_once($phplibrary.DIRECTORY_SEPARATOR."markdown.php"))
     {
         return Markdown($text);

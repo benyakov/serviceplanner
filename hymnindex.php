@@ -1,6 +1,6 @@
 <?php
 
-require('init.php');
+require('./init.php');
 
 function linksort($text, $sort) {
     // Return a link requesting the given sort
