@@ -210,7 +210,7 @@ function processFormData() {
         }
     }
     $dbh->commit();
-    // ?message= can be tacked on to show what just happened.
-    header("Location: modify.php"); //?message=" . urlencode($feedback));
+    $_SESSION[$sprefix]['message'] = $feedback;
+    header("Location: modify.php");
 }
 ?>

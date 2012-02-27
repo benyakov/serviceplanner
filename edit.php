@@ -206,7 +206,8 @@ if (! array_key_exists("stage", $_GET))
         $q->bindParam(":hymnid", $hymnid);
         $q->execute() or dieWithRollback($q, $q->queryString);
     }
-    header("Location: modify.php?message=".urlencode("Edit complete."));
+    $_SESSION[$sprefix]['message'] = "Edit complete.";
+    header("Location: modify.php");
     exit(0);
 }
 ?>

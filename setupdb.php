@@ -40,5 +40,6 @@ foreach ($queries as $query) {
     }
 }
 
-header("Location: records.php?message=".urlencode("Setup succeeded."));
+$_SESSION[$sprefix]['message'] = "Setup succeeded.";
+header("Location: records.php");
 ?>

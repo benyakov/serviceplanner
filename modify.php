@@ -25,9 +25,11 @@ if (is_numeric($_SESSION[$sprefix]["listinglimit"])) {
 <html lang="en">
 <?=html_head("Modify Service Planning Records")?>
 <body>
-    <? if ($_GET['message']) { ?>
-        <div class="message"><?=$_GET['message']?></div>
-    <? } ?>
+    <? if (array_key_exists('message', $_SESSION[$sprefix]) { ?>
+        <div class="message"><?=$_SESSION[$sprefix]['message']?></div>
+        <?  unset $_SESSION[$sprefix]['message'];
+    }
+    ?>
     <?=sitetabs($sitetabs, $script_basename)?>
     <div id="content-container">
     <div id="goto-now"><a href="#now">Jump to This Week</a></div>

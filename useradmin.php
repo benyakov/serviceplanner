@@ -1,5 +1,5 @@
 <?
-require('./utility/initialize-entrypoint.php');
+require('./init.php');
 
 $flag = $_GET['flag'];
 $authdata = $_SESSION[$sprefix]['authdata'];
@@ -66,7 +66,8 @@ if ( $auth == 3 ) {
 
     $ulevel = intval($_POST['userlevel']);
     if ($ulevel > 0 && $auth < 3) {
-        header("location:index.php?message=".urlencode(__('accesswarning')));
+        $_SESSION[$sprefix]['message'] = "Access Denied";
+        header("location:index.php");
         exit(0);
     }
     $uname = $_POST['username'];
@@ -126,8 +127,8 @@ if ( $auth == 3 ) {
         $q->bindParam(':id', $id);
         $q->execute();
         $_SESSION[$sprefix]['authdata']['password'] = $pw;
-        $message = urlencode(__('pwchanged').$authdata['login']);
-        header("Location: http://{$serverdir}/index.php?action=$view&day=$d&month=$m&year=$y&length=$l&unit=$u&message={$message}");
+        $_SESSION[$sprefix]['message'] = "Password changed.";
+        header("Location: http://{$serverdir}/index.php");
         exit(0);
     } else {
         header("location:index.php");
@@ -148,7 +149,7 @@ if ( $auth == 3 ) {
         $q->bindParam(':email', $_POST['email']);
         $q->execute();
         session_destroy();
-        require("./utility/setup-session.php");
+        require("./setup-session.php");
         auth($_POST['username'], $_POST['pw']);
         header("Location: http://{$serverdir}/index.php");
     } elseif ($flag=="reset" && array_key_exists('auth', $_GET)) {
@@ -161,16 +162,16 @@ if ( $auth == 3 ) {
         $q->bindParam(':resetkey', $_POST['auth']);
         $q->execute();
         if ($q->fetch()) {
-            $message = urlencode(__('pwchanged'));
+            $_SESSION[$sprefix]['message'] = "Password changed.";
         } else {
-            $message = urlencode(__('problem changing password'));
+            $_SESSION[$sprefix]['message'] = "Problem changing password";
         }
-        header("Location: http://{$serverdir}/index.php?action=$view&day=$d&month=$m&year=$y&length=$l&unit=$u&message={$message}");
+        header("Location: http://{$serverdir}/index.php");
         exit(0);
 
     } else {
-        $message = urlencode(__('accessdenied'));
-        header("Location: http://{$serverdir}/index.php?action=$view&day=$d&month=$m&year=$y&length=$l&unit=$u&message={$message}");
+        $_SESSION[$sprefix]['message'] = "Access denied.";
+        header("Location: http://{$serverdir}/index.php");
     }
 }
 
@@ -192,7 +193,8 @@ function changePW($authcode="") {
             $id = $row['uid'];
         } else {
             $serverdir = $_SERVER['HTTP_HOST'] . dirname($_SERVER['PHP_SELF']);
-            header ("Location: http://{$serverdir}/index.php?message=".urlencode(__("invalid or expired reset auth")));
+            $_SESSION[$sprefix]['message'] = "Invalid or expired reset authorization.";
+            header ("Location: http://{$serverdir}/index.php");
         }
     } else {
         $username = $_SESSION[$sprefix]['authdata']['login'];

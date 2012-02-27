@@ -1,2 +1,1 @@
 - Convert db access to PDO
-- Use session for feedback instead of $_GET
