@@ -168,14 +168,9 @@ function html_head($title, $five=false) {
     return implode("\n", $rv);
 }
 
-function mysql_esc_array($ary) {
+function quote_array($ary) {
     // reduce ugliness (Note: connect to mysql before using.)
-    return array_map("mysql_real_escape_string", $ary);
-}
-
-function mysql_esc($str) {
-    // further reduce ugliness (Note: connect to mysql before using.)
-    return mysql_real_escape_string($str);
+    return array_map($dbh->quote, $ary);
 }
 
 function sitetabs($sitetabs, $action) {

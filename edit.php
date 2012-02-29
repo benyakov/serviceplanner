@@ -186,7 +186,6 @@ if (! array_key_exists("stage", $_GET))
     // Update hymns
     foreach ($tohymns as $hymnid => $h) {
         if (in_array($hymnid, $todelete)) { continue; }
-        $hymn = mysql_esc_array($h);
         $q = $dbh->prepare("UPDATE {$dbp}hymns
             SET number=:number,
             note=:note, location=:location,

@@ -42,8 +42,7 @@ if (! $dbh->query("SELECT 1 FROM {$dbp}xref")) {
     $headings = fgetcsv($fh);
     while (($record = fgetcsv($fh, 250)) != FALSE) {
         $r = array();
-        $record[0] = mysql_real_escape_string($record[0]);
-        $record[1] = mysql_real_escape_string($record[1]);
+        $record = quote_array($record);
         foreach ($record as $field) {
             $f = trim($field);
             if (! $f) {

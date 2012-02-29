@@ -118,7 +118,6 @@ function processFormData() {
     $dbh->beginTransaction();
     $feedback='<ol>';
     $date = strftime("%Y-%m-%d", strtotime($_POST['date']));
-    $location = mysql_esc($_POST['location']);
     $existingKey = array_pop(preg_grep('/^existing_/', array_keys($_POST)));
     if ($existingKey) {
         preg_match('/existing_(\d+)/', $existingKey, $matches);
@@ -130,10 +129,10 @@ function processFormData() {
         $q = $dbh->prepare("INSERT INTO {$dbp}days
             (caldate, name, rite, servicenotes)
             VALUES (:date, :dayname, :rite, :servicenotes)");
-        $q->bindParam("date", $date);
-        $q->bindParam("dayname", $_POST['liturgicalname']);
-        $q->bindParam("rite", $_POST['rite']);
-        $q->bindParam("servicenotes", $_POST['servicenotes']);
+        $q->bindParam(':date', $date);
+        $q->bindParam(':dayname', $_POST['liturgicalname']);
+        $q->bindParam(':rite', $_POST['rite']);
+        $q->bindParam(':servicenotes', $_POST['servicenotes']);
         $q->execute() or dieWithRollback($q, ".");
         // Grab the pkey of the newly inserted row.
         $q = $dbh->prepare("SELECT LAST_INSERT_ID()");
@@ -170,11 +169,13 @@ function processFormData() {
         if ($q->execute()) {
             $feedback .= "<li>Saved name '{$h["title"]}' for {$h["book"]} {$h["number"]}.</li>";
         } else {
-            $sql = "UPDATE {$dbp}names SET title='${h["title"]}'
-                WHERE book='${h["book"]}' AND number='${h["number"]}'";
-            $feedback.=$sql;
-            mysql_query($sql) or dieWithRollback($q, ".");
-            if (mysql_affected_rows()) {
+            $q = $dbh->prepare("UPDATE {$dbp}names SET title=:title
+                WHERE book=:book AND number=:number");
+            $q->bindParam(':title', $h["title"]);
+            $q->bindParam(':book', $h["book"]);
+            $q->bindParam(':number', $h["number"]);
+            $q->execute() or dieWithRollback($q, ".");
+            if ($q->rowCount()) {
                 $feedback .="<li>Updated name '{$h["title"]}' for {$h["book"]} {$h["number"]}.</li>";
             } else {
                 $feedback .="<li>Title for hymn \"{$h["book"]} {$h["number"]}\" unchanged.</li>";
@@ -186,19 +187,21 @@ function processFormData() {
         $sqlhymns = array();
         $saved = array();
         $q = $dbh->prepare("SELECT MAX(`sequence`) FROM `{$dbp}hymns`
-            WHERE `service`='{$serviceid}'
-            AND `location`='{$location}'");
+            WHERE `service`=:serviceid
+            AND `location`=:location");
+        $q->bindParam(':location', $_POST['location']);
+        $q->bindParam(':serviceid', $serviceid);
         $q->execute() or dieWithRollback($q, ".");
         $sequenceMax = array_pop($q->fetch());
         foreach ($hymns as $sequence => $ahymn)
         {
             if (! intval($ahymn['number'])) continue;
-            $hymn = mysql_esc_array($ahymn);
             $realsequence = $sequence + $sequenceMax;
             $sqlhymns[] = "('{$dbh->quote($serviceid)}',
-                '{$dbh->quote($location)}', '{$hymn['book']}',
-                '{$dbh->quote($hymn['number'])}',
-                '{$dbh->quote($hymn['note'])}', '{$realsequence}')";
+                '{$dbh->quote($_POST['location'])}',
+                '{$dbh->quote($ahymn['book'])}',
+                '{$dbh->quote($ahymn['number'])}',
+                '{$dbh->quote($ahymn['note'])}', '{$realsequence}')";
             $saved[] = "{$ahymn['book']} {$ahymn['number']}";
         }
         $q = $dbh->prepare("INSERT INTO `{$dbp}hymns`

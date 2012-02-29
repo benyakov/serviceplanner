@@ -30,8 +30,8 @@ foreach ($dumplines as $line)
 $queries[] = implode("\n", $query);
 // Execute each SQL query.
 foreach ($queries as $query) {
-    $result = mysql_query($query);
-    if (! $result)
+    $result = $dbh->exec($query);
+    if ($result === false)
     {
         ?>
         <html><head><title>Setup Failed</title></head>

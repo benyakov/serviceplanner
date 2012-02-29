@@ -2,9 +2,7 @@
 require("./init.php");
 $this_script = $_SERVER['HTTP_HOST'].$_SERVER['SCRIPT_NAME'] ;
 if (! array_key_exists('stage', $_GET)) {
-    $id = mysql_esc($_GET['id']);
-?>
-    <!DOCTYPE html>
+    ?><!DOCTYPE html>
     <html lang="en">
     <?=html_head("Edit a Sermon Plan")?>
     <body>
@@ -19,25 +17,28 @@ if (! array_key_exists('stage', $_GET)) {
         <p class="explanation">You can delete the whole service, hymns, sermon
         plan, and all, from here.  To edit this service or modify the chosen
         hymns individually, use the link below.</p>
-        <a href="edit.php?id=<?=$id?>">Edit the Service</a>.</p>
+        <a href="edit.php?id=<?=urlencode($id)?>">Edit the Service</a>.</p>
     <?
-        $sql = "SELECT DATE_FORMAT(${dbp}days.caldate, '%e %b %Y') as date,
-            ${dbp}hymns.book, ${dbp}hymns.number, ${dbp}hymns.note,
-            ${dbp}hymns.location, ${dbp}days.name as dayname, ${dbp}days.rite,
-            ${dbp}days.pkey as id, ${dbp}names.title
-            FROM ${dbp}hymns
-            LEFT OUTER JOIN ${dbp}days ON (${dbp}hymns.service = ${dbp}days.pkey)
-            LEFT OUTER JOIN ${dbp}names ON (${dbp}hymns.number = ${dbp}names.number)
-                AND (${dbp}hymns.book = ${dbp}names.book)
-            WHERE ${dbp}days.pkey = '${id}'
-            ORDER BY ${dbp}days.caldate DESC, ${dbp}hymns.location,
-                ${dbp}hymns.sequence";
-        $result = mysql_query($sql) or die(mysql_error()) ;
-        modify_records_table($result, "delete.php");
+    $q = $dbh->prepare("SELECT
+            DATE_FORMAT(days.caldate, '%e %b %Y') as date,
+            hymns.book, hymns.number, hymns.note,
+            hymns.location, days.name as dayname, days.rite,
+            days.pkey as id, names.title
+            FROM {$$dbp}hymns AS hymns
+            LEFT OUTER JOIN {$dbp}days AS days ON (hymns.service = days.pkey)
+            LEFT OUTER JOIN {$dbp}names AS names ON
+                (hymns.number = names.number)
+                AND (hymns.book = names.book)
+            WHERE days.pkey = :id
+            ORDER BY days.caldate DESC, hymns.location,
+                hymns.sequence");
+    $q->bindParam(":id", $id);
+    $q->execute() or die(array_pop($q->errorInfo()));
+    modify_records_table($result, "delete.php");
 
-        $q = $dbh->query("SELECT bibletext, outline, notes
-            FROM {$dbp}sermons WHERE service='{$_GET['id']}'");
-        $row = $q->fetch(PDO::FETCH_ASSOC);
+    $q = $dbh->query("SELECT bibletext, outline, notes
+        FROM {$dbp}sermons WHERE service='{$_GET['id']}'");
+    $row = $q->fetch(PDO::FETCH_ASSOC);
     ?>
         <form action="http://<?=$this_script?>?stage=2" method="POST">
         <input type="hidden" id="service" name="service" value="<?=$id?>">
@@ -62,19 +63,19 @@ if (! array_key_exists('stage', $_GET)) {
     $q = $dbh->prepare("INSERT INTO ${dbp}sermons
         (bibletext, outline, notes, service)
         VALUES (:bibletext, :outline, :notes, :id)";
-    $q->bindParam('bibletext', $_POST['bibletext']);
-    $q->bindParam('outline', $_POST['outline']);
-    $q->bindParam('notes', $_POST['notes']);
-    $q->bindParam('id', $_POST['service']);
+    $q->bindParam(':bibletext', $_POST['bibletext']);
+    $q->bindParam(':outline', $_POST['outline']);
+    $q->bindParam(':notes', $_POST['notes']);
+    $q->bindParam(':id', $_POST['service']);
     if (! $q->execute()) {
         $q = $dbh->prepare("UPDATE {$dbp}sermons
             SET bibletext = :bibletext,
             outline = :outline, notes = :notes
             WHERE service = :id";
-        $q->bindParam('bibletext', $_POST['bibletext']);
-        $q->bindParam('outline', $_POST['outline']);
-        $q->bindParam('notes', $_POST['notes']);
-        $q->bindParam('id', $_POST['service']);
+        $q->bindParam(':bibletext', $_POST['bibletext']);
+        $q->bindParam(':outline', $_POST['outline']);
+        $q->bindParam(':notes', $_POST['notes']);
+        $q->bindParam(':id', $_POST['service']);
         $q->execute() or die(array_pop($q->errorInfo()));
     }
     $now = strftime('%T');
