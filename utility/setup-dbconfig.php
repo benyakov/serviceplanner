@@ -2,10 +2,16 @@
 chdir("..");
 require("./init.php");
 chdir("utility");
+if (! $auth) {
+    setMessage("Access denied.");
+    header("Location: ../index.php");
+    exit(0);
+}
 if (array_key_exists("step", $_POST) && $_POST['step'] == '2') {
     // Process the form (second time around)
     if (file_exists("../db-connection.php")) {
-        header ("Location: http://{$serverdir}/index.php?message=".urlencode(__('Database configuration already exists.  To reconfigure, delete db-connection.php and try again.')));
+        setMessage("Database configuration already exists.  To reconfigure, delete db-connection.php and any unwanted tables, then try again.");
+        header ("Location: http://{$serverdir}/index.php");
         exit(0);
     }
 
@@ -28,8 +34,13 @@ try{
 ");
     fclose($fp);
     chmod("../db.php", 0600);
-    header ("Location: http://{$serverdir}/index.php");
-    exit(0);
+    // Test the existence of a table
+    $q = $dbh->query("SHOW TABLES LIKE '{$_POST["dbtableprefix"]}days'");
+    if (! array_pop($q->fetch())) {
+        header("Location: setupdb.php");
+    } else {
+        header ("Location: http://{$serverdir}/index.php");
+    }
 } else {
     // Display the form (first time around)
 ?>

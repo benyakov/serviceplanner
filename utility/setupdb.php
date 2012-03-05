@@ -1,7 +1,9 @@
 <?
+chdir("..");
 require("./init.php");
+chdir("./utility");
 if (! $auth) {
-    header("location: index.php");
+    header("location: ../index.php");
     exit(0);
 }
 $dumpfile="createtables.sql";
@@ -29,12 +31,14 @@ foreach ($dumplines as $line)
 }
 $queries[] = implode("\n", $query);
 // Execute each SQL query.
+$dbh->beginTransaction();
 foreach ($queries as $query) {
     $result = $dbh->exec($query);
-    if ($result === false)
-    {
+    if ($result === false) {
+        $dbh->rollback();
         ?>
-        <html><head><title>Setup Failed</title></head>
+        <!DOCTYPE html>
+        <html lang="en"><head><title>Setup Failed</title></head>
         <body><h1>Setup Failed</h1>
         <p>Failed SQL Query:</p>
         <pre><?=$query?></pre>
@@ -43,7 +47,8 @@ foreach ($queries as $query) {
         exit(1);
     }
 }
+$dbh->commit();
 
 setMessage("Setup succeeded.");
-header("Location: records.php");
+header("Location: ../records.php");
 ?>
