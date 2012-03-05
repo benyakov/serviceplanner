@@ -228,4 +228,15 @@ function dieWithRollback($q, $errorstr = "") {
     $dbh->rollback();
     die($error);
 }
+
+function showMessage() {
+    if (array_key_exists('message', $_SESSION[$sprefix])) { ?>
+        <div class="message"><?=$_SESSION[$sprefix]['message']?></div>
+        <? unset $_SESSION[$sprefix]['message'];
+    }
+}
+
+function setMessage($text) {
+    $_SESSION[$sprefix]['message'] = $text;
+}
 ?>

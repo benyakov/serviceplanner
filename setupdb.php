@@ -44,6 +44,6 @@ foreach ($queries as $query) {
     }
 }
 
-$_SESSION[$sprefix]['message'] = "Setup succeeded.";
+setMessage("Setup succeeded.");
 header("Location: records.php");
 ?>

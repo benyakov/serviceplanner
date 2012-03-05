@@ -35,9 +35,7 @@ if (array_key_exists("date", $_POST)) {
     </script>
 <body>
     <header>
-    <? if ($_GET['error']) { ?>
-        <p class="errormessage"><?=htmlspecialchars($_GET['error'])?></p>
-    <? } ?>
+    <?showMessage();?>
     </header>
     <?=sitetabs($sitetabs, $script_basename)?>
     <div id="content-container">
@@ -213,7 +211,7 @@ function processFormData() {
         }
     }
     $dbh->commit();
-    $_SESSION[$sprefix]['message'] = $feedback;
+    setMessage($feedback);
     header("Location: modify.php");
 }
 ?>

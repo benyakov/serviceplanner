@@ -4,9 +4,11 @@ if (! $auth) {
     header('Location: index.html');
 }
 ?>
-<html>
+<!DOCTYPE html>
+<html lang="en">
 <?=html_head("Housekeeping")?>
 <body>
+    <?showMessage();?>
     <?=sitetabs($sitetabs, $script_basename)?>
     <div id="content-container">
     <h1>Housekeeping</h1>
@@ -40,6 +42,11 @@ symbolic link</em> can be given to others, e.g. organists.</p>
     it again.</li>
     <li><a href="dump.php">Save a Backup of the Database</a></li>
     <li><a href="restore.php">Restore from a Saved Backup</a></li>
+    <li><form name="import_hymns" action="importhymns.php" method="post">
+    <label for="prefix">Import hymn titles from a co-installation</label>
+    <input type="text" id="prefix" required placeholder="Database Prefix of Source Installation">
+    <button type="submit" id="submit">
+    </form></li>
     </ul>
     </div>
 </body>

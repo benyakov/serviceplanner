@@ -31,7 +31,7 @@ if (! array_key_exists("stage", $_GET)) {
         unlink($dumpfile);
         if (0 == $return)
         {
-            $_SESSION[$sprefix]['message'] = "Restore succeeded.";
+            setMessage("Restore succeeded.");
             header("Location: records.php");
         } else {
             ?>
@@ -44,7 +44,7 @@ if (! array_key_exists("stage", $_GET)) {
             <?
         }
     } else {
-        $_SESSION[$sprefix]['message'] = "Problem uploading backup file.";
+        setMessage("Problem uploading backup file.");
         header("Location: records.php");
     }
     exit(0);

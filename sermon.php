@@ -6,9 +6,7 @@ if (! array_key_exists('stage', $_GET)) {
     <html lang="en">
     <?=html_head("Edit a Sermon Plan")?>
     <body>
-        <? if ($_GET['message']) { ?>
-            <p class="message"><?=htmlspecialchars($_GET['message'])?></p>
-        <? } ?>
+        <? showMessage(); ?>
         <div id="content-container">
         <p><a href="sermonreport.php?id=<?=${id}?>">Printable Sermon Report</a>
         | <a href="sermons.php">Browse All Sermon Plans</a>
@@ -60,7 +58,7 @@ if (! array_key_exists('stage', $_GET)) {
 } elseif (2 == $_GET["stage"])
 {
     // Insert or update the sermon plans.
-    $q = $dbh->prepare("INSERT INTO ${dbp}sermons
+    $q = $dbh->prepare("INSERT INTO {$dbp}sermons
         (bibletext, outline, notes, service)
         VALUES (:bibletext, :outline, :notes, :id)";
     $q->bindParam(':bibletext', $_POST['bibletext']);
@@ -79,5 +77,6 @@ if (! array_key_exists('stage', $_GET)) {
         $q->execute() or die(array_pop($q->errorInfo()));
     }
     $now = strftime('%T');
-    header("Location: http://${this_script}?id=${id}&message=".urlencode("Sermon plans saved at ${now} server time."));
+    setMessage("Sermon plans saved at {$now} server time.");
+    header("Location: http://{$this_script}?id={$id}");
 }
