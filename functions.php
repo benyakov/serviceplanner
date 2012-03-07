@@ -46,6 +46,7 @@ function display_records_table($q) {
     $name = "";
     $location = "";
     $rowcount = 1;
+    $inarticle = false;
     while ($row = $q->fetch(PDO::FETCH_ASSOC)); {
         if (!  ($row['date'] == $date &&
                 $row['dayname'] == $name &&
@@ -57,6 +58,10 @@ function display_records_table($q) {
             } else {
                 $datetext = $row['date'];
             }
+            if ($inarticle) {
+                echo "</article>\n";
+            }
+            echo "<article>\n";
             echo "<tr class=\"heading\"><td>{$datetext} {$row['location']}</td>
                 <td colspan=2>{$row['dayname']}: {$row['rite']}</td></tr>\n";
             if ($row['servicenotes']) {
@@ -78,6 +83,7 @@ function display_records_table($q) {
             <td class=\"note\">{$row['note']}</td><td class=\"title\">{$row['title']}</td>";
         $rowcount += 1;
     }
+    echo "</article>\n";
     echo "</table>\n";
 }
 
@@ -95,6 +101,7 @@ function modify_records_table($q, $action) {
     $name = "";
     $location = "";
     $rowcount = 1;
+    $inarticle = false;
     while ($row = $q->fetch(PDO::FETCH_ASSOC)) {
         if (!  ($row['date'] == $date &&
                 $row['dayname'] == $name &&
@@ -107,6 +114,11 @@ function modify_records_table($q, $action) {
                 $datetext = $row['date'];
             }
             $urldate=urlencode($row['date']);
+            if ($inarticle) {
+                echo "</article>\n";
+            }
+            echo "<article>\n";
+            $inarticle = true;
             echo "<tr class=\"heading\"><td>
             <input type=\"checkbox\" name=\"{$row['id']}_{$row['location']}\" id=\"check_{$row['id']}_{$row['location']}\">
             {$datetext} <a href=\"enter.php?date={$urldate}\" title=\"Add another service or hymns on {$row['date']}.\">[add]</a> {$row['location']}</td>
@@ -132,6 +144,7 @@ function modify_records_table($q, $action) {
             <td class=\"note\">{$row['note']}</td><td class=\"title\">{$row['title']}</td></tr>\n";
         $rowcount += 1;
     }
+    echo "</article>\n";
     ?>
     </table>
     <input type="submit" value="Delete"><input type="reset" value="Clear">

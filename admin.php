@@ -1,10 +1,12 @@
 <?
 require("./init.php");
 if (! $auth) {
-    header('Location: index.html');
+    header('Location: index.php');
+    exit(0);
 }
 ?>
-<html>
+<!DOCTYPE html>
+<html lang=en>
 <?=html_head("Housekeeping")?>
 <body>
     <?=sitetabs($sitetabs, $script_basename)?>
@@ -40,6 +42,10 @@ symbolic link</em> can be given to others, e.g. organists.</p>
     it again.</li>
     <li><a href="dump.php">Save a Backup of the Database</a></li>
     <li><a href="restore.php">Restore from a Saved Backup</a></li>
+    <li><form action="importhymns.php" method="post">
+    <label for="otherprefix"><input id="prefix" type="text" required
+        placeholder="Other prefix in shared database.">
+        <button type="submit"></form></li>
     </ul>
     </div>
 </body>
