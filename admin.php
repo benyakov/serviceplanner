@@ -1,14 +1,25 @@
 <?
 require("./init.php");
 if (! $auth) {
-    header('Location: index.html');
+    setMessage("Access denied.  Please log in.");
+    header('Location: index.php');
+    exit(0);
 }
 ?>
 <!DOCTYPE html>
 <html lang="en">
 <?=html_head("Housekeeping")?>
+<script type="text/javascript">
+    auth = "<?=authId()?>";
+    $(document).ready(function() {
+        setupLogin();
+    });
+</script>
 <body>
+    <header>
+    <div id="login"></div>
     <?showMessage();?>
+    </header>
     <?=sitetabs($sitetabs, $script_basename)?>
     <div id="content-container">
     <h1>Housekeeping</h1>

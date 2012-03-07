@@ -68,11 +68,20 @@ if (array_key_exists('sort', $_GET)) {
     $sorted_on = "";
 }
 $q = $dbh->query("SELECT * FROM {$dbp}xref{$sort_by}") ;
-$script_basename = basename($_SERVER['SCRIPT_NAME'], ".php") ;
 ?>
 <html lang="en">
 <?=html_head("Hymn Cross Reference")?>
+<script type="text/javascript">
+    auth = "<?=authId()?>";
+    $(document).ready(function() {
+        setupLogin();
+    });
+</script>
 <body>
+    <header>
+    <div id="login"></div>
+    <?showMessage();?>
+    </header>
 <?= sitetabs($sitetabs, $script_basename); ?>
 <div id="content-container">
 <?  if ($sorted_on) { ?>

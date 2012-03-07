@@ -1,11 +1,11 @@
 <?php
 require("./init.php");
 if (! $auth) {
+    setMessage("Access denied.  Please log in.");
     header("location: index.php");
     exit(0);
 }
 $this_script = $_SERVER['HTTP_HOST'].$_SERVER['SCRIPT_NAME'] ;
-$script_basename = basename($_SERVER['SCRIPT_NAME'], ".php") ;
 
 if (array_key_exists("date", $_GET)) {
     $date = $_GET['date'];
@@ -31,10 +31,13 @@ if (array_key_exists("date", $_POST)) {
             $(this).doTimeout('fetch-hymn-title', 250, fetchHymnTitle)
         })
             .change(fetchHymnTitle);
+        setupLogin();
     })
+    auth = "<?=authId()?>";
     </script>
 <body>
     <header>
+    <div id="login"></div>
     <?showMessage();?>
     </header>
     <?=sitetabs($sitetabs, $script_basename)?>
@@ -206,7 +209,7 @@ function processFormData() {
             (service, location, book, number, note, sequence)
             VALUES ".implode(", ", $sqlhymns));
         $q->execute() or dieWithRollback($q, ".");
-        if ($->rowCount()) {
+        if ($q->rowCount()) {
             $feedback .="<li>Saved hymns: <ol><li>" . implode("</li><li>", $saved) . "</li></ol></li></ol>\n";
         }
     }

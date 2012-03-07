@@ -1,11 +1,9 @@
 <?
-chdir("..");
-require("./init.php");
-chdir("./utility");
-if (! $auth) {
-    header("location: ../index.php");
-    exit(0);
-}
+require("../options.php");
+require("../setup-session.php");
+require("../functions.php");
+require("../db-connection.php");
+
 $dumpfile="createtables.sql";
 $dumplines = file($dumpfile, FILE_IGNORE_NEW_LINES);
 // Separate SQL statements into an array.

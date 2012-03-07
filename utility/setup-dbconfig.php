@@ -1,45 +1,47 @@
 <? // Set up db.php database configuration file.
-chdir("..");
-require("./init.php");
-chdir("utility");
-if (! $auth) {
-    setMessage("Access denied.");
-    header("Location: ../index.php");
-    exit(0);
-}
+require("../options.php");
+require("../setup-session.php");
+require("../functions.php");
+$auth = auth();
+$serverdir = dirname($_SERVER['PHP_SELF']);
 if (array_key_exists("step", $_POST) && $_POST['step'] == '2') {
     // Process the form (second time around)
     if (file_exists("../db-connection.php")) {
         setMessage("Database configuration already exists.  To reconfigure, delete db-connection.php and any unwanted tables, then try again.");
-        header ("Location: http://{$serverdir}/index.php");
+        header ("Location: {$serverdir}/index.php");
         exit(0);
     }
+
+    // Escape string-ending characters to avoid PHP injection
+    $post = str_replace('\\', '\\\\', $_POST);
+    $post = str_replace('\'', '\\\'', $post);
 
     $fp = fopen("../db-connection.php", "w");
     fwrite($fp, "<? // Do not change this file unless you know what you are doing.
 // This tells the web application how to connect to your database.
 try{
-    \$dbh = new PDO('mysql:host={$_POST['dbhost']};dbname={$_POST['dbname']}',
-        '{$_POST['dbuser']}', '{$_POST['dbpassword']}');
+    \$dbh = new PDO('mysql:host={$post['dbhost']};dbname={$post['dbname']}',
+        '{$post['dbuser']}', '{$post['dbpassword']}');
 } catch (PDOException \$e) {
     die(\"Database Error: {\$e->getMessage()} </br>\");
 }
-\$dbp = '{$_POST['dbtableprefix']}';
+\$dbp = '{$post['dbtableprefix']}';
 \$dbconnection = array(
-    'dbhost'=>\"{$_POST['dbhost']}\",
-    'dbname'=>\"{$_POST['dbname']}\",
-    'dbuser'=>\"{$_POST['dbuser']}\",
-    'dbpassword'=>\"{$_POST['dbpassword']}\");
+    'dbhost'=>'{$post['dbhost']}',
+    'dbname'=>'{$post['dbname']}',
+    'dbuser'=>'{$post['dbuser']}',
+    'dbpassword'=>'{$post['dbpassword']}');
 ?>
 ");
     fclose($fp);
-    chmod("../db.php", 0600);
+    chmod("../db-connection.php", 0600);
+    require("../db-connection.php");
     // Test the existence of a table
-    $q = $dbh->query("SHOW TABLES LIKE '{$_POST["dbtableprefix"]}days'");
-    if (! array_pop($q->fetch())) {
-        header("Location: setupdb.php");
+    $q = $dbh->query("SHOW TABLES LIKE '{$dbp}days'");
+    if ($q->rowCount()) {
+        header("Location: {$serverdir}/index.php");
     } else {
-        header ("Location: http://{$serverdir}/index.php");
+        header("Location: setupdb.php");
     }
 } else {
     // Display the form (first time around)
@@ -53,35 +55,35 @@ try{
     <body><h1>New Installation</h1>
 
     <table border=0 cellspacing=7 cellpadding=0>
-    <form name="configForm" method="POST" action=".">
+    <form name="configForm" method="POST" action="<?=$_SERVER['PHP_SELF']?>">
         <input type="hidden" name="step" value="2"/>
         <tr>
             <td valign="top" align="right" nowrap>
-            <span class="form_labels"><?=__('dbhost')?></span></td>
+            <span class="form_labels">Database Host</span></td>
             <td><input required type="text" name="dbhost" size="25" value=""/></td>
         </tr>
         <tr>
             <td valign="top" align="right" nowrap>
-            <span class="form_labels"><?=__('dbname')?></span></td>
+            <span class="form_labels">Database Name</span></td>
             <td><input required type="text" name="dbname" size="25" value=""/></td>
         </tr>
         <tr>
             <td valign="top" align="right" nowrap>
-            <span class="form_labels"><?=__('dbuser')?></span></td>
+            <span class="form_labels">Database User</span></td>
             <td><input required type="text" name="dbuser" size="25" value=""/></td>
         </tr>
         <tr>
             <td valign="top" align="right" nowrap>
-            <span class="form_labels"><?=__('dbpassword')?></span></td>
+            <span class="form_labels">Database Password</span></td>
             <td><input required type="text" name="dbpassword" size="25" value=""/></td>
         </tr>
         <tr>
             <td valign="top" align="right" nowrap>
-            <span class="form_labels"><?=__('dbtableprefix')?></span></td>
+            <span class="form_labels">Database Table Prefix</span></td>
             <td><input type="text" name="dbtableprefix" size="25" value=""/></td>
         </tr>
         <tr>
-            <td><input type="submit" name="submit" value="<?= __('submit') ?>"/></td>
+            <td><input type="submit" name="submit" value="Submit"/></td>
         </tr>
     </form>
     </table>
