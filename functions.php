@@ -251,6 +251,7 @@ function dieWithRollback($q, $errorstr = "") {
 }
 
 function showMessage() {
+    global $sprefix;
     if (array_key_exists('message', $_SESSION[$sprefix])) { ?>
         <div class="message"><?=$_SESSION[$sprefix]['message']?></div>
         <? unset($_SESSION[$sprefix]['message']);
@@ -258,6 +259,7 @@ function showMessage() {
 }
 
 function setMessage($text) {
+    global $sprefix;
     $_SESSION[$sprefix]['message'] = $text;
 }
 
