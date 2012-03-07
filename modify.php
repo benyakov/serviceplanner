@@ -1,11 +1,11 @@
 <?
 require("./init.php");
 if (! $auth) {
+    setMessage("Access denied.  Please log in.");
     header("location: index.php");
     exit(0);
 }
 $this_script = $_SERVER['HTTP_HOST'].$_SERVER['SCRIPT_NAME'] ;
-$script_basename = basename($_SERVER['SCRIPT_NAME'], ".php") ;
 if (array_key_exists('listinglimit', $_GET) &&
     is_numeric($_GET['listinglimit'])) {
     $_SESSION[$sprefix]["listinglimit"] = $_GET['listinglimit'];
@@ -24,12 +24,17 @@ if (is_numeric($_SESSION[$sprefix]["listinglimit"])) {
 <!DOCTYPE html>
 <html lang="en">
 <?=html_head("Modify Service Planning Records")?>
+<script type="text/javascript">
+    auth = "<?=authId()?>";
+    $(document).ready(function() {
+        setupLogin();
+    });
+</script>
 <body>
-    <? if (array_key_exists('message', $_SESSION[$sprefix]) { ?>
-        <div class="message"><?=$_SESSION[$sprefix]['message']?></div>
-        <?  unset $_SESSION[$sprefix]['message'];
-    }
-    ?>
+    <header>
+    <div id="login"></div>
+    <? showMessage(); ?>
+    </header>
     <?=sitetabs($sitetabs, $script_basename)?>
     <div id="content-container">
     <div id="goto-now"><a href="#now">Jump to This Week</a></div>

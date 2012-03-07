@@ -1,9 +1,9 @@
 <?
-require("./init.php");
-if (! $auth) {
-    header("location: index.php");
-    exit(0);
-}
+require("../options.php");
+require("../setup-session.php");
+require("../functions.php");
+require("../db-connection.php");
+
 $dumpfile="createtables.sql";
 $dumplines = file($dumpfile, FILE_IGNORE_NEW_LINES);
 // Separate SQL statements into an array.
@@ -29,12 +29,14 @@ foreach ($dumplines as $line)
 }
 $queries[] = implode("\n", $query);
 // Execute each SQL query.
+$dbh->beginTransaction();
 foreach ($queries as $query) {
     $result = $dbh->exec($query);
-    if ($result === false)
-    {
+    if ($result === false) {
+        $dbh->rollback();
         ?>
-        <html><head><title>Setup Failed</title></head>
+        <!DOCTYPE html>
+        <html lang="en"><head><title>Setup Failed</title></head>
         <body><h1>Setup Failed</h1>
         <p>Failed SQL Query:</p>
         <pre><?=$query?></pre>
@@ -43,7 +45,8 @@ foreach ($queries as $query) {
         exit(1);
     }
 }
+$dbh->commit();
 
-$_SESSION[$sprefix]['message'] = "Setup succeeded.";
-header("Location: records.php");
+setMessage("Setup succeeded.");
+header("Location: ../records.php");
 ?>

@@ -3,11 +3,22 @@
 <?
 require("./init.php");
 if (! $auth) {
+    setMessage("Access denied.  Please log in.");
     header("location: index.php");
     exit(0);
 }
-$script_basename = basename($_SERVER['SCRIPT_NAME'], ".php") ;
 echo html_head("Sermon Plans");
+?>
+<script type="text/javascript">
+    auth = "<?=authId()?>";
+    <? if (! is_link($_SERVER['SCRIPT_FILENAME'])) {
+        ?>
+    $(document).ready(function() {
+        setupLogin();
+    });
+    <? } ?>
+</script>
+<?
 $q = $dbh->query("SELECT sermons.bibletext, sermons.outline,
     sermons.notes, sermons.service,
     DATE_FORMAT(days.caldate, '%e %b %Y') as date,
@@ -18,6 +29,10 @@ $q = $dbh->query("SELECT sermons.bibletext, sermons.outline,
 $q->execute() or die(array_pop($q->errorInfo));
 ?>
 <body>
+    <header>
+    <div id="login"></div>
+    <?showMessage();?>
+    </header>
     <?=sitetabs($sitetabs, $script_basename)?>
     <div id="content-container">
     <h1>Sermon Plans</h1>

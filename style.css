@@ -23,12 +23,6 @@ p.hymnlist {
     border: medium solid blue;
     padding: 1ex;
 }
-.errormessage {
-    color: black;
-    background-color: #FFEEEE;
-    border: medium solid red;
-    padding: 1ex;
-}
 .explanation {
     color: #724F13;
     background-color: #EEE5D7;

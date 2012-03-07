@@ -4,7 +4,7 @@ if (! $auth) {
     header("Location: index.php");
     exit(0);
 }
-$tabledescfile = "createtables.sql";
+$tabledescfile = "./utility/createtables.sql";
 $tabledesclines = file($tabledescfile, FILE_IGNORE_NEW_LINES);
 function gettablename ($line) {
     if (preg_match('/TABLE `(\w+)/', $line, $matches)) {

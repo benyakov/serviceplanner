@@ -2,9 +2,7 @@
 
 function auth($login = '', $passwd = '') {
     global $dbp, $sprefix, $dbh;
-
 	$authdata = $_SESSION[$sprefix]['authdata'];
-
 	if ( is_array( $authdata ) ) {
 		$check = $authdata['login'];
 		$pw = $authdata['password'];
@@ -32,6 +30,16 @@ function auth($login = '', $passwd = '') {
 		return true;
 	} else {
         unset( $_SESSION[$sprefix]['authdata'] );
+        return false;
+    }
+}
+
+function authId() {
+    // Return the current username from session or false
+	$authdata = $_SESSION[$sprefix]['authdata'];
+	if ( is_array( $authdata ) ) {
+		return $authdata['login'];
+    } else {
         return false;
     }
 }
@@ -241,4 +249,17 @@ function dieWithRollback($q, $errorstr = "") {
     $dbh->rollback();
     die($error);
 }
+
+function showMessage() {
+    if (array_key_exists('message', $_SESSION[$sprefix])) { ?>
+        <div class="message"><?=$_SESSION[$sprefix]['message']?></div>
+        <? unset($_SESSION[$sprefix]['message']);
+    }
+}
+
+function setMessage($text) {
+    $_SESSION[$sprefix]['message'] = $text;
+}
+
+
 ?>

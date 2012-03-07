@@ -90,6 +90,40 @@ function fetchHymnTitle() {
                 } else {
                     $("#past_"+entryNumber).text("").hide();
                 }
-            })
+            });
 }
 
+function setupLogin() {
+    // Set up the login form or logout link
+    if (! auth) {
+        $("#login").html('<form name="login" action="login.php" onsubmit="login()" method="post">'
+            + '<label for="username">User Name</label>'
+            + '<input type="text" name="username" required>'
+            + '<label for="password">Password</label>'
+            + '<input type"password" name="password" required>'
+            + '</form>');
+    } else {
+        $("#login").html(auth + " <a href=\"login.php?action=logout\""
+            + " onfocus=\"logout()\">Logout</a>");
+    }
+}
+
+function login() {
+    var jqxhr = $.getJSON("login.php", {
+        type: 'ajax',
+        user: document.forms['login']['username'].value,
+        password: document.forms['login']['password'].value },
+        function(result) {
+            auth = result[0];
+            setupLogin();
+        });
+}
+
+function logout() {
+    var jqxhr = $.getJSON("login.php", {
+        action: 'logout'},
+        function(result) {
+            auth = result[0];
+            setupLogin();
+        });
+}

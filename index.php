@@ -4,10 +4,22 @@ require("./init.php");
 <!DOCTYPE html>
 <html lang="en">
 <?=html_head("Upcoming Hymns")?>
+<script type="text/javascript">
+    auth = "<?=authId()?>";
+    <? if (! is_link($_SERVER['SCRIPT_FILENAME'])) {
+        ?>
+    $(document).ready(function() {
+        setupLogin();
+    });
+    <? } ?>
+</script>
 <body>
+    <header>
+    <div id="login"></div>
+    <?showMessage();?>
+    </header>
 <?
-if (! is_link($_SERVER['SCRIPT_FILENAME']))
-{
+if (! is_link($_SERVER['SCRIPT_FILENAME'])) {
     echo sitetabs($sitetabs, $script_basename);
 }   ?>
 <div id="content-container">

@@ -87,7 +87,7 @@ if (! array_key_exists("stage", $_GET)) {
 
     }
     $dbh->commit();
-    $_SESSION[$sprefix]['message'] = "Deletion(s) complete.";
+    setMessage("Deletion(s) complete.");
     header("Location: modify.php");
     exit(0);
 }
