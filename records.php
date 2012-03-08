@@ -5,15 +5,15 @@ $this_script = $_SERVER['HTTP_HOST'].$_SERVER['SCRIPT_NAME'] ;
 <!DOCTYPE html>
 <html lang="en">
 <?=html_head("Service Planning Records")?>
+<body>
 <script type="text/javascript">
     auth = "<?=authId()?>";
     $(document).ready(function() {
         setupLogin();
     });
 </script>
-<body>
     <header>
-    <div id="login"></div>
+    <div id="login"><?=loginForm()?></div>
     <?showMessage();?>
     </header>
     <?=sitetabs($sitetabs, $script_basename)?>

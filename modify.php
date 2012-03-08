@@ -24,15 +24,15 @@ if (is_numeric($_SESSION[$sprefix]["listinglimit"])) {
 <!DOCTYPE html>
 <html lang="en">
 <?=html_head("Modify Service Planning Records")?>
+<body>
 <script type="text/javascript">
     auth = "<?=authId()?>";
     $(document).ready(function() {
         setupLogin();
     });
 </script>
-<body>
     <header>
-    <div id="login"></div>
+    <div id="login"><?=loginForm()?></div>
     <? showMessage(); ?>
     </header>
     <?=sitetabs($sitetabs, $script_basename)?>

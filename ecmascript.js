@@ -96,27 +96,27 @@ function fetchHymnTitle() {
 function setupLogin() {
     // Set up the login form or logout link
     if (! auth) {
-        $("#login").html('<form name="login" action="login.php" onsubmit="login()" method="post">'
+        $("#login").html('<form name="login" action="" method="post">'
             + '<label for="username">User Name</label>'
             + '<input type="text" name="username" required>'
             + '<label for="password">Password</label>'
-            + '<input type"password" name="password" required>'
+            + '<input type="password" name="password" required>'
+            + '<button style="visibility: hidden" type="submit" value="submit">'
             + '</form>');
+        $("#login->form").submit(function() {
+            var jqxhr = $.getJSON("login.php", {
+                type: 'ajax',
+                user: document.forms['login']['username'].value,
+                password: document.forms['login']['password'].value },
+                function(result) {
+                    auth = result[0];
+                    setupLogin();
+                });
+        });
     } else {
         $("#login").html(auth + " <a href=\"login.php?action=logout\""
             + " onfocus=\"logout()\">Logout</a>");
     }
-}
-
-function login() {
-    var jqxhr = $.getJSON("login.php", {
-        type: 'ajax',
-        user: document.forms['login']['username'].value,
-        password: document.forms['login']['password'].value },
-        function(result) {
-            auth = result[0];
-            setupLogin();
-        });
 }
 
 function logout() {

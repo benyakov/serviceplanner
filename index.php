@@ -4,6 +4,7 @@ require("./init.php");
 <!DOCTYPE html>
 <html lang="en">
 <?=html_head("Upcoming Hymns")?>
+<body>
 <script type="text/javascript">
     auth = "<?=authId()?>";
     <? if (! is_link($_SERVER['SCRIPT_FILENAME'])) {
@@ -13,9 +14,8 @@ require("./init.php");
     });
     <? } ?>
 </script>
-<body>
     <header>
-    <div id="login"></div>
+    <div id="login"><?=loginForm()?></div>
     <?showMessage();?>
     </header>
 <?

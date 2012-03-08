@@ -71,15 +71,15 @@ $q = $dbh->query("SELECT * FROM {$dbp}xref{$sort_by}") ;
 ?>
 <html lang="en">
 <?=html_head("Hymn Cross Reference")?>
+<body>
 <script type="text/javascript">
     auth = "<?=authId()?>";
     $(document).ready(function() {
         setupLogin();
     });
 </script>
-<body>
     <header>
-    <div id="login"></div>
+    <div id="login"><?=loginForm()?></div>
     <?showMessage();?>
     </header>
 <?= sitetabs($sitetabs, $script_basename); ?>

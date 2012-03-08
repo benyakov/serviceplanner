@@ -4,6 +4,7 @@ require("../setup-session.php");
 require("../functions.php");
 require("../db-connection.php");
 
+$serverdir = dirname(dirname($_SERVER['PHP_SELF']));
 $dumpfile="createtables.sql";
 $dumplines = file($dumpfile, FILE_IGNORE_NEW_LINES);
 // Separate SQL statements into an array.
@@ -48,5 +49,5 @@ foreach ($queries as $query) {
 $dbh->commit();
 
 setMessage("Setup succeeded.");
-header("Location: ../records.php");
+header("Location: {$dirname}/useradmin.php?action=inituser");
 ?>

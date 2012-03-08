@@ -18,6 +18,7 @@ if (array_key_exists("date", $_POST)) {
 <!DOCTYPE html>
 <html lang="en">
 <?=html_head("Service Entry Form: ${this_script}", $five=true)?>
+<body>
     <script type="text/javascript">
     $(document).ready(function() {
         $("#existing-services").hide();
@@ -35,9 +36,8 @@ if (array_key_exists("date", $_POST)) {
     })
     auth = "<?=authId()?>";
     </script>
-<body>
     <header>
-    <div id="login"></div>
+    <div id="login"><?=loginForm()?></div>
     <?showMessage();?>
     </header>
     <?=sitetabs($sitetabs, $script_basename)?>

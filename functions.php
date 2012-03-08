@@ -3,7 +3,7 @@
 function auth($login = '', $passwd = '') {
     global $dbp, $sprefix, $dbh;
 	$authdata = $_SESSION[$sprefix]['authdata'];
-	if ( is_array( $authdata ) ) {
+	if (is_array($authdata) && (empty($login))) {
 		$check = $authdata['login'];
 		$pw = $authdata['password'];
 		$register = false;
@@ -263,5 +263,19 @@ function setMessage($text) {
     $_SESSION[$sprefix]['message'] = $text;
 }
 
+function loginForm() {
+    global $auth;
+    if (! $auth) {
+    ?>
+    <form name="login" action="login.php" method="post">
+        <label for="username">User Name</label>
+        <input type="text" name="username" required>
+        <label for="password">Password</label>
+        <input type="password" name="password" required>
+        <button style="visibility: hidden" type="submit" value="submit">
+        </form>
+    <?
+    }
+}
 
 ?>

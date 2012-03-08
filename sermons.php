@@ -9,6 +9,7 @@ if (! $auth) {
 }
 echo html_head("Sermon Plans");
 ?>
+<body>
 <script type="text/javascript">
     auth = "<?=authId()?>";
     <? if (! is_link($_SERVER['SCRIPT_FILENAME'])) {
@@ -28,9 +29,8 @@ $q = $dbh->query("SELECT sermons.bibletext, sermons.outline,
     ORDER BY days.caldate DESC");
 $q->execute() or die(array_pop($q->errorInfo));
 ?>
-<body>
     <header>
-    <div id="login"></div>
+    <div id="login"><?=loginForm()?></div>
     <?showMessage();?>
     </header>
     <?=sitetabs($sitetabs, $script_basename)?>
