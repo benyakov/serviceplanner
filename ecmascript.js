@@ -95,26 +95,28 @@ function fetchHymnTitle() {
 
 function setupLogin() {
     // Set up the login form or logout link
-    if (! auth) {
-        $("#login").html('<form name="login" action="" method="post">'
+    if (! window.auth) {
+        $("#login").html('<form id="loginform">'
             + '<label for="username">User Name</label>'
-            + '<input type="text" name="username" required>'
+            + '<input id="username" type="text" name="username" required>'
             + '<label for="password">Password</label>'
-            + '<input type="password" name="password" required>'
+            + '<input id="password" type="password" name="password" required>'
             + '<button style="visibility: hidden" type="submit" value="submit">'
             + '</form>');
-        $("#login->form").submit(function() {
-            var jqxhr = $.getJSON("login.php", {
-                type: 'ajax',
-                user: document.forms['login']['username'].value,
-                password: document.forms['login']['password'].value },
+        $("#loginform").submit(function() {
+            var jqxhr = $.post("login.php", {
+                username: $("#username").val(),
+                password: $("#password").val() },
                 function(result) {
-                    auth = result[0];
-                    setupLogin();
+                    window.auth = result;
+                    // setupLogin();
                 });
+        }).ajaxError(function(e, jqxhr, settings, exception) {
+            $("#errormessage").append("Triggered ajax error for " + settings.url);
         });
+
     } else {
-        $("#login").html(auth + " <a href=\"login.php?action=logout\""
+        $("#login").html(window.auth + " <a href=\"login.php?action=logout\""
             + " onfocus=\"logout()\">Logout</a>");
     }
 }

@@ -6,7 +6,7 @@ require("./init.php");
 <?=html_head("Upcoming Hymns")?>
 <body>
 <script type="text/javascript">
-    auth = "<?=authId()?>";
+    window.auth = "<?=authId()?>";
     <? if (! is_link($_SERVER['SCRIPT_FILENAME'])) {
         ?>
     $(document).ready(function() {
@@ -16,6 +16,7 @@ require("./init.php");
 </script>
     <header>
     <div id="login"><?=loginForm()?></div>
+    <div id="errormessage"></div>
     <?showMessage();?>
     </header>
 <?
