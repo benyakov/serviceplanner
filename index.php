@@ -6,11 +6,10 @@ require("./init.php");
 <?=html_head("Upcoming Hymns")?>
 <body>
 <script type="text/javascript">
-    window.auth = "<?=authId()?>";
     <? if (! is_link($_SERVER['SCRIPT_FILENAME'])) {
         ?>
     $(document).ready(function() {
-        setupLogin();
+        setupLogin("<?=authId()?>");
     });
     <? } ?>
 </script>

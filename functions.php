@@ -15,7 +15,7 @@ function auth($login = '', $passwd = '') {
 		return false;
 	}
 
-    $q = $dbh->prepare("SELECT * FROM `{$tablepre}users`
+    $q = $dbh->prepare("SELECT * FROM `{$dbp}users`
         WHERE `username` = :check");
     $q->bindParam(':check', $check);
     $q->execute();
@@ -267,13 +267,13 @@ function loginForm() {
     global $auth;
     if (! $auth) {
     ?>
-    <form name="login" action="login.php" method="post">
+    <form id="loginform" method="post" action="login.php">
         <label for="username">User Name</label>
-        <input type="text" name="username" required>
+        <input id="username" type="text" name="username" required>
         <label for="password">Password</label>
-        <input type="password" name="password" required>
-        <button style="visibility: hidden" type="submit" value="submit">
-        </form>
+        <input id="password" type="password" name="password" required>
+        <button type="submit" value="submit">Log In</button>
+    </form>
     <?
     }
 }

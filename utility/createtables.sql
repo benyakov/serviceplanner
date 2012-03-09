@@ -38,6 +38,7 @@ CREATE TABLE `users` (
   `password` char(32) NOT NULL,
   `fname` char(20) NOT NULL,
   `lname` char(30) NOT NULL,
+  `userlevel` tinyint NOT NULL default '0',
   `email` char(40) default NULL,
   `resetkey` text default NULL,
   `resetexpiry` datetime default NULL,

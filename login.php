@@ -10,6 +10,19 @@ if ($_POST['action'] == 'logout') {
 } else {
     auth($_POST['username'], $_POST['password']) ;
 }
-echo json_encode(authId());
+
+$authid = authId();
+
+if ($_POST['ajax'] == true) {
+    echo json_encode($authid);
+} else {
+    if ($authid) {
+        setMessage("You are logged in.");
+    } else {
+        setMessage("You are logged out.");
+    }
+    header("Location: ".$_SESSION['HTTP_REFERER']?
+        $_SESSION['HTTP_REFERER'] : "index.html");
+}
 
 ?>

@@ -93,30 +93,31 @@ function fetchHymnTitle() {
             });
 }
 
-function setupLogin() {
+function setupLogin(auth) {
     // Set up the login form or logout link
-    if (! window.auth) {
-        $("#login").html('<form id="loginform">'
+    if (auth) {
+        $("#login").has('a').html(
+            '<form id="loginform" method="post" action="login.php">'
             + '<label for="username">User Name</label>'
             + '<input id="username" type="text" name="username" required>'
             + '<label for="password">Password</label>'
             + '<input id="password" type="password" name="password" required>'
-            + '<button style="visibility: hidden" type="submit" value="submit">'
+            + '<button type="submit" value="submit">Log In</button>'
             + '</form>');
         $("#loginform").submit(function() {
             var jqxhr = $.post("login.php", {
+                ajax: true,
                 username: $("#username").val(),
                 password: $("#password").val() },
                 function(result) {
-                    window.auth = result;
-                    // setupLogin();
+                    setupLogin(result);
                 });
         }).ajaxError(function(e, jqxhr, settings, exception) {
             $("#errormessage").append("Triggered ajax error for " + settings.url);
         });
 
     } else {
-        $("#login").html(window.auth + " <a href=\"login.php?action=logout\""
+        $("#login").html(auth + " <a href=\"login.php?action=logout\""
             + " onfocus=\"logout()\">Logout</a>");
     }
 }
@@ -125,7 +126,6 @@ function logout() {
     var jqxhr = $.getJSON("login.php", {
         action: 'logout'},
         function(result) {
-            auth = result[0];
-            setupLogin();
+            setupLogin(auth);
         });
 }

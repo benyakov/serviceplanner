@@ -12,7 +12,7 @@ if ( $auth == 3 ) {
 
         $id = $_GET['id'];
 
-        $q = $dbh->prepare("SELECT * FROM `{$tablepre}users` WHERE `uid`=:id");
+        $q = $dbh->prepare("SELECT * FROM `{$dbp}users` WHERE `uid`=:id");
         $q->bindParam(":id", $id);
         $q->execute();
 
@@ -32,7 +32,7 @@ if ( $auth == 3 ) {
         $lname = $_POST['lname'];
         $email = $_POST['email'];
 
-        $q = $dbh->prepare("UPDATE `{$tablepre}users` SET {$pwstr}
+        $q = $dbh->prepare("UPDATE `{$dbp}users` SET {$pwstr}
             `fname`=:fname, `lname`=:lname, `userlevel`=:ulevel,
             `email`=:email WHERE `username`=:uname");
         $q->bindParam(':fname', $fname);
@@ -51,7 +51,7 @@ if ( $auth == 3 ) {
     } elseif ( $flag=="delete" ) {
         $id = $_GET['id'];
         if ($authdata['uid'] != $id) {
-            $q = $dbh->prepare("DELETE FROM `{$tablepre}users`
+            $q = $dbh->prepare("DELETE FROM `{$dbp}users`
                 WHERE `uid`=:id");
             $q->bindParam(':id', $id);
             $q->execute();
@@ -77,7 +77,7 @@ if ( $auth == 3 ) {
     $email = $_POST['email'];
     $dbh->beginTransaction();
     // Check for existing user name
-    $qu = $dbh->prepare("SELECT * FROM `{$tablepre}users`
+    $qu = $dbh->prepare("SELECT * FROM `{$dbp}users`
         WHERE `username`=:uname");
     $qu->bindParam(":uname", $uname);
     $qu->execute();
@@ -86,7 +86,7 @@ if ( $auth == 3 ) {
         $unameerror = $uname;
     }
     // Check for existing email address
-    $qe = $dbh->prepare("SELECT * FROM `{$tablepre}users`
+    $qe = $dbh->prepare("SELECT * FROM `{$dbp}users`
         WHERE `email`=:email");
     $qe->bindParam(":email", $email);
     $qe->execute();
@@ -98,7 +98,7 @@ if ( $auth == 3 ) {
         $elementValues = array("", "", $pw, $fname, $lname, $ulevel, $email);
         editUserForm($elementValues, "Add", $unameerror, $emailerror);
     } else {
-        $q = $dbh->prepare("INSERT INTO {$tablepre}users
+        $q = $dbh->prepare("INSERT INTO {$dbp}users
             SET `username`=:uname, `password`=:pw, `fname`=:fname,
             `lname`=:lname, `userlevel`=:ulevel, `email`=:email");
         $q->bindParam(":uname", $uname);
@@ -122,7 +122,7 @@ if ( $auth == 3 ) {
         $un = $_POST['un'];
         $pw = md5($_POST['pw']);
         $id = $_POST['id'];
-        $q = $dbh->prepare("UPDATE `{$tablepre}users` SET `password`='$pw'
+        $q = $dbh->prepare("UPDATE `{$dbp}users` SET `password`='$pw'
             WHERE `uid`=:id");
         $q->bindParam(':id', $id);
         $q->execute();
@@ -139,8 +139,9 @@ if ( $auth == 3 ) {
     if ( $flag=="inituser") {
         $dbh->beginTransaction();
         // Check that the table is really empty.
-        if ($dbh->query("SELECT `username` from `{$tablepre}users`
-            LIMIT 1")) {
+        $q = $dbh->query("SELECT `username` from `{$dbp}users`
+                    LIMIT 1");
+        if ($q->fetch()) {
             $dbh->rollback();
             setMessage("Access denied.  Users already exist.");
             header("Location: http://{$serverdir}/index.php");
@@ -148,7 +149,7 @@ if ( $auth == 3 ) {
         }
         // Save the posted user
         $pw = md5($_POST['pw']);
-        $q = $dbh->prepare("INSERT INTO `{$tablepre}users`
+        $q = $dbh->prepare("INSERT INTO `{$dbp}users`
             SET `username`=:username, `password`='{$pw}',
             `fname`=:fname, `lname`=:lname,
             `userlevel`=:ulevel, `email`=:email");
@@ -157,17 +158,18 @@ if ( $auth == 3 ) {
         $q->bindParam(':lname', $_POST['lname']);
         $q->bindParam(':ulevel', $_POST['ulevel']);
         $q->bindParam(':email', $_POST['email']);
-        $q->execute();
+        $q->execute() or dieWithRollback($q);
         $dbh->commit();
         session_destroy();
         require("./setup-session.php");
         auth($_POST['username'], $_POST['pw']);
+        setMessage("Initial user has been set up.");
         header("Location: http://{$serverdir}/index.php");
     } elseif ($flag=="reset" && array_key_exists('auth', $_GET)) {
         changePW($_GET['auth']);
     } elseif ($flag=="updatepw" && array_key_exists('auth', $_POST)) {
         $pw = md5($_POST['pw']);
-        $q = $dbh->prepare("UPDATE `{$tablepre}users` SET `password`='$pw',
+        $q = $dbh->prepare("UPDATE `{$dbp}users` SET `password`='$pw',
             `resetkey`=DEFAULT
             WHERE `resetkey`=:resetkey AND `resetexpiry` >= NOW()");
         $q->bindParam(':resetkey', $_POST['auth']);
@@ -191,10 +193,10 @@ if ( $auth == 3 ) {
 ***************************************/
 
 function changePW($authcode="") {
-    global $tablepre, $dbh;
+    global $dbp, $dbh;
 
     if ($authcode) { // password reset request
-        $q = $dbh->prepare("SELECT `uid`, `username` FROM `{$tablepre}users`
+        $q = $dbh->prepare("SELECT `uid`, `username` FROM `{$dbp}users`
             WHERE `resetkey` = :resetkey
             AND `resetexpiry` >= NOW() LIMIT 1");
         $q->bindParam(':resetkey', $_GET['auth']);
@@ -413,7 +415,7 @@ function editUserForm($elementValues="", $mode="Add",
 
 
 function userList() {
-    global $authdata, $tablepre, $dbh;
+    global $authdata, $dbp, $dbh;
 ?>
     <!DOCTYPE html>
     <html lang="en"><head><title>Calendar User List</title>
@@ -457,7 +459,7 @@ function userList() {
     </tr>
 
 <?
-    $q = $dbh->query("SELECT * FROM `{$tablepre}users`");
+    $q = $dbh->query("SELECT * FROM `{$dbp}users`");
     $bgcolor = "#ffffff";
 
     while( $row = $q->fetch() ) {

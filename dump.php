@@ -15,11 +15,11 @@ function gettablename ($line) {
 }
 $tablenamelines = array_filter($tabledesclines, gettablename);
 $tablenames = array_map(gettablename, $tablenamelines);
-function addtableprefix ($name) {
+function adddbpfix ($name) {
     global $dbp;
     return "{$dbp}{$name}";
 }
-$finaltablenames = array_map(addtableprefix, $tablenames);
+$finaltablenames = array_map(adddbpfix, $tablenames);
 $tablenamestring = implode(" ", $finaltablenames);
 header("Content-type: text/plain");
 $timestamp = date("dMY-Hi");
