@@ -33,7 +33,7 @@ if (array_key_exists("date", $_POST)) {
         })
             .change(fetchHymnTitle);
         setupLogin();
-    })
+    });
     auth = "<?=authId()?>";
     </script>
     <header>
