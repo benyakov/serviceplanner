@@ -55,7 +55,7 @@ $dbh->commit();
 <title>Set Up Initial User</title>
 <link rel="stylesheet" type="text/css" href="../style.css">
 <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery.min.js"></script>
-<script type="text/javascript" src="http://<?=$serverdir?>/ecmascript.js"></script>
+<script type="text/javascript" src="http://<?=$_SERVER['SERVER_NAME'].$serverdir?>/ecmascript.js"></script>
 <script type="text/javascript">
 $(document).ready(function() {
     $("#formsubmit").attr('disabled', true);
@@ -74,7 +74,7 @@ $(document).ready(function() {
 <body>
 <h1>Set Up Initial User</h1>
 <table>
-<form action="../useradmin.php?action=inituser" method="post">
+<form action="../useradmin.php?flag=inituser" method="post">
         <input type="hidden" name="ulevel" value="3"/>
         <tr>
             <td nowrap valign="top" align="right" nowrap>
@@ -108,7 +108,7 @@ $(document).ready(function() {
             <td><input id="password2" type="password" name="pwconfirm" required></td>
         </tr>
         <tr><td colspan="2" align="right">
-            <button id="formsubmit" type="submit" value="Submit">
+            <button id="formsubmit" type="submit" value="Submit">Submit</button>
         <td><tr>
 </form>
 </table>

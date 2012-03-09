@@ -83,6 +83,7 @@ try{
             <td><input type="text" name="dbtableprefix" size="25" value=""/></td>
         </tr>
         <tr>
+            <td></td>
             <td><input type="submit" name="submit" value="Submit"/></td>
         </tr>
     </form>

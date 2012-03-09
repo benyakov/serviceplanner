@@ -137,6 +137,16 @@ if ( $auth == 3 ) {
 } else {
 
     if ( $flag=="inituser") {
+        $dbh->beginTransaction();
+        // Check that the table is really empty.
+        if ($dbh->query("SELECT `username` from `{$tablepre}users`
+            LIMIT 1")) {
+            $dbh->rollback();
+            setMessage("Access denied.  Users already exist.");
+            header("Location: http://{$serverdir}/index.php");
+            exit(0);
+        }
+        // Save the posted user
         $pw = md5($_POST['pw']);
         $q = $dbh->prepare("INSERT INTO `{$tablepre}users`
             SET `username`=:username, `password`='{$pw}',
@@ -148,6 +158,7 @@ if ( $auth == 3 ) {
         $q->bindParam(':ulevel', $_POST['ulevel']);
         $q->bindParam(':email', $_POST['email']);
         $q->execute();
+        $dbh->commit();
         session_destroy();
         require("./setup-session.php");
         auth($_POST['username'], $_POST['pw']);
