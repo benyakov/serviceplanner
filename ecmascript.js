@@ -93,6 +93,17 @@ function fetchHymnTitle() {
             });
 }
 
+function submitLogin() {
+    var jqxhr = $.post("login.php", {
+        ajax: "ajax",
+        username: $("#username").val(),
+        password: $("#password").val() },
+        function(result) {
+            setupLogin(result);
+        }
+    );
+}
+
 function setupLogin(auth) {
     // Set up the login form or logout link
     if (auth) {
@@ -107,15 +118,9 @@ function setupLogin(auth) {
             + '<input id="password" type="password" name="password" required>'
             + '<button type="submit" value="submit">Log In</button>'
             + '</form>');
-        $("#loginform").submit(function() {
-            var jqxhr = $.post("login.php", {
-                ajax: "ajax",
-                username: $("#username").val(),
-                password: $("#password").val() },
-                function(result) {
-                    setupLogin(result);
-                });
-        }).ajaxError(function(e, jqxhr, settings, exception) {
+        $("#loginform")
+        .attr('action', 'javascript:submitLogin();')
+        .ajaxError(function(e, jqxhr, settings, exception) {
             $("#errormessage").append(e);
         });
     }
