@@ -96,7 +96,10 @@ function fetchHymnTitle() {
 function setupLogin(auth) {
     // Set up the login form or logout link
     if (auth) {
-        $("#login").has('a').html(
+        $("#login").html(auth + " <a href=\"login.php?action=logout\""
+            + " onfocus=\"logout()\">Logout</a>");
+    } else {
+        $("#login").not($(":has(form)")).html(
             '<form id="loginform" method="post" action="login.php">'
             + '<label for="username">User Name</label>'
             + '<input id="username" type="text" name="username" required>'
@@ -106,19 +109,15 @@ function setupLogin(auth) {
             + '</form>');
         $("#loginform").submit(function() {
             var jqxhr = $.post("login.php", {
-                ajax: true,
+                ajax: "ajax",
                 username: $("#username").val(),
                 password: $("#password").val() },
                 function(result) {
                     setupLogin(result);
                 });
         }).ajaxError(function(e, jqxhr, settings, exception) {
-            $("#errormessage").append("Triggered ajax error for " + settings.url);
+            $("#errormessage").append(e);
         });
-
-    } else {
-        $("#login").html(auth + " <a href=\"login.php?action=logout\""
-            + " onfocus=\"logout()\">Logout</a>");
     }
 }
 

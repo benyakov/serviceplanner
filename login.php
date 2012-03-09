@@ -1,10 +1,7 @@
 <?
 require("./init.php");
-header('Cache-Control: no-cache, must-revalidate');
-header('Expires: Mon, 01 Jan 1996 00:00:00 GMT');
-header("Content-type: application/json");
 
-if ($_POST['action'] == 'logout') {
+if (array_key_exists('action', $_POST) && $_POST['action'] == 'logout') {
     session_destroy();
     require("./setup_session.php");
 } else {
@@ -12,17 +9,20 @@ if ($_POST['action'] == 'logout') {
 }
 
 $authid = authId();
-
-if ($_POST['ajax'] == true) {
+if (array_key_exists('ajax', $_POST)) {
+    header('Cache-Control: no-cache, must-revalidate');
+    header('Expires: Mon, 01 Jan 1996 00:00:00 GMT');
+    header("Content-type: application/json");
     echo json_encode($authid);
 } else {
+    $redirect = $_SESSION['HTTP_REFERER']?
+            $_SESSION['HTTP_REFERER'] : "index.php";
     if ($authid) {
         setMessage("You are logged in.");
     } else {
         setMessage("You are logged out.");
     }
-    header("Location: ".$_SESSION['HTTP_REFERER']?
-        $_SESSION['HTTP_REFERER'] : "index.html");
+    header("Location: {$redirect}");
 }
 
 ?>
