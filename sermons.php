@@ -15,7 +15,7 @@ echo html_head("Sermon Plans");
     <? if (! is_link($_SERVER['SCRIPT_FILENAME'])) {
         ?>
     $(document).ready(function() {
-        setupLogin();
+        setupLogin("<?=authId()?>");
     });
     <? } ?>
 </script>

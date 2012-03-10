@@ -32,7 +32,7 @@ if (array_key_exists("date", $_POST)) {
             $(this).doTimeout('fetch-hymn-title', 250, fetchHymnTitle)
         })
             .change(fetchHymnTitle);
-        setupLogin();
+        setupLogin("<?=authId()?>");
     });
     auth = "<?=authId()?>";
     </script>

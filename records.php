@@ -9,7 +9,7 @@ $this_script = $_SERVER['HTTP_HOST'].$_SERVER['SCRIPT_NAME'] ;
 <script type="text/javascript">
     auth = "<?=authId()?>";
     $(document).ready(function() {
-        setupLogin();
+        setupLogin("<?=authId()?>");
     });
 </script>
     <header>

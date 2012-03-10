@@ -28,7 +28,7 @@ if (is_numeric($_SESSION[$sprefix]["listinglimit"])) {
 <script type="text/javascript">
     auth = "<?=authId()?>";
     $(document).ready(function() {
-        setupLogin();
+        setupLogin("<?=authId()?>");
     });
 </script>
     <header>

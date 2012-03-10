@@ -29,12 +29,14 @@ function auth($login = '', $passwd = '') {
 		}
 		return true;
 	} else {
+        echo "{$row['password']} !== $pw";
         unset( $_SESSION[$sprefix]['authdata'] );
         return false;
     }
 }
 
 function authId() {
+    global $sprefix;
     // Return the current username from session or false
 	$authdata = $_SESSION[$sprefix]['authdata'];
 	if ( is_array( $authdata ) ) {
@@ -183,7 +185,7 @@ function html_head($title, $five=false) {
         $rv[] = "<link href=\"http://ajax.googleapis.com/ajax/libs/jqueryui/1.8/themes/base/jquery-ui.css\" rel=\"stylesheet\" type=\"text/css\"/>
         <script type=\"text/javascript\" src=\"http://ajax.googleapis.com/ajax/libs/jqueryui/1.8/jquery-ui.min.js\"></script>
         <script type=\"text/javascript\" src=\"jquery.ba-dotimeout.min.js\"></script>";
-        $rv[] = "<script type=\"text/javascript\" src=\"{$here}/ecmascript.js\"></script>";
+        $rv[] = "<script type=\"text/javascript\" src=\"{$here}/ecmascript.js.php\"></script>";
     }
     $rv[] = "</head>";
     return implode("\n", $rv);
@@ -263,18 +265,18 @@ function setMessage($text) {
     $_SESSION[$sprefix]['message'] = $text;
 }
 
-function loginForm() {
+function getLoginForm() {
     global $auth;
-    if (! $auth) {
-    ?>
-    <form id="loginform" method="post" action="login.php">
+    if ($auth) {
+        return '';
+    } else {
+        return '<form id="loginform" method="post" action="login.php">
         <label for="username">User Name</label>
         <input id="username" type="text" name="username" required>
         <label for="password">Password</label>
         <input id="password" type="password" name="password" required>
         <button type="submit" value="submit">Log In</button>
-    </form>
-    <?
+        </form>'
     }
 }
 

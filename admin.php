@@ -13,7 +13,7 @@ if (! $auth) {
 <script type="text/javascript">
     auth = "<?=authId()?>";
     $(document).ready(function() {
-        setupLogin();
+        setupLogin("<?=authId()?>");
     });
 </script>
     <header>

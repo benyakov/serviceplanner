@@ -75,7 +75,7 @@ $q = $dbh->query("SELECT * FROM {$dbp}xref{$sort_by}") ;
 <script type="text/javascript">
     auth = "<?=authId()?>";
     $(document).ready(function() {
-        setupLogin();
+        setupLogin("<?=authId()?>");
     });
 </script>
     <header>
