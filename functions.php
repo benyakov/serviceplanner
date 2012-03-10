@@ -194,7 +194,7 @@ function html_head($title, $five=false) {
 
 function quote_array($ary) {
     // reduce ugliness (Note: connect to mysql before using.)
-    return array_map($dbh->quote, $ary);
+    return str_replace("'", "''", $ary);
 }
 
 function sitetabs($sitetabs, $action) {
@@ -282,7 +282,7 @@ function getLoginForm() {
 }
 
 function jsString($s, $q="'") {
-    return str_replace($q, "\\$q", str_replace("\n", "\\n", $s));
+    return str_replace( array($q, "\n"), array("\\$q", "\\n"), $s);
 }
 
 ?>
