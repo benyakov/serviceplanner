@@ -107,8 +107,8 @@ function submitLogin() {
 function setupLogin(auth) {
     // Set up the login form or logout link
     if (auth) {
-        $("#login").html(auth + " <a href=\"login.php?action=logout\""
-            + " onfocus=\"logout()\">Logout</a>");
+        $("#login").html(auth + " <a href=\"javascript: void(0);\" name=\"Log out\" title=\"Log out\">Log out</a>");
+        $("#login > a").keydown(logout).click(logout);
     } else {
         $("#login").not($(":has(form)")).html(
             '<form id="loginform" method="post" action="login.php">'
