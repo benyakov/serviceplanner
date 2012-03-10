@@ -13,7 +13,7 @@ $this_script = $_SERVER['HTTP_HOST'].$_SERVER['SCRIPT_NAME'] ;
     });
 </script>
     <header>
-    <div id="login"><?=loginForm()?></div>
+    <div id="login"><?=getLoginForm()?></div>
     <?showMessage();?>
     </header>
     <?=sitetabs($sitetabs, $script_basename)?>

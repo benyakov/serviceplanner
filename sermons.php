@@ -30,7 +30,7 @@ $q = $dbh->query("SELECT sermons.bibletext, sermons.outline,
 $q->execute() or die(array_pop($q->errorInfo));
 ?>
     <header>
-    <div id="login"><?=loginForm()?></div>
+    <div id="login"><?=getLoginForm()?></div>
     <?showMessage();?>
     </header>
     <?=sitetabs($sitetabs, $script_basename)?>

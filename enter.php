@@ -37,7 +37,7 @@ if (array_key_exists("date", $_POST)) {
     auth = "<?=authId()?>";
     </script>
     <header>
-    <div id="login"><?=loginForm()?></div>
+    <div id="login"><?=getLoginForm()?></div>
     <?showMessage();?>
     </header>
     <?=sitetabs($sitetabs, $script_basename)?>

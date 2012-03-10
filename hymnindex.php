@@ -79,7 +79,7 @@ $q = $dbh->query("SELECT * FROM {$dbp}xref{$sort_by}") ;
     });
 </script>
     <header>
-    <div id="login"><?=loginForm()?></div>
+    <div id="login"><?=getLoginForm()?></div>
     <?showMessage();?>
     </header>
 <?= sitetabs($sitetabs, $script_basename); ?>

@@ -276,8 +276,12 @@ function getLoginForm() {
         <label for="password">Password</label>
         <input id="password" type="password" name="password" required>
         <button type="submit" value="submit">Log In</button>
-        </form>'
+        </form>';
     }
+}
+
+function jsString($s, $q="'") {
+    return str_replace($q, "\\$q", str_replace("\n", "\\n", $s));
 }
 
 ?>

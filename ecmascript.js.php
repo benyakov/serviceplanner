@@ -113,7 +113,7 @@ function setupLogin(auth) {
             + " onfocus=\"logout()\">Logout</a>");
     } else {
         $("#login").not($(":has(form)")).html(
-            '<?=getLoginForm()?>'.replace('\n', '\\n'));
+            '<?=jsString(getLoginForm())?>');
         $("#loginform")
         .attr('action', 'javascript:submitLogin();')
         .ajaxError(function(e, jqxhr, settings, exception) {
