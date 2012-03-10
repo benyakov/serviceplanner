@@ -14,7 +14,7 @@ require("./init.php");
     <? } ?>
 </script>
     <header>
-    <div id="login"><?=loginForm()?></div>
+    <div id="login"><?=getLoginForm()?></div>
     <div id="errormessage"></div>
     <?showMessage();?>
     </header>

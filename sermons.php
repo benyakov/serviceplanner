@@ -15,7 +15,7 @@ echo html_head("Sermon Plans");
     <? if (! is_link($_SERVER['SCRIPT_FILENAME'])) {
         ?>
     $(document).ready(function() {
-        setupLogin();
+        setupLogin("<?=authId()?>");
     });
     <? } ?>
 </script>
@@ -30,7 +30,7 @@ $q = $dbh->query("SELECT sermons.bibletext, sermons.outline,
 $q->execute() or die(array_pop($q->errorInfo));
 ?>
     <header>
-    <div id="login"><?=loginForm()?></div>
+    <div id="login"><?=getLoginForm()?></div>
     <?showMessage();?>
     </header>
     <?=sitetabs($sitetabs, $script_basename)?>

@@ -1,3 +1,5 @@
+<? require('functions.php'); ?>
+
 function addHymn() {
     $("#hymnentries > li").eq(-1).clone().appendTo("#hymnentries");
     var oldBookId = $("#hymnentries > li").eq(-1).children().attr("id");
@@ -111,13 +113,7 @@ function setupLogin(auth) {
         $("#login > a").keydown(logout).click(logout);
     } else {
         $("#login").not($(":has(form)")).html(
-            '<form id="loginform" method="post" action="login.php">'
-            + '<label for="username">User Name</label>'
-            + '<input id="username" type="text" name="username" required>'
-            + '<label for="password">Password</label>'
-            + '<input id="password" type="password" name="password" required>'
-            + '<button type="submit" value="submit">Log In</button>'
-            + '</form>');
+            '<?=jsString(getLoginForm())?>');
         $("#loginform")
         .attr('action', 'javascript:submitLogin();')
         .ajaxError(function(e, jqxhr, settings, exception) {
@@ -133,3 +129,5 @@ function logout() {
             setupLogin(auth);
         });
 }
+
+// vim: set ft=javascript :

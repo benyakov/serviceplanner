@@ -13,11 +13,11 @@ if (! $auth) {
 <script type="text/javascript">
     auth = "<?=authId()?>";
     $(document).ready(function() {
-        setupLogin();
+        setupLogin("<?=authId()?>");
     });
 </script>
     <header>
-    <div id="login"><?=loginForm()?></div>
+    <div id="login"><?=getLoginForm()?></div>
     <?showMessage();?>
     </header>
     <?=sitetabs($sitetabs, $script_basename)?>

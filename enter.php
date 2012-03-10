@@ -32,12 +32,12 @@ if (array_key_exists("date", $_POST)) {
             $(this).doTimeout('fetch-hymn-title', 250, fetchHymnTitle)
         })
             .change(fetchHymnTitle);
-        setupLogin();
+        setupLogin("<?=authId()?>");
     });
     auth = "<?=authId()?>";
     </script>
     <header>
-    <div id="login"><?=loginForm()?></div>
+    <div id="login"><?=getLoginForm()?></div>
     <?showMessage();?>
     </header>
     <?=sitetabs($sitetabs, $script_basename)?>
