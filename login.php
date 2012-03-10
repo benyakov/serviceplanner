@@ -1,15 +1,15 @@
 <?
 require("./init.php");
 
-if (array_key_exists('action', $_POST) && $_POST['action'] == 'logout') {
+if (array_key_exists('action', $_GET) && $_GET['action'] == 'logout') {
     session_destroy();
-    require("./setup_session.php");
+    require("./setup-session.php");
 } else {
     auth($_POST['username'], $_POST['password']) ;
 }
 
 $authid = authId();
-if (array_key_exists('ajax', $_POST)) {
+if (array_key_exists('ajax', $_POST) || array_key_exists('ajax', $_GET)) {
     header('Cache-Control: no-cache, must-revalidate');
     header('Expires: Mon, 01 Jan 1996 00:00:00 GMT');
     header("Content-type: application/json");

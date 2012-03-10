@@ -23,6 +23,7 @@ function auth($login = '', $passwd = '') {
 	if ( $row["password"] == $pw ) {
 		if ($register) {
             $_SESSION[$sprefix]["authdata"] = array(
+                "fullname"=>"{$row['fname']} {$row['lname']}",
                 "login"=>$row["username"],
                 "password"=>$row["password"],
                 "uid"=>$row["uid"]);
@@ -40,7 +41,7 @@ function authId() {
     // Return the current username from session or false
 	$authdata = $_SESSION[$sprefix]['authdata'];
 	if ( is_array( $authdata ) ) {
-		return $authdata['login'];
+		return $authdata['fullname'];
     } else {
         return false;
     }
@@ -268,7 +269,7 @@ function setMessage($text) {
 function getLoginForm() {
     global $auth;
     if ($auth) {
-        return '';
+        return "{$auth['fullname']} <a href=\"login.php?action=logout\" name=\"Log out\" title=\"Log out\">Log out</a>";
     } else {
         return '<form id="loginform" method="post" action="login.php">
         <label for="username">User Name</label>

@@ -124,9 +124,10 @@ function setupLogin(auth) {
 
 function logout() {
     var jqxhr = $.getJSON("login.php", {
-        action: 'logout'},
+        action: 'logout',
+        ajax: true },
         function(result) {
-            setupLogin(auth);
+            setupLogin(result);
         });
 }
 
