@@ -17,6 +17,9 @@ if ($_POST['prefix'] && strpos($_POST['prefix'], ' ') === false) {
             WHERE (NOT (n1.book = n2.book AND n1.number = n2.number)))");
     setMessage($q->rowCount() . " hymn names imported.");
     header('Location: admin.php');
-    exit(0);
+} else {
+    setMessage("Bad prefix: `{$_POST['prefix']}'");
+    header('Location: admin.php');
 }
+
 ?>
