@@ -47,7 +47,7 @@ for that service, use the "Sermon" link.</p>
 <label for="listinglimit">Listing Limit (0 for None):</label>
 <input type="text" id="listinglimit" name="listinglimit"
     value="<?=$_SESSION[$sprefix]["listinglimit"]?>">
-<input type="submit" value="Apply">
+<button type="submit" value="Apply">Apply</button>
 </form>
 <?
 $q = $dbh->query("SELECT DATE_FORMAT(days.caldate, '%c/%e/%Y') as date,
