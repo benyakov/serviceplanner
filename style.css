@@ -251,3 +251,8 @@ a.sortlink :hover {
 .vcenter * {
     vertical-align: middle;
 }
+
+.honorspaces {
+    white-space: pre;
+    font-family: monospace;
+}
