@@ -47,6 +47,30 @@ function authId() {
     }
 }
 
+function checkCorsAuth() {
+    if ($_SERVER['HTTP_ORIGIN']) {
+        $corsfile = explode("\n", file_get_contents("corsfile.txt"));
+        if ($_SERVER['HTTP_HOST'] == $_SERVER['HTTP_ORIGIN']) {
+            return false;
+        } elseif ($corsfile && in_array($_SERVER['HTTP_ORIGIN'], $corsfile)) {
+            header("Access-Control-Allow-Origin: {$_SERVER['HTTP_ORIGIN']}");
+            return true;
+        } else {
+            ?><!DOCTYPE=html>
+            <html lang="en">
+            <head><title>Access Denied</title></head>
+            <body><p><?=$_SERVER['HTTP_ORIGIN']?> is not set up for a CORS
+            mashup.  If you can log in to
+            <?="{$_SERVER['HTTP_HOST']}/{$serverdir}/admin.php"?>,
+            then you need to save "<?=$_SERVER['HTTP_ORIGIN']?>" in the form box
+            under the heading "Mashing up pages from here into your own web
+            site."</p></body></html>
+            <?
+            exit(0);
+        }
+    } else return false;
+}
+
 function display_records_table($q) {
     // Show a table of the data in the query $result
     ?><table id="records-listing">

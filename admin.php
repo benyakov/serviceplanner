@@ -118,6 +118,10 @@ $.ajax({
         </dd>
     </dl>
 
+    <p>Note that you can apply your own css stylesheet to the resulting
+    imported information to make it look nicer in the context of your web
+    site.</p>
+
     <h2>The Broom Closet</h2>
 
     <ul>

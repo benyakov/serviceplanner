@@ -1,12 +1,18 @@
 <?
 require("./init.php");
+$cors = checkCorsAuth($reqheaders);
+if (is_link($_SERVER['SCRIPT_FILENAME']) || $cors) {
+    $displayonly = true;
+} else {
+    $displayonly = false;
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
 <?=html_head("Upcoming Hymns")?>
 <body>
 <script type="text/javascript">
-    <? if (! is_link($_SERVER['SCRIPT_FILENAME'])) {
+    <? if (! $displayonly) {
         ?>
     $(document).ready(function() {
         setupLogin("<?=authId()?>");
@@ -19,7 +25,7 @@ require("./init.php");
     <?showMessage();?>
     </header>
 <?
-if (! is_link($_SERVER['SCRIPT_FILENAME'])) {
+if (! $displayonly) {
     echo sitetabs($sitetabs, $script_basename);
 }   ?>
 <div id="content-container">
