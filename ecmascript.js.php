@@ -110,7 +110,13 @@ function setupLogin(auth) {
     // Set up the login form or logout link
     if (auth) {
         $("#login").html(auth + " <a href=\"javascript: void(0);\" name=\"Log out\" title=\"Log out\">Log out</a>");
-        $("#login > a").keydown(logout).click(logout);
+        $("#login > a").keydown(function(evobj) {
+            // Don't logout if the character is a tab or shift-tab
+            if (evobj.which != 9 &&
+                evobj.which != 17) {
+                logout();
+            }
+        }).click(logout);
     } else {
         $("#login").not($(":has(form)")).html(
             '<?=jsString(getLoginForm())?>');
