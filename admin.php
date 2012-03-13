@@ -86,19 +86,25 @@ if (! $auth) {
         <dd class="honorspaces">
 &lt;script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery.min.js"&gt;&lt;/script&gt;
         </dd>
-        <dt>Where you want the hymn listing to appear in the page body, insert:</dt>
+        <dt>Where you want the listing of all records to appear in the page body, insert:</dt>
         <dd class="honorspaces">
 &lt;div id="services-import"&gt;&lt;/div&gt;
 &lt;script type="text/javascript"&gt;
-$.ajax({
-    url: "http://<?=$_SERVER['HTTP_HOST']?>/<?=dirname($_SERVER["SCRIPT_NAME"])?>/servicerecords.php",
-    success: function(data, status, jqxhr) {
-        $('#services-import').html($('body', data));
-    }});
+$("#services-import").load(
+"http://<?=$_SERVER['HTTP_HOST']?>/<?=dirname($_SERVER["SCRIPT_NAME"])?>/servicerecords.php #content-container");
+&lt;/script&gt;
+        </dd>
+        <dt>Where you want the listing of <em>future</em> hymns to appear in the page body, insert:</dt>
+        <dd class="honorspaces">
+&lt;div id="services-import"&gt;&lt;/div&gt;
+&lt;script type="text/javascript"&gt;
+$("#services-import").load(
+"http://<?=$_SERVER['HTTP_HOST']?>/<?=dirname($_SERVER["SCRIPT_NAME"])?>/index.php #content-container");
 &lt;/script&gt;
         </dd>
         <dt>Finally, save your server's domain name here
-        (or multiple servers' domain names, one per line):<dt>
+        (or multiple servers' domain names, one per line),
+        like "http://www.mydomain.com":<dt>
         <dd>
 <?
     if (file_exists("corsfile.txt")) {

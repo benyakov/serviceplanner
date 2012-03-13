@@ -256,3 +256,8 @@ a.sortlink :hover {
     white-space: pre;
     font-family: monospace;
 }
+
+form#corsform #contents {
+    width: 40em;
+    height: 5em;
+}
