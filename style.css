@@ -11,7 +11,7 @@ body {
 }
 
 #login * {
-    font-style: bold;
+    font-weight: bold;
     margin: 0 .5em 0 .5em;
 }
 
