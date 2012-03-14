@@ -418,8 +418,8 @@ function userList() {
     global $authdata, $dbp, $dbh;
 ?>
     <!DOCTYPE html>
-    <html lang="en"><head><title>Calendar User List</title>
-    <link rel="stylesheet" type="text/css" href="css/adminpgs.css">
+    <html lang="en"><head><title>User List</title>
+    <link rel="stylesheet" type="text/css" href="styles.css">
 
     <script language="JavaScript">
         function deleteConfirm(user, uid) {
