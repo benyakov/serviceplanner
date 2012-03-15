@@ -29,13 +29,6 @@ p.hymnlist {
     font-size: smaller;
     margin: 0.2em 0 0.2em 2em;
 }
-.verified { border: thin solid green; }
-.unverified {
-    border: thin solid red;
-    background-color: #FFEEEE;
-    border: medium solid red;
-    padding: 1ex;
-}
 .message {
     color: black;
     background-color: #EEEEFF;

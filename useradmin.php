@@ -215,53 +215,35 @@ function changePW($authcode="") {
     }
 ?>
     <!DOCTYPE html>
-    <html lang="en"><head>
-    <title><?=__('changepw')?></title>
-    <link rel="stylesheet" type="text/css" href="css/adminpgs.css">
-    <script type=text/javascript>
-    function validate(f, next) {
-        var regex = /\W+/;
-        var pw = f.pw.value;
-        var str = "";
-        if (pw == "") { str += "\n<?=__('pwblank')?>"; }
-        if (pw != f.pwconfirm.value) { str += "\n<?=__('pwmatch')?>"; }
-        if (pw.length < 4) { str += "\n<?=__('pwlength')?>"; }
-        if (regex.test(pw)) { str += "\n<?=__('pwchars')?>"; }
-
-        if (str == "") {
-            f.method = "post";
-            f.action = "http://<?=$serverdir?>/useradmin.php?flag="+next;
-            f.submit();
-        } else {
-            alert(str);
-            return false;
-        }
-    }
+    <html lang="en">
+    <?=html_head("Change Password")?>
+    <body>
+    <script type="text/javascript">
+        $(document).ready(function() {
+        <? passwordFormManagement(); ?>
+        });
     </script>
-    </head></body>
-    <form onSubmit="return validate(this, 'updatepw');">
+    <h1>Change Password</h1>
+    <form id="pwform" target="useradmin.php" method="post">
     <input type="hidden" name="id" value="<?= $id ?>">
     <input type="hidden" name="un" value="<?= $username ?>">
     <input type="hidden" name="auth" value="<?= $authcode ?>">
-    <table cellpadding="2" cellspacing="2" border="0">
+    <table>
     <tr>
-        <td colspan="2" class="user-edit-header"><span class="edit_user_header"><?=__('chpassheader')?></span></td>
+        <td></td>
+        <td>><?=$username?></td>
     </tr>
     <tr>
-        <td align="right"><span class="edit_user_label"><?=__('username')?>:</span></td>
-        <td><span class="edit_user_label"><?=$username?></span></td>
+        <td align="right"><label for="pw">Password</label></td>
+        <td><input id="password" type="password" name="pw" value="" required></td>
     </tr>
     <tr>
-        <td align="right"><span class="edit_user_label"><?=__('password')?>:</span></td>
-        <td><input type="password" name="pw" size="29" maxlength="25" value=""></td>
+        <td align="right"><label for="pwconfirm">Confirm Password</label></td>
+        <td><input id="password" type="password" name="pwconfirm" value="" required></td>
     </tr>
     <tr>
-        <td align="right"><span class="edit_user_label"><?=__('pwconfirm')?>:</span></td>
-        <td><input type="password" name="pwconfirm" size="29" maxlength="25" value=""></td>
-    </tr>
-    <tr>
-        <td colspan="2" align="right"><input type="submit" value="<?=__('changepw')?>">
-        &nbsp;  <input type="button" value="<?=__('cancel')?>" onClick="location.replace('index.php');">
+        <td colspan="2" align="right"><button type="submit" value="Change Password">Change Password</button>
+        &nbsp;  <button id="cancel" type="submit" value="Cancel">Cancel</button>
         </td>
     </tr>
     </table>
@@ -275,9 +257,7 @@ function changePW($authcode="") {
 function editUserForm($elementValues="", $mode="Add",
     $unameerror = "", $emailerror = "") {
     global $authdata;
-
     if ($mode=="Edit") {
-
         $username = $elementValues[1];
         $password = ""; // $elementValues[2];
         $fname = $elementValues[3];
@@ -285,125 +265,71 @@ function editUserForm($elementValues="", $mode="Add",
         $userlevel = $elementValues[5];
         $email = $elementValues[6];
 
-        $header = __('edituser');
-
         $userlevel_selected = array(
             0 => ($userlevel == 0) ? "selected" : "",
             1 => ($userlevel == 1) ? "selected" : "",
             2 => ($userlevel == 2) ? "selected" : "",
             3 => ($userlevel == 3) ? "selected" : "");
-
-        $formaction = "f.action = \"useradmin.php?flag=update\";";
-        $unameinput = "<span class=\"edit_user_label\">{$username}</span><input type=\"hidden\" name=\"username\" value=\"{$username}\">\n";
-
         if ($username == $authdata['login']) { $editorstr=$userstr = ""; }
-
     } else {
-
         $username=$password=$fname=$lname=$userlevel=$email="";
-        $header = __('adduser');
-        $formaction = "f.action = \"useradmin.php?flag=insert\";";
-        $unameinput = "<input type=\"text\" name=\"username\" size=\"29\" maxlength=\"20\" value=\"\">";
         $userlevel_selected = array(0 => "", 1 => "", 2 => "", 3 => "");
-
     }
 ?>
     <!DOCTYPE html>
-    <html lang="en"><head>
-    <title>Flexical:  <?=$mode?> Calendar User</title>
-    <link rel="stylesheet" type="text/css" href="css/adminpgs.css">
-
-    <script language="JavaScript">
-
-        function validate(f) {
-            var regex = /\W+/;
-            var un = f.username.value;
-            var pw = f.pw.value;
-
-            var str = "";
-            if (f.fname.value == "") { str += "\n<?=__('fnameblank')?>"; }
-            if (f.lname.value == "") { str += "\n<?=__('lnameblank')?>"; }
-            if (f.email.value == "") { str += "\n<?=__('emailblank')?>"; }
-            if (un == "") { str += "\n<?=__('unameblank')?>"; }
-            if (un.length < 4) { str += "\n<?=__('unamelength')?>"; }
-            if (regex.test(un)) { str += "\n<?=__('unameillegal')?>"; }
-            if (pw != "<?=__('no change')?>") {
-                if (pw == "") { str += "\n<?=__('pwblank')?>"; }
-                if (pw != f.pwconfirm.value) { str += "\n<?=__('pwmatch')?>"; }
-                if (pw.length < 4) { str += "\n<?=__('pwlength')?>"; }
-                if (regex.test(pw)) { str += "\n<?=__('pwchars')?>"; }
-            }
-
-            if (str == "") {
-                f.method = "post";
-                <?= $formaction ?>
-                f.submit();
-            } else {
-                alert(str);
-                return false;
-            }
-        }
-
+    <html lang="en">
+    <?=html_head("User")?>
+    <body>
+    <script type="text/javascript">
+        $(document).ready(function() {
+        <? passwordFormManagement(); ?>
+        });
     </script>
-    </head><body>
-
-<?
-    if ( !empty($unameerror) ) {
-        echo "<p><span class=\"bad_user_name\">" . __('userinuse') . "</span></p>";
-    }
-    if ( !empty($emailerror) ) {
-        echo "<p><span class=\"bad_user_name\">" . __('emailinuse') . "</span></p>";
-    }
-?>
-    <form onSubmit="return validate(this);">
-    <table cellpadding="2" cellspacing="2" border="0">
+    <h1>Edit User</h1>
+    <form id="userform" target="useradmin.php" method="post">
+    <table>
     <tr>
-        <td colspan="2" class="user-edit-header"><span class="edit_user_header"><?=$header?>:</span></td>
+        <td align="right"><label for="username">User name</label></td>
+        <td><input type="text" name="username" value="<?=$username?>"
+                required></td>
     </tr>
     <tr>
-        <td align="right"><span class="edit_user_label"><?=__('username')?>:</span></td>
-        <td><?=$unameinput?></td>
+        <td align="right"><label for="pw">Password</label></td>
+        <td><input type="password" name="pw" value="" <?=($mode=="Add")?"required":""?>></td>
     </tr>
     <tr>
-        <td align="right"><span class="edit_user_label"><?=__('password')?>:</span></td>
-        <td><input type="password" name="pw" size="29" maxlength="20" value="<?=($mode=="Add")?"":__('no change')?>"></td>
-    </tr>
-    <tr>
-        <td align="right"><span class="edit_user_label"><?=__('pwconfirm')?>:</span></td>
-        <td><input type="password" name="pwconfirm" size="29" maxlength="20" value="<?=($mode=="Add")?"":__('no change')?>"></td>
+        <td align="right"><label for="pwconfirm">Confirm password</label></td>
+        <td><input type="password" name="pwconfirm" value="" <?=($mode=="Add")?"required":""?>></td>
     </tr>
     <? if ($authdata['userlevel'] == 3) { ?>
     <tr>
-        <td align="right"><span class="edit_user_label"><?=__('userlevel')?>:</span></td>
+        <td align="right"><label for="userlevel">User Level</label></td>
         <td><select name="userlevel">
-            <option value="0" <?=$userlevel_selected[0]?>>
-                <?=__('subscriberoption')?></option>
-            <option value="1" <?=$userlevel_selected[1]?>>
-                <?=__('useroption')?></option>
-            <option value="2" <?=$userlevel_selected[2]?>>
-                <?=__('editoroption')?></option>
-            <option value="3" <?=$userlevel_selected[3]?>>
-                <?=__('adminoption')?></option>
+            <option value="0" <?=$userlevel_selected[0]?>>User</option>
+            <option value="1" <?=$userlevel_selected[1]?>>User</option>
+            <option value="2" <?=$userlevel_selected[2]?>>User</option>
+            <option value="3" <?=$userlevel_selected[3]?>>Admin</option>
             </select>
         </td>
     </tr>
     <? } ?>
     <tr>
-        <td align="right"><span class="edit_user_label"><?=__('fname')?>:</span></td>
-        <td><input type="text" name="fname" size="29" maxlength="20" value="<?=$fname?>"></td>
+        <td align="right"><label for="fname">First name</label></td>
+        <td><input type="text" name="fname" value="<?=$fname?>" required></td>
     </tr>
     <tr>
-        <td align="right"><span class="edit_user_label"><?=__('lname')?>:</span></td>
-        <td><input disable type="text" name="lname" size="29" maxlength="30" value="<?=$lname?>"></td>
+        <td align="right"><label for="lname">Last name</label></td>
+        <td><input type="text" name="lname" value="<?=$lname?>"></td>
     </tr>
     <tr>
-        <td align="right"><span class="edit_user_label"><?=__('email')?>:</span></td>
-        <td><input type="text" name="email" size="29" maxlength="40" value="<?=$email?>"></td>
+        <td align="right"><label for="email">Email</label></td>
+        <td><input type="email" name="email" value="<?=$email?>" required></td>
     </tr>
 
     <tr>
-        <td colspan="2" align="right"><input type="submit" value="<?=$mode?> User">
-        &nbsp;  <input type="button" value="cancel" onClick="location.replace('useradmin.php');">
+    <td colspan="2" align="right">
+        <button id="submit" type="submit" value="<?=$mode?> User"><?=$mode?> User</button>
+        &nbsp;  <button value="cancel" id="cancel">Cancel</button>
         </td>
     </tr>
     </table>
@@ -418,15 +344,14 @@ function userList() {
     global $authdata, $dbp, $dbh;
 ?>
     <!DOCTYPE html>
-    <html lang="en"><head><title>User List</title>
-    <link rel="stylesheet" type="text/css" href="styles.css">
-
+    <html lang="en">
+    <?=html_head("User List");?>
+    <body>
     <script language="JavaScript">
         function deleteConfirm(user, uid) {
-            var msg = "<?=__('deleteconf')?>: \"" + user + "\"?";
-
+            var msg = "Are you sure you want to delete \"" + user + "\"?";
             if (user == "<?= $authdata['login'] ?>") {
-                alert("<?=__('deleteown')?>");
+                alert("You can't delete yourself.");
                 return;
             } else if (confirm(msg)) {
                 location.replace("useradmin.php?flag=delete&id=" + uid);
@@ -435,53 +360,59 @@ function userList() {
             }
         }
     </script>
-    </head>
+    <header>
+    <h1>User List</h1>
 
-    <body>
-    <table cellpadding="0" cellspacing="0" border="0" width="600">
-    <tr>
-        <td class="user-edit-header"><span class="edit_user_header"><?=__('ulistheader')?></span></td>
-        <td align="right" valign="bottom"><span class="user_list_options">[ <a href="useradmin.php?flag=add"><?=__('adduser')?></a> | <a href="index.php"><?=__('return')?></a> ]</span></td>
+    <nav>
+        [ <a href="useradmin.php?flag=add">Add User</a> | <a href="index.php">Return to Services</a> ]
+    </nav>
+    </header>
+
+    <table id="userlist">
+    <tr class="headings">
+        <td>User Name></td>
+        <td>Name</td>
+        <td>Email</td>
+        <td>User Level</td>
+        <td>Edit</td>
+        <td>Delete</td>
     </tr>
-    </table>
-
-    <table cellpadding="0" cellspacing="0" border="0" width="600" bgcolor="#000000">
-    <tr><td>
-
-    <table cellspacing="1" cellpadding="3" border="0" width="100%">
-    <tr bgcolor="#666666">
-        <td><span class="user_table_col_label"><?=__('username')?></span></td>
-        <td><span class="user_table_col_label"><?=__('name')?></span></td>
-        <td><span class="user_table_col_label"><?=__('email')?></span></td>
-        <td><span class="user_table_col_label"><?=__('userlevel')?></span></td>
-        <td><span class="user_table_col_label"><?=__('edit')?></span></td>
-        <td><span class="user_table_col_label"><?=__('delete')?></span></td>
-    </tr>
-
 <?
     $q = $dbh->query("SELECT * FROM `{$dbp}users`");
-    $bgcolor = "#ffffff";
-
     while( $row = $q->fetch() ) {
         //$userlevel = ($row[5] == 2) ? __('admin') : __('editor');
         $userlevel = $row[5];
-
-        echo "<tr bgcolor=\"$bgcolor\">\n";
-        echo "  <td><span class=\"user_table_txt\">{$row[1]}</td>\n";
-        echo "  <td><span class=\"user_table_txt\">{$row[3]} {$row[4]}</span></td>\n";
-        echo "  <td><span class=\"user_table_txt\">{$row[6]}</span></td>\n";
-        echo "  <td><span class=\"user_table_txt\">{$userlevel}</span></td>\n";
-        echo "  <td><span class=\"user_table_txt\"><a href=\"useradmin.php?flag=edit&id=" . $row[0] . "\">" . __('edit') . "</a></span></td>\n";
-        echo "  <td><span class=\"user_table_txt\"><a href=\"#\" onClick=\"deleteConfirm('{$row[1]}', '{$row[0]}');\">".__('delete')."</a></span></td>\n";
-        echo "</tr>\n";
-
-    if ( $bgcolor == "#ffffff" )
-        $bgcolor = "#dddddd";
-    else
-        $bgcolor = "#ffffff";
+?>
+        <tr>
+            <td><?=$row[1]?></td>
+            <td><?=$row[3]?> <?=$row[4]?></td>
+            <td><?=$row[6]?></td>
+            <td><?=$userlevel?></td>
+            <td><a href="useradmin.php?flag=edit&id=<?=$row[0]?>">Edit</a></td>
+            <td><a href="#" onClick="deleteConfirm('<?=$row[1]?>', '<?=$row[0]?>');">Delete</a></td>
+        </tr>
+<?
     }
+    ?> </table> <?
+}
 
-    echo "</table></td></tr></table>";
+function passwordFormManagement() {
+    ?>
+        $("#cancel").click(function(evt) {
+            location.replace('useradmin.php');
+            evt.preventDefault()
+        }
+        $("#submit").prop("disabled", true);
+        $("#pwconfirm").keyup(function() {
+            if ($("#pwconfirm").val() == $("#pw").val()) {
+                $("#submit").prop("disabled", false);
+                $("#userform").attr("target", "useradmin.php");
+            } else {
+                $("#submit").prop("disabled", true);
+                $("#userform").attr("target", "javascript: null(0);");
+            }
+        });
+    <?
 }
 // vim: set tags+=../../**/tags :
 ?>
