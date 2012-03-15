@@ -1,5 +1,4 @@
 <?php
-$cors = checkCorsAuth($reqheaders);
 if (array_key_exists('listinglimit', $_GET) &&
     is_numeric($_GET['listinglimit'])) {
     $_SESSION[$sprefix]["listinglimit"] = $_GET['listinglimit'];

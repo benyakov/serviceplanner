@@ -71,6 +71,10 @@ function checkCorsAuth() {
     } else return false;
 }
 
+function checkJsonpReq() {
+    return $_GET['jsonpreq'];
+}
+
 function display_records_table($q) {
     // Show a table of the data in the query $result
     ?><table id="records-listing">

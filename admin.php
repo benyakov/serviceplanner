@@ -90,16 +90,14 @@ if (! $auth) {
         <dd class="honorspaces">
 &lt;div id="services-import"&gt;&lt;/div&gt;
 &lt;script type="text/javascript"&gt;
-$("#services-import").load(
-"http://<?=$_SERVER['HTTP_HOST']?>/<?=dirname($_SERVER["SCRIPT_NAME"])?>/servicerecords.php #content-container");
+$(document).ready(function(){var a="http://www.bethanythedalles.org/services-devel/servicerecords.php";$("#services-import").load(a+" #content-container",function(){if(!$("#services-import").has("#content-container").length){$.ajax(a,{dataType:"jsonp",jsonp:"jsonpreq",success:function(a,b){$("#services-import").html(a)}})}})})
 &lt;/script&gt;
         </dd>
         <dt>Where you want the listing of <em>future</em> hymns to appear in the page body, insert:</dt>
         <dd class="honorspaces">
 &lt;div id="services-import"&gt;&lt;/div&gt;
 &lt;script type="text/javascript"&gt;
-$("#services-import").load(
-"http://<?=$_SERVER['HTTP_HOST']?>/<?=dirname($_SERVER["SCRIPT_NAME"])?>/index.php #content-container");
+$(document).ready(function(){var a="http://www.bethanythedalles.org/services-devel/index.php";$("#services-import").load(a+" #content-container",function(){if(!$("#services-import").has("#content-container").length){$.ajax(a,{dataType:"jsonp",jsonp:"jsonpreq",success:function(a,b){$("#services-import").html(a)}})}})})
 &lt;/script&gt;
         </dd>
         <dt>Finally, save your server's domain name here
