@@ -297,7 +297,14 @@ function setMessage($text) {
 function getLoginForm() {
     global $auth;
     if ($auth) {
-        return "{$auth['fullname']} <a href=\"login.php?action=logout\" name=\"Log out\" title=\"Log out\">Log out</a>";
+        if ($auth<3) {
+            $useractions = '<a href="useradmin.php?flag=changepw"
+                title="Update Password">Update Password</a>';
+        } else {
+            $useraction = '<a href="useradmin.php"
+                title="User Administration">User Administration</a>';
+        }
+        return "{$auth['fullname']} <a href=\"login.php?action=logout\" name=\"Log out\" title=\"Log out\">Log out</a> | {$useractions}";
     } else {
         return '<form id="loginform" method="post" action="login.php">
         <label for="username">User Name</label>
@@ -305,7 +312,11 @@ function getLoginForm() {
         <label for="password">Password</label>
         <input id="password" type="password" name="password" required>
         <button type="submit" value="submit">Log In</button>
-        </form>';
+        </form>
+        <a href="useradmin.php?flag=reset"
+        title="Reset Password">Reset Password</a>
+        | <a href="useradmin.php?flag=add"
+        title="Register">Register</a>';
     }
 }
 

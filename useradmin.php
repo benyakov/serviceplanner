@@ -5,23 +5,16 @@ $flag = $_GET['flag'];
 $authdata = $_SESSION[$sprefix]['authdata'];
 $serverdir = $_SERVER['HTTP_HOST'] . dirname($_SERVER['PHP_SELF']);
 $auth = auth();
-$_ = '__';
 
 if ( $auth == 3 ) {
     if ( $flag=="edit" ) {
-
         $id = $_GET['id'];
-
         $q = $dbh->prepare("SELECT * FROM `{$dbp}users` WHERE `uid`=:id");
         $q->bindParam(":id", $id);
         $q->execute();
-
         $row = $q->fetch();
-
         editUserForm($row, "Edit");
-
     } elseif ( $flag=="update" ) {
-
         $uname = $_POST['username'];
         if ($_POST['pw'] == __('no change'))
             { $pwstr = ''; }
@@ -31,7 +24,6 @@ if ( $auth == 3 ) {
         $fname = $_POST['fname'];
         $lname = $_POST['lname'];
         $email = $_POST['email'];
-
         $q = $dbh->prepare("UPDATE `{$dbp}users` SET {$pwstr}
             `fname`=:fname, `lname`=:lname, `userlevel`=:ulevel,
             `email`=:email WHERE `username`=:uname");
@@ -41,13 +33,10 @@ if ( $auth == 3 ) {
         $q->bindParam(':email', $email);
         $q->bindParam(':uname', $uname);
         $q->execute();
-
         if ( $uname==$authdata['login'] ) {
             $_SESSION[$sprefix]['authdata']['password'] = $pw;
         }
-
         header("location:useradmin.php");
-
     } elseif ( $flag=="delete" ) {
         $id = $_GET['id'];
         if ($authdata['uid'] != $id) {
@@ -57,13 +46,11 @@ if ( $auth == 3 ) {
             $q->execute();
         }
         header("location:useradmin.php");
-
     } else {
         userList();
     }
 
 } elseif ( $flag=="insert" ) {
-
     $ulevel = intval($_POST['userlevel']);
     if ($ulevel > 0 && $auth < 3) {
         setMessage("Access Denied");
@@ -115,7 +102,6 @@ if ( $auth == 3 ) {
 } elseif ( $flag=="add" ) {
     editUserForm();
 } elseif ( is_numeric($auth) ) {
-
     if ( $flag=="changepw" ) {
         changePW();
     } elseif ( $flag=="updatepw" ) {
@@ -130,12 +116,18 @@ if ( $auth == 3 ) {
         setMessage("Password changed.");
         header("Location: http://{$serverdir}/index.php");
         exit(0);
+    } elseif ( $flag=="deleteme" ) {
+        $id = $_GET['id'];
+        if ($authdata['uid'] == $id) {
+            $q = $dbh->prepare("DELETE FROM `{$dbp}users`
+                WHERE `uid`=:id");
+            $q->bindParam(':id', $id);
+            $q->execute();
+        }
     } else {
         header("location:index.php");
     }
-
 } else {
-
     if ( $flag=="inituser") {
         $dbh->beginTransaction();
         // Check that the table is really empty.
