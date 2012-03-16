@@ -20,32 +20,42 @@ if ( $_POST ) {
     }
     $q = $dbh->prepare("SELECT `email`, `username`
         FROM `{$dbp}users` WHERE {$where}");
-    $q->bindParam(':where', $svalue);
+    $q->bindParam(':value', $svalue);
     $q->execute();
-    print_r($q);
-    if (! $q->fetch()) {
+    if (! $result = $q->fetchAll(PDO::FETCH_ASSOC)) {
         setMessage("No matching user found.");
         header("Location: index.php");
         exit(0);
     }
-    while ($row = $q->fetch(PDO::FETCH_ASSOC)) {
+    foreach ($result as $row) {
         $resetkey = md5($row['username'].date('%c').$row['email']);
         $q1 = $dbh->prepare("UPDATE `{$dbp}users`
             SET `resetkey` = '{$resetkey}',
             `resetexpiry` = DATE_ADD(NOW(),INTERVAL 6 DAY)
             WHERE {$where}");
-        $q1->bindParam(':where', $svalue);
+        $q1->bindParam(':value', $svalue);
         $q1->execute();
         $resetkey = urlencode($resetkey);
-        $mailresult = mail($to=$row['email'], $subject=$__('pwresetsubject'),
-            $additional_headers="From: noreply@{$_SERVER['HTTP_HOST']}",
-            $message=$__('pwresetmessage').
-            "\n\nTo reset the password for {$row['username']}, use this link:\n".
-            "http://{$serverdir}/useradmin.php?flag=reset&auth={$resetkey}");
-        if (! $mailresult)
-            die("Problem sending password reset email to {$row['email']}");
-        setMessage("Password reset message has been sent.");
-        header("Location: index.html");
+        $mailresult = mail($to=$row['email'],
+            $subject="Password reset for {$dbp} services at {$_SERVER['HTTP_HOST']}",
+            $message=<<<EOM
+Someone has requested to reset your password in the {$dbp} service planning
+application at {$_SERVER['HTTP_HOST']}.  If it was not you, you can safely
+ignore this message.
+
+To reset the password for {$row['username']}, use this link:
+http://{$serverdir}/useradmin.php?flag=reset&auth={$resetkey}
+
+The link will expire after six days.
+EOM
+        , $additional_headers="From: noreply@{$_SERVER['HTTP_HOST']}"
+        );
+        if (! $mailresult) {
+            setMessage("Problem sending password reset email to {$row['email']}");
+        } else {
+            setMessage("Password reset message has been sent.");
+        }
+        header("Location: index.php");
     }
 
 } else {
@@ -62,7 +72,7 @@ will contain a link that will allow the recipient to reset that user's
 password.  The link will expire after six days.</p>
 
 <table>
-<form action="<?= $_SERVER['PHP_SELF'] ?>?action=sendpw" method="post">
+<form action="<?= $_SERVER['PHP_SELF'] ?>" method="post">
         <tr>
             <td><label for="username">User name</label></td>
             <td><input type="text" name="username"></td>

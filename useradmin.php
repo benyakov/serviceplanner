@@ -210,32 +210,28 @@ function changePW() {
     <html lang="en">
     <?=html_head("Change Password")?>
     <body>
-    <script type="text/javascript">
-        $(document).ready(function() {
         <? passwordFormManagement(); ?>
-        });
-    </script>
     <h1>Change Password</h1>
-    <form id="pwform" target="useradmin.php?flag=updatepw" method="post">
+    <form id="pwform" action="useradmin.php?flag=updatepw" method="post">
     <input type="hidden" name="id" value="<?= $id ?>">
     <input type="hidden" name="un" value="<?= $username ?>">
     <input type="hidden" name="auth" value="<?= $_GET['auth'] ?>">
     <table>
     <tr>
         <td></td>
-        <td>><?=$username?></td>
+        <td><?=$username?></td>
     </tr>
     <tr>
         <td align="right"><label for="pw">Password</label></td>
-        <td><input id="password" type="password" name="pw" value="" required></td>
+        <td><input id="pw" type="password" name="pw" value="" required></td>
     </tr>
     <tr>
         <td align="right"><label for="pwconfirm">Confirm Password</label></td>
-        <td><input id="password" type="password" name="pwconfirm" value="" required></td>
+        <td><input id="pwconfirm" type="password" name="pwconfirm" value="" required></td>
     </tr>
     <tr>
-        <td colspan="2" align="right"><button type="submit" value="Change Password">Change Password</button>
-        &nbsp;  <button id="cancel" type="submit" value="Cancel">Cancel</button>
+        <td colspan="2" align="right">
+            <button id="submit" type="submit" value="Change Password">Change Password</button>
         </td>
     </tr>
     </table>
@@ -272,13 +268,10 @@ function editUserForm($elementValues="", $mode="Add",
     <html lang="en">
     <?=html_head("User")?>
     <body>
-    <script type="text/javascript">
-        $(document).ready(function() {
         <? passwordFormManagement(); ?>
-        });
     </script>
     <h1>Edit User</h1>
-    <form id="userform" target="useradmin.php" method="post">
+    <form id="userform" action="useradmin.php" method="post">
     <table>
     <tr>
         <td align="right"><label for="username">User name</label></td>
@@ -321,7 +314,6 @@ function editUserForm($elementValues="", $mode="Add",
     <tr>
     <td colspan="2" align="right">
         <button id="submit" type="submit" value="<?=$mode?> User"><?=$mode?> User</button>
-        &nbsp;  <button value="cancel" id="cancel">Cancel</button>
         </td>
     </tr>
     </table>
@@ -390,20 +382,18 @@ function userList() {
 
 function passwordFormManagement() {
     ?>
-        $("#cancel").click(function(evt) {
-            location.replace('useradmin.php');
-            evt.preventDefault()
-        }
+    <script type="text/javascript">
+    $(document).ready(function() {
         $("#submit").prop("disabled", true);
         $("#pwconfirm").keyup(function() {
             if ($("#pwconfirm").val() == $("#pw").val()) {
                 $("#submit").prop("disabled", false);
-                $("#userform").attr("target", "useradmin.php");
             } else {
                 $("#submit").prop("disabled", true);
-                $("#userform").attr("target", "javascript: null(0);");
             }
         });
+    });
+    </script>
     <?
 }
 // vim: set tags+=../../**/tags :
