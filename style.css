@@ -34,6 +34,7 @@ p.hymnlist {
     background-color: #EEEEFF;
     border: medium solid blue;
     padding: 1ex;
+    margin-top: 2ex;
 }
 .explanation {
     color: #724F13;

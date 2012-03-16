@@ -158,7 +158,7 @@ if ( $auth == 3 ) {
         setMessage("Initial user has been set up.");
         header("Location: http://{$serverdir}/index.php");
     } elseif ($flag=="reset" && array_key_exists('auth', $_GET)) {
-        changePW($_GET['auth']);
+        changePW();
     } elseif ($flag=="updatepw" && array_key_exists('auth', $_POST)) {
         $pw = md5($_POST['pw']);
         $q = $dbh->prepare("UPDATE `{$dbp}users` SET `password`='$pw',
@@ -184,10 +184,10 @@ if ( $auth == 3 ) {
 ******** user admin functions **********
 ***************************************/
 
-function changePW($authcode="") {
+function changePW() {
     global $dbp, $dbh;
 
-    if ($authcode) { // password reset request
+    if ($_GET['auth']) { // password reset request
         $q = $dbh->prepare("SELECT `uid`, `username` FROM `{$dbp}users`
             WHERE `resetkey` = :resetkey
             AND `resetexpiry` >= NOW() LIMIT 1");
@@ -216,10 +216,10 @@ function changePW($authcode="") {
         });
     </script>
     <h1>Change Password</h1>
-    <form id="pwform" target="useradmin.php" method="post">
+    <form id="pwform" target="useradmin.php?flag=updatepw" method="post">
     <input type="hidden" name="id" value="<?= $id ?>">
     <input type="hidden" name="un" value="<?= $username ?>">
-    <input type="hidden" name="auth" value="<?= $authcode ?>">
+    <input type="hidden" name="auth" value="<?= $_GET['auth'] ?>">
     <table>
     <tr>
         <td></td>

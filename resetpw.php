@@ -19,20 +19,21 @@ if ( $_POST ) {
         $where .= "`email` = :value";
     }
     $q = $dbh->prepare("SELECT `email`, `username`
-        FROM `{$tablepre}users` WHERE {$where}");
+        FROM `{$dbp}users` WHERE {$where}");
     $q->bindParam(':where', $svalue);
     $q->execute();
+    print_r($q);
     if (! $q->fetch()) {
         setMessage("No matching user found.");
-        header("Location: index.html");
+        header("Location: index.php");
         exit(0);
     }
     while ($row = $q->fetch(PDO::FETCH_ASSOC)) {
         $resetkey = md5($row['username'].date('%c').$row['email']);
-        $q1 = $dbh->prepare("UPDATE `{$tablepre}users`
+        $q1 = $dbh->prepare("UPDATE `{$dbp}users`
             SET `resetkey` = '{$resetkey}',
             `resetexpiry` = DATE_ADD(NOW(),INTERVAL 6 DAY)
-            WHERE {$where}";
+            WHERE {$where}");
         $q1->bindParam(':where', $svalue);
         $q1->execute();
         $resetkey = urlencode($resetkey);
@@ -43,7 +44,7 @@ if ( $_POST ) {
             "http://{$serverdir}/useradmin.php?flag=reset&auth={$resetkey}");
         if (! $mailresult)
             die("Problem sending password reset email to {$row['email']}");
-        setMessage("Password reset message has been sent.")
+        setMessage("Password reset message has been sent.");
         header("Location: index.html");
     }
 
@@ -55,7 +56,7 @@ if ( $_POST ) {
 <body>
 <h1>Reset Password</h1>
 
-<p style="explanation">When you submit this page with your username or email
+<p class="explanation">When you submit this page with your username or email
 address, an email will be sent to the address of a matching user.  This message
 will contain a link that will allow the recipient to reset that user's
 password.  The link will expire after six days.</p>

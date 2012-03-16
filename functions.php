@@ -313,7 +313,7 @@ function getLoginForm() {
         <input id="password" type="password" name="password" required>
         <button type="submit" value="submit">Log In</button>
         </form>
-        <a href="useradmin.php?flag=reset"
+        <a href="resetpw.php"
         title="Reset Password">Reset Password</a>
         | <a href="useradmin.php?flag=add"
         title="Register">Register</a>';
