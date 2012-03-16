@@ -166,7 +166,7 @@ if ( $auth == 3 ) {
             WHERE `resetkey`=:resetkey AND `resetexpiry` >= NOW()");
         $q->bindParam(':resetkey', $_POST['auth']);
         $q->execute();
-        if ($q->fetch()) {
+        if ($q->rowCount()) {
             setMessage("Password changed.");
         } else {
             setMessage("Problem changing password");
