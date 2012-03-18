@@ -252,6 +252,7 @@ function editUserForm($elementValues="", $mode="Add",
         $lname = $elementValues[4];
         $userlevel = $elementValues[5];
         $email = $elementValues[6];
+        $title = "Edit User";
 
         $userlevel_selected = array(
             0 => ($userlevel == 0) ? "selected" : "",
@@ -262,15 +263,16 @@ function editUserForm($elementValues="", $mode="Add",
     } else {
         $username=$password=$fname=$lname=$userlevel=$email="";
         $userlevel_selected = array(0 => "", 1 => "", 2 => "", 3 => "");
+        $title = "Register User";
     }
 ?>
     <!DOCTYPE html>
     <html lang="en">
-    <?=html_head("User")?>
+    <?=html_head($title)?>
     <body>
         <? passwordFormManagement(); ?>
     </script>
-    <h1>Edit User</h1>
+    <h1><?=$title?></h1>
     <form id="userform" action="useradmin.php" method="post">
     <table>
     <tr>

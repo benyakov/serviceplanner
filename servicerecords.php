@@ -6,7 +6,8 @@ if ($jsonp=checkJsonpReq()) {
 }
 $this_script = $_SERVER['HTTP_HOST'].$_SERVER['SCRIPT_NAME'] ;
 ?>
-<html>
+<!DOCTYPE html>
+<html lang="en">
 <?=html_head("Service Planning Records")?>
 <body>
     <? if ($jsonp) {
