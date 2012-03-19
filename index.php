@@ -20,7 +20,6 @@ if ($jsonp = checkJsonpReq()) {
         echo getLoginForm();
         echo getUserActions();
     } ?>
-    <div id="errormessage"></div>
     <?showMessage();?>
     </header>
 <?

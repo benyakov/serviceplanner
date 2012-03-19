@@ -36,6 +36,7 @@ p.hymnlist {
     margin: 0.2em 0 0.2em 2em;
 }
 .message {
+    float: clear;
     color: black;
     background-color: #EEEEFF;
     border: medium solid blue;
@@ -260,4 +261,28 @@ a.sortlink :hover {
 form#corsform #contents {
     width: 40em;
     height: 5em;
+}
+
+section#existing-services {
+    float: right;
+    display: block;
+}
+section#existing-services ul {
+    margin: 0;
+    padding: 0;
+}
+section#existing-services li {
+    list-style: none;
+}
+
+section#service-items li {
+    list-style: none;
+}
+
+section#service-items label {
+    width: 10em;
+    display: inline-block;
+    text-align: right;
+    font-weight: bold;
+    font-family: sans-serif;
 }

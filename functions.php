@@ -201,7 +201,7 @@ function modify_records_table($q, $action) {
     <?
 }
 
-function html_head($title, $five=false) {
+function html_head($title) {
     $rv[] = '<meta charset="utf-8" />';
     $rv[] = "<head><title>{$title}</title>";
     if (is_link($_SERVER['SCRIPT_FILENAME']))
@@ -217,9 +217,6 @@ function html_head($title, $five=false) {
         $here = dirname($_SERVER['SCRIPT_NAME']);
         $rv[] = "<link type=\"text/css\" rel=\"stylesheet\" href=\"{$here}/style.css\">";
         $rv[] = "<link type=\"text/css\" rel=\"stylesheet\" media=\"print\" href=\"{$here}/print.css\">";
-        if ($five) {
-            $rv[] = "<link type=\"text/css\" rel=\"stylesheet\" href=\"{$here}/style5.css\">";
-        }
         $rv[] = "<script type=\"text/javascript\" src=\"http://ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery.min.js\"></script>";
         $rv[] = "<link href=\"http://ajax.googleapis.com/ajax/libs/jqueryui/1.8/themes/base/jquery-ui.css\" rel=\"stylesheet\" type=\"text/css\"/>
         <script type=\"text/javascript\" src=\"http://ajax.googleapis.com/ajax/libs/jqueryui/1.8/jquery-ui.min.js\"></script>
