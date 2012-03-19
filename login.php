@@ -13,7 +13,17 @@ if (array_key_exists('ajax', $_POST) || array_key_exists('ajax', $_GET)) {
     header('Cache-Control: no-cache, must-revalidate');
     header('Expires: Mon, 01 Jan 1996 00:00:00 GMT');
     header("Content-type: application/json");
-    echo json_encode($authid);
+    if (array_key_exists('authdata', $_SESSION[$sprefix])) {
+        $rv = $_SESSION[$sprefix]['authdata'];
+        $rv['actions'] = getUserActions($bare=true);
+        $rv['loginform'] = getLoginForm($bare=true);
+        echo json_encode($rv);
+    } else {
+        $rv = array('userlevel' => 0,
+            'actions' => getUserActions(),
+            'loginform' => getLoginForm());
+        echo json_encode($rv);
+    }
 } else {
     $redirect = $_SESSION['HTTP_REFERER']?
             $_SESSION['HTTP_REFERER'] : "index.php";

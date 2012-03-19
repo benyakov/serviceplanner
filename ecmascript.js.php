@@ -106,29 +106,29 @@ function submitLogin() {
     );
 }
 
-function setupLogin(auth) {
+function setupLogin(authactions) {
     // Set up the login form or logout link
-    if (auth) {
-        $("#login").html(auth + " <a href=\"javascript: void(0);\" name=\"Log out\" title=\"Log out\">Log out</a>");
-        $("#login > a").keydown(function(evobj) {
-            // Don't logout if the character is a tab or shift-tab
-            if (evobj.which != 9 &&
-                evobj.which != 17) {
-                logout();
-            }
-        }).click(logout);
-    } else {
-        $("#login").not($(":has(form)")).html(
-            '<?=jsString(getLoginForm())?>');
-        $("#loginform")
-        .attr('action', 'javascript:submitLogin();')
-        .ajaxError(function(e, jqxhr, settings, exception) {
-            $("#errormessage").append(e);
+    if (! authactions['userlevel']) {
+        $("#login").not($(":has(form)")).html(authactions['loginform']);
+        $("#loginform").submit(function(evt) {
+            submitLogin();
+            evt.preventDefault();
         });
+    } else {
+        $("#login").html(authactions['loginform']);
+        $("#login > a").keydown(function(evt) {
+            // Don't logout if the character is a tab or shift-tab
+            if (evt.which != 9 &&
+                evt.which != 17) {
+                logout(null);
+            }
+        }).click(logout(evt));
     }
+    $("#useractions").html(authactions['actions']);
 }
 
-function logout() {
+function logout(evt) {
+    if (evt) { evt.preventDefault(); }
     var jqxhr = $.getJSON("login.php", {
         action: 'logout',
         ajax: true },
@@ -136,5 +136,12 @@ function logout() {
             setupLogin(result);
         });
 }
+
+$(document).ready(function() {
+    $("#loginform").submit(function(evt) {
+        submitLogin();
+        evt.preventDefault();
+    });
+});
 
 // vim: set ft=javascript :

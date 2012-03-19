@@ -6,14 +6,9 @@ $this_script = $_SERVER['HTTP_HOST'].$_SERVER['SCRIPT_NAME'] ;
 <html lang="en">
 <?=html_head("Service Planning Records")?>
 <body>
-<script type="text/javascript">
-    auth = "<?=authId()?>";
-    $(document).ready(function() {
-        setupLogin("<?=authId()?>");
-    });
-</script>
     <header>
-    <div id="login"><?=getLoginForm()?></div>
+    <?=getLoginForm()?>
+    <?=getUserActions()?>
     <?showMessage();?>
     </header>
     <?=sitetabs($sitetabs, $script_basename)?>

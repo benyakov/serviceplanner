@@ -4,42 +4,52 @@ function auth($login = '', $passwd = '') {
     global $dbp, $sprefix, $dbh;
 	$authdata = $_SESSION[$sprefix]['authdata'];
 	if (is_array($authdata) && (empty($login))) {
-		$check = $authdata['login'];
-		$pw = $authdata['password'];
-		$register = false;
+        $q = $dbh->prepare("SELECT * FROM `{$dbp}users`
+            WHERE `username` = :login AND `password` = :password
+            AND `uid` = :uid AND `userlevel` = :userlevel
+            AND CONCAT_WS(' ', `fname`, `lname`) == :fullname");
+        $q->bindParam(':login', $authdata["login"]);
+        $q->bindParam(':password', $authdata["password"]);
+        $q->bindParam(':uid', $authdata["uid"]);
+        $q->bindParam(':userlevel', $authdata["userlevel"]);
+        $q->bindParam(':fullname', $authdata["fullname"]);
+        $q->execute();
+        $row = $q->fetch(PDO::FETCH_ASSOC);
+        if ($q->fetch()) {
+            return true;
+        } else {
+            return false;
+        }
 	} elseif (!empty($login)) {
 		$check = $login;
-		$pw = md5($passwd);
-		$register = true;
+        $q = $dbh->prepare("SELECT * FROM `{$dbp}users`
+            WHERE `username` = :check");
+        $q->bindParam(':check', $check);
+        $q->execute();
+        $row = $q->fetch(PDO::FETCH_ASSOC);
+        if ( $row["password"] == crypt($passwd, $row["password"]) ) {
+                $_SESSION[$sprefix]["authdata"] = array(
+                    "fullname"=>"{$row['fname']} {$row['lname']}",
+                    "login"=>$row["username"],
+                    "password"=>$row["password"],
+                    "uid"=>$row["uid"],
+                    "userlevel"=>$row["userlevel"]);
+            return true;
+        } else {
+            unset( $_SESSION[$sprefix]['authdata'] );
+            return false;
+        }
 	} else {
 		return false;
 	}
-
-    $q = $dbh->prepare("SELECT * FROM `{$dbp}users`
-        WHERE `username` = :check");
-    $q->bindParam(':check', $check);
-    $q->execute();
-	$row = $q->fetch(PDO::FETCH_ASSOC);
-	if ( $row["password"] == $pw ) {
-		if ($register) {
-            $_SESSION[$sprefix]["authdata"] = array(
-                "fullname"=>"{$row['fname']} {$row['lname']}",
-                "login"=>$row["username"],
-                "password"=>$row["password"],
-                "uid"=>$row["uid"]);
-		}
-		return true;
-	} else {
-        echo "{$row['password']} !== $pw";
-        unset( $_SESSION[$sprefix]['authdata'] );
-        return false;
-    }
 }
 
-function authId() {
+function authId($authdata=false) {
+    // Return the current username from parameter or session, or false
     global $sprefix;
-    // Return the current username from session or false
-	$authdata = $_SESSION[$sprefix]['authdata'];
+    $authdata = $authdata?$authdata:
+        (array_key_exists('authdata', $_SESSION[$sprefix])?
+            $_SESSION[$sprefix]['authdata']:0);
 	if ( is_array( $authdata ) ) {
 		return $authdata['fullname'];
     } else {
@@ -294,29 +304,56 @@ function setMessage($text) {
     $_SESSION[$sprefix]['message'] = $text;
 }
 
-function getLoginForm() {
+function getLoginForm($bare=false) {
     global $auth;
-    if ($auth) {
-        if ($auth<3) {
-            $useractions = '<a href="useradmin.php?flag=changepw"
-                title="Update Password">Update Password</a>';
-        } else {
-            $useraction = '<a href="useradmin.php"
-                title="User Administration">User Administration</a>';
-        }
-        return "{$auth['fullname']} <a href=\"login.php?action=logout\" name=\"Log out\" title=\"Log out\">Log out</a> | {$useractions}";
+    if ($bare) {
+        $rv = "";
     } else {
-        return '<form id="loginform" method="post" action="login.php">
+        $rv = '<div id="login">';
+    }
+    if ($auth) {
+        $rv .= "{$auth['fullname']} <a href=\"login.php?action=logout\" name=\"Log out\" title=\"Log out\">Log out</a>";
+    } else {
+        $rv .= '<form id="loginform" method="post" action="login.php">
         <label for="username">User Name</label>
         <input id="username" type="text" name="username" required>
         <label for="password">Password</label>
         <input id="password" type="password" name="password" required>
         <button type="submit" value="submit">Log In</button>
-        </form>
-        <a href="resetpw.php"
+        </form>';
+    }
+    if ($bare) {
+        return $rv;
+    } else {
+        return $rv .= '</div>';
+    }
+}
+
+function getUserActions($bare=false) {
+    global $auth;
+    if ($bare) {
+        $rv = "";
+    } else {
+        $rv = '<div id="useractions">';
+    }
+    if ($auth) {
+        if ($auth<3) {
+            $rv .= '<a href="useradmin.php?flag=changepw"
+                title="Update Password">Update Password</a>';
+        } else {
+            $rv .= '<a href="useradmin.php"
+                title="User Administration">User Administration</a>';
+        }
+    } else {
+        $rv .= '<a href="resetpw.php"
         title="Reset Password">Reset Password</a>
         | <a href="useradmin.php?flag=add"
         title="Register">Register</a>';
+    }
+    if ($bare) {
+        return $rv;
+    } else {
+        return $rv .= '</div>';
     }
 }
 

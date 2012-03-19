@@ -19,7 +19,7 @@ if ( $auth == 3 ) {
         if ($_POST['pw'] == __('no change'))
             { $pwstr = ''; }
         else
-            { $pwstr = "`password`='".md5($_POST['pw'])."',"; }
+            { $pwstr = "`password`='".hashPassword($_POST['pw'])."',"; }
         $ulevel = $_POST['userlevel'];
         $fname = $_POST['fname'];
         $lname = $_POST['lname'];
@@ -58,7 +58,7 @@ if ( $auth == 3 ) {
         exit(0);
     }
     $uname = $_POST['username'];
-    $pw = md5($_POST['pw']);
+    $pw = hashPassword($_POST['pw']);
     $fname = $_POST['fname'];
     $lname = $_POST['lname'];
     $email = $_POST['email'];
@@ -106,7 +106,7 @@ if ( $auth == 3 ) {
         changePW();
     } elseif ( $flag=="updatepw" ) {
         $un = $_POST['un'];
-        $pw = md5($_POST['pw']);
+        $pw = hashPassword($_POST['pw']);
         $id = $_POST['id'];
         $q = $dbh->prepare("UPDATE `{$dbp}users` SET `password`='$pw'
             WHERE `uid`=:id");
@@ -140,7 +140,7 @@ if ( $auth == 3 ) {
             exit(0);
         }
         // Save the posted user
-        $pw = md5($_POST['pw']);
+        $pw = hashPassword($_POST['pw']);
         $q = $dbh->prepare("INSERT INTO `{$dbp}users`
             SET `username`=:username, `password`='{$pw}',
             `fname`=:fname, `lname`=:lname,
@@ -160,7 +160,7 @@ if ( $auth == 3 ) {
     } elseif ($flag=="reset" && array_key_exists('auth', $_GET)) {
         changePW();
     } elseif ($flag=="updatepw" && array_key_exists('auth', $_POST)) {
-        $pw = md5($_POST['pw']);
+        $pw = hashPassword($_POST['pw']);
         $q = $dbh->prepare("UPDATE `{$dbp}users` SET `password`='$pw',
             `resetkey`=DEFAULT
             WHERE `resetkey`=:resetkey AND `resetexpiry` >= NOW()");
@@ -398,5 +398,17 @@ function passwordFormManagement() {
     </script>
     <?
 }
+
+function hashPassword($pw) {
+    $saltchars = explode(' ', '. / 0 1 2 3 4 5 6 7 8 9 A B C D E F G H I J K L M N O P Q R S T U V W X Y Z a b c d e f g h i j k l m n o p q r s t u v w x y z');
+    $randexes = array_rand($saltchars, 22);
+    $saltarray = array_map(function($i, $s=$saltchars) { return $s[$i]; },
+        $randexes);
+    $salt = implode("", $saltarray);
+    $algo = '$2a'; // Blowfish
+    $cost = '$24';
+    return crypt($pw, "$algo$cost\$$salt");
+}
+
 // vim: set tags+=../../**/tags :
 ?>

@@ -15,16 +15,11 @@ if ($jsonp = checkJsonpReq()) {
 <html lang="en">
 <?=html_head("Upcoming Hymns")?>
 <body>
-<script type="text/javascript">
-    <? if (! $displayonly) {
-        ?>
-    $(document).ready(function() {
-        setupLogin("<?=authId()?>");
-    });
-    <? } ?>
-</script>
     <header>
-    <div id="login"><?=getLoginForm()?></div>
+    <? if (!$displayonly) {
+        echo getLoginForm();
+        echo getUserActions();
+    } ?>
     <div id="errormessage"></div>
     <?showMessage();?>
     </header>

@@ -4,23 +4,29 @@ body {
     color: white;
 }
 
-#login {
+body>header {
     font-family: sans-serif;
     font-size: small;
-    height: 2.5em;
 }
 
-#login * {
+#login {
     font-weight: bold;
-    margin: 0 .5em 0 .5em;
+    height: 2.5em;
+    margin: 0 1em 1ex 0;
+    float: left;
 }
 
-#login a:link,
-#login a:visited {
+#useractions a:link,
+#useractions a:visited {
     text-decoration: none;
     color: #CCF;
     background-color: transparent;
-    font-weight: bold;
+}
+
+#useractions {
+    margin: .5em;
+    text-align: center;
+
 }
 
 .odd { background-color: #FFF; }

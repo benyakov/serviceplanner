@@ -21,12 +21,15 @@ if (! $auth) {
             })
     }
     $(document).ready(function() {
-        setupLogin("<?=authId()?>");
-        $("#corsform").attr('action', 'javascript:saveCorsfile()');
+        $("#corsform").submit(function(evt) {
+            saveCorsfile();
+            evt.preventDefault();
+        }
     });
 </script>
     <header>
-    <div id="login"><?=getLoginForm()?></div>
+    <?=getLoginForm()?>
+    <?=getUserActions()?>
     <?showMessage();?>
     </header>
     <?=sitetabs($sitetabs, $script_basename)?>

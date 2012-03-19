@@ -10,15 +10,6 @@ if (! $auth) {
 echo html_head("Sermon Plans");
 ?>
 <body>
-<script type="text/javascript">
-    auth = "<?=authId()?>";
-    <? if (! is_link($_SERVER['SCRIPT_FILENAME'])) {
-        ?>
-    $(document).ready(function() {
-        setupLogin("<?=authId()?>");
-    });
-    <? } ?>
-</script>
 <?
 $q = $dbh->query("SELECT sermons.bibletext, sermons.outline,
     sermons.notes, sermons.service,
@@ -30,7 +21,8 @@ $q = $dbh->query("SELECT sermons.bibletext, sermons.outline,
 $q->execute() or die(array_pop($q->errorInfo));
 ?>
     <header>
-    <div id="login"><?=getLoginForm()?></div>
+    <?=getLoginForm()?>
+    <?=getUserActions()?>
     <?showMessage();?>
     </header>
     <?=sitetabs($sitetabs, $script_basename)?>
