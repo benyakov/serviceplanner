@@ -35,7 +35,7 @@ CREATE TABLE `sermons` (
 CREATE TABLE `users` (
   `uid` smallint NOT NULL auto_increment,
   `username` char(15) NOT NULL,
-  `password` char(32) NOT NULL,
+  `password` varchar(1024) NOT NULL,
   `fname` char(20) NOT NULL,
   `lname` char(30) NOT NULL,
   `userlevel` tinyint NOT NULL default '0',

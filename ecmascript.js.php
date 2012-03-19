@@ -111,9 +111,10 @@ function setupLogin(authactions) {
     if (! authactions['userlevel']) {
         $("#login").not($(":has(form)")).html(authactions['loginform']);
         $("#loginform").submit(function(evt) {
-            submitLogin();
             evt.preventDefault();
+            submitLogin();
         });
+        setMessage("Login failed.");
     } else {
         $("#login").html(authactions['loginform']);
         $("#login > a").keydown(function(evt) {
@@ -137,10 +138,20 @@ function logout(evt) {
         });
 }
 
+function setMessage(msg) {
+    var timestamp = (new Date).toTimeString();
+    if ($(".message").length > 0) {
+        $(".message").html(timestamp + " " + msg);
+    } else {
+        $("body>header").append('<div class="message">'+
+            timestamp+" "+msg+'</div>');
+    }
+}
+
 $(document).ready(function() {
     $("#loginform").submit(function(evt) {
-        submitLogin();
         evt.preventDefault();
+        submitLogin();
     });
 });
 

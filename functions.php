@@ -36,6 +36,8 @@ function auth($login = '', $passwd = '') {
                     "userlevel"=>$row["userlevel"]);
             return true;
         } else {
+            echo $row["password"]." != ".crypt($passwd, $row["password"]);
+            exit(0);
             unset( $_SESSION[$sprefix]['authdata'] );
             return false;
         }
@@ -343,9 +345,7 @@ function getUserActions($bare=false) {
         }
     } else {
         $rv .= '<a href="resetpw.php"
-        title="Reset Password">Reset Password</a>
-        | <a href="useradmin.php?flag=add"
-        title="Register">Register</a>';
+        title="Reset Password">Reset Password</a>';
     }
     if ($bare) {
         return $rv;

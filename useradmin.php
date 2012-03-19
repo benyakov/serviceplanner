@@ -16,10 +16,11 @@ if ( $auth == 3 ) {
         editUserForm($row, "Edit");
     } elseif ( $flag=="update" ) {
         $uname = $_POST['username'];
-        if ($_POST['pw'] == __('no change'))
-            { $pwstr = ''; }
-        else
-            { $pwstr = "`password`='".hashPassword($_POST['pw'])."',"; }
+        if ($_POST['pw'] == "No change") {
+            $pwstr = '';
+        } else {
+            $pwstr = "`password`=:pw,";
+        }
         $ulevel = $_POST['userlevel'];
         $fname = $_POST['fname'];
         $lname = $_POST['lname'];
@@ -32,6 +33,7 @@ if ( $auth == 3 ) {
         $q->bindParam(':ulevel', $ulevel);
         $q->bindParam(':email', $email);
         $q->bindParam(':uname', $uname);
+        if ($pwstr) $q->bindParam(':pw', hashPassword($_POST['pw']));
         $q->execute();
         if ( $uname==$authdata['login'] ) {
             $_SESSION[$sprefix]['authdata']['password'] = $pw;
@@ -58,7 +60,6 @@ if ( $auth == 3 ) {
         exit(0);
     }
     $uname = $_POST['username'];
-    $pw = hashPassword($_POST['pw']);
     $fname = $_POST['fname'];
     $lname = $_POST['lname'];
     $email = $_POST['email'];
@@ -82,14 +83,14 @@ if ( $auth == 3 ) {
     }
     if ( $unameerror || $emailerror ) {
         $dbh->rollBack();
-        $elementValues = array("", "", $pw, $fname, $lname, $ulevel, $email);
+        $elementValues = array("", "", "", $fname, $lname, $ulevel, $email);
         editUserForm($elementValues, "Add", $unameerror, $emailerror);
     } else {
         $q = $dbh->prepare("INSERT INTO {$dbp}users
             SET `username`=:uname, `password`=:pw, `fname`=:fname,
             `lname`=:lname, `userlevel`=:ulevel, `email`=:email");
         $q->bindParam(":uname", $uname);
-        $q->bindParam(":pw", $pw);
+        $q->bindParam(":pw", hashPassword($_POST['pw']));
         $q->bindParam(":fname", $fname);
         $q->bindParam(":lname", $lname);
         $q->bindParam(":ulevel", $ulevel);
@@ -105,12 +106,10 @@ if ( $auth == 3 ) {
     if ( $flag=="changepw" ) {
         changePW();
     } elseif ( $flag=="updatepw" ) {
-        $un = $_POST['un'];
-        $pw = hashPassword($_POST['pw']);
-        $id = $_POST['id'];
-        $q = $dbh->prepare("UPDATE `{$dbp}users` SET `password`='$pw'
+        $q = $dbh->prepare("UPDATE `{$dbp}users` SET `password`=':pw'
             WHERE `uid`=:id");
-        $q->bindParam(':id', $id);
+        $q->bindParam(':id', $_POST['id']);
+        $q->bindParam(':pw', hashPassword($_POST['pw']));
         $q->execute();
         $_SESSION[$sprefix]['authdata']['password'] = $pw;
         setMessage("Password changed.");
@@ -140,9 +139,8 @@ if ( $auth == 3 ) {
             exit(0);
         }
         // Save the posted user
-        $pw = hashPassword($_POST['pw']);
         $q = $dbh->prepare("INSERT INTO `{$dbp}users`
-            SET `username`=:username, `password`='{$pw}',
+            SET `username`=:username, `password`=:pw,
             `fname`=:fname, `lname`=:lname,
             `userlevel`=:ulevel, `email`=:email");
         $q->bindParam(':username', $_POST['username']);
@@ -150,21 +148,25 @@ if ( $auth == 3 ) {
         $q->bindParam(':lname', $_POST['lname']);
         $q->bindParam(':ulevel', $_POST['ulevel']);
         $q->bindParam(':email', $_POST['email']);
+        $q->bindParam(':pw', hashPassword($_POST['pw']));
         $q->execute() or dieWithRollback($q);
         $dbh->commit();
         session_destroy();
         require("./setup-session.php");
         auth($_POST['username'], $_POST['pw']);
+        $fh = fopen("has-user.txt", "w");
+        fwrite($fh, "Initial user has been set up.  Do not delete this file.");
+        fclose($fh);
         setMessage("Initial user has been set up.");
         header("Location: http://{$serverdir}/index.php");
     } elseif ($flag=="reset" && array_key_exists('auth', $_GET)) {
         changePW();
     } elseif ($flag=="updatepw" && array_key_exists('auth', $_POST)) {
-        $pw = hashPassword($_POST['pw']);
-        $q = $dbh->prepare("UPDATE `{$dbp}users` SET `password`='$pw',
+        $q = $dbh->prepare("UPDATE `{$dbp}users` SET `password`=:pw,
             `resetkey`=DEFAULT
             WHERE `resetkey`=:resetkey AND `resetexpiry` >= NOW()");
         $q->bindParam(':resetkey', $_POST['auth']);
+        $q->bindParam(':pw', hashPassword($_POST['pw']));
         $q->execute();
         if ($q->rowCount()) {
             setMessage("Password changed.");
@@ -273,8 +275,8 @@ function editUserForm($elementValues="", $mode="Add",
         <? passwordFormManagement(); ?>
     </script>
     <h1><?=$title?></h1>
-    <form id="userform" action="useradmin.php" method="post">
     <table>
+    <form id="userform" action="useradmin.php" method="post">
     <tr>
         <td align="right"><label for="username">User name</label></td>
         <td><input type="text" name="username" value="<?=$username?>"
@@ -282,11 +284,11 @@ function editUserForm($elementValues="", $mode="Add",
     </tr>
     <tr>
         <td align="right"><label for="pw">Password</label></td>
-        <td><input type="password" name="pw" value="" <?=($mode=="Add")?"required":""?>></td>
+        <td><input id="pw" type="password" name="pw" value="" <?=($mode=="Add")?"required":""?>></td>
     </tr>
     <tr>
         <td align="right"><label for="pwconfirm">Confirm password</label></td>
-        <td><input type="password" name="pwconfirm" value="" <?=($mode=="Add")?"required":""?>></td>
+        <td><input id="pwconfirm" type="password" name="pwconfirm" value="" <?=($mode=="Add")?"required":""?>></td>
     </tr>
     <? if ($authdata['userlevel'] == 3) { ?>
     <tr>
@@ -318,8 +320,8 @@ function editUserForm($elementValues="", $mode="Add",
         <button id="submit" type="submit" value="<?=$mode?> User"><?=$mode?> User</button>
         </td>
     </tr>
-    </table>
     </form>
+    </table>
 
     </body></html>
 <?
@@ -389,9 +391,9 @@ function passwordFormManagement() {
         $("#submit").prop("disabled", true);
         $("#pwconfirm").keyup(function() {
             if ($("#pwconfirm").val() == $("#pw").val()) {
-                $("#submit").prop("disabled", false);
+                $("#submit").attr("disabled", false);
             } else {
-                $("#submit").prop("disabled", true);
+                $("#submit").attr("disabled", true);
             }
         });
     });
@@ -402,12 +404,12 @@ function passwordFormManagement() {
 function hashPassword($pw) {
     $saltchars = explode(' ', '. / 0 1 2 3 4 5 6 7 8 9 A B C D E F G H I J K L M N O P Q R S T U V W X Y Z a b c d e f g h i j k l m n o p q r s t u v w x y z');
     $randexes = array_rand($saltchars, 22);
-    $saltarray = array_map(function($i, $s=$saltchars) { return $s[$i]; },
-        $randexes);
+    $saltarray = array();
+    foreach ($randexes as $r) $saltarray[] = $saltchars[$r];
     $salt = implode("", $saltarray);
     $algo = '$2a'; // Blowfish
-    $cost = '$24';
-    return crypt($pw, "$algo$cost\$$salt");
+    $cost = '$07';
+    return crypt($pw, crypt($pw, "$algo$cost\$$salt\$"));
 }
 
 // vim: set tags+=../../**/tags :
