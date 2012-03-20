@@ -57,15 +57,6 @@ p.hymnlist {
     width: 45em;
     padding: 1ex;
 }
-tr.heading {
-    background-color: #DDD;
-    color: black;
-}
-
-tr.heading th {
-    padding: .7ex 0 .7ex 0;
-}
-
 tr.even {
     background-color: #F5F5F5;
 }
@@ -132,6 +123,15 @@ table#sermonplan-listing {
     background-color: transparent;
     color: black;
     border-collapse: collapse;
+}
+
+table#xref-listing th,
+table#modify-listing th,
+table#records-listing th,
+table#sermonplan-listing th {
+    padding: .4ex .5em;
+    background-color: #DDD;
+    color: black;
 }
 
 tr.table-topline td {
