@@ -102,30 +102,32 @@ function submitLogin() {
         password: $("#password").val() },
         function(result) {
             setupLogin(result);
+            if (result['userlevel']) {
+                setMessage("Logged in.");
+            } else {
+                setMessage("Login failed.");
+            }
         }
     );
 }
 
 function setupLogin(authactions) {
     // Set up the login form or logout link
-    if (! authactions['userlevel']) {
-        $("#login").not($(":has(form)")).html(authactions['loginform']);
-        $("#loginform").submit(function(evt) {
-            evt.preventDefault();
-            submitLogin();
-        });
-        setMessage("Login failed.");
-    } else {
-        $("#login").html(authactions['loginform']);
-        $("#login > a").keydown(function(evt) {
-            // Don't logout if the character is a tab or shift-tab
-            if (evt.which != 9 &&
-                evt.which != 17) {
-                logout(null);
-            }
-        }).click(logout(evt));
-    }
     $("#useractions").html(authactions['actions']);
+    $("#login").html(authactions['loginform']);
+    $("#loginform").submit(function(evt) {
+        evt.preventDefault();
+        submitLogin();
+    });
+    $("#login > a").keydown(function(evt) {
+        // Don't logout if the character is a tab or shift-tab
+        if (evt.which != 9 &&
+            evt.which != 17) {
+            logout(null);
+        }
+    }).click(function(evt) {
+        logout(evt);
+    });
 }
 
 function logout(evt) {
@@ -135,6 +137,7 @@ function logout(evt) {
         ajax: true },
         function(result) {
             setupLogin(result);
+            setMessage("Logged out.");
         });
 }
 

@@ -1,7 +1,5 @@
 <?php
-
 require('./init.php');
-
 function linksort($text, $sort) {
     // Return a link requesting the given sort
     return "<a class=\"sortlink\" href=\"${_SERVER['PHP_SELF']}?sort=${sort}\">${text}</a>";

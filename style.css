@@ -9,6 +9,13 @@ body>header {
     font-size: small;
 }
 
+body>header>nav a,
+body>header>nav a:link,
+body>header>nav a:visited {
+    color: #88F;
+    background-color: transparent;
+}
+
 #login {
     font-weight: bold;
     height: 2.5em;
@@ -150,6 +157,30 @@ td.title {
     font-style: italic;
 }
 
+table#userlist {
+    background-color: #444;
+    font-family: sans-serif;
+}
+
+table#userlist td {
+    text-align: center;
+    padding: 0 .3em;
+}
+
+table#userlist a,
+table#userlist a:visited,
+table#userlist a:link {
+    color: #88F;
+    background-color: transparent;
+}
+
+tr.headings {
+    color: #AAF;
+    background-color: #666;
+    font-weight: bold;
+    border-bottom: thin solid blue;
+}
+
 /**** site tabs ****/
 
 ul#sitetabs {
@@ -286,3 +317,4 @@ section#service-items label {
     font-weight: bold;
     font-family: sans-serif;
 }
+

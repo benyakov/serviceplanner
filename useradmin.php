@@ -48,6 +48,8 @@ if ( $auth == 3 ) {
             $q->execute();
         }
         header("location:useradmin.php");
+    } elseif ( $flag=="add" ) {
+        editUserForm();
     } else {
         userList();
     }
@@ -233,7 +235,8 @@ function changePW() {
     </tr>
     <tr>
         <td colspan="2" align="right">
-            <button id="submit" type="submit" value="Change Password">Change Password</button>
+            <button id="submit" type="submit" disabled
+                value="Change Password">Change Password</button>
         </td>
     </tr>
     </table>
@@ -272,11 +275,11 @@ function editUserForm($elementValues="", $mode="Add",
     <html lang="en">
     <?=html_head($title)?>
     <body>
-        <? passwordFormManagement(); ?>
+        <? passwordFormManagement($mode); ?>
     </script>
     <h1><?=$title?></h1>
     <table>
-    <form id="userform" action="useradmin.php" method="post">
+    <form id="userform" action="useradmin.php" method="post" autocomplete="off">
     <tr>
         <td align="right"><label for="username">User name</label></td>
         <td><input type="text" name="username" value="<?=$username?>"
@@ -284,17 +287,16 @@ function editUserForm($elementValues="", $mode="Add",
     </tr>
     <tr>
         <td align="right"><label for="pw">Password</label></td>
-        <td><input id="pw" type="password" name="pw" value="" <?=($mode=="Add")?"required":""?>></td>
+        <td><input id="pw" type="password" name="pw" value="" <?=($mode=="Add")?"required":"placeholder=\"Unchanged\""?>></td>
     </tr>
     <tr>
         <td align="right"><label for="pwconfirm">Confirm password</label></td>
-        <td><input id="pwconfirm" type="password" name="pwconfirm" value="" <?=($mode=="Add")?"required":""?>></td>
+        <td><input id="pwconfirm" type="password" name="pwconfirm" value="" <?=($mode=="Add")?"required":"placeholder=\"Unchanged\""?>></td>
     </tr>
     <? if ($authdata['userlevel'] == 3) { ?>
     <tr>
         <td align="right"><label for="userlevel">User Level</label></td>
         <td><select name="userlevel">
-            <option value="0" <?=$userlevel_selected[0]?>>User</option>
             <option value="1" <?=$userlevel_selected[1]?>>User</option>
             <option value="2" <?=$userlevel_selected[2]?>>User</option>
             <option value="3" <?=$userlevel_selected[3]?>>Admin</option>
@@ -317,7 +319,8 @@ function editUserForm($elementValues="", $mode="Add",
 
     <tr>
     <td colspan="2" align="right">
-        <button id="submit" type="submit" value="<?=$mode?> User"><?=$mode?> User</button>
+    <button id="submit" type="submit" <?=$mode=="Add"?"disabled":""?>
+            value="<?=$mode?> User"><?=$mode?> User</button>
         </td>
     </tr>
     </form>
@@ -358,7 +361,7 @@ function userList() {
 
     <table id="userlist">
     <tr class="headings">
-        <td>User Name></td>
+        <td>User Name</td>
         <td>Name</td>
         <td>Email</td>
         <td>User Level</td>
@@ -384,17 +387,30 @@ function userList() {
     ?> </table> <?
 }
 
-function passwordFormManagement() {
+function passwordFormManagement($mode="") {
     ?>
     <script type="text/javascript">
     $(document).ready(function() {
-        $("#submit").prop("disabled", true);
         $("#pwconfirm").keyup(function() {
             if ($("#pwconfirm").val() == $("#pw").val()) {
                 $("#submit").attr("disabled", false);
             } else {
                 $("#submit").attr("disabled", true);
             }
+        });
+        $("#pw").keyup(function() {
+            if ($("#pwconfirm").val() == $("#pw").val()) {
+                $("#submit").attr("disabled", false);
+            } else {
+                $("#submit").attr("disabled", true);
+            }
+            <? if ($mode == "Edit") { ?>
+            if ($("#pw").val()) {
+                $("#pwconfirm").attr("required", true);
+            } else {
+                $("#pwconfirm").attr("required", false);
+            }
+            <? } ?>
         });
     });
     </script>

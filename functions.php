@@ -7,14 +7,13 @@ function auth($login = '', $passwd = '') {
         $q = $dbh->prepare("SELECT * FROM `{$dbp}users`
             WHERE `username` = :login AND `password` = :password
             AND `uid` = :uid AND `userlevel` = :userlevel
-            AND CONCAT_WS(' ', `fname`, `lname`) == :fullname");
+            AND CONCAT_WS(' ', `fname`, `lname`) = :fullname");
         $q->bindParam(':login', $authdata["login"]);
         $q->bindParam(':password', $authdata["password"]);
         $q->bindParam(':uid', $authdata["uid"]);
         $q->bindParam(':userlevel', $authdata["userlevel"]);
         $q->bindParam(':fullname', $authdata["fullname"]);
         $q->execute();
-        $row = $q->fetch(PDO::FETCH_ASSOC);
         if ($q->fetch()) {
             return true;
         } else {
@@ -304,14 +303,14 @@ function setMessage($text) {
 }
 
 function getLoginForm($bare=false) {
-    global $auth;
+    $auth = authId();
     if ($bare) {
         $rv = "";
     } else {
         $rv = '<div id="login">';
     }
     if ($auth) {
-        $rv .= "{$auth['fullname']} <a href=\"login.php?action=logout\" name=\"Log out\" title=\"Log out\">Log out</a>";
+        $rv .= "{$auth} <a href=\"login.php?action=logout\" name=\"Log out\" title=\"Log out\">Log out</a>";
     } else {
         $rv .= '<form id="loginform" method="post" action="login.php">
         <label for="username">User Name</label>

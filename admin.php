@@ -24,7 +24,7 @@ if (! $auth) {
         $("#corsform").submit(function(evt) {
             saveCorsfile();
             evt.preventDefault();
-        }
+        });
     });
 </script>
     <header>

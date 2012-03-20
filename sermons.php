@@ -1,14 +1,13 @@
-<!DOCTYPE html>
-<html lang="en">
-<?
-require("./init.php");
+<?  require("./init.php");
 if (! $auth) {
     setMessage("Access denied.  Please log in.");
     header("location: index.php");
     exit(0);
 }
-echo html_head("Sermon Plans");
 ?>
+<!DOCTYPE html>
+<html lang="en">
+<? echo html_head("Sermon Plans"); ?>
 <body>
 <?
 $q = $dbh->query("SELECT sermons.bibletext, sermons.outline,

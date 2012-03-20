@@ -4,8 +4,9 @@ require("./init.php");
 if (array_key_exists('action', $_GET) && $_GET['action'] == 'logout') {
     session_destroy();
     require("./setup-session.php");
+    $auth = false;
 } else {
-    auth($_POST['username'], $_POST['password']) ;
+    $auth = auth($_POST['username'], $_POST['password']) ;
 }
 
 $authid = authId();
@@ -15,13 +16,14 @@ if (array_key_exists('ajax', $_POST) || array_key_exists('ajax', $_GET)) {
     header("Content-type: application/json");
     if (array_key_exists('authdata', $_SESSION[$sprefix])) {
         $rv = $_SESSION[$sprefix]['authdata'];
+        unset($rv['password']);
         $rv['actions'] = getUserActions($bare=true);
         $rv['loginform'] = getLoginForm($bare=true);
         echo json_encode($rv);
     } else {
         $rv = array('userlevel' => 0,
-            'actions' => getUserActions(),
-            'loginform' => getLoginForm());
+            'actions' => getUserActions($bare=true),
+            'loginform' => getLoginForm($bare=true));
         echo json_encode($rv);
     }
 } else {
