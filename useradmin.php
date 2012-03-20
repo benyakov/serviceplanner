@@ -265,10 +265,12 @@ function editUserForm($elementValues="", $mode="Add",
             2 => ($userlevel == 2) ? "selected" : "",
             3 => ($userlevel == 3) ? "selected" : "");
         if ($username == $authdata['login']) { $editorstr=$userstr = ""; }
+        $flag = "update";
     } else {
         $username=$password=$fname=$lname=$userlevel=$email="";
         $userlevel_selected = array(0 => "", 1 => "", 2 => "", 3 => "");
         $title = "Register User";
+        $flag = "insert";
     }
 ?>
     <!DOCTYPE html>
@@ -279,7 +281,8 @@ function editUserForm($elementValues="", $mode="Add",
     </script>
     <h1><?=$title?></h1>
     <table>
-    <form id="userform" action="useradmin.php" method="post" autocomplete="off">
+    <form id="userform" action="useradmin.php?flag=<?=$flag?>"
+        method="post" autocomplete="off">
     <tr>
         <td align="right"><label for="username">User name</label></td>
         <td><input type="text" name="username" value="<?=$username?>"
