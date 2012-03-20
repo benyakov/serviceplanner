@@ -123,9 +123,11 @@ function setupLogin(authactions) {
         // Don't logout if the character is a tab or shift-tab
         if (evt.which != 9 &&
             evt.which != 17) {
+            $(self).attr("href", "javascript: void(0);");
             logout(null);
         }
     }).click(function(evt) {
+        $(self).attr("href", "javascript: void(0);");
         logout(evt);
     });
 }

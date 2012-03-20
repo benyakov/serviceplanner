@@ -9,9 +9,9 @@ body>header {
     font-size: small;
 }
 
-body>header>nav a,
-body>header>nav a:link,
-body>header>nav a:visited {
+body>header a,
+body>header a:link,
+body>header a:visited {
     color: #88F;
     background-color: transparent;
 }

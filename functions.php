@@ -58,6 +58,19 @@ function authId($authdata=false) {
     }
 }
 
+function authLevel($authdata=false) {
+    // Return the auth level from parameter or session, or 0
+    global $sprefix;
+    $authdata = $authdata?$authdata:
+        (array_key_exists('authdata', $_SESSION[$sprefix])?
+            $_SESSION[$sprefix]['authdata']:0);
+    if ($authdata) {
+        return $authdata['userlevel'];
+    } else {
+        return 0;
+    }
+}
+
 function checkCorsAuth() {
     if ($_SERVER['HTTP_ORIGIN']) {
         $corsfile = explode("\n", file_get_contents("corsfile.txt"));
@@ -328,14 +341,14 @@ function getLoginForm($bare=false) {
 }
 
 function getUserActions($bare=false) {
-    global $auth;
+    $authlevel = authLevel();
     if ($bare) {
         $rv = "";
     } else {
         $rv = '<div id="useractions">';
     }
-    if ($auth) {
-        if ($auth<3) {
+    if ($authlevel) {
+        if ($authlevel<3) {
             $rv .= '<a href="useradmin.php?flag=changepw"
                 title="Update Password">Update Password</a>';
         } else {

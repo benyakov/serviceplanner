@@ -3,57 +3,55 @@ require('./init.php');
 
 $flag = $_GET['flag'];
 $authdata = $_SESSION[$sprefix]['authdata'];
-$serverdir = $_SERVER['HTTP_HOST'] . dirname($_SERVER['PHP_SELF']);
 $auth = auth();
 
-if ( $auth == 3 ) {
-    if ( $flag=="edit" ) {
-        $id = $_GET['id'];
-        $q = $dbh->prepare("SELECT * FROM `{$dbp}users` WHERE `uid`=:id");
-        $q->bindParam(":id", $id);
-        $q->execute();
-        $row = $q->fetch();
-        editUserForm($row, "Edit");
-    } elseif ( $flag=="update" ) {
-        $uname = $_POST['username'];
-        if ($_POST['pw'] == "No change") {
-            $pwstr = '';
-        } else {
-            $pwstr = "`password`=:pw,";
-        }
-        $ulevel = $_POST['userlevel'];
-        $fname = $_POST['fname'];
-        $lname = $_POST['lname'];
-        $email = $_POST['email'];
-        $q = $dbh->prepare("UPDATE `{$dbp}users` SET {$pwstr}
-            `fname`=:fname, `lname`=:lname, `userlevel`=:ulevel,
-            `email`=:email WHERE `username`=:uname");
-        $q->bindParam(':fname', $fname);
-        $q->bindParam(':lname', $lname);
-        $q->bindParam(':ulevel', $ulevel);
-        $q->bindParam(':email', $email);
-        $q->bindParam(':uname', $uname);
-        if ($pwstr) $q->bindParam(':pw', hashPassword($_POST['pw']));
-        $q->execute();
-        if ( $uname==$authdata['login'] ) {
-            $_SESSION[$sprefix]['authdata']['password'] = $pw;
-        }
-        header("location:useradmin.php");
-    } elseif ( $flag=="delete" ) {
-        $id = $_GET['id'];
-        if ($authdata['uid'] != $id) {
-            $q = $dbh->prepare("DELETE FROM `{$dbp}users`
-                WHERE `uid`=:id");
-            $q->bindParam(':id', $id);
-            $q->execute();
-        }
-        header("location:useradmin.php");
-    } elseif ( $flag=="add" ) {
-        editUserForm();
+if ( $flag=="edit" ) {
+    adminOnly($authdata['userlevel']);
+    $id = $_GET['id'];
+    $q = $dbh->prepare("SELECT * FROM `{$dbp}users` WHERE `uid`=:id");
+    $q->bindParam(":id", $id);
+    $q->execute();
+    $row = $q->fetch();
+    editUserForm($row, "Edit");
+} elseif ( $flag=="update" ) {
+    adminOnly($authdata['userlevel']);
+    $uname = $_POST['username'];
+    if ($_POST['pw'] == "No change") {
+        $pwstr = '';
     } else {
-        userList();
+        $pwstr = "`password`=:pw,";
     }
-
+    $ulevel = $_POST['userlevel'];
+    $fname = $_POST['fname'];
+    $lname = $_POST['lname'];
+    $email = $_POST['email'];
+    $q = $dbh->prepare("UPDATE `{$dbp}users` SET {$pwstr}
+        `fname`=:fname, `lname`=:lname, `userlevel`=:ulevel,
+        `email`=:email WHERE `username`=:uname");
+    $q->bindParam(':fname', $fname);
+    $q->bindParam(':lname', $lname);
+    $q->bindParam(':ulevel', $ulevel);
+    $q->bindParam(':email', $email);
+    $q->bindParam(':uname', $uname);
+    if ($pwstr) $q->bindParam(':pw', hashPassword($_POST['pw']));
+    $q->execute();
+    if ( $uname==$authdata['login'] ) {
+        $_SESSION[$sprefix]['authdata']['password'] = $pw;
+    }
+    header("location:useradmin.php");
+} elseif ( $flag=="delete" ) {
+    adminOnly($authdata['userlevel']);
+    $id = $_GET['id'];
+    if ($authdata['uid'] != $id) {
+        $q = $dbh->prepare("DELETE FROM `{$dbp}users`
+            WHERE `uid`=:id");
+        $q->bindParam(':id', $id);
+        $q->execute();
+    }
+    header("location:useradmin.php");
+} elseif ( $flag=="add" ) {
+    adminOnly($authdata['userlevel']);
+    editUserForm();
 } elseif ( $flag=="insert" ) {
     $ulevel = intval($_POST['userlevel']);
     if ($ulevel > 0 && $auth < 3) {
@@ -101,35 +99,57 @@ if ( $auth == 3 ) {
         header("location:useradmin.php");
         $dbh->commit();
     }
-
 } elseif ( $flag=="add" ) {
     editUserForm();
-} elseif ( is_numeric($auth) ) {
-    if ( $flag=="changepw" ) {
-        changePW();
-    } elseif ( $flag=="updatepw" ) {
-        $q = $dbh->prepare("UPDATE `{$dbp}users` SET `password`=':pw'
-            WHERE `uid`=:id");
-        $q->bindParam(':id', $_POST['id']);
-        $q->bindParam(':pw', hashPassword($_POST['pw']));
-        $q->execute();
-        $_SESSION[$sprefix]['authdata']['password'] = $pw;
-        setMessage("Password changed.");
-        header("Location: http://{$serverdir}/index.php");
-        exit(0);
-    } elseif ( $flag=="deleteme" ) {
-        $id = $_GET['id'];
-        if ($authdata['uid'] == $id) {
-            $q = $dbh->prepare("DELETE FROM `{$dbp}users`
-                WHERE `uid`=:id");
-            $q->bindParam(':id', $id);
-            $q->execute();
-        }
+} elseif ( $flag=="changepw" || $flag=="reset") {
+    if (! array_key_exists('auth', $_GET)
+        || $flag == "changepw") authOnly($authdata['userlevel']);
+    changePW();
+} elseif ( $flag=="updatepw" ) {
+    authOnly($authdata['userlevel']);
+    $dbh->beginTransaction();
+    $q = $dbh->exec("SELECT `password` FROM `{$dbp}users`
+        WHERE `uid`=:id");
+    $currentpw = $q->fetchColumn[0];
+    $q = $dbh->prepare("UPDATE `{$dbp}users` SET `password`=':pw'
+        WHERE `uid`=:id AND `password`=':oldpw'");
+    $q->bindParam(':id', $_POST['id']);
+    $q->bindParam(':pw', hashPassword($_POST['pw']));
+    $q->bindParam(':oldpw', crypt($_POST['oldpw'], $currentpw));
+    $q->execute();
+    if (! $q->rowCount()) {
+        dieWithRollback($q, "Problem saving new password.");
     } else {
-        header("location:index.php");
+        $q->commit();
     }
-} else {
-    if ( $flag=="inituser") {
+    $_SESSION[$sprefix]['authdata']['password'] = $pw;
+    setMessage("Password changed.");
+    header("Location: index.php");
+    exit(0);
+} elseif ($flag=="updatepw" && array_key_exists('auth', $_POST)) {
+    $q = $dbh->prepare("UPDATE `{$dbp}users` SET `password`=:pw,
+        `resetkey`=DEFAULT
+        WHERE `resetkey`=:resetkey AND `resetexpiry` >= NOW()");
+    $q->bindParam(':resetkey', $_POST['auth']);
+    $q->bindParam(':pw', hashPassword($_POST['pw']));
+    $q->execute();
+    if ($q->rowCount()) {
+        setMessage("Password changed.");
+    } else {
+        setMessage("Problem changing password");
+    }
+    header("Location: index.php");
+    exit(0);
+} elseif ( $flag=="deleteme" ) {
+    authOnly($authdata['userlevel']);
+    $id = $_GET['id'];
+    if ($authdata['uid'] == $id) {
+        $q = $dbh->prepare("DELETE FROM `{$dbp}users`
+            WHERE `uid`=:id");
+        $q->bindParam(':id', $id);
+        $q->execute();
+    }
+} elseif ( $flag=="inituser") {
         $dbh->beginTransaction();
         // Check that the table is really empty.
         $q = $dbh->query("SELECT `username` from `{$dbp}users`
@@ -137,7 +157,7 @@ if ( $auth == 3 ) {
         if ($q->fetch()) {
             $dbh->rollback();
             setMessage("Access denied.  Users already exist.");
-            header("Location: http://{$serverdir}/index.php");
+            header("Location: index.php");
             exit(0);
         }
         // Save the posted user
@@ -160,28 +180,13 @@ if ( $auth == 3 ) {
         fwrite($fh, "Initial user has been set up.  Do not delete this file.");
         fclose($fh);
         setMessage("Initial user has been set up.");
-        header("Location: http://{$serverdir}/index.php");
-    } elseif ($flag=="reset" && array_key_exists('auth', $_GET)) {
-        changePW();
-    } elseif ($flag=="updatepw" && array_key_exists('auth', $_POST)) {
-        $q = $dbh->prepare("UPDATE `{$dbp}users` SET `password`=:pw,
-            `resetkey`=DEFAULT
-            WHERE `resetkey`=:resetkey AND `resetexpiry` >= NOW()");
-        $q->bindParam(':resetkey', $_POST['auth']);
-        $q->bindParam(':pw', hashPassword($_POST['pw']));
-        $q->execute();
-        if ($q->rowCount()) {
-            setMessage("Password changed.");
-        } else {
-            setMessage("Problem changing password");
-        }
-        header("Location: http://{$serverdir}/index.php");
-        exit(0);
-
-    } else {
-        setMessage("Access denied.");
-        header("Location: http://{$serverdir}/index.php");
-    }
+        header("Location: index.php");
+} elseif ($authdata['userlevel'] == 3) {
+    userList();
+} else {
+    setMessage("Access denied.");
+    header("Location: index.php");
+    exit(0);
 }
 
 /***************************************
@@ -201,9 +206,8 @@ function changePW() {
             $username = $row['username'];
             $id = $row['uid'];
         } else {
-            $serverdir = $_SERVER['HTTP_HOST'] . dirname($_SERVER['PHP_SELF']);
             setMessage("Invalid or expired reset authorization.");
-            header ("Location: http://{$serverdir}/index.php");
+            header ("Location: index.php");
         }
     } else {
         $username = $_SESSION[$sprefix]['authdata']['login'];
@@ -216,7 +220,8 @@ function changePW() {
     <body>
         <? passwordFormManagement(); ?>
     <h1>Change Password</h1>
-    <form id="pwform" action="useradmin.php?flag=updatepw" method="post">
+    <form id="pwform" action="useradmin.php?flag=updatepw"
+        autocomplete="off" method="post">
     <input type="hidden" name="id" value="<?= $id ?>">
     <input type="hidden" name="un" value="<?= $username ?>">
     <input type="hidden" name="auth" value="<?= $_GET['auth'] ?>">
@@ -224,6 +229,10 @@ function changePW() {
     <tr>
         <td></td>
         <td><?=$username?></td>
+    </tr>
+    <tr>
+        <td align="right"><label for="oldpw">Old Password</label></td>
+        <td><input id="oldpw" type="password" name="oldpw" value="" required></td>
     </tr>
     <tr>
         <td align="right"><label for="pw">Password</label></td>
@@ -429,6 +438,22 @@ function hashPassword($pw) {
     $algo = '$2a'; // Blowfish
     $cost = '$07';
     return crypt($pw, crypt($pw, "$algo$cost\$$salt\$"));
+}
+
+function adminOnly($authlevel) {
+    if ($authlevel != 3) {
+        setMessage("Access Denied");
+        header("Location: index.php");
+        exit(0);
+    }
+}
+
+function authOnly($authlevel) {
+    if (! is_numeric($authlevel)) {
+        setMessage("Access Denied");
+        header("Location: index.php");
+        exit(0);
+    }
 }
 
 // vim: set tags+=../../**/tags :
