@@ -42,7 +42,8 @@ if (! array_key_exists("stage", $_GET))
         $row = $q->fetch(PDO::FETCH_ASSOC);
         ?>
         <form action="http://<?=$this_script?>?stage=2" method="POST">
-        <input type="submit" value="Commit"><input type="reset">
+        <button type="submit" value="Commit">Commit</button>
+        <button type="reset">Reset</button>
         <input type="hidden" id="id" name="id" value="<?=$_GET['id']?>">
         <dl>
             <dt>Date</dt>
@@ -70,10 +71,8 @@ if (! array_key_exists("stage", $_GET))
         <tr class="heading"><th>Del</th><th>Seq</th><th>Book</th><th>#</th><th>Note</th>
             <th>Location</th><th>Title</th></tr>
         <?
-        while ($row)
-        {
-            if ('' == $row['number'])
-            {
+        while ($row) {
+            if ('' == $row['number']) {
                 $row = $q->fetch(PDO::FETCH_ASSOC);
                 continue;
             }
@@ -86,7 +85,8 @@ if (! array_key_exists("stage", $_GET))
                 <td>
                     <input type="number" id="sequence_<?=$row['hymnid']?>"
                         size="2" name="sequence_<?=$row['hymnid']?>"
-                        value="<?=$row['sequence']?>">
+                        value="<?=$row['sequence']?>" class="hymn-number"
+                        class="hymn-sequence">
                 </td>
                 <td>
                     <select id="book_<?=$row['hymnid']?>" name="book_<?=$row['hymnid']?>">
@@ -97,19 +97,21 @@ if (! array_key_exists("stage", $_GET))
                     <? } ?>
                     </select>
                 </td>
-                <td><input class="hymn-number" type="number" id="number_<?=$row['hymnid']?>" size="5"
+                <td><input class="hymn-number" type="number"
+                    id="number_<?=$row['hymnid']?>" size="5"
                     name="number_<?=$row['hymnid']?>" value="<?=$row['number']?>">
                 </td>
                 <td><input type="text" id="note_<?=$row['hymnid']?>" size="30"
                      maxlength="100" name="note_<?=$row['hymnid']?>"
-                     value="<?=$row['note']?>">
+                     value="<?=$row['note']?>" class="hymn-note">
                 </td>
                 <td><input type="text" id="location_<?=$row['hymnid']?>"
-                    name="location_<?=$row['hymnid']?>" value="<?=$row['location']?>">
+                    name="location_<?=$row['hymnid']?>"
+                    value="<?=$row['location']?>" class="hymn-location">
                 </td>
                 <td><input type="text" id="title_<?=$row['hymnid']?>" size="50"
                      maxlength="50" name="title_<?=$row['hymnid']?>"
-                     value="<?=$row['title']?>">
+                     value="<?=$row['title']?>" class="hymn-title">
                 </td>
             </tr>
             <tr>
@@ -121,7 +123,8 @@ if (! array_key_exists("stage", $_GET))
         }
         ?>
         </table>
-        <input type="submit" value="Commit"><input type="reset">
+        <button type="submit" value="Commit">Commit</button>
+        <button type="reset">Reset</button>
         </form>
         <p><a href="<?=$backlink?>">Cancel Edit</a><p>
         </div>
@@ -152,6 +155,8 @@ if (! array_key_exists("stage", $_GET))
             }
         }
     }
+    print_r($todays);
+    $dbh->rollBack();
 
     // Update hymn names
     foreach ($tonames as $key => $value) {
@@ -189,8 +194,8 @@ if (! array_key_exists("stage", $_GET))
         $q = $dbh->prepare("UPDATE {$dbp}hymns
             SET number=:number,
             note=:note, location=:location,
-            book=book, sequence=:sequence
-            WHERE pkey = :hymnid");
+            book=:book, sequence=:sequence
+            WHERE pkey=:hymnid");
         foreach ($h as $k=>$v) {
             $q->bindParam(":{$k}", $v);
         }
@@ -201,7 +206,7 @@ if (! array_key_exists("stage", $_GET))
     // Delete tagged hymns
     foreach ($todelete as $hymnid) {
         $q = $dbh->prepare("DELETE FROM {$dbp}hymns
-            WHERE pkey = :hymnid";
+            WHERE pkey = :hymnid");
         $q->bindParam(":hymnid", $hymnid);
         $q->execute() or dieWithRollback($q, $q->queryString);
     }

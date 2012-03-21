@@ -87,10 +87,15 @@ input.hymn-number {
     width: 3em;
 }
 input.hymn-note {
-    width: 30em;
+    width: 15em;
 }
 input.hymn-title {
-    width: 50em;
+    width: 20em;
+}
+input.hymn-location {
+    width: 10em;
+}
+input.hidden {
     display: none;
 }
 div.hymn-past {
@@ -144,13 +149,16 @@ tr.table-topline td {
     padding: 1ex;
 }
 
+th.hymn-number,
 td.hymn-number {
     padding: 0 1em 0 1em;
     text-align: right;
 }
 
+th.note,
 td.note {
-    width: 12em;
+    width: 8em;
+    text-align: left;
 }
 
 td.title {
@@ -179,6 +187,13 @@ tr.headings {
     background-color: #666;
     font-weight: bold;
     border-bottom: thin solid blue;
+}
+tr.heading>td {
+    padding: .25ex .5em;
+}
+dt {
+    font-weight: bold;
+    font-family: sans-serif;
 }
 
 /**** site tabs ****/

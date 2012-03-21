@@ -104,29 +104,9 @@ if ( $flag=="edit" ) {
 } elseif ( $flag=="changepw" || $flag=="reset") {
     if (! array_key_exists('auth', $_GET)
         || $flag == "changepw") authOnly($authdata['userlevel']);
-    changePW();
-} elseif ( $flag=="updatepw" ) {
-    authOnly($authdata['userlevel']);
-    $dbh->beginTransaction();
-    $q = $dbh->exec("SELECT `password` FROM `{$dbp}users`
-        WHERE `uid`=:id");
-    $currentpw = $q->fetchColumn[0];
-    $q = $dbh->prepare("UPDATE `{$dbp}users` SET `password`=':pw'
-        WHERE `uid`=:id AND `password`=':oldpw'");
-    $q->bindParam(':id', $_POST['id']);
-    $q->bindParam(':pw', hashPassword($_POST['pw']));
-    $q->bindParam(':oldpw', crypt($_POST['oldpw'], $currentpw));
-    $q->execute();
-    if (! $q->rowCount()) {
-        dieWithRollback($q, "Problem saving new password.");
-    } else {
-        $q->commit();
-    }
-    $_SESSION[$sprefix]['authdata']['password'] = $pw;
-    setMessage("Password changed.");
-    header("Location: index.php");
-    exit(0);
+    changePW($flag);
 } elseif ($flag=="updatepw" && array_key_exists('auth', $_POST)) {
+    // Password reset
     $q = $dbh->prepare("UPDATE `{$dbp}users` SET `password`=:pw,
         `resetkey`=DEFAULT
         WHERE `resetkey`=:resetkey AND `resetexpiry` >= NOW()");
@@ -137,6 +117,32 @@ if ( $flag=="edit" ) {
         setMessage("Password changed.");
     } else {
         setMessage("Problem changing password");
+    }
+    header("Location: index.php");
+    exit(0);
+} elseif ( $flag=="updatepw" ) {
+    // Password change
+    authOnly($authdata['userlevel']);
+    $dbh->beginTransaction();
+    $q = $dbh->prepare("SELECT `password` FROM `{$dbp}users`
+        WHERE `uid`=:id");
+    $q->bindParam(':id', $_POST['id']);
+    $q->execute();
+    $currentpw = $q->fetchColumn(0);
+    $q = $dbh->prepare("UPDATE `{$dbp}users` SET `password`=:pw
+        WHERE `uid`=:id AND `password`=:oldpw");
+    $q->bindParam(':id', $_POST['id']);
+    $q->bindParam(':pw', hashPassword($_POST['pw']));
+    $compare = crypt($_POST['oldpw'], $currentpw);
+    $q->bindParam(':oldpw', $compare);
+    $q->execute();
+    if (! $q->rowCount()) {
+        $dbh->rollBack();
+        setMessage("Problem saving new password. ".$q->queryString);
+    } else {
+        $dbh->commit();
+        $_SESSION[$sprefix]['authdata']['password'] = $pw;
+        setMessage("Password changed.");
     }
     header("Location: index.php");
     exit(0);
@@ -155,7 +161,7 @@ if ( $flag=="edit" ) {
         $q = $dbh->query("SELECT `username` from `{$dbp}users`
                     LIMIT 1");
         if ($q->fetch()) {
-            $dbh->rollback();
+            $dbh->rollBack();
             setMessage("Access denied.  Users already exist.");
             header("Location: index.php");
             exit(0);
@@ -193,10 +199,10 @@ if ( $flag=="edit" ) {
 ******** user admin functions **********
 ***************************************/
 
-function changePW() {
-    global $dbp, $dbh;
+function changePW($flag) {
+    global $dbp, $dbh, $sprefix;
 
-    if ($_GET['auth']) { // password reset request
+    if ($flag=="reset") { // password reset request
         $q = $dbh->prepare("SELECT `uid`, `username` FROM `{$dbp}users`
             WHERE `resetkey` = :resetkey
             AND `resetexpiry` >= NOW() LIMIT 1");
@@ -208,6 +214,7 @@ function changePW() {
         } else {
             setMessage("Invalid or expired reset authorization.");
             header ("Location: index.php");
+            exit(0);
         }
     } else {
         $username = $_SESSION[$sprefix]['authdata']['login'];
@@ -223,17 +230,20 @@ function changePW() {
     <form id="pwform" action="useradmin.php?flag=updatepw"
         autocomplete="off" method="post">
     <input type="hidden" name="id" value="<?= $id ?>">
-    <input type="hidden" name="un" value="<?= $username ?>">
+    <? if ($flag=="reset") { ?>
     <input type="hidden" name="auth" value="<?= $_GET['auth'] ?>">
+    <? } ?>
     <table>
     <tr>
         <td></td>
         <td><?=$username?></td>
     </tr>
+    <? if ($flag=="changepw") { ?>
     <tr>
         <td align="right"><label for="oldpw">Old Password</label></td>
         <td><input id="oldpw" type="password" name="oldpw" value="" required></td>
     </tr>
+    <? } ?>
     <tr>
         <td align="right"><label for="pw">Password</label></td>
         <td><input id="pw" type="password" name="pw" value="" required></td>

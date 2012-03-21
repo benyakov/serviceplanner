@@ -94,7 +94,7 @@ if (array_key_exists("date", $_POST)) {
         </select>
         <input tabindex="<?=$tabindex+1?>" type="number" min="1" id="number_<?=$i?>" name="number_<?=$i?>" value="" class="hymn-number">
         <input tabindex="<?=$tabindex+2?>" type="text" id="note_<?=$i?>" name="note_<?=$i?>" class="hymn-note" maxlength="100" value="">
-        <input tabindex="<?=$tabindex+3?>" type="text" id="title_<?=$i?>" name="title_<?=$i?>" class="hymn-title">
+        <input tabindex="<?=$tabindex+3?>" type="text" id="title_<?=$i?>" name="title_<?=$i?>" class="hymn-title hidden">
         <div id="past_<?=$i?>" class="hymn-past"></div>
     </li>
     <? } ?>
@@ -115,7 +115,7 @@ function existing($str) {
 function processFormData() {
     // echo "POST:"; print_r($_POST); exit(0);
     //// Add a new service, if needed.
-    global $dbh;
+    global $dbh, $dbp;
     $dbh->beginTransaction();
     $feedback='<ol>';
     $date = strftime("%Y-%m-%d", strtotime($_POST['date']));
@@ -163,7 +163,7 @@ function processFormData() {
         if (! $h['title']) { continue; }
         // Check to see if the hymn is already entered.
         $q = $dbh->prepare("INSERT INTO {$dbp}names (book, number, title)
-            VALUES ('book', '{number}', '{title}')");
+            VALUES (:book, :number, :title)");
         $q->bindParam(":book", $h["book"]);
         $q->bindParam(":number",$h["number"]);
         $q->bindParam(":title", $h["title"]);
@@ -198,17 +198,17 @@ function processFormData() {
         {
             if (! intval($ahymn['number'])) continue;
             $realsequence = $sequence + $sequenceMax;
-            $sqlhymns[] = "('{$dbh->quote($serviceid)}',
-                '{$dbh->quote($_POST['location'])}',
-                '{$dbh->quote($ahymn['book'])}',
-                '{$dbh->quote($ahymn['number'])}',
-                '{$dbh->quote($ahymn['note'])}', '{$realsequence}')";
+            $sqlhymns[] = "({$dbh->quote($serviceid)},
+                {$dbh->quote($_POST['location'])},
+                {$dbh->quote($ahymn['book'])},
+                {$dbh->quote($ahymn['number'])},
+                {$dbh->quote($ahymn['note'])}, {$realsequence})";
             $saved[] = "{$ahymn['book']} {$ahymn['number']}";
         }
         $q = $dbh->prepare("INSERT INTO `{$dbp}hymns`
             (service, location, book, number, note, sequence)
             VALUES ".implode(", ", $sqlhymns));
-        $q->execute() or dieWithRollback($q, ".");
+        $q->execute() or dieWithRollback($q, $q->queryString);
         if ($q->rowCount()) {
             $feedback .="<li>Saved hymns: <ol><li>" . implode("</li><li>", $saved) . "</li></ol></li></ol>\n";
         }

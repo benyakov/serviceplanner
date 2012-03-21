@@ -103,7 +103,7 @@ function display_records_table($q) {
     // Show a table of the data in the query $result
     ?><table id="records-listing">
         <tr class="heading"><th>Date &amp; Location</th><th colspan=2>Liturgical Day Name: Service/Rite</th></tr>
-        <tr><th>Book &amp; #</th><th>Note</th><th>Title</th></tr>
+        <tr><th class="hymn-number">Book &amp; #</th><th class="note">Note</th><th>Title</th></tr>
     <?
     $date = "";
     $name = "";
@@ -155,10 +155,11 @@ function modify_records_table($q, $action) {
     // Show a table of the data in the query $q
   // with links to edit each record, and checkboxes to delete records.
     ?><form action="<?=$action?>" method="POST">
-      <input type="submit" value="Delete"><input type="reset" value="Clear">
+      <button type="submit" value="Delete">Delete</button>
+      <button type="reset" value="Clear">Clear</button>
       <table id="modify-listing">
         <tr class="heading"><th>Date &amp; Location</th><th colspan=2>Liturgical Day Name: Service/Rite</th></tr>
-        <tr><th>Book &amp; #</th><th>Note</th><th>Title</th></tr>
+        <tr><th class="hymn-number">Book &amp; #</th><th class="note">Note</th><th>Title</th></tr>
     <?
     $date = "";
     $name = "";
@@ -210,7 +211,8 @@ function modify_records_table($q, $action) {
     echo "</article>\n";
     ?>
     </table>
-    <input type="submit" value="Delete"><input type="reset" value="Clear">
+    <button type="submit" value="Delete">Delete</button>
+    <button type="reset" value="Clear">Clear</button>
     </form>
     <?
 }
@@ -298,7 +300,7 @@ function dieWithRollback($q, $errorstr = "") {
     } else {
         $error = "";
     }
-    $dbh->rollback();
+    $dbh->rollBack();
     die($error);
 }
 
