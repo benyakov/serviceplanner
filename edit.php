@@ -85,8 +85,7 @@ if (! array_key_exists("stage", $_GET))
                 <td>
                     <input type="number" id="sequence_<?=$row['hymnid']?>"
                         size="2" name="sequence_<?=$row['hymnid']?>"
-                        value="<?=$row['sequence']?>" class="hymn-number"
-                        class="hymn-sequence">
+                        value="<?=$row['sequence']?>" class="hymn-sequence">
                 </td>
                 <td>
                     <select id="book_<?=$row['hymnid']?>" name="book_<?=$row['hymnid']?>">
@@ -134,6 +133,7 @@ if (! array_key_exists("stage", $_GET))
 } elseif (2 == $_GET['stage']) {
     //// Commit changes to db
     // Pull out changes for each table into separate arrays
+    $dbh->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
     $dbh->beginTransaction();
     $tohymns = array();
@@ -147,33 +147,36 @@ if (! array_key_exists("stage", $_GET))
         } elseif (preg_match('/delete_(\d+)/', $key, $matches)) {
             $todelete[] = $matches[1];
         } elseif (preg_match('/(\w+)_(\d+)/', $key, $matches)) {
-            if ("title" == $matches[1])
-            {
+            if ("title" == $matches[1]) {
                 $tonames[$matches[2]] = $value;
             } else {
                 $tohymns[$matches[2]][$matches[1]] = $value;
             }
         }
     }
-    print_r($todays);
-    $dbh->rollBack();
-
     // Update hymn names
+    $q = $dbh->prepare("INSERT INTO {$dbp}names (title, number, book)
+        VALUES (:title, :number, :book)");
+    $q->bindParam(":title", $ititle);
+    $q->bindParam(":number", $inumber);
+    $q->bindParam(":book", $ibook);
+    $qu = $dbh->prepare("UPDATE {$dbp}names SET title = :title
+        WHERE number = :number
+        AND book = :book");
+    $qu->bindParam(":title", $ititle);
+    $qu->bindParam(":number", $inumber);
+    $qu->bindParam(":book", $ibook);
     foreach ($tonames as $key => $value) {
         if (! $value) { continue; }
-        $q = $dbh->prepare("INSERT INTO {$dbp}names (title, number, book)
-            VALUES (:title, :number, :book)");
-        $q->bindParam(":title", $value);
-        $q->bindParam(":number", $tohymns[$key]["number"]);
-        $q->bindParam(":book", $tohymns[$key]["book"]);
-        if (! $q->execute()) {
-            $qu = $dbh->prepare("UPDATE {$dbp}names SET title = :title
-                WHERE number = :number
-                AND book = :book");
-            $qu->bindParam(":title", $value);
-            $qu->bindParam(":number", $tohymns[$key]["number"]);
-            $qu->bindParam(":book", $tohymns[$key]["book"]);
-            $qu->execute() or dieWithRollback($q, $q->queryString);
+        $ititle = $value;
+        $inumber = $tohymns[$key]["number"];
+        $ibook = $tohymns[$key]["book"];
+        try {
+            $q->execute();
+        } catch (PDOException $e) {
+            $qu->debugDumpParams();
+            exit(0);
+            $qu->execute() or dieWithRollback($qu, ".");
         }
     }
     // Update day information
@@ -181,33 +184,32 @@ if (! array_key_exists("stage", $_GET))
         `name`=:name, `rite`=:rite,
         `servicenotes`=:servicenotes
         WHERE `pkey` = :id");
-    $q->bindParam(":date", strftime("%Y-%m-%d", strtotime($todays['date'])));
-    $q->bindParam(":name", $todays['dayname']);
-    $q->bindParam(":rite", $todays['rite']);
-    $q->bindParam(":servicenotes", $todays['servicenotes']);
-    $q->bindParam(":id", $_POST['id']);
+    $q->bindValue(":date", strftime("%Y-%m-%d", strtotime($todays['date'])));
+    $q->bindValue(":name", $todays['dayname']);
+    $q->bindValue(":rite", $todays['rite']);
+    $q->bindValue(":servicenotes", $todays['servicenotes']);
+    $q->bindValue(":id", $_POST['id']);
     $q->execute() or dieWithRollback($q, $q->queryString);
 
     // Update hymns
+    $q = $dbh->prepare("UPDATE {$dbp}hymns
+        SET number=:number,
+        note=:note, location=:location,
+        book=:book, sequence=:sequence
+        WHERE pkey=:hymnid");
     foreach ($tohymns as $hymnid => $h) {
         if (in_array($hymnid, $todelete)) { continue; }
-        $q = $dbh->prepare("UPDATE {$dbp}hymns
-            SET number=:number,
-            note=:note, location=:location,
-            book=:book, sequence=:sequence
-            WHERE pkey=:hymnid");
-        foreach ($h as $k=>$v) {
-            $q->bindParam(":{$k}", $v);
-        }
-        $q->bindParam(":hymnid", $hymnid);
-        $q->execute() or dieWithRollback($q, $q->queryString);
+        foreach ($h as $k=>$v) { $q->bindValue(":{$k}", $v); }
+        $q->bindValue(":hymnid", $hymnid);
+        $q->execute() or dieWithRollback($q, '.');
     }
 
     // Delete tagged hymns
-    foreach ($todelete as $hymnid) {
-        $q = $dbh->prepare("DELETE FROM {$dbp}hymns
-            WHERE pkey = :hymnid");
-        $q->bindParam(":hymnid", $hymnid);
+    $q = $dbh->prepare("DELETE FROM {$dbp}hymns
+        WHERE pkey = :hymnid");
+    $hymnid = 0;
+    $q->bindParam(":hymnid", $hymnid);
+    foreach ($todelete as &$hymnid) {
         $q->execute() or dieWithRollback($q, $q->queryString);
     }
     setMessage("Edit complete.");
