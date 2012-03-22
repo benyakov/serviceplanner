@@ -10,16 +10,6 @@ if (array_key_exists('listinglimit', $_GET) &&
     is_numeric($_GET['listinglimit'])) {
     $_SESSION[$sprefix]["listinglimit"] = $_GET['listinglimit'];
 }
-if (is_numeric($_SESSION[$sprefix]["listinglimit"])) {
-    if ($_SESSION[$sprefix]["listinglimit"] > 0) {
-        $limit = " LIMIT {$_SESSION[$sprefix]["listinglimit"]}";
-    } else {
-        $limit = "";
-    }
-} else {
-    $_SESSION[$sprefix]["listinglimit"] = $listinglimit;
-    $limit = " LIMIT {$_SESSION[$sprefix]["listinglimit"]}";
-}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -45,17 +35,7 @@ for that service, use the "Sermon" link.</p>
 <button type="submit" value="Apply">Apply</button>
 </form>
 <?
-$q = $dbh->query("SELECT DATE_FORMAT(days.caldate, '%c/%e/%Y') as date,
-    hymns.book, hymns.number, hymns.note,
-    hymns.location, days.name as dayname, days.rite,
-    days.pkey as id, days.servicenotes, names.title
-    FROM {$dbp}hymns AS hymns
-    RIGHT OUTER JOIN {$dbp}days AS days ON (hymns.service = days.pkey)
-    LEFT OUTER JOIN {$dbp}names AS names ON (hymns.number = names.number)
-        AND (hymns.book = names.book)
-    ORDER BY days.caldate DESC, hymns.service DESC,
-        hymns.location, hymns.sequence
-    {$limit}");
+$q = queryAllHymns($dbh, $dbp, $_SESSION[$sprefix]['listinglimit']);
 modify_records_table($q, "delete.php");
 ?>
 </div>

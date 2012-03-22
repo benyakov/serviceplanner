@@ -99,6 +99,33 @@ function checkJsonpReq() {
     return $_GET['jsonpreq'];
 }
 
+function queryAllHymns($dbh, $dbp="", $limit=0, $future=false) {
+    if ($future) {
+        $where = "WHERE days.caldate >= CURDATE()";
+        $order = "";
+    } else {
+        $where = "";
+        $order = "DESC";
+    }
+    if ($limit > 0) $limitstr = " LIMIT {$limit}";
+    else $limitstr = "";
+    $q = $dbh->prepare("SELECT DATE_FORMAT(days.caldate, '%c/%e/%Y') as date,
+    hymns.book, hymns.number, hymns.note,
+    hymns.location, days.name as dayname, days.rite,
+    days.pkey as id, days.servicenotes, names.title
+    FROM {$dbp}hymns AS hymns
+    RIGHT OUTER JOIN {$dbp}days AS days ON (hymns.service = days.pkey)
+    LEFT OUTER JOIN {$dbp}names AS names ON (hymns.number = names.number)
+        AND (hymns.book = names.book)
+    {$where}
+    ORDER BY days.caldate {$order}, hymns.service {$order},
+        hymns.location, hymns.sequence {$limitstr}");
+    if (! $q->execute()) {
+        die("<p>".array_pop($q->errorInfo()).'</p><p style="white-space: pre;">'.$q->queryString."</p>");
+    }
+    return $q;
+}
+
 function display_records_table($q) {
     // Show a table of the data in the query $result
     ?><table id="records-listing">
@@ -110,7 +137,7 @@ function display_records_table($q) {
     $location = "";
     $rowcount = 1;
     $inarticle = false;
-    while ($row = $q->fetch(PDO::FETCH_ASSOC)); {
+    while ($row = $q->fetch(PDO::FETCH_ASSOC)) {
         if (!  ($row['date'] == $date &&
                 $row['dayname'] == $name &&
                 $row['location'] == $location))
@@ -154,9 +181,10 @@ function display_records_table($q) {
 function modify_records_table($q, $action) {
     // Show a table of the data in the query $q
   // with links to edit each record, and checkboxes to delete records.
-    ?><form action="<?=$action?>" method="POST">
+    ?><form name="listing-limit" action="<?=$action?>" method="POST">
       <button type="submit" value="Delete">Delete</button>
       <button type="reset" value="Clear">Clear</button>
+      </form>
       <table id="modify-listing">
         <tr class="heading"><th>Date &amp; Location</th><th colspan=2>Liturgical Day Name: Service/Rite</th></tr>
         <tr><th class="hymn-number">Book &amp; #</th><th class="note">Note</th><th>Title</th></tr>
@@ -211,8 +239,8 @@ function modify_records_table($q, $action) {
     echo "</article>\n";
     ?>
     </table>
-    <button type="submit" value="Delete">Delete</button>
-    <button type="reset" value="Clear">Clear</button>
+    <button form="listing-limit" type="submit" value="Delete">Delete</button>
+    <button form="listing-limit" type="reset" value="Clear">Clear</button>
     </form>
     <?
 }
