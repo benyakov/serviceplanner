@@ -155,6 +155,7 @@ if (! array_key_exists("stage", $_GET))
         }
     }
     // Update hymn names
+    $ititle = $inumber = $ibook = 0;
     $q = $dbh->prepare("INSERT INTO {$dbp}names (title, number, book)
         VALUES (:title, :number, :book)");
     $q->bindParam(":title", $ititle);
@@ -174,8 +175,6 @@ if (! array_key_exists("stage", $_GET))
         try {
             $q->execute();
         } catch (PDOException $e) {
-            $qu->debugDumpParams();
-            exit(0);
             $qu->execute() or dieWithRollback($qu, ".");
         }
     }
@@ -209,9 +208,11 @@ if (! array_key_exists("stage", $_GET))
         WHERE pkey = :hymnid");
     $hymnid = 0;
     $q->bindParam(":hymnid", $hymnid);
-    foreach ($todelete as &$hymnid) {
+    foreach ($todelete as $id) {
+        $hymnid = $id;
         $q->execute() or dieWithRollback($q, $q->queryString);
     }
+    $dbh->commit();
     setMessage("Edit complete.");
     header("Location: modify.php");
     exit(0);

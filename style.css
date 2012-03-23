@@ -69,6 +69,7 @@ textarea#servicenotes{
     margin: 1ex;
 }
 div.servicenote {
+    margin: 0;
     padding: 2px 2px 2px 1em;
     border-top: thin dashed black;
     font-size: 80%;

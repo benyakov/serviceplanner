@@ -155,8 +155,7 @@ function display_records_table($q) {
             echo "<tr class=\"heading\"><td>{$datetext} {$row['location']}</td>
                 <td colspan=2>{$row['dayname']}: {$row['rite']}</td></tr>\n";
             if ($row['servicenotes']) {
-                echo "<tr class=\"heading\">".
-                     "<td colspan=3 class=\"servicenote\">".
+                echo "<tr><td colspan=3 class=\"servicenote\">".
                      translate_markup($row['servicenotes'])."</td></tr>\n";
             }
             $date = $row['date'];
@@ -221,8 +220,7 @@ function modify_records_table($q, $action) {
             $name = $row['dayname'];
             $location = $row['location'];
             if ($row['servicenotes']) {
-                echo "<tr class=\"heading\">".
-                     "<td colspan=3 class=\"servicenote\">".
+                echo "<tr><td colspan=3 class=\"servicenote\">".
                      translate_markup($row['servicenotes'])."</td></tr>\n";
             }
         }

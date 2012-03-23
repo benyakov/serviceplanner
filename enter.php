@@ -141,7 +141,7 @@ function processFormData() {
         $row = $q->fetch($result);
         $serviceid = $row[0];
         $feedback .= "<li>Saved a new service on '{$date}' for
-            '{$dayname}'.</li>";
+            '{$_POST['liturgicalname']}'.</li>";
     }
     ////  Enter new/updated hymn titles (2 steps for clarity)
     // Build an array of hymnbook_hymnnumber items from $_POST
