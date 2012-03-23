@@ -11,7 +11,11 @@ $this_script = $_SERVER['HTTP_HOST'].$_SERVER['SCRIPT_NAME'] ;
     <?=getUserActions()?>
     <?showMessage();?>
     </header>
-    <?=sitetabs($sitetabs, $script_basename)?>
+    <? if ($auth) {
+        echo sitetabs($sitetabs, $script_basename);
+    } else {
+        echo sitetabs($sitetabs_anonymous, $script_basename);
+    } ?>
     <div id="content-container">
     <div id="goto-now"><a href="#now">Jump to This Week</a></div>
     <?

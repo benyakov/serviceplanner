@@ -276,11 +276,14 @@ function quote_array($ary) {
     return str_replace("'", "''", $ary);
 }
 
-function sitetabs($sitetabs, $action) {
+function sitetabs($sitetabs, $action, $bare=false) {
     $tabs = array_fill_keys(array_keys($sitetabs), 0);
     $tabs[$action] = 1;
-    echo "<nav><div id=\"sitetabs-background\">";
-    echo "<ul id=\"sitetabs\">\n";
+    $rv = "";
+    if (!$bare) {
+        $rv .= "<nav><div id=\"sitetabs-background\">";
+        $rv .= "<ul id=\"sitetabs\">\n";
+    }
     foreach ($tabs as $name => $activated) {
         if ($activated) {
             $class = ' class="activated"';
@@ -288,9 +291,12 @@ function sitetabs($sitetabs, $action) {
             $class = "";
         }
         $tabtext = $sitetabs[$name];
-        echo "<li{$class}><a href=\"{$name}.php\">{$tabtext}</a></li>\n";
+        $rv .= "<li{$class}><a href=\"{$name}.php\">{$tabtext}</a></li>\n";
     }
-    echo "</ul></div></nav>\n";
+    if (!$bare) {
+        $rv .= "</ul></div></nav>\n";
+    }
+    return $rv;
 }
 
 function translate_markup($text) {

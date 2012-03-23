@@ -75,7 +75,11 @@ $q = $dbh->query("SELECT * FROM {$dbp}xref{$sort_by}") ;
     <?=getUserActions()?>
     <?showMessage();?>
     </header>
-<?= sitetabs($sitetabs, $script_basename); ?>
+<? if ($auth) {
+    echo sitetabs($sitetabs, $script_basename);
+} else {
+    echo sitetabs($sitetabs_anonymous, $script_basename);
+} ?>
 <div id="content-container">
 <?  if ($sorted_on) { ?>
 <div id="goto-now"><a href="#sortstart">Jump to Beginning of Sorted</a></div>

@@ -24,9 +24,13 @@ if ($jsonp = checkJsonpReq()) {
     </header>
 <?
 if (! $displayonly) {
-    echo sitetabs($sitetabs, $script_basename);
-}   ?>
-<? if ($jsonp) {
+    if ($auth) {
+        echo sitetabs($sitetabs, $script_basename);
+    } else {
+        echo sitetabs($sitetabs_anonymous, $script_basename);
+    }
+}
+if ($jsonp) {
     ob_clean();
 } ?>
 <div id="content-container">

@@ -130,6 +130,7 @@ function setupLogin(authactions) {
         $(self).attr("href", "javascript: void(0);");
         logout(evt);
     });
+    $("#sitetabs").html(authactions['sitetabs']);
 }
 
 function logout(evt) {

@@ -31,6 +31,15 @@ $sitetabs = array(
     ,"admin"=>"Housekeeping"
 );
 
+// This is the same as above, and will be substituted for it when the web
+// site user has not logged in.  This does not prevent the user from trying
+// to access the other tabs manually, but it does allow for a less confusing
+// interface.
+$sitetabs_anonymous = array(
+    "index"=>"Upcoming Hymns"
+    ,"records"=>"Service Records"
+    ,"hymnindex"=>"Cross Ref"
+);
 
 // Default limit for the comprehensive (not future) service listings.
 // When this has not been manually set by the user, this will be the number

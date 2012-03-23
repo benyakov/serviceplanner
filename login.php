@@ -19,13 +19,16 @@ if (array_key_exists('ajax', $_POST) || array_key_exists('ajax', $_GET)) {
         unset($rv['password']);
         $rv['actions'] = getUserActions($bare=true);
         $rv['loginform'] = getLoginForm($bare=true);
-        echo json_encode($rv);
+        $st = $sitetabs;
     } else {
-        $rv = array('userlevel' => 0,
-            'actions' => getUserActions($bare=true),
-            'loginform' => getLoginForm($bare=true));
-        echo json_encode($rv);
+        $rv = array('userlevel' => 0);
+        $st = $sitetabs_anonymous;
     }
+    $stkeys = array_keys($st);
+    $rv['actions'] = getUserActions($bare=true);
+    $rv['loginform'] = getLoginForm($bare=true);
+    $rv['sitetabs'] = sitetabs($st, $stkeys[0], $bare=true);
+    echo json_encode($rv);
 } else {
     $redirect = $_SESSION['HTTP_REFERER']?
             $_SESSION['HTTP_REFERER'] : "index.php";
