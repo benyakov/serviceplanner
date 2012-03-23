@@ -129,7 +129,7 @@ function queryAllHymns($dbh, $dbp="", $limit=0, $future=false) {
 function display_records_table($q) {
     // Show a table of the data in the query $result
     ?><table id="records-listing">
-        <tr class="heading"><th>Date &amp; Location</th><th colspan=2>Liturgical Day Name: Service/Rite</th></tr>
+        <tr><th>Date &amp; Location</th><th colspan=2>Liturgical Day Name: Service/Rite</th></tr>
         <tr><th class="hymn-number">Book &amp; #</th><th class="note">Note</th><th>Title</th></tr>
     <?
     $date = "";
@@ -185,7 +185,7 @@ function modify_records_table($q, $action) {
       <button type="reset" value="Clear">Clear</button>
       </form>
       <table id="modify-listing">
-        <tr class="heading"><th>Date &amp; Location</th><th colspan=2>Liturgical Day Name: Service/Rite</th></tr>
+        <tr><th>Date &amp; Location</th><th colspan=2>Liturgical Day Name: Service/Rite</th></tr>
         <tr><th class="hymn-number">Book &amp; #</th><th class="note">Note</th><th>Title</th></tr>
     <?
     $date = "";

@@ -140,6 +140,12 @@ table#sermonplan-listing th {
     color: black;
 }
 
+tr.heading {
+    border-top: thin solid #BBB;
+    background-color: #DFDFDF;
+    color: black;
+}
+
 tr.table-topline td {
     border-top: thin solid black;
 }
