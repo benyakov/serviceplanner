@@ -1,6 +1,62 @@
 <? require('functions.php'); ?>
 
 function addHymn() {
+    if ($("#hymnentries").is("table")) {
+        addHymnToTable();
+    } else {
+        addHymnToList();
+    }
+}
+
+function incrElement(elem) {
+    elem.val(Number(elem.val()) + 1);
+}
+
+function addHymnToTable() {
+    $("#hymnentries > tbody > tr").eq(-1).clone()
+        .appendTo("#hymnentries > tbody");
+    var tabindexStart = Number($("#hymnentries > tbody > tr").eq(-1)
+        .find('[id^=delete]').attr("tabindex"));
+    $("#hymnentries > tbody > tr").eq(-1).find('[id^=delete]')
+        .attr("id", "delete_new-"+tabindexStart+7)
+        .attr("name", "delete_new-"+tabindexStart+7)
+        .attr("tabindex", tabindexStart+7)
+        .attr("disabled", true);
+    incrElement($("#hymnentries > tbody > tr").eq(-1).find('[id^=sequence]')
+        .attr("id", "sequence_new-"+tabindexStart+8)
+        .attr("name", "sequence_new-"+tabindexStart+8)
+        .attr("tabindex", tabindexStart+8));
+    $("#hymnentries > tbody > tr").eq(-1).find('[id^=book]')
+        .attr("id", "book_new-"+tabindexStart+9)
+        .attr("name", "book_new-"+tabindexStart+9)
+        .attr("tabindex", tabindexStart+9)
+        .val("");
+    $("#hymnentries > tbody > tr").eq(-1).find('[id^=number]')
+        .attr("id", "number_new-"+tabindexStart+10)
+        .attr("name", "number_new-"+tabindexStart+10)
+        .attr("tabindex", tabindexStart+10)
+        .val("")
+        .keyup(function() {
+            $(this).doTimeout('fetch-hymn-title', 250, fetchHymnTitle)
+        })
+        .change(fetchHymnTitle);
+    $("#hymnentries > tbody > tr").eq(-1).find('[id^=note]')
+        .attr("id", "note_new_"+tabindexStart+11)
+        .attr("name", "note_new_"+tabindexStart+11)
+        .attr("tabindex", tabindexStart+11)
+        .val("");
+    $("#hymnentries > tbody > tr").eq(-1).find('[id^=location]')
+        .attr("id", "location_new_"+tabindexStart+12)
+        .attr("name", "location_new_"+tabindexStart+12)
+        .attr("tabindex", tabindexStart+12);
+    $("#hymnentries > tbody > tr").eq(-1).find('[id^=title]')
+        .attr("id", "title_new_"+tabindexStart+13)
+        .attr("name", "title_new_"+tabindexStart+13)
+        .attr("tabindex", tabindexStart+13)
+        .val("");
+}
+
+function addHymnToList() {
     $("#hymnentries > li").eq(-1).clone().appendTo("#hymnentries");
     var oldBookId = $("#hymnentries > li").eq(-1).children().attr("id");
     var hymnIndex = Number(oldBookId.split("_")[1]) + 1;
@@ -12,7 +68,11 @@ function addHymn() {
     $("#hymnentries > li").eq(-1).children().filter('[id^="number"]')
         .attr("id", "number_"+hymnIndex)
         .attr("name", "number_"+hymnIndex)
-        .attr("tabindex", tabindexStart+5);
+        .attr("tabindex", tabindexStart+5)
+        .keyup(function() {
+            $(this).doTimeout('fetch-hymn-title', 250, fetchHymnTitle)
+        })
+        .change(fetchHymnTitle);
     $("#hymnentries > li").eq(-1).children().filter('[id^="note"]')
         .attr("id", "note_"+hymnIndex)
         .attr("name", "note_"+hymnIndex)

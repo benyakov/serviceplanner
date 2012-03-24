@@ -15,9 +15,14 @@ if (! array_key_exists("stage", $_GET))
     $(document).ready(function() {
         showJsOnly();
         $("#date").datepicker({showOn:"both"});
-        $(".hymn-number").keyup(fetchHymnTitle)
-            .blur(fetchHymnTitle)
-            .blur();
+        $(".hymn-number").keyup(function() {
+            $(this).doTimeout('fetch-hymn-title', 250, fetchHymnTitle)
+        })
+            .change(fetchHymnTitle);
+        $("#addHymn").click(function(evt) {
+            evt.preventDefault();
+            addHymn();
+        });
     })
     </script>
     <body>
@@ -66,8 +71,7 @@ if (! array_key_exists("stage", $_GET))
                 <textarea id="servicenotes" name="servicenotes"><?=trim($row['servicenotes'])?></textarea>
             </dd>
         </dl>
-        <p><a href="enter.php?date=<?=str_replace(' ', '', $row['date'])?>">Add Hymns at Any Location</a></p>
-        <table>
+        <table id="hymnentries"><tbody>
         <tr class="heading"><th>Del</th><th>Seq</th><th>Book</th><th>#</th><th>Note</th>
             <th>Location</th><th>Title</th></tr>
         <?
@@ -113,15 +117,13 @@ if (! array_key_exists("stage", $_GET))
                      value="<?=$row['title']?>" class="hymn-title">
                 </td>
             </tr>
-            <tr>
-                <td colspan="4"></td>
-                <td colspan="3"><div class="hymn-past" id="past_<?=$row['hymnid']?>"></div></td>
-            </tr>
             <?
             $row = $q->fetch(PDO::FETCH_ASSOC);
         }
         ?>
-        </table>
+        </tbody></table>
+        <a id="addHymn" class="jsonly" tabindex="200"
+            href="javascript: void(0);" >Add another hymn.</a>
         <button type="submit" value="Commit">Commit</button>
         <button type="reset">Reset</button>
         </form>

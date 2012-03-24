@@ -32,6 +32,10 @@ if (array_key_exists("date", $_POST)) {
             $(this).doTimeout('fetch-hymn-title', 250, fetchHymnTitle)
         })
             .change(fetchHymnTitle);
+        $("#addHymn").click(function(evt) {
+            evt.preventDefault();
+            addHymn();
+        });
     });
     auth = "<?=authId()?>";
     </script>
@@ -99,8 +103,8 @@ if (array_key_exists("date", $_POST)) {
     </li>
     <? } ?>
     </ol>
-    <a class="jsonly" tabindex="200"
-        href="javascript: void(0);" onclick="addHymn()">Add another hymn.</a>
+    <a id="addHymn" class="jsonly" tabindex="200"
+        href="javascript: void(0);" >Add another hymn.</a>
     <button tabindex="201" type="submit" value="Send">Send</button>
     <button tabindex="202" type="reset">Reset</button>
     </form>
