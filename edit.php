@@ -148,7 +148,7 @@ if (! array_key_exists("stage", $_GET))
             $todays[$key] = $value;
         } elseif (preg_match('/delete_(\d+)/', $key, $matches)) {
             $todelete[] = $matches[1];
-        } elseif (preg_match('/(\w+)_(\d+)/', $key, $matches)) {
+        } elseif (preg_match('/(\w+)_([-0-9a-z]+)/', $key, $matches)) {
             if ("title" == $matches[1]) {
                 $tonames[$matches[2]] = $value;
             } else {
@@ -198,11 +198,22 @@ if (! array_key_exists("stage", $_GET))
         note=:note, location=:location,
         book=:book, sequence=:sequence
         WHERE pkey=:hymnid");
+    $qi = $dbh->prepare("INSERT INTO {$dbp}hymns
+        (service, location, book, number, note, sequence)
+        VALUES (:service, :location, :book, :number, :note, :sequence)");
+    $qi->bindValue(":service", $_POST['id']);
     foreach ($tohymns as $hymnid => $h) {
         if (in_array($hymnid, $todelete)) { continue; }
-        foreach ($h as $k=>$v) { $q->bindValue(":{$k}", $v); }
-        $q->bindValue(":hymnid", $hymnid);
-        $q->execute() or dieWithRollback($q, '.');
+        foreach ($h as $k=>$v) {
+            $q->bindValue(":{$k}", $v);
+            $qi->bindValue(":{$k}", $v);
+        }
+        if (is_numeric($hymnid)) {
+            $q->bindValue(":hymnid", $hymnid);
+            $q->execute() or dieWithRollback($q, "Couldn't update hymn.");
+        } else {
+            $qi->execute() or dieWithRollback($q, "Couldn't insert new hymn.");
+        }
     }
 
     // Delete tagged hymns
