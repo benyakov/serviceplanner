@@ -21,7 +21,6 @@ if (! array_key_exists("stage", $_GET)) {
         <h1>Confirm Deletions</h1>
         <ol>
         <?
-        $dbh->beginTransaction();
         foreach ($todelete as $deletion) {
             if (0 == strlen($deletion['loc'])) {
                 $whereclause = "";
@@ -71,7 +70,7 @@ if (! array_key_exists("stage", $_GET)) {
                   AND days.pkey = {$todelete['index']}");
         $q->execute();
 
-        if (! $q->fetch())) {
+        if (! $q->fetch()) {
             // If not, delete the service (should cascade to hymns)
             $q = $dbh->prepare("DELETE FROM `{$dbp}days`
                 WHERE `pkey` = '{$todelete['index']}'");
@@ -89,6 +88,5 @@ if (! array_key_exists("stage", $_GET)) {
     $dbh->commit();
     setMessage("Deletion(s) complete.");
     header("Location: modify.php");
-    exit(0);
 }
 
