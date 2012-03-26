@@ -180,7 +180,7 @@ function display_records_table($q) {
 function modify_records_table($q, $action) {
     // Show a table of the data in the query $q
   // with links to edit each record, and checkboxes to delete records.
-    ?><form name="listing-limit" action="<?=$action?>" method="POST">
+    ?><form id="listing-limit" action="<?=$action?>" method="POST">
       <button type="submit" value="Delete">Delete</button>
       <button type="reset" value="Clear">Clear</button>
       </form>

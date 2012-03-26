@@ -1,3 +1,0 @@
-- Make modify.php delete buttons (top & bottom) use jQuery's .dialog
-- Allow edit.php to add new hymns to the hymn list ard remove "/Hymns" from the
-  "Add Service/Hymns" tab.
