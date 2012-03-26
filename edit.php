@@ -23,7 +23,8 @@ if (! array_key_exists("stage", $_GET))
             evt.preventDefault();
             addHymn();
         });
-    })
+        $(".hymn-number").each(fetchHymnTitle);
+    });
     </script>
     <body>
     <div id="content-container">

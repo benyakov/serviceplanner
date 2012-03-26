@@ -18,22 +18,22 @@ function addHymnToTable() {
     var tabindexStart = Number($("#hymnentries > tbody > tr").eq(-1)
         .find('[id^=delete]').attr("tabindex"));
     $("#hymnentries > tbody > tr").eq(-1).find('[id^=delete]')
-        .attr("id", "delete_new-"+tabindexStart+7)
-        .attr("name", "delete_new-"+tabindexStart+7)
+        .attr("id", "delete_new-"+tabindexStart)
+        .attr("name", "delete_new-"+tabindexStart)
         .attr("tabindex", tabindexStart+7)
         .attr("disabled", true);
     incrElement($("#hymnentries > tbody > tr").eq(-1).find('[id^=sequence]')
-        .attr("id", "sequence_new-"+tabindexStart+8)
-        .attr("name", "sequence_new-"+tabindexStart+8)
+        .attr("id", "sequence_new-"+tabindexStart)
+        .attr("name", "sequence_new-"+tabindexStart)
         .attr("tabindex", tabindexStart+8));
     $("#hymnentries > tbody > tr").eq(-1).find('[id^=book]')
-        .attr("id", "book_new-"+tabindexStart+9)
-        .attr("name", "book_new-"+tabindexStart+9)
+        .attr("id", "book_new-"+tabindexStart)
+        .attr("name", "book_new-"+tabindexStart)
         .attr("tabindex", tabindexStart+9)
         .val("");
     $("#hymnentries > tbody > tr").eq(-1).find('[id^=number]')
-        .attr("id", "number_new-"+tabindexStart+10)
-        .attr("name", "number_new-"+tabindexStart+10)
+        .attr("id", "number_new-"+tabindexStart)
+        .attr("name", "number_new-"+tabindexStart)
         .attr("tabindex", tabindexStart+10)
         .val("")
         .keyup(function() {
@@ -41,17 +41,17 @@ function addHymnToTable() {
         })
         .change(fetchHymnTitle);
     $("#hymnentries > tbody > tr").eq(-1).find('[id^=note]')
-        .attr("id", "note_new_"+tabindexStart+11)
-        .attr("name", "note_new_"+tabindexStart+11)
+        .attr("id", "note_new-"+tabindexStart)
+        .attr("name", "note_new-"+tabindexStart)
         .attr("tabindex", tabindexStart+11)
         .val("");
     $("#hymnentries > tbody > tr").eq(-1).find('[id^=location]')
-        .attr("id", "location_new_"+tabindexStart+12)
-        .attr("name", "location_new_"+tabindexStart+12)
+        .attr("id", "location_new-"+tabindexStart)
+        .attr("name", "location_new-"+tabindexStart)
         .attr("tabindex", tabindexStart+12);
     $("#hymnentries > tbody > tr").eq(-1).find('[id^=title]')
-        .attr("id", "title_new_"+tabindexStart+13)
-        .attr("name", "title_new_"+tabindexStart+13)
+        .attr("id", "title_new-"+tabindexStart)
+        .attr("name", "title_new-"+tabindexStart)
         .attr("tabindex", tabindexStart+13)
         .val("");
 }
