@@ -30,8 +30,7 @@ if (! array_key_exists("stage", $_GET))
     <div id="content-container">
     <h1>Edit a Service</h1>
     <p class="explanation">You can change any service- or hymn-related
-    information on this page.  To add hymns to a service that are not
-    already listed here, use the "Add Hymns" link.</p>
+    information on this page.</p>
     <p><a href="<?=$backlink?>">Cancel Edit</a><p>
     <?
         $q = $dbh->prepare("SELECT

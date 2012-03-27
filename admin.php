@@ -145,6 +145,12 @@ $(document).ready(function(){var a="http://www.bethanythedalles.org/services-dev
     <input type="text" name="prefix" pattern="[\w\d]+" id="prefix" required placeholder="Database Prefix of Source Installation">
     <button type="submit" id="submit">Import Titles</button>
     </form></li>
+    <li>You are using Services version <?
+        echo "{$version['major']}.{$version['minor']}.{$version['tick']}";
+?>.  Refer to this version number, and include the address
+    <?=$_SERVER['PHP_SELF']?> when writing bug reports.  You may send them via
+    email to <a href="mailto: jmatjac@gmail.com">the author</a>.
+    </li>
     </ul>
     </div>
 </body>

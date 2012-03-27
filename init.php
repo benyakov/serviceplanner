@@ -1,4 +1,5 @@
 <?
+require("./version.php");
 require("./options.php");
 require("./setup-session.php");
 require("./functions.php");
