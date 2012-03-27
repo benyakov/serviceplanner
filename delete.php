@@ -1,7 +1,9 @@
 <?
 require("./init.php");
 $this_script = $_SERVER['HTTP_HOST'].$_SERVER['SCRIPT_NAME'] ;
-if (! array_key_exists("stage", $_GET)) {
+if ((! array_key_exists("stage", $_GET))
+    || array_key_exists("ajaxconfirm", $_GET))) {
+    $ajax = $_GET['ajaxconfirm'];
     // Put items to delete into an array.
     $todelete = array();
     foreach ($_POST as $posted=>$value) {
@@ -10,12 +12,13 @@ if (! array_key_exists("stage", $_GET)) {
         }
     }
     $_SESSION[$sprefix]['stage1'] = $todelete;
-    print_r($todelete);
+    if (! $ajax) {
     ?>
     <!DOCTYPE html>
     <html lang="en">
     <?=html_head("Delete Confirmation")?>
     <body>
+    <? } ?>
         <div id="content-container">
         <p><a href="modify.php">Abort</a><p>
         <h1>Confirm Deletions</h1>
@@ -28,7 +31,7 @@ if (! array_key_exists("stage", $_GET)) {
                 $whereclause = "AND hymns.location = :location";
             }
             $deletions = implode(", ", array_map($dbh->quote, $deletions));
-            $q = $dbh->query("
+            $q = $dbh->prepare("
                 SELECT DATE_FORMAT(days.caldate, '%e %b %Y') as date,
                 hymns.book, hymns.number, hymns.note,
                 hymns.location, days.name as dayname, days.rite,
@@ -42,8 +45,11 @@ if (! array_key_exists("stage", $_GET)) {
                 WHERE days.pkey IN({$deletions})
                 {$whereclause}
                 ORDER BY days.caldate DESC, hymns.service DESC,
-                    hymns.location, hymns.sequence")
-                or dieWithRollback($q, ".");
+                    hymns.location, hymns.sequence");
+            if ($whereclause) {
+                $q->bindValue(":location", $loc);
+            }
+            $q->execute() or dieWithRollback($q, ".");
             display_records_table($q);
         }
         $dbh->commit();
@@ -52,36 +58,40 @@ if (! array_key_exists("stage", $_GET)) {
         <input type="submit" value="Confirm">
         </form>
         </div>
+    <? if (! $ajax) { ?>
     </body>
     </html>
-    <?
+    <?  }
 } elseif ("2" == $_GET['stage']) {
     //// Delete and acknowledge deletion.
     $dbh->beginTransaction();
-    foreach ($_SESSION[$sprefix]['stage1'] as $todelete) {
+    foreach ($_SESSION[$sprefix]['stage1'] as $loc => $deletions) {
         // Check to see if service has hymns at another location
+        $deletions = implode(", ", array_map($dbh->quote, $deletions));
         $q = $dbh->prepare("SELECT number
                 FROM {$dbp}hymns as hymns
                 JOIN {$dbp}days as days
                 ON (hymns.service = days.pkey)
-                WHERE hymns.location != '{$todelete['loc']}'
-                  AND days.pkey = {$todelete['index']}");
+                WHERE hymns.location != :location
+                    AND days.pkey IN({$deletions})
+                LIMIT 1");
+        $q->bindValue(":location", $loc);
         $q->execute();
-
-        if (! $q->fetch()) {
-            // If not, delete the service (should cascade to hymns)
-            $q = $dbh->prepare("DELETE FROM `{$dbp}days`
-                WHERE `pkey` = '{$todelete['index']}'");
-            $q->execute() or die(array_pop($q->errorInfo()));
-        } else { // If so, delete only the hymns.
+        if ($q->fetch()) {
+            // If so, delete only the hymns.
             $q = $dbh->prepare("DELETE FROM {$dbp}hymns as hymns
                 USING hymns JOIN {$dbp}days as days
                     ON (hymns.service = days.pkey)
-                WHERE days.pkey = {$todelete['index']}
-                  AND hymns.location = '{$todelete['loc']}'");
+                WHERE days.pkey IN({$deletions})
+                  AND hymns.location = :location");
+            $q->bindValue(":location", $loc);
             $q->execute() or dieWithRollback($q, ".");
+        } else {
+            // If not, delete the service (should cascade to hymns)
+            $q = $dbh->prepare("DELETE FROM `{$dbp}days`
+                WHERE `pkey` IN({$deletions})");
+            $q->execute() or die(array_pop($q->errorInfo()));
         }
-
     }
     $dbh->commit();
     setMessage("Deletion(s) complete.");
