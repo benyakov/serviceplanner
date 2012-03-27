@@ -207,10 +207,12 @@ function logout(evt) {
 function setMessage(msg) {
     var timestamp = (new Date).toTimeString();
     if ($(".message").length > 0) {
-        $(".message").html(timestamp + " " + msg).delay(5000).slideUp();
+        $(".message").html(timestamp + " " + msg).slideDown()
+        .delay(5000).slideUp();
     } else {
         $("body>header").append('<div class="message">'+
-            timestamp+" "+msg+'</div>').delay(5000).slideUp();
+            timestamp+" "+msg+'</div>');
+        $(".message").delay(5000).slideUp();
     }
 }
 

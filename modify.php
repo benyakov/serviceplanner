@@ -28,6 +28,7 @@ if (array_key_exists('listinglimit', $_GET) &&
                             $("#dialog").html(data)
                                 .dialog({modal: true,
                                     width: $(window).width()*0.7,
+                                    maxHeight: $(window).height()*0.7,
                                     close: function() {
                                         setMessage("Deletion cancelled.");
                                     }});

@@ -21,18 +21,22 @@ function adddbpfix ($name) {
 }
 $finaltablenames = array_map(adddbpfix, $tablenames);
 $tablenamestring = implode(" ", $finaltablenames);
-header("Content-type: text/plain");
-$timestamp = date("dMY-Hi");
-header("Content-disposition: attachment; filename=services-{$timestamp}.dump");
-// Including the password here is insecure on a shared machine
-// because the invocation will appear in the list of processes.
-// But it's easy.
-$fp = fopen(".my.cnf", "w");
-fwrite($fp, "[client]
-user=\"{$dbuser}\"
-password=\"{$dbpw}\"\n") ;
-fclose($fp);
-chmod(".my.cnf", 0600);
-passthru("mysqldump --defaults-file=.my.cnf -h {$dbhost} {$dbname} {$tablenamestring}");
-unlink(".my.cnf");
+if (touch(".my.cnf") && chmod(".my.cnf", 0600)) {
+    header("Content-type: text/plain");
+    $timestamp = date("dMY-Hi");
+    header("Content-disposition: attachment; filename=services-{$timestamp}.dump");
+    $fp = fopen(".my.cnf", "w");
+    fwrite($fp, "[client]
+    user=\"{$dbconnection['dbuser']}\"
+    password=\"{$dbconnection['dbpassword']}\"\n") ;
+    fclose($fp);
+    $rv = 0;
+    passthru("mysqldump --defaults-file=.my.cnf -h {$dbconnection['dbhost']} {$dbconnection['dbname']} {$tablenamestring}", $rv);
+    unlink(".my.cnf");
+    if ($rv != 0) {
+        echo "mysqldump returned {$rv}";
+    }
+} else {
+    echo "Problem dumping database tables.";
+}
 ?>

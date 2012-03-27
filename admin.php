@@ -133,9 +133,15 @@ $(document).ready(function(){var a="http://www.bethanythedalles.org/services-dev
 
     <ul>
     <li><a href="dump.php">Save a Backup of the Database</a></li>
-    <li><a href="restore.php">Restore from a Saved Backup</a></li>
-    <li><form name="import_hymns" action="importhymns.php" method="post">
-    <label for="prefix">Import hymn titles from a co-installation</label>
+    <li><form id="restore-backup" action="restore.php" method="post"
+        enctype="multipart/form-data">
+        <label for="backup_file">Upload a backup (dump) file to restore.</label>
+        <input type="file" name="backup_file" placeholder="Select local file">
+        <button type="submit">Send</button>
+        <button type="reset">Reset</button>
+    </form>  (Caution: This will replace all current data, and things could go wrong.  Test before relying upon it!)</li>
+    <li><form id="import-hymns" action="importhymns.php" method="post">
+    <label for="prefix">Merge hymn titles from a co-installation.</label>
     <input type="text" name="prefix" pattern="[\w\d]+" id="prefix" required placeholder="Database Prefix of Source Installation">
     <button type="submit" id="submit">Import Titles</button>
     </form></li>

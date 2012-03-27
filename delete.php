@@ -22,7 +22,6 @@ if ((! array_key_exists("stage", $_GET)) || $ajax) {
     <? } ?>
         <h1>Confirm Deletions</h1>
         <?
-        print_r($_POST);
         $dbh->beginTransaction();
         foreach ($todelete as $loc => $deletions) {
             if (0 == strlen($loc)) {
