@@ -15,6 +15,27 @@ if (array_key_exists('listinglimit', $_GET) &&
 <html lang="en">
 <?=html_head("Modify Service Planning Records")?>
 <body>
+    <script type="text/javascript">
+        $(document).ready(function() {
+            $("button.deletesubmit").click(function(evt) {
+                evt.preventDefault();
+                var submitData = $("#delete-service").serialize();
+                if (! submitData) {
+                    setMessage("No services are selected for deletion.");
+                } else {
+                    $.post("delete.php?ajaxconfirm=1", submitData,
+                        function(data) {
+                            $("#dialog").html(data)
+                                .dialog({modal: true,
+                                    width: $(window).width()*0.7,
+                                    close: function() {
+                                        setMessage("Deletion cancelled.");
+                                    }});
+                    });
+                }
+            });
+        });
+    </script>
     <header>
     <?=getLoginForm()?>
     <?=getUserActions()?>
@@ -39,5 +60,6 @@ $q = queryAllHymns($dbh, $dbp, $_SESSION[$sprefix]['listinglimit']);
 modify_records_table($q, "delete.php");
 ?>
 </div>
+<div id="dialog"></div>
 </body>
 </html>

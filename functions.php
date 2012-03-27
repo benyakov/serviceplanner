@@ -181,7 +181,7 @@ function modify_records_table($q, $action) {
     // Show a table of the data in the query $q
   // with links to edit each record, and checkboxes to delete records.
     ?><form id="delete-service" action="<?=$action?>" method="post">
-      <button type="submit" value="Delete">Delete</button>
+      <button class="deletesubmit" type="submit" value="Delete">Delete</button>
       <button type="reset" value="Clear">Clear</button>
       </form>
       <table id="modify-listing">
@@ -237,7 +237,7 @@ function modify_records_table($q, $action) {
     echo "</article>\n";
     ?>
     </table>
-    <button form="delete-service" type="submit" value="Delete">Delete</button>
+    <button class="deletesubmit" form="delete-service" type="submit" value="Delete">Delete</button>
     <button form="delete-service" type="reset" value="Clear">Clear</button>
     </form>
     <?

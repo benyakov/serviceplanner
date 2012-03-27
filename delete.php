@@ -1,9 +1,8 @@
 <?
 require("./init.php");
 $this_script = $_SERVER['HTTP_HOST'].$_SERVER['SCRIPT_NAME'] ;
-if ((! array_key_exists("stage", $_GET))
-    || array_key_exists("ajaxconfirm", $_GET))) {
-    $ajax = $_GET['ajaxconfirm'];
+$ajax = $_GET['ajaxconfirm'];
+if ((! array_key_exists("stage", $_GET)) || $ajax) {
     // Put items to delete into an array.
     $todelete = array();
     foreach ($_POST as $posted=>$value) {
@@ -18,11 +17,12 @@ if ((! array_key_exists("stage", $_GET))
     <html lang="en">
     <?=html_head("Delete Confirmation")?>
     <body>
-    <? } ?>
         <div id="content-container">
         <p><a href="modify.php">Abort</a><p>
+    <? } ?>
         <h1>Confirm Deletions</h1>
         <?
+        print_r($_POST);
         $dbh->beginTransaction();
         foreach ($todelete as $loc => $deletions) {
             if (0 == strlen($loc)) {
@@ -55,10 +55,10 @@ if ((! array_key_exists("stage", $_GET))
         $dbh->commit();
         ?>
         <form action="http://<?=$this_script."?stage=2"?>" method="POST">
-        <input type="submit" value="Confirm">
+        <button type="submit">Confirm</button>
         </form>
-        </div>
     <? if (! $ajax) { ?>
+        </div>
     </body>
     </html>
     <?  }
