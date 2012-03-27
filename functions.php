@@ -180,7 +180,7 @@ function display_records_table($q) {
 function modify_records_table($q, $action) {
     // Show a table of the data in the query $q
   // with links to edit each record, and checkboxes to delete records.
-    ?><form id="listing-limit" action="<?=$action?>" method="POST">
+    ?><form id="delete-service" action="<?=$action?>" method="post">
       <button type="submit" value="Delete">Delete</button>
       <button type="reset" value="Clear">Clear</button>
       </form>
@@ -211,7 +211,7 @@ function modify_records_table($q, $action) {
             echo "<article>\n";
             $inarticle = true;
             echo "<tr class=\"heading\"><td>
-            <input type=\"checkbox\" name=\"{$row['id']}_{$row['location']}\" id=\"check_{$row['id']}_{$row['location']}\">
+            <input form=\"delete-service\" type=\"checkbox\" name=\"{$row['id']}_{$row['location']}\" id=\"check_{$row['id']}_{$row['location']}\">
             {$datetext} <a href=\"enter.php?date={$urldate}\" title=\"Add another service or hymns on {$row['date']}.\">[add]</a> {$row['location']}</td>
             <td colspan=2><a href=\"edit.php?id={$row['id']}\">Edit</a> |
             <a href=\"sermon.php?id={$row['id']}\">Sermon</a> |
@@ -237,8 +237,8 @@ function modify_records_table($q, $action) {
     echo "</article>\n";
     ?>
     </table>
-    <button form="listing-limit" type="submit" value="Delete">Delete</button>
-    <button form="listing-limit" type="reset" value="Clear">Clear</button>
+    <button form="delete-service" type="submit" value="Delete">Delete</button>
+    <button form="delete-service" type="reset" value="Clear">Clear</button>
     </form>
     <?
 }

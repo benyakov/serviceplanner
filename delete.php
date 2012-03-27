@@ -6,11 +6,11 @@ if (! array_key_exists("stage", $_GET)) {
     $todelete = array();
     foreach ($_POST as $posted=>$value) {
         if (preg_match('/(\d+)_(.*)/', $posted, $matches)) {
-            $todelete[] = array("index" => $matches[1],
-                "loc" => str_replace('_', ' ', $matches[2]));
+            $todelete[str_replace('_', ' ', $matches[2])][] = $matches[1];
         }
     }
     $_SESSION[$sprefix]['stage1'] = $todelete;
+    print_r($todelete);
     ?>
     <!DOCTYPE html>
     <html lang="en">
@@ -19,15 +19,15 @@ if (! array_key_exists("stage", $_GET)) {
         <div id="content-container">
         <p><a href="modify.php">Abort</a><p>
         <h1>Confirm Deletions</h1>
-        <ol>
         <?
         $dbh->beginTransaction();
-        foreach ($todelete as $deletion) {
-            if (0 == strlen($deletion['loc'])) {
+        foreach ($todelete as $loc => $deletions) {
+            if (0 == strlen($loc)) {
                 $whereclause = "";
             } else {
-                $whereclause = "AND hymns.location = '{$deletion['loc']}'";
+                $whereclause = "AND hymns.location = :location";
             }
+            $deletions = implode(", ", array_map($dbh->quote, $deletions));
             $q = $dbh->query("
                 SELECT DATE_FORMAT(days.caldate, '%e %b %Y') as date,
                 hymns.book, hymns.number, hymns.note,
@@ -39,18 +39,15 @@ if (! array_key_exists("stage", $_GET)) {
                 LEFT OUTER JOIN {$dbp}names AS names
                     ON (hymns.number = names.number)
                         AND (hymns.book = names.book)
-                WHERE days.pkey = '{$deletion['index']}'
+                WHERE days.pkey IN({$deletions})
                 {$whereclause}
                 ORDER BY days.caldate DESC, hymns.service DESC,
                     hymns.location, hymns.sequence")
                 or dieWithRollback($q, ".");
-            echo "<li>\n";
             display_records_table($q);
-            echo "</li>\n";
         }
         $dbh->commit();
         ?>
-        </ol>
         <form action="http://<?=$this_script."?stage=2"?>" method="POST">
         <input type="submit" value="Confirm">
         </form>
@@ -71,7 +68,7 @@ if (! array_key_exists("stage", $_GET)) {
                   AND days.pkey = {$todelete['index']}");
         $q->execute();
 
-        if (! $q->fetch())) {
+        if (! $q->fetch()) {
             // If not, delete the service (should cascade to hymns)
             $q = $dbh->prepare("DELETE FROM `{$dbp}days`
                 WHERE `pkey` = '{$todelete['index']}'");
@@ -89,6 +86,5 @@ if (! array_key_exists("stage", $_GET)) {
     $dbh->commit();
     setMessage("Deletion(s) complete.");
     header("Location: modify.php");
-    exit(0);
 }
 
