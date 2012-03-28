@@ -2,6 +2,7 @@
 require("../options.php");
 require("../setup-session.php");
 require("../functions.php");
+validateAuth($require=false);
 require("../db-connection.php");
 
 $dumpfile="createtables.sql";

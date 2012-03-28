@@ -71,6 +71,20 @@ function authLevel($authdata=false) {
     }
 }
 
+function validateAuth($require) {
+    global $serverdir, $sprefix;
+    if (array_key_exists($_SESSION[$sprefix]['authdata']) {
+        if (authLevel() < 3) {
+            require("../functions.php");
+            setMessage("Access denied");
+            header("Location: {$serverdir}/index.php");
+        }
+    } elseif ($require) {
+        setMessage("Access denied");
+        header("Location: {$serverdir}/index.php");
+    }
+}
+
 function checkCorsAuth() {
     if ($_SERVER['HTTP_ORIGIN']) {
         $corsfile = explode("\n", file_get_contents("corsfile.txt"));
