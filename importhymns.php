@@ -11,7 +11,7 @@ if ($_POST['prefix'] && strpos($_POST['prefix'], ' ') === false) {
         header('Location: admin.php');
         exit(0);
     }
-    $rowcount = $dbh->exec("INSERT IGNORE INTO `{$dbp}names` AS n1
+    $rowcount = $dbh->exec("INSERT IGNORE INTO `{$dbp}names`
         (book, number, title)
         SELECT n2.book, n2.number, n2.title
             FROM `{$_POST['prefix']}names` AS n2");
