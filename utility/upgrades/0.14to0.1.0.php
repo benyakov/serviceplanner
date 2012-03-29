@@ -41,7 +41,7 @@ die(\"Database Error: {\$e->getMessage()} </br>\");
 // Add new table
 $rv[] = "Adding new users table.";
 $sql = "
-CREATE TABLE `users` (
+CREATE TABLE `{$dbp}users` (
   `uid` smallint NOT NULL auto_increment,
   `username` char(15) NOT NULL,                                                   `password` varchar(1024) NOT NULL,
   `fname` char(20) NOT NULL,
