@@ -73,7 +73,7 @@ function authLevel($authdata=false) {
 
 function validateAuth($require) {
     global $serverdir, $sprefix;
-    if (array_key_exists($_SESSION[$sprefix]['authdata'])) {
+    if (array_key_exists('authdata', $_SESSION[$sprefix])) {
         if (authLevel() < 3) {
             require("../functions.php");
             setMessage("Access denied");
