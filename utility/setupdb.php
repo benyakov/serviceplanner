@@ -4,6 +4,7 @@ require("../setup-session.php");
 require("../functions.php");
 validateAuth($require=false);
 require("../db-connection.php");
+require("../version.php");
 
 $dumpfile="createtables.sql";
 $dumplines = file($dumpfile, FILE_IGNORE_NEW_LINES);
@@ -47,5 +48,10 @@ foreach ($queries as $query) {
     }
 }
 $dbh->commit();
+// Write database version to dbversion.txt
+$fh = fopen("../dbversion.txt", "w");
+fwrite($fh, "{$version['major']}.{$version['minor']}.{$version['tick']}");
+fclose($fh);
+// Create the initial user
 require("inituser.php");
 ?>

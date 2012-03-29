@@ -21,15 +21,15 @@ if (! file_exists("dbversion.txt")) {
         $oldversion = "{$dbcurrent[0]}.{$dbcurrent[1]}";
     }
 }
-if ($upgradedb) {
-    $newversion = "{$version['major']}.{$version['minor']}";
-    header("Location: {$serverdir}/utility/upgrades/{$oldversion}to{$newversion}.php");
-    exit(0);
-}
 if ((! file_exists("db-connection.php") and
     (! is_link($_SERVER['SCRIPT_FILENAME'])))) {
         header("Location: {$serverdir}/utility/setup-dbconfig.php");
         exit(0);
+}
+if ($upgradedb) {
+    $newversion = "{$version['major']}.{$version['minor']}";
+    header("Location: {$serverdir}/utility/upgrades/{$oldversion}to{$newversion}.php");
+    exit(0);
 }
 if (! (file_exists("has-user.txt") || $_GET['flag'] == 'inituser')) {
     header("Location: {$serverdir}/utility/inituser.php");
