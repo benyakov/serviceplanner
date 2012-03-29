@@ -10,7 +10,7 @@ if (! file_exists("dbversion.txt")) {
     $upgradedb = true;
     $oldversion = "";
 } else {
-    $fh = fopen($dbversion, "rb");
+    $fh = fopen("dbversion.txt", "rb");
     $dbcurrent = explode('.', trim(fread($fh, 64)));
     fclose($fh);
     if (! ($version['major'] == $dbcurrent[0]
