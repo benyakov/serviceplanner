@@ -1,5 +1,6 @@
 <?
-require("./init.php");
+$thisdir = dirname(__FILE__);
+require("{$thisdir}/init.php");
 $cors = checkCorsAuth();
 if ($jsonp=checkJsonpReq()) {
     ob_start();
