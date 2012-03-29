@@ -262,7 +262,7 @@ function html_head($title) {
     $rv[] = "<head><title>{$title}</title>";
     if (is_link($_SERVER['SCRIPT_FILENAME']))
     {   // Find the installation for css and other links
-        $here = dirname(readlink($_SERVER['SCRIPT_FILENAME']));
+        $here = dirname(__FILE__);
         $rv[] = "<style type=\"text/css\">";
         $rv[] = get_style("{$here}/style");
         $rv[] = "</style>";

@@ -1,4 +1,6 @@
 <?
+$thisdir = dirname(__FILE__);
+chdir($thisdir);
 require("./version.php");
 require("./options.php");
 require("./setup-session.php");
