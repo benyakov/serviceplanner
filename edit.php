@@ -15,8 +15,11 @@ if (! array_key_exists("stage", $_GET))
     $(document).ready(function() {
         showJsOnly();
         $("#date").datepicker({showOn:"both"});
-        $(".hymn-number").keyup(function() {
-            $(this).doTimeout('fetch-hymn-title', 250, fetchHymnTitle)
+        $(".hymn-number").keyup(function(evt) {
+            if (evt.which != 9 &&
+                evt.which != 17) {
+                $(this).doTimeout('fetch-hymn-title', 250, fetchHymnTitle);
+            }
         })
             .change(fetchHymnTitle);
         $("#addHymn").click(function(evt) {
