@@ -332,6 +332,7 @@ section#existing-services li {
 
 section#service-items > ul {
     margin: 1ex .5ex 1ex 0;
+    padding: 0;
 }
 
 section#service-items li {
