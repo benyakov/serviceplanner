@@ -320,6 +320,7 @@ form#corsform #contents {
 section#existing-services {
     float: right;
     display: block;
+    width: 350px;
 }
 section#existing-services ul {
     margin: 0;
@@ -327,6 +328,10 @@ section#existing-services ul {
 }
 section#existing-services li {
     list-style: none;
+}
+
+section#service-items > ul {
+    margin: 1ex .5ex 1ex 0;
 }
 
 section#service-items li {
