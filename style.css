@@ -129,6 +129,7 @@ table#sermonplan-listing {
     background-color: transparent;
     color: black;
     border-collapse: collapse;
+    width: 100%;
 }
 
 table#xref-listing th,
