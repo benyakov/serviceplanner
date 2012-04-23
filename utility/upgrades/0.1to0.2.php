@@ -5,7 +5,7 @@ require('./setup-session.php');
 require('./functions.php');
 validateAuth($require=true);
 // Check dbversion.txt
-if (file_exists("./dbversion.txt")) {
+if (file_exists("./dbversion.txt", "rb")) {
     $fh = fopen("./dbversion.txt");
     $version = trim(fread($fh, 32));
     fclose($fh);
@@ -17,9 +17,9 @@ if (file_exists("./dbversion.txt")) {
 $rv = array();
 require('./db-connection.php');
 $rv[] = "Adding sermon file to database definition.";
-$q = $dbh->execute("ALTER TABLE `{$dbp}sermons`
+$q = $dbh->exec("ALTER TABLE `{$dbp}sermons`
     ADD COLUMN `manuscript` BLOB AFTER `notes`");
-$q = $dbh->execute("ALTER TABLE `{$dbp}sermons`
+$q = $dbh->exec("ALTER TABLE `{$dbp}sermons`
     ADD COLUMN `mstype` varchar(50) default NULL
     AFTER `manuscript`");
 // write a new dbversion.txt
@@ -30,6 +30,6 @@ fclose($fh);
 // redirect with a message.
 setMessage(implode("<br />\n", $rv));
 $serverdir = dirname(dirname(dirname($_SERVER['PHP_SELF'])));
-header("Location: {$serverdir});
+header("Location: {$serverdir}");
 
 ?>

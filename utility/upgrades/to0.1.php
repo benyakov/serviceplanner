@@ -6,7 +6,7 @@ require('./functions.php');
 validateAuth($require=false);
 // Check dbversion.txt file.  It should not exist.
 if (file_exists("./dbversion.txt")) {
-    $fh = fopen("./dbversion.txt");
+    $fh = fopen("./dbversion.txt", "rb");
     $version = trim(fread($fh, 32));
     fclose($fh);
     die("Can't upgrade from 0.14, since the current db version is {$version}.");
