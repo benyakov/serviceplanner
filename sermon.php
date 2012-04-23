@@ -2,6 +2,12 @@
 require("./init.php");
 $this_script = $_SERVER['HTTP_HOST'].$_SERVER['SCRIPT_NAME'] ;
 if (! array_key_exists('stage', $_GET)) {
+    if (! array_key_exists('id', $_GET)) {
+        setMessage("Need a service first to edit a sermon plan.");
+        header("Location: modify.php");
+    } else {
+        $id = $_GET['id'];
+    }
     ?><!DOCTYPE html>
     <html lang="en">
     <?=html_head("Edit a Sermon Plan")?>
