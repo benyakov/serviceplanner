@@ -32,7 +32,7 @@ if (! array_key_exists('stage', $_GET)) {
                 hymns.sequence");
     $q->bindParam(":id", $id);
     $q->execute() or die(array_pop($q->errorInfo()));
-    modify_records_table($result, "delete.php");
+    modify_records_table($q, "delete.php");
 
     $q = $dbh->query("SELECT bibletext, outline, notes
         FROM {$dbp}sermons WHERE service='{$_GET['id']}'");
@@ -60,7 +60,7 @@ if (! array_key_exists('stage', $_GET)) {
     // Insert or update the sermon plans.
     $q = $dbh->prepare("INSERT INTO {$dbp}sermons
         (bibletext, outline, notes, service)
-        VALUES (:bibletext, :outline, :notes, :id)";
+        VALUES (:bibletext, :outline, :notes, :id)");
     $q->bindParam(':bibletext', $_POST['bibletext']);
     $q->bindParam(':outline', $_POST['outline']);
     $q->bindParam(':notes', $_POST['notes']);
@@ -69,7 +69,7 @@ if (! array_key_exists('stage', $_GET)) {
         $q = $dbh->prepare("UPDATE {$dbp}sermons
             SET bibletext = :bibletext,
             outline = :outline, notes = :notes
-            WHERE service = :id";
+            WHERE service = :id");
         $q->bindParam(':bibletext', $_POST['bibletext']);
         $q->bindParam(':outline', $_POST['outline']);
         $q->bindParam(':notes', $_POST['notes']);
