@@ -348,3 +348,13 @@ section#service-items label {
     font-family: sans-serif;
 }
 
+#manuscript-link {
+    margin: 1ex;
+}
+
+#sermondata {
+    border: thin solid blue;
+    margin-top: 2ex;
+    padding: 1ex;
+}
+
