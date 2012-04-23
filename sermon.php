@@ -21,7 +21,7 @@ if (! array_key_exists('stage', $_GET)) {
             DATE_FORMAT(days.caldate, '%e %b %Y') as date,
             hymns.book, hymns.number, hymns.note,
             hymns.location, days.name as dayname, days.rite,
-            days.pkey as id, days.servicesotes, names.title
+            days.pkey as id, days.servicenotes, names.title
             FROM {$dbp}hymns AS hymns
             LEFT OUTER JOIN {$dbp}days AS days ON (hymns.service = days.pkey)
             LEFT OUTER JOIN {$dbp}names AS names ON
