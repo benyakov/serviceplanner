@@ -141,6 +141,15 @@ table#sermonplan-listing th {
     color: black;
 }
 
+#listinglimit {
+    width:4em;
+}
+
+#prefix,
+#backup_file {
+    width: 25em;
+}
+
 tr.heading {
     border-top: thin solid #BBB;
     background-color: #DFDFDF;
