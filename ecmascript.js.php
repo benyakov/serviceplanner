@@ -119,6 +119,7 @@ function fetchHymnTitle() {
     var hymnNumber = $(this).val();
     var id = $(this).attr("id").split("_");
     var entryNumber = id[1];
+    var use_xref = $("#xref-names:checked").val();
     if (! hymnNumber) {
         $("#title_"+entryNumber).val("").hide();
         $("#past_"+entryNumber).text("").hide();
@@ -126,7 +127,7 @@ function fetchHymnTitle() {
     }
     var hymnBook = $("#book_"+entryNumber).val();
     var jqxhr = $.getJSON("hymntitle.php",
-            { number: hymnNumber, book: hymnBook },
+            { number: hymnNumber, book: hymnBook, xref: use_xref },
             function(result) {
                 var hymnTitle = result[0];
                 var pastServices = result[1];
