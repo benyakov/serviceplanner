@@ -2,6 +2,7 @@
 require("../options.php");
 require("../setup-session.php");
 require("../functions.php");
+validateAuth($require=false);
 $serverdir = dirname(dirname($_SERVER['PHP_SELF']));
 if (array_key_exists("step", $_POST) && $_POST['step'] == '2') {
     // Process the form (second time around)

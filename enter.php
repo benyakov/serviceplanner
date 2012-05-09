@@ -28,8 +28,11 @@ if (array_key_exists("date", $_POST)) {
             $(this).doTimeout('update-existing', 250, updateExisting)
         })
             .change(updateExisting);
-        $(".hymn-number").keyup(function(){
-            $(this).doTimeout('fetch-hymn-title', 250, fetchHymnTitle)
+        $(".hymn-number").keyup(function(evt){
+            if (evt.which != 9 &&
+                evt.which != 17) {
+                $(this).doTimeout('fetch-hymn-title', 250, fetchHymnTitle);
+            }
         })
             .change(fetchHymnTitle);
         $("#addHymn").click(function(evt) {

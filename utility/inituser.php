@@ -1,5 +1,11 @@
 <?
+require("../db-connection.php");
 $serverdir = dirname(dirname($_SERVER['PHP_SELF']));
+// Test the existence of a table
+$q = $dbh->query("SHOW TABLES LIKE '{$dbp}days'");
+if (!$q->rowCount()) {
+    header("Location: setupdb.php");
+}
 ?>
 <!DOCTYPE html>
 <html lang=en>

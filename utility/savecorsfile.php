@@ -1,6 +1,7 @@
 <?
 chdir("..");
 require("./init.php");
+validateAuth($require=true);
 chdir("utility");
 if ($_POST['contents']) {
     $fh = fopen("../corsfile.txt", "w");

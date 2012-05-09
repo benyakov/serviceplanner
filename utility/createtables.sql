@@ -28,6 +28,8 @@ CREATE TABLE `sermons` (
   `bibletext` varchar(80) default NULL,
   `outline` text,
   `notes` text,
+  `manuscript` blob,
+  `mstype` varchar(50) default NULL,
   `service` int(10) unsigned default NULL,
   UNIQUE KEY `service` (`service`),
   CONSTRAINT `sermons_ibfk_1` FOREIGN KEY (`service`) REFERENCES `days` (`pkey`) ON DELETE CASCADE

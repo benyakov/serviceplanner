@@ -9,6 +9,8 @@ $this_script = $_SERVER['HTTP_HOST'].$_SERVER['SCRIPT_NAME'] ;
 if (array_key_exists('listinglimit', $_GET) &&
     is_numeric($_GET['listinglimit'])) {
     $_SESSION[$sprefix]["listinglimit"] = $_GET['listinglimit'];
+} elseif (! array_key_exists('listinglimit', $_SESSION[$sprefix])) {
+    $_SESSION[$sprefix]['listinglimit'] = $listinglimit;
 }
 ?>
 <!DOCTYPE html>

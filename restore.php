@@ -4,7 +4,7 @@ if (! $auth) {
     header("location: index.php");
     exit(0);
 }
-$dumpfile = "restore-{$dbname}.txt";
+$dumpfile = "restore-{$dbconnection['dbname']}.txt";
 if (move_uploaded_file($_FILES['backup_file']['tmp_name'], $dumpfile))
 {
     $cmdline = "mysql -u {$dbconnection['dbuser']} -p{$dbconnection['dbpassword']} -h {$dbconnection['dbhost']} {$dbconnection['dbname']} ".

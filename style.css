@@ -129,6 +129,7 @@ table#sermonplan-listing {
     background-color: transparent;
     color: black;
     border-collapse: collapse;
+    width: 100%;
 }
 
 table#xref-listing th,
@@ -138,6 +139,15 @@ table#sermonplan-listing th {
     padding: .4ex .5em;
     background-color: #DDD;
     color: black;
+}
+
+#listinglimit {
+    width:4em;
+}
+
+#prefix,
+#backup_file {
+    width: 25em;
 }
 
 tr.heading {
@@ -320,6 +330,7 @@ form#corsform #contents {
 section#existing-services {
     float: right;
     display: block;
+    width: 350px;
 }
 section#existing-services ul {
     margin: 0;
@@ -327,6 +338,11 @@ section#existing-services ul {
 }
 section#existing-services li {
     list-style: none;
+}
+
+section#service-items > ul {
+    margin: 1ex .5ex 1ex 0;
+    padding: 0;
 }
 
 section#service-items li {
@@ -339,5 +355,15 @@ section#service-items label {
     text-align: right;
     font-weight: bold;
     font-family: sans-serif;
+}
+
+#manuscript-link {
+    margin: 1ex;
+}
+
+#sermondata {
+    border: thin solid blue;
+    margin-top: 2ex;
+    padding: 1ex;
 }
 

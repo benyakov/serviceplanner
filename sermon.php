@@ -1,11 +1,49 @@
 <?
 require("./init.php");
 $this_script = $_SERVER['HTTP_HOST'].$_SERVER['SCRIPT_NAME'] ;
+if (array_key_exists('manuscript', $_GET)) {
+    // Send the sermon manuscript, or a message saying it ain't there
+    $q = $dbh->prepare("SELECT manuscript, mstype FROM {$dbp}sermons
+        WHERE service=:id");
+    $q->bindParam(":id", $_GET['id']);
+    $q->execute();
+    $q->bindColumn(1, $mss, PDO::PARAM_LOB);
+    $q->bindColumn(2, $mstype, PDO::PARAM_STR, 256);
+    $q->fetch(PDO::FETCH_BOUND);
+    if (! $mstype) {
+        setMessage("No manuscript has been saved for this sermon.");
+        header("Location: sermon.php?id={$_GET['id']}");
+        exit(0);
+    }
+    header("Content-type: {$mstype}");
+    header("Content-disposition: attachment; filename=sermonmanuscript");
+    fpassthru($mss);
+    exit(0);
+}
 if (! array_key_exists('stage', $_GET)) {
+    if (! is_numeric($_GET['id'])) {
+        setMessage("Need a service first to edit a sermon plan.");
+        header("Location: modify.php");
+        exit(0);
+    } else {
+        $id = $_GET['id'];
+    }
     ?><!DOCTYPE html>
     <html lang="en">
     <?=html_head("Edit a Sermon Plan")?>
     <body>
+    <script type="text/javascript">
+        $(document).ready(function() {
+            $('#deletems').change(function() {
+                if ($(this).prop('checked')) {
+                    $('#manuscript_file').val('')
+                        .prop('disabled', true);
+                } else {
+                    $('#manuscript_file').prop('disabled', false);
+                }
+            });
+        });
+    </script>
         <? showMessage(); ?>
         <div id="content-container">
         <p><a href="sermonreport.php?id=<?=${id}?>">Printable Sermon Report</a>
@@ -21,8 +59,8 @@ if (! array_key_exists('stage', $_GET)) {
             DATE_FORMAT(days.caldate, '%e %b %Y') as date,
             hymns.book, hymns.number, hymns.note,
             hymns.location, days.name as dayname, days.rite,
-            days.pkey as id, names.title
-            FROM {$$dbp}hymns AS hymns
+            days.pkey as id, days.servicenotes, names.title
+            FROM {$dbp}hymns AS hymns
             LEFT OUTER JOIN {$dbp}days AS days ON (hymns.service = days.pkey)
             LEFT OUTER JOIN {$dbp}names AS names ON
                 (hymns.number = names.number)
@@ -32,35 +70,80 @@ if (! array_key_exists('stage', $_GET)) {
                 hymns.sequence");
     $q->bindParam(":id", $id);
     $q->execute() or die(array_pop($q->errorInfo()));
-    modify_records_table($result, "delete.php");
+    modify_records_table($q, "delete.php");
 
-    $q = $dbh->query("SELECT bibletext, outline, notes
-        FROM {$dbp}sermons WHERE service='{$_GET['id']}'");
+    $q = $dbh->prepare("SELECT bibletext, outline, notes, mstype
+        FROM {$dbp}sermons WHERE service=:id");
+    $q->bindParam(":id", $id);
+    $q->execute();
     $row = $q->fetch(PDO::FETCH_ASSOC);
-    ?>
-        <form action="http://<?=$this_script?>?stage=2" method="POST">
+
+    if ($row['mstype']) { ?>
+        <div id="manuscript-link"><a href="http://<?=$this_script."?manuscript=1&id=".$id?>">Download Manuscript</a> (<?=$row['mstype']?>)</div>
+    <? } ?>
+        <div id="sermondata">
+        <form action="http://<?=$this_script?>?stage=2" method="POST"
+            enctype="multipart/form-data">
         <input type="hidden" id="service" name="service" value="<?=$id?>">
-        <p>
+        <label for="manuscript_file">Upload new manuscript:</label><br />
+        <input type="file" name="manuscript_file" id="manuscript_file"
+            placeholder="Enter filename">
+        <input type="checkbox" name="deletems" id="deletems">
+        <label for="deletems">Delete saved manuscript file.</label><br />
         <label for="bibletext">Text:</label><br />
         <input type="text" id="bibletext" name="bibletext"
         size="80" maxlength="80" class="entryline"
-        value="<?=trim($row['bibletext'])?>"><br />
+        value="<?=trim($row['bibletext'])?>"
+        placeholder="Enter a biblical text reference as basis for the sermon."><br />
         <label for="outline">Outline:</label><br />
-        <textarea id="outline" name="outline"><?=trim($row['outline'])?></textarea><br />
+        <textarea id="outline" name="outline"
+         placeholder="Enter a bare outline of the sermon flow"><?=trim($row['outline'])?></textarea><br />
         <label for="notes">Notes:</label><br />
-        <textarea id="notes" name="notes"><?=trim($row['notes'])?></textarea><br />
-        <input type="submit" value="Commit"><input type="reset">
+        <textarea id="notes" name="notes"
+         placeholder="Include extra notes on the sermon"><?=trim($row['notes'])?></textarea><br />
+        <button type="submit" value="Commit">Commit</button>
+        <button type="reset">Reset</button>
         </form>
+        </div>
     </div>
     </body>
     </html>
 <?
 } elseif (2 == $_GET["stage"])
 {
+    $dbh->beginTransaction();
+    $msfile = "manuscript-{$dbconnection['dbname']}.txt";
+    if (! move_uploaded_file($_FILES['manuscript_file']['tmp_name'], $msfile)
+            || $_POST['deletems']) {
+        $fp = tmpfile();
+        $ft = "";
+    } else {
+        $fp = fopen($msfile, 'rb');
+        $ft = $_FILES['manuscript_file']['type'];
+    }
+    if ($ft || $_POST['deletems']) {
+        // Update the saved file blob and type field
+        // This is handled separately from the other data updates
+        $q = $dbh->prepare("INSERT INTO {$dbp}sermons
+            (manuscript, mstype, service)
+            VALUES (?, ?, ?");
+        $q->bindParam(1, $fp, PDO::PARAM_LOB);
+        $q->bindParam(2, $ft);
+        $q->bindParam(3, $_POST['service']);
+        if (! $q->execute()) {
+            $q = $dbh->prepare("UPDATE {$dbp}sermons
+                SET manuscript=?, mstype=?
+                WHERE service=?");
+            $q->bindParam(1, $fp, PDO::PARAM_LOB);
+            $q->bindParam(2, $ft);
+            $q->bindParam(3, $_POST['service']);
+            $q->execute() or die(array_pop($q->errorInfo()));
+        }
+    }
     // Insert or update the sermon plans.
     $q = $dbh->prepare("INSERT INTO {$dbp}sermons
         (bibletext, outline, notes, service)
-        VALUES (:bibletext, :outline, :notes, :id)";
+        VALUES (:bibletext, :outline, :notes, :id)");
     $q->bindParam(':bibletext', $_POST['bibletext']);
     $q->bindParam(':outline', $_POST['outline']);
     $q->bindParam(':notes', $_POST['notes']);
@@ -69,14 +152,16 @@ if (! array_key_exists('stage', $_GET)) {
         $q = $dbh->prepare("UPDATE {$dbp}sermons
             SET bibletext = :bibletext,
             outline = :outline, notes = :notes
-            WHERE service = :id";
+            WHERE service = :id");
         $q->bindParam(':bibletext', $_POST['bibletext']);
         $q->bindParam(':outline', $_POST['outline']);
         $q->bindParam(':notes', $_POST['notes']);
         $q->bindParam(':id', $_POST['service']);
         $q->execute() or die(array_pop($q->errorInfo()));
     }
+    $dbh->commit();
+    fclose($fp);
     $now = strftime('%T');
     setMessage("Sermon plans saved at {$now} server time.");
-    header("Location: http://{$this_script}?id={$id}");
+    header("Location: http://{$this_script}?id={$_POST['service']}");
 }
