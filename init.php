@@ -2,6 +2,9 @@
 $thisdir = dirname(__FILE__);
 chdir($thisdir);
 require("./version.php");
+if (! file_exists("options.php")) {
+    copy("options.php.sample", "options.php");
+}
 require("./options.php");
 require("./setup-session.php");
 require("./functions.php");
