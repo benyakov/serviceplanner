@@ -91,9 +91,8 @@ if (array_key_exists("date", $_POST)) {
     </section>
     <h2>Hymns to Enter (Book, Number, Note)</h2>
     <input type="checkbox" id="xref-names" name="xref-names">
-    <label for="xref-names">Supplement stored hymn titles with a match from the
-cross-reference table.  The match is not guaranteed to be from the hymn book
-you are using.</label>
+    <label for="xref-names">Attempt to provide unknown hymn titles using the
+cross-reference table.</label>
     <ol id="hymnentries">
     <? for ($i=1; $i<=$option_hymncount; $i++) {
         $tabindex = $i*4 + 51; ?>

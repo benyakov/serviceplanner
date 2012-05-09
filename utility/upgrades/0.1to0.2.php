@@ -5,8 +5,8 @@ require('./setup-session.php');
 require('./functions.php');
 validateAuth($require=true);
 // Check dbversion.txt
-if (file_exists("./dbversion.txt", "rb")) {
-    $fh = fopen("./dbversion.txt");
+if (file_exists("./dbversion.txt")) {
+    $fh = fopen("./dbversion.txt", "rb");
     $version = trim(fread($fh, 32));
     fclose($fh);
     if ("0.1." != substr($version, 0, 4)) {

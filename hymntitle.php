@@ -29,7 +29,16 @@ while ($row = $q->fetch(PDO::FETCH_ASSOC)) {
 }
 if ($title) {
     echo json_encode(array($title, $lastusedary));
-} else {
-    echo json_encode("");
+    exit(0);
 }
+$bookname = strtolower($_GET['book']);
+$q = $dbh->prepare("SELECT `title` from `{$dbp}xref`
+    WHERE `{$_GET['book']}` = :number LIMIT 1");
+$q->bindParam(':number', $_GET['number']);
+if ($q->execute() && ($row = $q->fetch())) {
+    $title = $row[0];
+} else {
+    $title = "";
+}
+echo json_encode(array($title, array()));
 ?>

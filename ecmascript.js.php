@@ -119,7 +119,7 @@ function fetchHymnTitle() {
     var hymnNumber = $(this).val();
     var id = $(this).attr("id").split("_");
     var entryNumber = id[1];
-    var use_xref = $("#xref-names:checked").val();
+    var use_xref = $("#xref-names:checked").val() || "off";
     if (! hymnNumber) {
         $("#title_"+entryNumber).val("").hide();
         $("#past_"+entryNumber).text("").hide();
