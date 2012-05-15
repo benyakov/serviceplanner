@@ -11,8 +11,8 @@ if (! $auth) {
 if (! $dbh->query("SELECT 1 FROM `{$dbp}churchyear`")) {
     /* Create the church year table */
     $q = $dbh->prepare("CREATE TABLE `{$dbp}churchyear` (
-        `season` varchar default NULL,
         `dayname` varchar NOT NULL,
+        `season` varchar default NULL,
         `base` varchar default NULL,
         `offset` smallint default 0,
         `month` tinyint default 0,
@@ -105,7 +105,39 @@ if ($_GET['dayname']) {
 
 if ($_POST['submit-day']==1) {
     // Update/save supplied values for the given day
-
+    unset($_POST['submit-day']);
+    $q = $dbh->prepare("INSERT INTO `{$dbp}churchyear`
+        (dayname, season, base, offset, month, day,
+        observed_month, observed_sunday)
+        VALUES (:dayname, :season, :base, :offset, :month, :day,
+            :observed_month, :observed_sunday)");
+    $q->bindValue(":dayname", $_POST['dayname']);
+    $q->bindValue(":season", $_POST['season']);
+    $q->bindValue(":base", $_POST['base']);
+    $q->bindValue(":offset", $_POST['offset']);
+    $q->bindValue(":month", $_POST['month']);
+    $q->bindValue(":day", $_POST['day']);
+    $q->bindValue(":observed_month", $_POST['observed_month']);
+    $q->bindValue(":observed_sunday", $_POST['observed_sunday']);
+    if ($q->execute()) {
+        $return = "New day {$_POST['dayname']} saved.";
+    } else {
+        $q = $dbh->prepare("UPDATE `{$dbp}churchyear`
+            SET season=:season,
+            base=:base, offset=:offset,
+            month=:month, day=:day,
+            observed_month=:observed_month, observed_sunday=:observed_sunday
+            WHERE dayname=:dayname");
+        $q->bindValue(":dayname", $_POST['dayname']);
+        $q->bindValue(":season", $_POST['season']);
+        $q->bindValue(":base", $_POST['base']);
+        $q->bindValue(":offset", $_POST['offset']);
+        $q->bindValue(":month", $_POST['month']);
+        $q->bindValue(":day", $_POST['day']);
+        $q->bindValue(":observed_month", $_POST['observed_month']);
+        $q->bindValue(":observed_sunday", $_POST['observed_sunday']);
+        $q->execute();
+    }
 }
 
 
