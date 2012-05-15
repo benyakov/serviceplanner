@@ -217,11 +217,46 @@ function setMessage(msg) {
     }
 }
 
+function updateDay(params) {
+    displayId = "#"+params.old_dayname;
+    if ($(displayId)) {
+        // update existing display
+    } else {
+        // Insert a new service where the date exists in the current year
+    }
+}
+
+function submitDayform() {
+    var dayParams = {
+        submit-day: 1,
+        old_dayname: $("#old-dayname").val(),
+        dayname: $("#dayname").val(),
+        season: $("#season").val(),
+        base: $("#base").val(),
+        offset: $("#offset").val(),
+        month: $("#month").val(),
+        day: $("#day").val(),
+        observed_month: $("#observed-month").val(),
+        observed_sunday: $("#observed-sunday").val()
+    }
+    var jqxhr = $.post("churchyear.php", dayParams,
+        function(result) {
+            if (result[0]) {
+                dayParams.currentYear = result[2];
+                updateDay(dayParams);
+            }
+            setMessage(result[1]);
+        }
+    );
+}
+
 $(document).ready(function() {
     $("#loginform").submit(function(evt) {
         evt.preventDefault();
         submitLogin();
     });
 });
+
+
 
 // vim: set ft=javascript :

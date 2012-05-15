@@ -105,6 +105,9 @@ if ($_GET['dayname']) {
 
 if ($_POST['submit-day']==1) {
     // Update/save supplied values for the given day
+    header('Cache-Control: no-cache, must-revalidate');
+    header('Expires: Mon, 01 Jan 1996 00:00:00 GMT');
+    header("Content-type: application/json");
     unset($_POST['submit-day']);
     $q = $dbh->prepare("INSERT INTO `{$dbp}churchyear`
         (dayname, season, base, offset, month, day,
@@ -120,7 +123,9 @@ if ($_POST['submit-day']==1) {
     $q->bindValue(":observed_month", $_POST['observed_month']);
     $q->bindValue(":observed_sunday", $_POST['observed_sunday']);
     if ($q->execute()) {
-        $return = "New day {$_POST['dayname']} saved.";
+        echo json_encode(array(1, "New day {$_POST['dayname']} saved.",
+        get_date_for($_POST['dayname'], date('Y'), $_POST)));
+        exit(0);
     } else {
         $q = $dbh->prepare("UPDATE `{$dbp}churchyear`
             SET season=:season,
@@ -136,7 +141,13 @@ if ($_POST['submit-day']==1) {
         $q->bindValue(":day", $_POST['day']);
         $q->bindValue(":observed_month", $_POST['observed_month']);
         $q->bindValue(":observed_sunday", $_POST['observed_sunday']);
-        $q->execute();
+        if ($q->execute()) {
+            echo json_encode(array(1, "Day {$_POST['dayname']} updated.",
+            get_date_for($_POST['dayname'], date('Y'), $_POST)));
+        } else {
+            echo json_encode(array(0, "Problem saving: ". array_pop($q->errorInfo())));
+        }
+        exit(0);
     }
 }
 
