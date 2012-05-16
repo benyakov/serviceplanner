@@ -27,14 +27,14 @@ if (array_key_exists("date", $_POST)) {
         $("#date").keyup(function(){
             $(this).doTimeout('update-existing', 250, updateExisting)
         })
-            .change(updateExisting);
+            .focusout(updateExisting);
         $(".hymn-number").keyup(function(evt){
             if (evt.which != 9 &&
                 evt.which != 17) {
                 $(this).doTimeout('fetch-hymn-title', 250, fetchHymnTitle);
             }
         })
-            .change(fetchHymnTitle);
+            .focusout(fetchHymnTitle);
         $("#addHymn").click(function(evt) {
             evt.preventDefault();
             addHymn();
