@@ -2,6 +2,12 @@
 /* Edit the days in the church year
  */
 require("init.php");
+
+define get_date_for() {
+
+}
+
+
 if (! $dbh->query("SELECT 1 FROM `{$dbp}churchyear`")) {
     /* Create the church year table */
     $q = $dbh->prepare("CREATE TABLE `{$dbp}churchyear` (
@@ -98,13 +104,20 @@ if ($_GET['dayname']) {
         <button type="submit" name="submit">Submit</button>
         <button type="reset" name="reset">Reset</button>
     </form>
-    <p>Calculated dates include:
+    <p>Calculated dates include:</p>
+    <div id="calculated-dates">
 <?
     $thisyear = date('Y');
     for ($y = $thisyear-5; $y<=$thisyear+5; $y++) {
         echo date("mdY", get_date_for($_GET['dayname'], $y, $specifics));
     }
-    echo "</p>";
+?>
+    </div>
+    <script type="javascript">
+    $("#dayform").update();
+    // Flesh this out so that changes to the form update the dates listed.
+    </script>
+<?
 }
 
 if ($_POST['submit-day']==1) {
