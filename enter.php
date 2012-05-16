@@ -22,12 +22,16 @@ if (array_key_exists("date", $_POST)) {
     <script type="text/javascript">
     $(document).ready(function() {
         $("#existing-services").hide();
-        showJsOnly();
-        $("#date").datepicker({showOn:"both"});
-        $("#date").keyup(function(){
-            $(this).doTimeout('update-existing', 250, updateExisting)
-        })
-            .focusout(updateExisting);
+        $("#date").focus()
+            .keyup(function(){
+                $(this).doTimeout('update-existing', 250, updateExisting)
+            })
+            .change(updateExisting)
+            .datepicker({showOn:"button", numberOfMonths: [2,2],
+                stepMonths: 4, onClose: function() {
+                    $("#date").change();
+                    $("#location").focus();
+                }})
         $(".hymn-number").keyup(function(evt){
             if (evt.which != 9 &&
                 evt.which != 17) {
@@ -39,6 +43,7 @@ if (array_key_exists("date", $_POST)) {
             evt.preventDefault();
             addHymn();
         });
+        showJsOnly();
     });
     auth = "<?=authId()?>";
     </script>
@@ -54,7 +59,9 @@ if (array_key_exists("date", $_POST)) {
     <p class="explanation">This form allows you to enter a new service,
     or to add hymns to an existing service.
     The available hymnbooks can be configured in the
-    file "options.php" on the webserver. </p>
+    file "options.php" on the webserver.
+    You can use <a href="http://michelf.com/projects/php-markdown/concepts/">Markdown syntax</a>
+    to format the service notes.</p>
     </header>
     <form action="http://<?=$this_script?>" method="post">
     <section id="existing-services">
@@ -74,23 +81,21 @@ if (array_key_exists("date", $_POST)) {
     <li>
         <label for="liturgical_name">Liturgical Name:</label>
         <input tabindex="26" type="text"
-            id="liturgicalname" name="liturgicalname" size="50"
-            maxlength="50" value="">
+            id="liturgicalname" name="liturgicalname" value="">
     </li>
     <li>
         <label for="rite">Rite or Order:</label>
-        <input tabindex="27" type="text" id="rite" name="rite"
-            size="50" maxlength="50" value="">
+        <input tabindex="27" type="text" id="rite" name="rite" value="">
     </li>
     <li class="vcenter">
-        <label for="servicenotes">Service Notes:</label>
+        <label for="servicenotes">Service Notes:</label><br>
         <textarea tabindex="28" id="servicenotes"
             name="servicenotes"></textarea>
     </li>
     </ul>
     </section>
     <h2>Hymns to Enter (Book, Number, Note)</h2>
-    <input type="checkbox" id="xref-names" name="xref-names">
+    <input type="checkbox" id="xref-names" name="xref-names" tabindex="40">
     <label for="xref-names">Attempt to provide unknown hymn titles using the
 cross-reference table.</label>
     <ol id="hymnentries">

@@ -228,7 +228,7 @@ function updateDay(params) {
 
 function submitDayform() {
     var dayParams = {
-        submit-day: 1,
+        submit_day: 1,
         old_dayname: $("#old-dayname").val(),
         dayname: $("#dayname").val(),
         season: $("#season").val(),
@@ -249,6 +249,7 @@ function submitDayform() {
         }
     );
 }
+
 
 $(document).ready(function() {
     $("#loginform").submit(function(evt) {

@@ -65,7 +65,7 @@ if ($_GET['dayname']) {
 ?>
     <div id="edit-day">
     <form id="dayform" name="dayform" method="post">
-        <input type="hidden" name="submit-day" value="1">
+        <input type="hidden" name="submit_day" value="1">
         <dl>
         <dt><label for="dayname">Day Name</label></dt>
         <dd><input type="text" name="dayname" id="dayname"
@@ -120,7 +120,7 @@ if ($_GET['dayname']) {
 <?
 }
 
-if ($_POST['submit-day']==1) {
+if ($_POST['submit_day']==1) {
     if (! $auth) {
         echo json_encode(array(0, "Access denied. Please log in."));
         exit(0);
@@ -130,7 +130,7 @@ if ($_POST['submit-day']==1) {
     header('Cache-Control: no-cache, must-revalidate');
     header('Expires: Mon, 01 Jan 1996 00:00:00 GMT');
     header("Content-type: application/json");
-    unset($_POST['submit-day']);
+    unset($_POST['submit_day']);
     $q = $dbh->prepare("INSERT INTO `{$dbp}churchyear`
         (dayname, season, base, offset, month, day,
         observed_month, observed_sunday)
