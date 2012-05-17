@@ -3,10 +3,32 @@
  */
 require("init.php");
 
-define get_date_for() {
-
+define get_date_for($dayname, $year, $specifics) {
+    /* TODO: Compare the db calculation below to a php implementation
+     * of the same thing. */
+    $start = microtime();
+    $rv = db_calc_date_for($dayname, $year, $specifics);
+    $dbruntime = microtime() - $start;
+    // Insert php implementation here.
+    return $rv
 }
 
+define db_calc_date_for($dayname, $year, $specifics) {
+    /* Given a liturgical day name, a year, and some defining specifics,
+     * return the db's stored function calculation of the day's date
+     * in that year. */
+    $q = $dbh->prepare("SELECT `season`, `base`, `offset`, `month`, `day`, `observed_month`, `observed_sunday`");
+    $q = $dbh->query("SELECT calc_date_in_year(:year, :dayname,
+        :base, :offset, :month, :day)");
+    $q->bindParam(":year", $year);
+    $q->bindParam(":dayname", $dayname);
+    $q->bindParam(":base", $specifics["base"]);
+    $q->bindParam(":offset", $specifics["offset"]);
+    $q->bindParam(":month", $specifics["month"]);
+    $q->bindParam(":day", $specifics["day"]);
+    $q->execute();
+    return strptime($q->fetchColumn(0), "Y-m-d");
+}
 
 if (! $dbh->query("SELECT 1 FROM `{$dbp}churchyear`")) {
     /* Create the church year table */

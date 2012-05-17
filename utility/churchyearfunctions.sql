@@ -43,14 +43,12 @@ SET @oct1wd = DAYOFWEEK(@oct1);
 RETURN DATE_ADD(@oct1, 8-@oct1wd DAYS);
 END$$
 
-CREATE FUNCTION date_in_year (p_year INT, p_dayname STRING)
+CREATE FUNCTION calc_date_in_year (p_year INT, p_dayname STRING,
+    base STRING, offset INT, month INT, day INT)
+DETERMINISTIC
 RETURNS DATE
 BEGIN
-SELECT base, offset, month, day
-    FROM {$dbp}churchyear
-    WHERE dayname=p_dayname
-    INTO base, offset, month, day;
-IF **IS_NULL(base) THEN RETURN CONCAT_WS('-', p_year, month, day);
+IF base IS NULL THEN RETURN CONCAT_WS('-', p_year, month, day);
 IF base = "Easter" THEN
     RETURN DATE_ADD(easter_in_year(p_year), offset DAYS);
 ELSEIF base = "Christmas 1" THEN
@@ -60,18 +58,28 @@ ELSEIF base = "Michaelmas 1" THEN
 END IF;
 END$$
 
-CREATE FUNCTION observed_date_in_year (p_year INT, p_dayname STRING)
+CREATE FUNCTION date_in_year (p_year INT, p_dayname STRING)
+READS SQL DATA
 RETURNS DATE
 BEGIN
-SELECT base, offset, observed_month, observed_sunday
+SELECT base, offset, month, day
     FROM {$dbp}churchyear
     WHERE dayname=p_dayname
-    INTO base, offset, observed_month, observed_sunday;
-IF **IS_NULL(base) THEN
-    IF **IS_NULL(observed_month) THEN
+    INTO base, offset, month, day;
+RETURN calc_date_in_year(p_year, p_dayname, base, offset, month, day)
+END$$
+
+CREATE FUNCTION calc_observed_date_in_year (p_year INT, p_dayname STRING,
+    base STRING, observed_month INT, observed_sunday INT)
+DETERMINISTIC
+RETURNS DATE
+BEGIN
+IF base IS NULL THEN
+    IF observed_month = 0 THEN
         SET @actual = date_in_year(p_year, p_dayname)
         IF DAYOFWEEK(@actual) > 1 THEN
             RETURN DATE_ADD(@actual, 8-DAYOFWEEK(@actual) DAYS);
+        END IF;
     END IF;
     IF observed_sunday > 0 THEN
         SET @firstofmonth =
@@ -82,17 +90,28 @@ IF **IS_NULL(base) THEN
         RETURN DATE_ADD(@firstofmonth, (observed_sunday-1)*7 DAYS);
     ELSE
         SET @lastofmonth =
-        DATE_SUB(DATE_ADD(
-            CONCAT_WS('-', p_year, observed_month)
-            , 1 MONTH), 1 DAY);
+            DATE_SUB(DATE_ADD(
+                CONCAT_WS('-', p_year, observed_month)
+                , 1 MONTH), 1 DAY);
         IF DAYOFWEEK(@lastofmonth > 1) THEN
             SET @lastofmonth = DATE_SUB(@lastofmonth,
                 DAYOFWEEK(@lastofmonth)-1);
         END IF;
         RETURN DATE_ADD(@lastofmonth, (observed_sunday+1)*7 DAYS);
     END IF;
-    END IF;
 END IF;
+END$$
+
+CREATE FUNCTION observed_date_in_year (p_year INT, p_dayname STRING)
+READS SQL DATA
+RETURNS DATE
+BEGIN
+SELECT base, observed_month, observed_sunday
+    FROM {$dbp}churchyear
+    WHERE dayname=p_dayname
+    INTO base, observed_month, observed_sunday;
+RETURN calc_observed_date_in_year(p_year, p_dayname, base, observed_month,
+    observed_sunday);
 END$$
 
 DELIMITER ;
