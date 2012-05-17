@@ -122,6 +122,7 @@ div#content-container {
     color: black;
 }
 
+table#churchyear-listing,
 table#xref-listing,
 table#modify-listing,
 table#records-listing,
@@ -132,6 +133,7 @@ table#sermonplan-listing {
     width: 100%;
 }
 
+table#churchyear-listing th,
 table#xref-listing th,
 table#modify-listing th,
 table#records-listing th,

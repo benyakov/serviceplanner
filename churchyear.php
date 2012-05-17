@@ -3,7 +3,7 @@
  */
 require("init.php");
 
-define get_date_for($dayname, $year, $specifics) {
+function get_date_for($dayname, $year, $specifics) {
     /* TODO: Compare the db calculation below to a php implementation
      * of the same thing. */
     $start = microtime();
@@ -13,7 +13,7 @@ define get_date_for($dayname, $year, $specifics) {
     return $rv
 }
 
-define db_calc_date_for($dayname, $year, $specifics) {
+function db_calc_date_for($dayname, $year, $specifics) {
     /* Given a liturgical day name, a year, and some defining specifics,
      * return the db's stored function calculation of the day's date
      * in that year. */
@@ -31,20 +31,19 @@ define db_calc_date_for($dayname, $year, $specifics) {
 }
 
 if (! $dbh->query("SELECT 1 FROM `{$dbp}churchyear`")) {
+    $dbh->beginTransaction();
     /* Create the church year table */
     $q = $dbh->prepare("CREATE TABLE `{$dbp}churchyear` (
-        `dayname` varchar NOT NULL,
+        `dayname` varchar PRIMARY KEY,
         `season` varchar default NULL,
         `base` varchar default NULL,
         `offset` smallint default 0,
         `month` tinyint default 0,
         `day`   tinyint default 0,
         `observed_month` tinyint default 0,
-        `observed_sunday` tinyint default 0,
-        KEY `dayname` (`dayname`)
+        `observed_sunday` tinyint default 0
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8") ;
     $q->execute() or die(array_pop($q->errorInfo()));
-    $dbh->beginTransaction();
     $fh = fopen("historictable.csv", "r");
     $headings = fgetcsv($fh);
     while (($record = fgetcsv($fh, 250)) != FALSE) {
@@ -63,6 +62,21 @@ if (! $dbh->query("SELECT 1 FROM `{$dbp}churchyear`")) {
             VALUES ({$r[0]}, {$r[1]}, {$r[2]}, {$r[3]}, {$r[4]}, {$r[5]}, {$r[6]}, {$r[7]})");
         $q->execute() or dieWithRollback($q, "\n".__FILE__.":".__LINE__);
     }
+    // Define helper table for ordering the presentation of days
+    $q = $dbh->prepare("CREATE TABLE `{$dbp}churchyear_order` (
+        `name` varchar PRIMARY KEY,
+        `index` smallint UNIQUE)");
+    $q->execute() or die(array_pop($q->errorInfo()));
+    $q->exec("INSERT INTO {$dbp}churchyear_order (name, index) VALUES
+        (\"Advent\", 1),
+        (\"Christmas\", 2),
+        (\"Epiphany\", 3),
+        (\"Pre-lent\", 4),
+        (\"Lent\", 5),
+        (\"Easter\", 6),
+        (\"Pentecost\", 7),
+        (\"Trinity\", 8),
+        (\"Michaelmas\", 9)");
     // Define helper functions on the db for getting the dates of days
     $functionsfile = "utility/churchyearfunctions.sql";
     $functionsfh = fopen($functionsfile, "rb");
@@ -85,7 +99,6 @@ if ($_GET['dayname']) {
     $specifics = $q->fetch(PDO::FETCH_ASSOC);
     /* Show a day edit form with dates in the surrounding 10 years */
 ?>
-    <div id="edit-day">
     <form id="dayform" name="dayform" method="post">
         <input type="hidden" name="submit_day" value="1">
         <dl>
@@ -123,7 +136,7 @@ if ($_GET['dayname']) {
             type="number" min="0" max="31"
             value="<?=$specifics['observed_sunday']?>"></dd>
         </dl>
-        <button type="submit" name="submit">Submit</button>
+        <button id="dayform_submit" type="submit" name="submit">Submit</button>
         <button type="reset" name="reset">Reset</button>
     </form>
     <p>Calculated dates include:</p>
@@ -136,7 +149,14 @@ if ($_GET['dayname']) {
 ?>
     </div>
     <script type="javascript">
-    $("#dayform").update();
+    $("#dayform base|offset|month|day|observed_month|observed_sunday").change();
+    $("#dayform_submit").click(function() {
+        // TODO
+        // Submit the form to churchyear.php
+        // Put the return value in message or the relevant table line
+        // Close the dialog
+        return;
+     }
     // Flesh this out so that changes to the form update the dates listed.
     </script>
 <?
@@ -200,13 +220,32 @@ if (! $auth) {
     exit(0);
 }
 
-$q = $dbh->query("SELECT `season`, `base`, `offset`, `month`, `day`, `observed_month`, `observed_sunday`
-    FROM `{$dbp}churchyear`");
+$q = $dbh->query("SELECT cy.`season`, cy.`base`, cy.`offset`, cy.`month`,
+    cy.`day`, cy.`observed_month`, cy.`observed_sunday`
+    FROM `{$dbp}churchyear` AS cy
+    JOIN `{$dbp}churchyear_order` AS cyo ON (cy.season = cyo.season)
+    ORDER BY cyo.index, cy.offset, cy.month, cy.day
+    ");
+$q->execute();
 ?>
 <!DOCTYPE html>
 <html lang="en">
 <?=html_head("Church Service")?>
 <body>
+<script type="javascript">
+    $(document).ready(function() {
+        $("td.edit").click(function() {
+            $("#dialog")
+                .load("churchyear.php?dayname=".$(this).attr("data-day"))
+                .dialog({modal: true,
+                    width: $(window).width()*0.7,
+                    maxHeight: $(window).height()*0.7,
+                    close: function() {
+                        setMessage("Edit cancelled.");
+                    }});
+        });
+    });
+</script>
 <header>
 <?=getLoginForm()?>
 <?=getUserActions()?>
@@ -215,9 +254,23 @@ $q = $dbh->query("SELECT `season`, `base`, `offset`, `month`, `day`, `observed_m
 <?=sitetabs($sitetabs, $script_basename)?>
 <div id="content-container">
 <h1>Church Year Configuration</h1>
-
-
+<table id="churchyear-listing">
+<tr><td></td><th>Season</th><th>Base Day</th><th>Days Offset</th><th>Month</th>
+    <th>Day</th><th>Observed Month</th><th>Observed Sunday</th></tr>
+<? while ($row = $q->fetch(PDO::FETCH_ASSOC)) { ?>
+<tr id="row_<?=$row['day']?>">
+    <td class="edit" data-day="<?=$row['day']?>"</td>
+    <td><?=$row['season']?></td>
+    <td><?=$row['base']?></td>
+    <td><?=$row['offset']?></td>
+    <td><?=$row['month']?></td>
+    <td><?=$row['day']?></td>
+    <td><?=$row['observed_month']?></td>
+    <td><?=$row['observed_sunday']?></td></tr>
+<? } ?>
+</table>
 </div>
+<div id="dialog"></div>
 </body>
 </html>
 
