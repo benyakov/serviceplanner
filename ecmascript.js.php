@@ -250,7 +250,6 @@ function submitDayform() {
     );
 }
 
-
 $(document).ready(function() {
     $("#loginform").submit(function(evt) {
         evt.preventDefault();

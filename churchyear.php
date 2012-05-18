@@ -149,7 +149,55 @@ if ($_GET['dayname']) {
 ?>
     </div>
     <script type="javascript">
-    $("#dayform base|offset|month|day|observed_month|observed_sunday").change();
+    function calcEaster(year) {
+        // Borrowed from Emacs
+        var a = year % 19;
+        var b = year / 100;
+        var c = year % 100;
+        var d = b / 4;
+        var e = b % 4;
+        var f = (b+8)/25;
+        var g = (b-f+1)/3;
+        var h = (19*a+b-d-g+15)%30;
+        var i = c/4;
+        var k = c%4;
+        var l = (32+2*e+2*i-h-k)%7;
+        var m = (a+11*h+22*l)/451;
+        var month = (h+l-7*m+114)/31;
+        var p = (h+l-7*m+114)%31;
+        var day = p+1;
+        return new Date(year, month, day);
+    }
+    function calcChristmas1(year) {
+        return;
+    }
+    function calcMichaelmas1(year) {
+        return;
+    }
+    function getDateFor(year) {
+        // With the current settings of the form, calculate the date
+        // in the given year
+        if (! $("#base").val()) {
+            return new Date(year, $("#month"), $("#day"));
+        } elseif ("Easter" == $("#base")) {
+            return new Date(calcEaster(year).valueOf() +
+                $("#offset")*24*60*60*1000)
+        } elseif ("Christmas 1" == $("#base")) {
+            return new Date(calcChristmas1(year).valueOf() +
+                $("#offset")*24*60*60*1000)
+        } elseif ("Michaelmas 1" == $("#base")) {
+            return new Date(calcMichaelmas1(year).valueOf() +
+                $("#offset")*24*60*60*1000)
+        }
+    }
+    $("#base, #offset, #month, #day, #observed_month, #observed_sunday")
+        .change(function() {
+            var decade = new Array();
+            for (y=thisyear-5; $y<=thisyear+5; y++) {
+                decade.push(getDateFor(y).toLocaleDateString());
+            }
+            $("#calculated-dates").html(decade.join(" "));
+        });
     $("#dayform_submit").click(function() {
         // TODO
         // Submit the form to churchyear.php
