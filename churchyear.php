@@ -85,6 +85,23 @@ if (! $dbh->query("SELECT 1 FROM `{$dbp}churchyear`")) {
     $dbh->commit();
 }
 
+if ($_GET['params']) {
+    if (! $auth) {
+        echo json_encode("Access denied.  Please log in.");
+        exit(0);
+    }
+    $q = $dbh->prepare("SELECT `season`, `base`, `offset`, `month`, `day`, `observed_month`, `observed_sunday`
+        FROM `{$dbp}churchyear`
+        WHERE `dayname` = :dayname");
+    $q->bindParam(":dayname", $_GET['params']);
+    $q->execute();
+    if ($row = $q->fetch(PDO::FETCH_ASSOC)) {
+        return json_encode($row);
+    } else {
+        return json_encode(array());
+    }
+}
+
 if ($_GET['dayname']) {
     if (! $auth) {
         echo "Access denied.  Please log in.";
@@ -169,10 +186,23 @@ if ($_GET['dayname']) {
         return new Date(year, month, day);
     }
     function calcChristmas1(year) {
-        return;
+        var christmas = new Date(year, 12, 25);
+        if (christmas.getDay() == 0) {
+            return christmas;
+        } else {
+            return new Date(christmas.valueOf() +
+                (7-christmas.getDay())*24*60*60*1000);
+        }
     }
-    function calcMichaelmas1(year) {
-        return;
+    function calcMichaelmas1(year, callback) {
+        var michaelmas = new Date(year, 9, 29);
+        if (sessionStorage.michaelmasObserved != -1 && michaelmas.getDay = 6) {
+            return new Date(year, 9, 30);
+        } else {
+            var oct1 = new Date(year, 10, 1);
+            return new Date(oct1.valueOf() +
+                (7-oct1.getDay())*24*60*60*1000);
+        }
     }
     function getDateFor(year) {
         // With the current settings of the form, calculate the date
@@ -199,12 +229,37 @@ if ($_GET['dayname']) {
             $("#calculated-dates").html(decade.join(" "));
         });
     $("#dayform_submit").click(function() {
-        // TODO
-        // Submit the form to churchyear.php
-        // Put the return value in message or the relevant table line
-        // Close the dialog
-        return;
-     }
+        if ($('#dayname') == "Michaelmas") {
+           sessionStorage.michaelmasObserved = $("#observed-sunday").val();
+        }
+        $.post('churchyear.php', {
+                submit_day: 1,
+                dayname: $("#dayname").val(),
+                season: $("#season").val(),
+                base: $("#base").val(),
+                offset: $("#offset").val(),
+                month: $("#month").val(),
+                day: $("#day").val(),
+                observed_month: $("#observed-month").val(),
+                observed_sunday: $("#observed-sunday").val()
+            }, function(result) {
+                if (result[1]) {
+                    // Update the relevant part of the table
+                    $("#row_"+$("#dayname").val()).html(
+                        '<td class="edit" data-day="'+$("#day").val()+'"</td>'
+                        +'<td>'+$("#season").val()+'</td>'
+                        +'<td>'+$("#base").val()+'</td>'
+                        +'<td>'+$("#offset").val()+'</td>'
+                        +'<td>'+$("#month").val()+'</td>'
+                        +'<td>'+$("#day").val()+'</td>'
+                        +'<td>'+$("#observed-month").val()+'</td>'
+                        +'<td>'+$("#observed-sunday").val()+'</td>'
+                    );
+                }
+                $("#dialog").dialog("close");
+                setMessage(result);
+            });
+     });
     // Flesh this out so that changes to the form update the dates listed.
     </script>
 <?
@@ -292,6 +347,10 @@ $q->execute();
                         setMessage("Edit cancelled.");
                     }});
         });
+        $.get("churchyear.php", { params: "Michaelmas" },
+            function(params) {
+                sessionStorage.michaelmasObserved = params['observed_sunday'];
+            });
     });
 </script>
 <header>
