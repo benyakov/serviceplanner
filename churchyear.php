@@ -10,7 +10,7 @@ function get_date_for($dayname, $year, $specifics) {
     $rv = db_calc_date_for($dayname, $year, $specifics);
     $dbruntime = microtime() - $start;
     // Insert php implementation here.
-    return $rv
+    return $rv;
 }
 
 function db_calc_date_for($dayname, $year, $specifics) {
@@ -34,14 +34,15 @@ if (! $dbh->query("SELECT 1 FROM `{$dbp}churchyear`")) {
     $dbh->beginTransaction();
     /* Create the church year table */
     $q = $dbh->prepare("CREATE TABLE `{$dbp}churchyear` (
-        `dayname` varchar PRIMARY KEY,
-        `season` varchar default NULL,
-        `base` varchar default NULL,
+        `dayname` varchar(256),
+        `season` varchar(64) default NULL,
+        `base` varchar(256) default NULL,
         `offset` smallint default 0,
         `month` tinyint default 0,
         `day`   tinyint default 0,
         `observed_month` tinyint default 0,
-        `observed_sunday` tinyint default 0
+        `observed_sunday` tinyint default 0,
+        PRIMARY KEY (`dayname`)
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8") ;
     $q->execute() or die(array_pop($q->errorInfo()));
     $fh = fopen("historictable.csv", "r");
@@ -64,8 +65,9 @@ if (! $dbh->query("SELECT 1 FROM `{$dbp}churchyear`")) {
     }
     // Define helper table for ordering the presentation of days
     $q = $dbh->prepare("CREATE TABLE `{$dbp}churchyear_order` (
-        `name` varchar PRIMARY KEY,
-        `index` smallint UNIQUE)");
+        `name` varchar(32),
+        `index` smallint UNIQUE,
+        PRIMARY KEY (`name`))");
     $q->execute() or die(array_pop($q->errorInfo()));
     $q->exec("INSERT INTO {$dbp}churchyear_order (name, index) VALUES
         (\"Advent\", 1),
@@ -80,7 +82,7 @@ if (! $dbh->query("SELECT 1 FROM `{$dbp}churchyear`")) {
     // Define helper functions on the db for getting the dates of days
     $functionsfile = "utility/churchyearfunctions.sql";
     $functionsfh = fopen($functionsfile, "rb");
-    $result = $dbh->exec(readfile($functionsfh, filesize($functionsfile));
+    $result = $dbh->exec(readfile($functionsfh, filesize($functionsfile)));
     fclose($functionsfh);
     $dbh->commit();
 }
@@ -260,7 +262,6 @@ if ($_GET['dayname']) {
                 setMessage(result);
             });
      });
-    // Flesh this out so that changes to the form update the dates listed.
     </script>
 <?
 }
