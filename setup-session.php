@@ -1,5 +1,5 @@
 <?
-session_name("Service Planner Session");
+session_name("ServicePlannerSession");
 session_set_cookie_params(604800);
 session_start();
 $sprefix = realpath(dirname(__FILE__));

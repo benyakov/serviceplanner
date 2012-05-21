@@ -2,6 +2,7 @@
 /* Edit the days in the church year
  */
 require("init.php");
+$auth = auth();
 
 function get_date_for($dayname, $year, $specifics) {
     /* TODO: Compare the db calculation below to a php implementation
@@ -34,9 +35,9 @@ if (! $dbh->query("SELECT 1 FROM `{$dbp}churchyear`")) {
     $dbh->beginTransaction();
     /* Create the church year table */
     $q = $dbh->prepare("CREATE TABLE `{$dbp}churchyear` (
-        `dayname` varchar(256),
+        `dayname` varchar(255),
         `season` varchar(64) default NULL,
-        `base` varchar(256) default NULL,
+        `base` varchar(255) default NULL,
         `offset` smallint default 0,
         `month` tinyint default 0,
         `day`   tinyint default 0,
@@ -66,10 +67,11 @@ if (! $dbh->query("SELECT 1 FROM `{$dbp}churchyear`")) {
     // Define helper table for ordering the presentation of days
     $q = $dbh->prepare("CREATE TABLE `{$dbp}churchyear_order` (
         `name` varchar(32),
-        `index` smallint UNIQUE,
+        `idx` smallint UNIQUE,
         PRIMARY KEY (`name`))");
     $q->execute() or die(array_pop($q->errorInfo()));
-    $q->exec("INSERT INTO {$dbp}churchyear_order (name, index) VALUES
+    $q = $dbh->prepare("INSERT INTO `{$dbp}churchyear_order`
+        (name, idx) VALUES
         (\"Advent\", 1),
         (\"Christmas\", 2),
         (\"Epiphany\", 3),
@@ -79,10 +81,14 @@ if (! $dbh->query("SELECT 1 FROM `{$dbp}churchyear`")) {
         (\"Pentecost\", 7),
         (\"Trinity\", 8),
         (\"Michaelmas\", 9)");
+    if (! $q->execute()) {
+        echo "Problem inserting seasons: " . array_pop($q->errorInfo());
+        exit(0);
+    }
     // Define helper functions on the db for getting the dates of days
     $functionsfile = "utility/churchyearfunctions.sql";
     $functionsfh = fopen($functionsfile, "rb");
-    $result = $dbh->exec(readfile($functionsfh, filesize($functionsfile)));
+    $result = $dbh->exec(fread($functionsfh, filesize($functionsfile)));
     fclose($functionsfh);
     $dbh->commit();
 }
@@ -324,13 +330,17 @@ if (! $auth) {
     exit(0);
 }
 
-$q = $dbh->query("SELECT cy.`season`, cy.`base`, cy.`offset`, cy.`month`,
-    cy.`day`, cy.`observed_month`, cy.`observed_sunday`
+$q = $dbh->prepare("SELECT cy.`dayname`, cy.`season`, cy.`base`,
+    cy.`offset`, cy.`month`, cy.`day`,
+    cy.`observed_month`, cy.`observed_sunday`
     FROM `{$dbp}churchyear` AS cy
-    JOIN `{$dbp}churchyear_order` AS cyo ON (cy.season = cyo.season)
-    ORDER BY cyo.index, cy.offset, cy.month, cy.day
+    JOIN `{$dbp}churchyear_order` AS cyo ON (cy.season = cyo.name)
+    ORDER BY cyo.idx, cy.offset, cy.month, cy.day
     ");
-$q->execute();
+if (! $q->execute()) {
+    echo "Problem querying database:" . array_pop($q->errorInfo());
+    exit(0);
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -363,11 +373,12 @@ $q->execute();
 <div id="content-container">
 <h1>Church Year Configuration</h1>
 <table id="churchyear-listing">
-<tr><td></td><th>Season</th><th>Base Day</th><th>Days Offset</th><th>Month</th>
+<tr><td></td><th>Name</th><th>Season</th><th>Base Day</th><th>Days Offset</th><th>Month</th>
     <th>Day</th><th>Observed Month</th><th>Observed Sunday</th></tr>
 <? while ($row = $q->fetch(PDO::FETCH_ASSOC)) { ?>
 <tr id="row_<?=$row['day']?>">
-    <td class="edit" data-day="<?=$row['day']?>"</td>
+    <td class="edit" data-day="<?=$row['day']?>">Edit</td>
+    <td><?=$row['dayname']?></td>
     <td><?=$row['season']?></td>
     <td><?=$row['base']?></td>
     <td><?=$row['offset']?></td>
