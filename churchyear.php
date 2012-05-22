@@ -18,8 +18,8 @@ function db_calc_date_for($dayname, $year, $specifics) {
     /* Given a liturgical day name, a year, and some defining specifics,
      * return the db's stored function calculation of the day's date
      * in that year. */
-    $q = $dbh->prepare("SELECT `season`, `base`, `offset`, `month`, `day`, `observed_month`, `observed_sunday`");
-    $q = $dbh->query("SELECT calc_date_in_year(:year, :dayname,
+    global $dbh;
+    $q = $dbh->prepare("SELECT calc_date_in_year(:year, :dayname,
         :base, :offset, :month, :day)");
     $q->bindParam(":year", $year);
     $q->bindParam(":dayname", $dayname);
@@ -28,7 +28,8 @@ function db_calc_date_for($dayname, $year, $specifics) {
     $q->bindParam(":month", $specifics["month"]);
     $q->bindParam(":day", $specifics["day"]);
     $q->execute();
-    return strptime($q->fetchColumn(0), "Y-m-d");
+    return $q->fetchColumn(0);
+        //strptime($q->fetchColumn(0), "Y-m-d");
 }
 
 if (! $dbh->query("SELECT 1 FROM `{$dbp}churchyear`")) {
@@ -93,14 +94,19 @@ if (! $dbh->query("SELECT 1 FROM `{$dbp}churchyear`")) {
     $dbh->commit();
 }
 
+/* churchyear.php?params=dayname
+ * Returns the db parameters for dayname in the church year as json.
+ */
+
 if ($_GET['params']) {
     if (! $auth) {
         echo json_encode("Access denied.  Please log in.");
         exit(0);
     }
-    header('Cache-Control: no-cache, must-revalidate');
+    /* header('Cache-Control: no-cache, must-revalidate');
     header('Expires: Mon, 01 Jan 1996 00:00:00 GMT');
     header("Content-type: application/json");
+     */
     $q = $dbh->prepare("SELECT `season`, `base`, `offset`, `month`, `day`,
         `observed_month`, `observed_sunday`
         FROM `{$dbp}churchyear`
@@ -118,13 +124,18 @@ if ($_GET['params']) {
     exit(0);
 }
 
+/* churchyear.php?dayname=dayname
+ * Returns a form for modifying the db parameters of dayname.
+ */
+
 if ($_GET['dayname']) {
     if (! $auth) {
         echo "Access denied.  Please log in.";
         exit(0);
     }
 
-    $q = $dbh->prepare("SELECT `season`, `base`, `offset`, `month`, `day`, `observed_month`, `observed_sunday`
+    $q = $dbh->prepare("SELECT `season`, `base`, `offset`, `month`, `day`,
+        `observed_month`, `observed_sunday`
         FROM `{$dbp}churchyear`
         WHERE `dayname` = :dayname");
     $q->bindParam(":dayname", $_GET['dayname']);
@@ -137,7 +148,7 @@ if ($_GET['dayname']) {
         <dl>
         <dt><label for="dayname">Day Name</label></dt>
         <dd><input type="text" name="dayname" id="dayname"
-            value="<?=$specifics['dayname']?>"></dd>
+            value="<?=$_GET['dayname']?>"></dd>
         <dt><label for="season">Season</label></dt>
         <dd><input type="text" name="season" id="season"
             value="<?=$specifics['season']?>"></dd>
@@ -177,7 +188,7 @@ if ($_GET['dayname']) {
 <?
     $thisyear = date('Y');
     for ($y = $thisyear-5; $y<=$thisyear+5; $y++) {
-        echo date("mdY", get_date_for($_GET['dayname'], $y, $specifics));
+        echo date("mdY", get_date_for($_GET['dayname'], $y, $specifics))." ";
     }
 ?>
     </div>
@@ -212,7 +223,7 @@ if ($_GET['dayname']) {
     }
     function calcMichaelmas1(year, callback) {
         var michaelmas = new Date(year, 9, 29);
-        if (sessionStorage.michaelmasObserved != -1 && michaelmas.getDay = 6) {
+        if (sessionStorage.michaelmasObserved != -1 && michaelmas.getDay == 6) {
             return new Date(year, 9, 30);
         } else {
             var oct1 = new Date(year, 10, 1);
@@ -225,21 +236,23 @@ if ($_GET['dayname']) {
         // in the given year
         if (! $("#base").val()) {
             return new Date(year, $("#month"), $("#day"));
-        } elseif ("Easter" == $("#base")) {
+        } else if ("Easter" == $("#base").val()) {
             return new Date(calcEaster(year).valueOf() +
-                $("#offset")*24*60*60*1000)
-        } elseif ("Christmas 1" == $("#base")) {
+                $("#offset")*24*60*60*1000);
+        } else if ("Christmas 1" == $("#base").val()) {
             return new Date(calcChristmas1(year).valueOf() +
-                $("#offset")*24*60*60*1000)
-        } elseif ("Michaelmas 1" == $("#base")) {
+                $("#offset")*24*60*60*1000);
+        } else if ("Michaelmas 1" == $("#base").val()) {
             return new Date(calcMichaelmas1(year).valueOf() +
-                $("#offset")*24*60*60*1000)
+                $("#offset")*24*60*60*1000);
         }
     }
     $("#base, #offset, #month, #day, #observed_month, #observed_sunday")
         .change(function() {
             var decade = new Array();
-            for (y=thisyear-5; $y<=thisyear+5; y++) {
+            var now = new Date();
+            var thisyear = now.getFullYear();
+            for (y=thisyear-5; y<=thisyear+5; y++) {
                 decade.push(getDateFor(y).toLocaleDateString());
             }
             $("#calculated-dates").html(decade.join(" "));
@@ -278,7 +291,12 @@ if ($_GET['dayname']) {
      });
     </script>
 <?
+    exit(0);
 }
+
+/* churchyear.php with POST of [submitday=>1]
+ * Saves the submitted POST data to the included dayname.
+ */
 
 if ($_POST['submit_day']==1) {
     if (! $auth) {
@@ -356,9 +374,11 @@ if (! $q->execute()) {
 <body>
 <script type="text/javascript">
     $(document).ready(function() {
-        $("td.edit > a").click(function() {
+        $(".edit > a").click(function() {
+            $(this).attr('href', 'javascript: void(0);');
             $("#dialog")
-                .load("churchyear.php?dayname=".$(this).attr("data-day"))
+                .load(encodeURI("churchyear.php?dayname="
+                    +$(this).attr("data-day")))
                 .dialog({modal: true,
                     width: $(window).width()*0.7,
                     maxHeight: $(window).height()*0.7,
@@ -386,7 +406,7 @@ if (! $q->execute()) {
 <? while ($row = $q->fetch(PDO::FETCH_ASSOC)) { ?>
 <tr id="row_<?=$row['dayname']?>">
     <td class="edit"><a href="" data-day="<?=$row['dayname']?>">Edit</a></td>
-    <td><?=$row['dayname']?></td>
+    <td class="dayname"><?=$row['dayname']?></td>
     <td><?=$row['season']?></td>
     <td><?=$row['base']?></td>
     <td><?=$row['offset']?></td>

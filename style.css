@@ -146,6 +146,12 @@ table#sermonplan-listing th {
 table#churchyear-listing td {
     text-align: center;
 }
+table#churchyear-listing td.dayname {
+    padding: 0 .25em 0 .25em;
+    text-align: left;
+    font-weight: bold;
+}
+
 
 #listinglimit {
     width:4em;
