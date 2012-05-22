@@ -143,6 +143,10 @@ table#sermonplan-listing th {
     color: black;
 }
 
+table#churchyear-listing th {
+    font-size: 80%;
+}
+
 table#churchyear-listing td {
     text-align: center;
 }
@@ -194,10 +198,20 @@ td.title {
     font-style: italic;
 }
 
-td.edit {
-    font-size: smaller;
+td.controls {
+    font: bold 50% sans-serif;
+}
+td.controls a:link {
     color: blue;
     background-color: transparent;
+}
+td.controls a:visited {
+    color: blue;
+    background-color: transparent;
+}
+td.controls a:active {
+    color: white;
+    background-color: blue;
 }
 
 table#userlist {
