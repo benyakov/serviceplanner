@@ -98,16 +98,24 @@ if ($_GET['params']) {
         echo json_encode("Access denied.  Please log in.");
         exit(0);
     }
-    $q = $dbh->prepare("SELECT `season`, `base`, `offset`, `month`, `day`, `observed_month`, `observed_sunday`
+    header('Cache-Control: no-cache, must-revalidate');
+    header('Expires: Mon, 01 Jan 1996 00:00:00 GMT');
+    header("Content-type: application/json");
+    $q = $dbh->prepare("SELECT `season`, `base`, `offset`, `month`, `day`,
+        `observed_month`, `observed_sunday`
         FROM `{$dbp}churchyear`
         WHERE `dayname` = :dayname");
     $q->bindParam(":dayname", $_GET['params']);
-    $q->execute();
-    if ($row = $q->fetch(PDO::FETCH_ASSOC)) {
-        return json_encode($row);
+    if ($q->execute()) {
+        if ($row = $q->fetch(PDO::FETCH_ASSOC)) {
+            echo json_encode($row);
+        } else {
+            echo json_encode(array());
+        }
     } else {
-        return json_encode(array());
+        echo json_encode("Problem with query: ".array_pop($q->errorInfo()));
     }
+    exit(0);
 }
 
 if ($_GET['dayname']) {
@@ -173,7 +181,7 @@ if ($_GET['dayname']) {
     }
 ?>
     </div>
-    <script type="javascript">
+    <script type="text/javascript">
     function calcEaster(year) {
         // Borrowed from Emacs
         var a = year % 19;
@@ -346,9 +354,9 @@ if (! $q->execute()) {
 <html lang="en">
 <?=html_head("Church Service")?>
 <body>
-<script type="javascript">
+<script type="text/javascript">
     $(document).ready(function() {
-        $("td.edit").click(function() {
+        $("td.edit > a").click(function() {
             $("#dialog")
                 .load("churchyear.php?dayname=".$(this).attr("data-day"))
                 .dialog({modal: true,
@@ -376,8 +384,8 @@ if (! $q->execute()) {
 <tr><td></td><th>Name</th><th>Season</th><th>Base Day</th><th>Days Offset</th><th>Month</th>
     <th>Day</th><th>Observed Month</th><th>Observed Sunday</th></tr>
 <? while ($row = $q->fetch(PDO::FETCH_ASSOC)) { ?>
-<tr id="row_<?=$row['day']?>">
-    <td class="edit" data-day="<?=$row['day']?>">Edit</td>
+<tr id="row_<?=$row['dayname']?>">
+    <td class="edit"><a href="" data-day="<?=$row['dayname']?>">Edit</a></td>
     <td><?=$row['dayname']?></td>
     <td><?=$row['season']?></td>
     <td><?=$row['base']?></td>

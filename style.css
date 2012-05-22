@@ -143,6 +143,10 @@ table#sermonplan-listing th {
     color: black;
 }
 
+table#churchyear-listing td {
+    text-align: center;
+}
+
 #listinglimit {
     width:4em;
 }
@@ -182,6 +186,12 @@ td.note {
 
 td.title {
     font-style: italic;
+}
+
+td.edit {
+    font-size: smaller;
+    color: blue;
+    background-color: transparent;
 }
 
 table#userlist {
