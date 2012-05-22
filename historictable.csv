@@ -51,12 +51,12 @@ Trinity,Trinity 4,Easter,84,,,,
 Trinity,Trinity 5,Easter,91,,,,
 Trinity,Trinity 6,Easter,98,,,,
 Trinity,Trinity 7,Easter,105,,,,
-Michaelmas,Michaelmas 2,Michaelmas,2,,,,
-Michaelmas,Michaelmas 3,Michaelmas,3,,,,
-Michaelmas,Michaelmas 4,Michaelmas,4,,,,
-Michaelmas,Michaelmas 5,Michaelmas,5,,,,
-Michaelmas,Michaelmas 6,Michaelmas,6,,,,
-Michaelmas,Michaelmas 7,Michaelmas,7,,,,
+Michaelmas,Michaelmas 2,Michaelmas 1,14,,,,
+Michaelmas,Michaelmas 3,Michaelmas 1,21,,,,
+Michaelmas,Michaelmas 4,Michaelmas 1,28,,,,
+Michaelmas,Michaelmas 5,Michaelmas 1,35,,,,
+Michaelmas,Michaelmas 6,Michaelmas 1,42,,,,
+Michaelmas,Michaelmas 7,Michaelmas 1,49,,,,
 Michaelmas,Michaelmas,,,9,29,9,-1
 Trinity,Third Last,Christmas 1,-49,,,,
 Trinity,Second Last,Christmas 1,-42,,,,
@@ -100,8 +100,7 @@ Epiphany,Epiphany,,,1,6,,
 ,"St. Mary, Mother of our Lord",,,8,15,,
 ,Holy Innocents,,,12,28,,
 ,"St. Timothy, Bishop and Martyr",,,1,24,,
-,St. Michael and All Angels,,,9,29,9,"(6, -1)"
-,Festival of the Reformation,,,10,31,10,"(6, -1)"
-,Presentation of our Lord,,,2,2,2,"(6, 1)"
-,Visitation,,,7,2,7,"(6, 1)"
-,All Saints' Day,,,11,1,11,"(6, 1)"
+,Festival of the Reformation,,,10,31,10,-1
+,Presentation of our Lord,,,2,2,2,1
+,Visitation,,,7,2,7,1
+,All Saints' Day,,,11,1,11,1
