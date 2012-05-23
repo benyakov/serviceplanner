@@ -219,56 +219,69 @@ function setMessage(msg) {
 
 function calcEaster(year) {
     // Borrowed from Emacs
-    var a = year % 19;
-    var b = year / 100;
-    var c = year % 100;
-    var d = b / 4;
-    var e = b % 4;
-    var f = (b+8)/25;
-    var g = (b-f+1)/3;
-    var h = (19*a+b-d-g+15)%30;
-    var i = c/4;
-    var k = c%4;
-    var l = (32+2*e+2*i-h-k)%7;
-    var m = (a+11*h+22*l)/451;
-    var month = (h+l-7*m+114)/31;
-    var p = (h+l-7*m+114)%31;
-    var day = p+1;
-    return new Date(year, month, day);
+    var msInDay = 1000*60*60*24;
+    var century = Math.floor(1 + (year / 100));
+    // Age of moon for April 5
+    var shiftedEpact = ((14 + (11 * (year % 19)) // Nicean rule
+        - Math.floor((3 * century) / 4)          // Gregorian Century rule
+        + Math.floor(((8 * century) + 5) / 25)   // Metonic cycle corrctn
+        + (30 * century))                        // To keep value positive
+        % 30);
+    // Adjust for 29.5 day month
+    if (shiftedEpact == 0 ||
+        (shiftedEpact == 1 && 10 < (year % 19))) {
+            var adjustedEpact = shiftedEpact + 1;
+        } else {
+            var adjustedEpact = shiftedEpact;
+        }
+    var apr19 = new Date(year, 3, 19, 12);  // Hour needed for accuracy
+    var paschalMoon = Math.round(apr19.getTime()/msInDay) - adjustedEpact;
+    var paschalMoonDate = new Date(paschalMoon*msInDay);
+    var paschalMoonDay = paschalMoonDate.getDay();
+    var easter = new Date((paschalMoon+(7-paschalMoonDay))*msInDay);
+    return easter;
 }
 function calcChristmas1(year) {
-    var christmas = new Date(year, 12, 25);
-    if (christmas.getDay() == 0) {
-        return christmas;
+    var base = new Date(year, 11, 25); // Christmas
+    if (base.getDay() == 0) {
+        return base;
     } else {
-        return new Date(christmas.valueOf() +
-            (7-christmas.getDay())*24*60*60*1000);
+        var offset = new Number(7-base.getDay());
+        base.setDate(base.getDate() + offset);
+        return base;
     }
 }
 function calcMichaelmas1(year, callback) {
-    var michaelmas = new Date(year, 9, 29);
+    var michaelmas = new Date(year, 8, 29);
     if (sessionStorage.michaelmasObserved != -1 && michaelmas.getDay == 6) {
-        return new Date(year, 9, 30);
+        return new Date(year, 8, 30);
     } else {
-        var oct1 = new Date(year, 10, 1);
-        return new Date(oct1.valueOf() +
-            (7-oct1.getDay())*24*60*60*1000);
+        var base = new Date(year, 9, 1); // Oct 1
+        var offset = new Number(7-base.getDay());
+        base.setDate(base.getDate() + offset);
+        return base
     }
 }
 function getDateFor(year) {
     // With the current settings of the form, calculate the date
     // in the given year
     if ($("#base").val() == "None") {
-        return new Date(year, $("#month").val(), $("#day").val());
+        return new Date(year, $("#month").val()-1, $("#day").val());
     } else if ("Easter" == $("#base").val()) {
-        return new Date(calcEaster(year).valueOf() +
-            $("#offset").val()*24*60*60*1000);
+        var base = calcEaster(year);
+        var offset = new Number($("#offset").val());
+        base.setDate(base.getDate()+offset);
+        return base;
     } else if ("Christmas 1" == $("#base").val()) {
-        return new Date(calcChristmas1(year).valueOf() +
-            $("#offset").val()*24*60*60*1000);
+        var base = calcChristmas1(year);
+        var offset = new Number($("#offset").val());
+        base.setDate(base.getDate()+offset);
+        return base;
     } else if ("Michaelmas 1" == $("#base").val()) {
-        return new Date(calcMichaelmas1(year).valueOf() +
-            $("#offset").val()*24*60*60*1000);
+        var base = calcMichaelmas1(year);
+        var offset = new Number($("#offset").val());
+        base.setDate(base.getDate()+offset);
+        return base;
     }
 }
 
