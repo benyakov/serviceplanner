@@ -258,17 +258,17 @@ function calcMichaelmas1(year, callback) {
 function getDateFor(year) {
     // With the current settings of the form, calculate the date
     // in the given year
-    if (! $("#base").val()) {
-        return new Date(year, $("#month"), $("#day"));
+    if ($("#base").val() == "None") {
+        return new Date(year, $("#month").val(), $("#day").val());
     } else if ("Easter" == $("#base").val()) {
         return new Date(calcEaster(year).valueOf() +
-            $("#offset")*24*60*60*1000);
+            $("#offset").val()*24*60*60*1000);
     } else if ("Christmas 1" == $("#base").val()) {
         return new Date(calcChristmas1(year).valueOf() +
-            $("#offset")*24*60*60*1000);
+            $("#offset").val()*24*60*60*1000);
     } else if ("Michaelmas 1" == $("#base").val()) {
         return new Date(calcMichaelmas1(year).valueOf() +
-            $("#offset")*24*60*60*1000);
+            $("#offset").val()*24*60*60*1000);
     }
 }
 

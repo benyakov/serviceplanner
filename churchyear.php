@@ -245,12 +245,6 @@ if ($_GET['dayname']) {
     </form>
     <p>Calculated dates include:</p>
     <div id="calculated-dates">
-<?
-    $thisyear = date('Y');
-    for ($y = $thisyear-5; $y<=$thisyear+5; $y++) {
-        echo date("mdY", get_date_for($_GET['dayname'], $y, $specifics))." ";
-    }
-?>
     </div>
 <?
     exit(0);
@@ -358,16 +352,20 @@ $q = query_churchyear();
             evt.preventDefault();
             $("#dialog")
                 .load(encodeURI("churchyear.php?dayname="
-                    +$(this).attr("data-day")))
-                .dialog({modal: true,
-                    width: $(window).width()*0.7,
-                    maxHeight: $(window).height()*0.7,
-                    close: function() {
-                        setMessage("Edit cancelled.");
-                    },
-                    open: function() {
-                        setupDialog();
-                    }});
+                    +$(this).attr("data-day")), function() {
+                        $("#dialog").dialog({modal: true,
+                            width: $(window).width()*0.7,
+                            maxHeight: $(window).height()*0.7,
+                            close: function() {
+                                setMessage("Edit cancelled.");
+                            },
+                            create: function() {
+                                setupDialog();
+                            },
+                            open: function() {
+                                setupDialog();
+                            }});
+                    });
         });
     }
 
@@ -391,15 +389,22 @@ $q = query_churchyear();
     }
 
     function setupDialog() {
+        function getDecadeDates() {
+            // Return a 10-year span of matching dates.
+            var decade = new Array();
+            var now = new Date();
+            var thisyear = now.getFullYear();
+            for (y=thisyear-5; y<=thisyear+5; y++) {
+                decade.push(getDateFor(y).toDateString());
+            }
+            return decade.join(", ");
+        }
+        var origdates = getDecadeDates();
+        $("#calculated-dates").html(origdates);
         $("#base, #offset, #month, #day, #observed_month, #observed_sunday")
             .change(function() {
-                var decade = new Array();
-                var now = new Date();
-                var thisyear = now.getFullYear();
-                for (y=thisyear-5; y<=thisyear+5; y++) {
-                    decade.push(getDateFor(y).toLocaleDateString());
-                }
-                $("#calculated-dates").html(decade.join(" "));
+                var newdates = getDecadeDates();
+                $("#calculated-dates").html(newdates);
             });
         $("#dayform").submit(function() {
             if ($('#dayname') == "Michaelmas") {
