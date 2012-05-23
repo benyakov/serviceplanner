@@ -28,6 +28,7 @@ $sitetabs = array(
     ,"enter"=>"Add Service"
     ,"sermons"=>"Sermon Plans"
     ,"hymnindex"=>"Cross Ref"
+    ,"churchyear"=>"Church Year"
     ,"admin"=>"Housekeeping"
 );
 
