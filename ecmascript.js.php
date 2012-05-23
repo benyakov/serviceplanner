@@ -217,37 +217,59 @@ function setMessage(msg) {
     }
 }
 
-function updateDay(params) {
-    displayId = "#"+params.old_dayname;
-    if ($(displayId)) {
-        // update existing display
+function calcEaster(year) {
+    // Borrowed from Emacs
+    var a = year % 19;
+    var b = year / 100;
+    var c = year % 100;
+    var d = b / 4;
+    var e = b % 4;
+    var f = (b+8)/25;
+    var g = (b-f+1)/3;
+    var h = (19*a+b-d-g+15)%30;
+    var i = c/4;
+    var k = c%4;
+    var l = (32+2*e+2*i-h-k)%7;
+    var m = (a+11*h+22*l)/451;
+    var month = (h+l-7*m+114)/31;
+    var p = (h+l-7*m+114)%31;
+    var day = p+1;
+    return new Date(year, month, day);
+}
+function calcChristmas1(year) {
+    var christmas = new Date(year, 12, 25);
+    if (christmas.getDay() == 0) {
+        return christmas;
     } else {
-        // Insert a new service where the date exists in the current year
+        return new Date(christmas.valueOf() +
+            (7-christmas.getDay())*24*60*60*1000);
     }
 }
-
-function submitDayform() {
-    var dayParams = {
-        submit_day: 1,
-        old_dayname: $("#old-dayname").val(),
-        dayname: $("#dayname").val(),
-        season: $("#season").val(),
-        base: $("#base").val(),
-        offset: $("#offset").val(),
-        month: $("#month").val(),
-        day: $("#day").val(),
-        observed_month: $("#observed-month").val(),
-        observed_sunday: $("#observed-sunday").val()
+function calcMichaelmas1(year, callback) {
+    var michaelmas = new Date(year, 9, 29);
+    if (sessionStorage.michaelmasObserved != -1 && michaelmas.getDay == 6) {
+        return new Date(year, 9, 30);
+    } else {
+        var oct1 = new Date(year, 10, 1);
+        return new Date(oct1.valueOf() +
+            (7-oct1.getDay())*24*60*60*1000);
     }
-    var jqxhr = $.post("churchyear.php", dayParams,
-        function(result) {
-            if (result[0]) {
-                dayParams.currentYear = result[2];
-                updateDay(dayParams);
-            }
-            setMessage(result[1]);
-        }
-    );
+}
+function getDateFor(year) {
+    // With the current settings of the form, calculate the date
+    // in the given year
+    if (! $("#base").val()) {
+        return new Date(year, $("#month"), $("#day"));
+    } else if ("Easter" == $("#base").val()) {
+        return new Date(calcEaster(year).valueOf() +
+            $("#offset")*24*60*60*1000);
+    } else if ("Christmas 1" == $("#base").val()) {
+        return new Date(calcChristmas1(year).valueOf() +
+            $("#offset")*24*60*60*1000);
+    } else if ("Michaelmas 1" == $("#base").val()) {
+        return new Date(calcMichaelmas1(year).valueOf() +
+            $("#offset")*24*60*60*1000);
+    }
 }
 
 $(document).ready(function() {

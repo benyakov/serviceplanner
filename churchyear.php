@@ -32,9 +32,68 @@ function db_calc_date_for($dayname, $year, $specifics) {
         //strptime($q->fetchColumn(0), "Y-m-d");
 }
 
+function query_churchyear($json=false) {
+    /* Return an executed query for all rows of the churchyear db
+     */
+    global $dbh, $dbp;
+    $q = $dbh->prepare("SELECT cy.`dayname`, cy.`season`, cy.`base`,
+        cy.`offset`, cy.`month`, cy.`day`,
+        cy.`observed_month`, cy.`observed_sunday`
+        FROM `{$dbp}churchyear` AS cy
+        JOIN `{$dbp}churchyear_order` AS cyo ON (cy.season = cyo.name)
+        ORDER BY cyo.idx, cy.offset, cy.month, cy.day
+        ");
+    if (! $q->execute()) {
+        if ($json) {
+            echo json_encode(array(false, array_pop($q->errorInfo())));
+        } else {
+            echo "Problem querying database:" . array_pop($q->errorInfo());
+        }
+        exit(0);
+    } else {
+        return $q;
+    }
+}
+
+function churchyear_listing($query) {
+    /* Given an executed query on the churchyear database,
+     * list all items in a table with edit/delete links.
+     */
+    ob_start();
+?>
+<table id="churchyear-listing">
+<tr><td></td><th>Name</th><th>Season</th><th>Base Day</th><th>Days Offset</th><th>Month</th>
+    <th>Day</th><th>Observed Month</th><th>Observed Sunday</th></tr>
+<? $even = "";
+    while ($row = $query->fetch(PDO::FETCH_ASSOC)) {
+        if ($even == "class=\"even\"") {
+            $even = "";
+        } else {
+            $even = "class=\"even\"";
+        }
+?>
+    <tr id="row_<?=$row['dayname']?>" <?=$even?>>
+    <td class="controls">
+    <a class="edit" href="" data-day="<?=$row['dayname']?>">Edit</a><br>
+    <a class="delete" href="" data-day="<?=$row['dayname']?>">Delete</a></td>
+    <td class="dayname"><?=$row['dayname']?></td>
+    <td class="season"><?=$row['season']?></td>
+    <td class="base"><?=$row['base']?></td>
+    <td class="offset"><?=$row['offset']?></td>
+    <td class="month"><?=$row['month']?></td>
+    <td class="day"><?=$row['day']?></td>
+    <td class="observed-month"><?=$row['observed_month']?></td>
+    <td class="observed-sunday"><?=$row['observed_sunday']?></td></tr>
+<?  } ?>
+</table>
+<?
+    return ob_get_clean();
+}
+
+/* Create the church year table if necessary.
+ */
 if (! $dbh->query("SELECT 1 FROM `{$dbp}churchyear`")) {
     $dbh->beginTransaction();
-    /* Create the church year table */
     $q = $dbh->prepare("CREATE TABLE `{$dbp}churchyear` (
         `dayname` varchar(255),
         `season` varchar(64) default \"\",
@@ -134,7 +193,6 @@ if ($_GET['dayname']) {
         echo "Access denied.  Please log in.";
         exit(0);
     }
-
     $q = $dbh->prepare("SELECT `season`, `base`, `offset`, `month`, `day`,
         `observed_month`, `observed_sunday`
         FROM `{$dbp}churchyear`
@@ -181,7 +239,7 @@ if ($_GET['dayname']) {
             type="number" min="0" max="31"
             value="<?=$specifics['observed_sunday']?>"></dd>
         </dl>
-        <button id="dayform_submit" type="submit" name="submit">Submit</button>
+        <button class="dayform_submit" type="submit" name="submit">Submit</button>
         <button type="reset" name="reset">Reset</button>
     </form>
     <p>Calculated dates include:</p>
@@ -193,127 +251,6 @@ if ($_GET['dayname']) {
     }
 ?>
     </div>
-    <script type="text/javascript">
-    function calcEaster(year) {
-        // Borrowed from Emacs
-        var a = year % 19;
-        var b = year / 100;
-        var c = year % 100;
-        var d = b / 4;
-        var e = b % 4;
-        var f = (b+8)/25;
-        var g = (b-f+1)/3;
-        var h = (19*a+b-d-g+15)%30;
-        var i = c/4;
-        var k = c%4;
-        var l = (32+2*e+2*i-h-k)%7;
-        var m = (a+11*h+22*l)/451;
-        var month = (h+l-7*m+114)/31;
-        var p = (h+l-7*m+114)%31;
-        var day = p+1;
-        return new Date(year, month, day);
-    }
-    function calcChristmas1(year) {
-        var christmas = new Date(year, 12, 25);
-        if (christmas.getDay() == 0) {
-            return christmas;
-        } else {
-            return new Date(christmas.valueOf() +
-                (7-christmas.getDay())*24*60*60*1000);
-        }
-    }
-    function calcMichaelmas1(year, callback) {
-        var michaelmas = new Date(year, 9, 29);
-        if (sessionStorage.michaelmasObserved != -1 && michaelmas.getDay == 6) {
-            return new Date(year, 9, 30);
-        } else {
-            var oct1 = new Date(year, 10, 1);
-            return new Date(oct1.valueOf() +
-                (7-oct1.getDay())*24*60*60*1000);
-        }
-    }
-    function getDateFor(year) {
-        // With the current settings of the form, calculate the date
-        // in the given year
-        if (! $("#base").val()) {
-            return new Date(year, $("#month"), $("#day"));
-        } else if ("Easter" == $("#base").val()) {
-            return new Date(calcEaster(year).valueOf() +
-                $("#offset")*24*60*60*1000);
-        } else if ("Christmas 1" == $("#base").val()) {
-            return new Date(calcChristmas1(year).valueOf() +
-                $("#offset")*24*60*60*1000);
-        } else if ("Michaelmas 1" == $("#base").val()) {
-            return new Date(calcMichaelmas1(year).valueOf() +
-                $("#offset")*24*60*60*1000);
-        }
-    }
-    $("#base, #offset, #month, #day, #observed_month, #observed_sunday")
-        .change(function() {
-            var decade = new Array();
-            var now = new Date();
-            var thisyear = now.getFullYear();
-            for (y=thisyear-5; y<=thisyear+5; y++) {
-                decade.push(getDateFor(y).toLocaleDateString());
-            }
-            $("#calculated-dates").html(decade.join(" "));
-        });
-    $("#dayform_submit").click(function(evt) {
-        evt.preventDefault();
-        if ($('#dayname') == "Michaelmas") {
-           sessionStorage.michaelmasObserved = $("#observed-sunday").val();
-        }
-        $.post('churchyear.php', {
-                submit_day: 1,
-                dayname: $("#dayname").val(),
-                season: $("#season").val(),
-                base: $("#base").val(),
-                offset: $("#offset").val(),
-                month: $("#month").val(),
-                day: $("#day").val(),
-                observed_month: $("#observed-month").val(),
-                observed_sunday: $("#observed-sunday").val()
-            }, function(result) {
-                var dn = $("#dayname");
-                if (result[1]) {
-                    // Update the relevant part of the table
-                    if ($("#row_"+dn)) {
-                        $("#row_"+dn.val()).html(
-                            '<td class="control">' +
-                            '<a class="edit" href="" data-day="'.dn.val()+'">Edit</a><br>' +
-                            '<a class="delete" href="" data-day="'+dn.val()+'">Delete</a></td>' +
-                            +'<td class="season">'+$("#season").val()+'</td>'
-                            +'<td class="base">'+$("#base").val()+'</td>'
-                            +'<td class="offset">'+$("#offset").val()+'</td>'
-                            +'<td class="month">'+$("#month").val()+'</td>'
-                            +'<td class="day">'+$("#day").val()+'</td>'
-                            +'<td class="observed-month">'+$("#observed-month").val()+'</td>'
-                            +'<td class="observed-sunday">'+$("#observed-sunday").val()+'</td>'
-                        );
-                    } else {
-                        // Changed dayname and added a row
-                        $("tr").has("td.season:contains('"+$("#season").val()+"')")
-                            .first()
-                            .before(
-                            '<td class="control">' +
-                            '<a class="edit" href="" data-day="'.dn.val()+'">Edit</a><br>' +
-                            '<a class="delete" href="" data-day="'+dn.val()+'">Delete</a></td>' +
-                            +'<td class="season">'+$("#season").val()+'</td>'
-                            +'<td class="base">'+$("#base").val()+'</td>'
-                            +'<td class="offset">'+$("#offset").val()+'</td>'
-                            +'<td class="month">'+$("#month").val()+'</td>'
-                            +'<td class="day">'+$("#day").val()+'</td>'
-                            +'<td class="observed-month">'+$("#observed-month").val()+'</td>'
-                            +'<td class="observed-sunday">'+$("#observed-sunday").val()+'</td>'
-                            );
-                    }
-                }
-                $("#dialog").dialog("close");
-                setMessage(result);
-                $(document).ready();
-            });
-     });
-    </script>
 <?
     exit(0);
 }
@@ -334,9 +271,11 @@ if ($_POST['del']) {
         WHERE `dayname` = :dayname");
     $q->bindValue(":dayname", $_POST['del']);
     if ($q->execute()) {
-        echo json_encode(array(true, $_POST['del']));
+        echo json_encode(array(true,
+            churchyear_listing(query_churchyear(true))));
     } else {
-        echo json_encode(array(false, $_POST['del']));
+        echo json_encode(array(false,
+        "Problem deleting: ".array_pop($q->errorInfo())));
     }
     exit(0);
 }
@@ -389,31 +328,23 @@ if ($_POST['submit_day']==1) {
         $q->bindValue(":observed_month", $_POST['observed_month']);
         $q->bindValue(":observed_sunday", $_POST['observed_sunday']);
         if ($q->execute()) {
-            echo json_encode(array(1, "Day {$_POST['dayname']} updated.",
-            get_date_for($_POST['dayname'], date('Y'), $_POST)));
+            echo json_encode(array(true,
+                churchyear_listing(query_churchyear(true))));
         } else {
-            echo json_encode(array(0, "Problem saving: ". array_pop($q->errorInfo())));
+            echo json_encode(array(false,
+                "Problem saving: ". array_pop($q->errorInfo())));
         }
         exit(0);
     }
 }
+
 if (! $auth) {
     setMessage("Access denied.  Please log in.");
     header("location: index.php");
     exit(0);
 }
 
-$q = $dbh->prepare("SELECT cy.`dayname`, cy.`season`, cy.`base`,
-    cy.`offset`, cy.`month`, cy.`day`,
-    cy.`observed_month`, cy.`observed_sunday`
-    FROM `{$dbp}churchyear` AS cy
-    JOIN `{$dbp}churchyear_order` AS cyo ON (cy.season = cyo.name)
-    ORDER BY cyo.idx, cy.offset, cy.month, cy.day
-    ");
-if (! $q->execute()) {
-    echo "Problem querying database:" . array_pop($q->errorInfo());
-    exit(0);
-}
+$q = query_churchyear();
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -421,6 +352,16 @@ if (! $q->execute()) {
 <body>
 <script type="text/javascript">
     $(document).ready(function() {
+        setupEdit();
+        setupDelete();
+        $.get("churchyear.php", { params: "Michaelmas" },
+            function(params) {
+                sessionStorage.michaelmasObserved = params['observed_sunday'];
+            });
+    });
+
+    function setupEdit() {
+        // Set up edit links
         $(".edit").click(function(evt) {
             evt.preventDefault();
             $("#dialog")
@@ -432,26 +373,67 @@ if (! $q->execute()) {
                     close: function() {
                         setMessage("Edit cancelled.");
                     }});
+            setupDialog();
         });
+    }
+
+    function setupDelete() {
+        // Set up delete links
         $(".delete").click(function(evt) {
             evt.preventDefault();
             var dayname = $(this).attr("data-day");
             if (confirm("Delete the day '"+dayname+"'?")) {
                 $.post("churchyear.php", {del: dayname}, function(rv) {
                     if (rv[0]) {
-                        setMessage(rv[1]+" has been deleted.");
-                        $("#row_"+rv[1]).remove();
+                        $("#churchyear-listing").replaceWith(rv[1]);
+                        setupEdit();
+                        setupDelete();
                     } else {
-                        setMessage("Problem deleting "+rv[1]+".");
+                        setMessage(rv[1]);
                     }
-                })
+                });
             }
         });
-        $.get("churchyear.php", { params: "Michaelmas" },
-            function(params) {
-                sessionStorage.michaelmasObserved = params['observed_sunday'];
+    }
+
+    function setupDialog() {
+        $("#base, #offset, #month, #day, #observed_month, #observed_sunday")
+            .change(function() {
+                var decade = new Array();
+                var now = new Date();
+                var thisyear = now.getFullYear();
+                for (y=thisyear-5; y<=thisyear+5; y++) {
+                    decade.push(getDateFor(y).toLocaleDateString());
+                }
+                $("#calculated-dates").html(decade.join(" "));
             });
-    });
+        $("#dayform").submit(function(evt) {
+            evt.preventDefault();
+            if ($('#dayname') == "Michaelmas") {
+               sessionStorage.michaelmasObserved = $("#observed-sunday").val();
+            }
+            $.post('churchyear.php', {
+                    submit_day: 1,
+                    dayname: $("#dayname").val(),
+                    season: $("#season").val(),
+                    base: $("#base").val(),
+                    offset: $("#offset").val(),
+                    month: $("#month").val(),
+                    day: $("#day").val(),
+                    observed_month: $("#observed-month").val(),
+                    observed_sunday: $("#observed-sunday").val()
+                }, function(result) {
+                    if (result[0]) {
+                        $("#churchyear-listing").replaceWith(result[1]);
+                        setupEdit();
+                        setupDelete();
+                    } else {
+                        setMessage(result[1]);
+                    }
+                    $("#dialog").dialog("close");
+                });
+         });
+    }
 </script>
 <header>
 <?=getLoginForm()?>
@@ -461,31 +443,7 @@ if (! $q->execute()) {
 <?=sitetabs($sitetabs, $script_basename)?>
 <div id="content-container">
 <h1>Church Year Configuration</h1>
-<table id="churchyear-listing">
-<tr><td></td><th>Name</th><th>Season</th><th>Base Day</th><th>Days Offset</th><th>Month</th>
-    <th>Day</th><th>Observed Month</th><th>Observed Sunday</th></tr>
-<? $even = "";
-    while ($row = $q->fetch(PDO::FETCH_ASSOC)) {
-        if ($even == "class=\"even\"") {
-            $even = "";
-        } else {
-            $even = "class=\"even\"";
-        }
-?>
-    <tr id="row_<?=$row['dayname']?>" <?=$even?>>
-    <td class="controls">
-    <a class="edit" href="" data-day="<?=$row['dayname']?>">Edit</a><br>
-    <a class="delete" href="" data-day="<?=$row['dayname']?>">Delete</a></td>
-    <td class="dayname"><?=$row['dayname']?></td>
-    <td class="season"><?=$row['season']?></td>
-    <td class="base"><?=$row['base']?></td>
-    <td class="offset"><?=$row['offset']?></td>
-    <td class="month"><?=$row['month']?></td>
-    <td class="day"><?=$row['day']?></td>
-    <td class="observed-month"><?=$row['observed_month']?></td>
-    <td class="observed-sunday"><?=$row['observed_sunday']?></td></tr>
-<?  } ?>
-</table>
+<?=churchyear_listing($q)?>
 </div>
 <div id="dialog"></div>
 </body>
