@@ -40,7 +40,8 @@ function query_churchyear($json=false) {
         cy.`offset`, cy.`month`, cy.`day`,
         cy.`observed_month`, cy.`observed_sunday`
         FROM `{$dbp}churchyear` AS cy
-        JOIN `{$dbp}churchyear_order` AS cyo ON (cy.season = cyo.name)
+        LEFT OUTER JOIN `{$dbp}churchyear_order` AS cyo
+            ON (cy.season = cyo.name)
         ORDER BY cyo.idx, cy.offset, cy.month, cy.day
         ");
     if (! $q->execute()) {
@@ -286,14 +287,12 @@ if ($_POST['del']) {
 
 if ($_POST['submit_day']==1) {
     if (! $auth) {
-        echo json_encode(array(0, "Access denied. Please log in."));
+        setMessage("Access denied. Please log in.");
+        header("location: index.php");
         exit(0);
     }
 
     // Update/save supplied values for the given day
-    header('Cache-Control: no-cache, must-revalidate');
-    header('Expires: Mon, 01 Jan 1996 00:00:00 GMT');
-    header("Content-type: application/json");
     unset($_POST['submit_day']);
     $q = $dbh->prepare("INSERT INTO `{$dbp}churchyear`
         (dayname, season, base, offset, month, day,
@@ -308,11 +307,7 @@ if ($_POST['submit_day']==1) {
     $q->bindValue(":day", $_POST['day']);
     $q->bindValue(":observed_month", $_POST['observed_month']);
     $q->bindValue(":observed_sunday", $_POST['observed_sunday']);
-    if ($q->execute()) {
-        echo json_encode(array(1, "New day {$_POST['dayname']} saved.",
-        get_date_for($_POST['dayname'], date('Y'), $_POST)));
-        exit(0);
-    } else {
+    if (! $q->execute()) {
         $q = $dbh->prepare("UPDATE `{$dbp}churchyear`
             SET season=:season,
             base=:base, offset=:offset,
@@ -327,13 +322,10 @@ if ($_POST['submit_day']==1) {
         $q->bindValue(":day", $_POST['day']);
         $q->bindValue(":observed_month", $_POST['observed_month']);
         $q->bindValue(":observed_sunday", $_POST['observed_sunday']);
-        if ($q->execute()) {
-            echo json_encode(array(true,
-                churchyear_listing(query_churchyear(true))));
-        } else {
-            echo json_encode(array(false,
-                "Problem saving: ". array_pop($q->errorInfo())));
+        if (! $q->execute()) {
+            setMessage("Problem saving: ". array_pop($q->errorInfo()));
         }
+        header("location: churchyear.php");
         exit(0);
     }
 }
@@ -372,8 +364,10 @@ $q = query_churchyear();
                     maxHeight: $(window).height()*0.7,
                     close: function() {
                         setMessage("Edit cancelled.");
+                    },
+                    open: function() {
+                        setupDialog();
                     }});
-            setupDialog();
         });
     }
 
@@ -407,31 +401,10 @@ $q = query_churchyear();
                 }
                 $("#calculated-dates").html(decade.join(" "));
             });
-        $("#dayform").submit(function(evt) {
-            evt.preventDefault();
+        $("#dayform").submit(function() {
             if ($('#dayname') == "Michaelmas") {
                sessionStorage.michaelmasObserved = $("#observed-sunday").val();
             }
-            $.post('churchyear.php', {
-                    submit_day: 1,
-                    dayname: $("#dayname").val(),
-                    season: $("#season").val(),
-                    base: $("#base").val(),
-                    offset: $("#offset").val(),
-                    month: $("#month").val(),
-                    day: $("#day").val(),
-                    observed_month: $("#observed-month").val(),
-                    observed_sunday: $("#observed-sunday").val()
-                }, function(result) {
-                    if (result[0]) {
-                        $("#churchyear-listing").replaceWith(result[1]);
-                        setupEdit();
-                        setupDelete();
-                    } else {
-                        setMessage(result[1]);
-                    }
-                    $("#dialog").dialog("close");
-                });
          });
     }
 </script>

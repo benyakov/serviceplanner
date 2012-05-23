@@ -154,6 +154,7 @@ table#churchyear-listing td.dayname {
     padding: 0 .25em 0 .25em;
     text-align: left;
     font-weight: bold;
+    width: 20em;
 }
 
 
