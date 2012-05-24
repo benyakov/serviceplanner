@@ -2,20 +2,20 @@ DELIMITER $$;
 CREATE FUNCTION easter_in_year(p_year INT) RETURNS DATE
 DETERMINISTIC
 BEGIN
-SET @iD=0,@iE=0,@iQ=0,@iMonth=0,@iDay=0;
-SET @iD = 255 - 11 * (p_year % 19);
-SET @iD = IF (@iD > 50,(@iD-21) % 30 + 21,@iD);
-SET @iD = @iD - IF(@iD > 48, 1 ,0);
-SET @iE = (p_year + FLOOR(p_year/4) + @iD + 1) % 7;
-SET @iQ = @iD + 7 - @iE;
-IF @iQ < 32 THEN
-    SET @iMonth = 3;
-    SET @iDay = @iQ;
+SET @century = FLOOR(1 + p_year/100);
+COMMENT "Age of moon for April 5";
+SET @shiftedEpact = ((14 + 11 * (p_year % 19))
+    - FLOOR((3 * @century) / 4)
+    + FLOOR(((8 * @century) + 5) / 25)
+    + 30 * @century) % 30;
+COMMENT "Adjust for 29.5 day month.";
+IF @shiftedEpact = 0 OR (@shiftedEpact = 1 AND 10 < (p_year % 19)) THEN
+    SET @adjustedEpact = @shiftedEpact + 1;
 ELSE
-    SET @iMonth = 4;
-    SET @iDay = @iQ - 31;
-END IF;
-RETURN STR_TO_DATE(CONCAT(p_year,'-',@iMonth,'-',@iDay),'%Y-%m-%d');
+    SET @adjustedEpact = @shiftedEpact;
+END IF
+SET @paschalMoon = DATE_SUB(CONCAT_WS('-', p_year, 4, 19), @adjustedEpact);
+RETURN DATE_ADD(@paschalMoon, 8-DAYOFWEEK(@paschalMoon));
 END$$
 
 CREATE FUNCTION christmas1_in_year(p_year INT) RETURNS DATE
