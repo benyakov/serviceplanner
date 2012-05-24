@@ -150,7 +150,8 @@ if (! $dbh->query("SELECT 1 FROM `{$dbp}churchyear`")) {
     // Define helper functions on the db for getting the dates of days
     $functionsfile = "utility/churchyearfunctions.sql";
     $functionsfh = fopen($functionsfile, "rb");
-    $result = $dbh->exec(fread($functionsfh, filesize($functionsfile)));
+    $functionstext = fread($functionsfh, filesize($functionsfile));
+    $result = $dbh->exec(str_replace('{$dbp}', $dbp, $functionstext));
     fclose($functionsfh);
     $dbh->commit();
 }
