@@ -20,13 +20,31 @@ if (array_key_exists("date", $_POST)) {
 <?=html_head("Service Entry Form: ${this_script}")?>
 <body>
     <script type="text/javascript">
+    function updateDayname() {
+        var sdate = new Date($("#date").val());
+        sdate = sdate.toISOString().split("T")[0];
+        $.get("churchyear.php", {daysfordate: sdate},
+            function(rv) {
+                if (rv[0]) {
+                    if (rv.length) {
+                        $("#liturgicalname").val(rv[1].join(", "));
+                    }
+                }
+            });
+    }
+    function updateFromDate() {
+        updateDayname();
+        updateExisting();
+    }
     $(document).ready(function() {
         $("#existing-services").hide();
         $("#date").focus()
             .keyup(function(){
-                $(this).doTimeout('update-existing', 250, updateExisting)
+                $(this).doTimeout('update-existing', 250, updateFromDate)
             })
-            .change(updateExisting)
+            .change(function() {
+                updateFromDate();
+            })
             .datepicker({showOn:"button", numberOfMonths: [2,2],
                 stepMonths: 4, onClose: function() {
                     $("#date").change();

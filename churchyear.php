@@ -142,7 +142,7 @@ if (! $dbh->query("SELECT 1 FROM `{$dbp}churchyear`")) {
     $sql = "CREATE TABLE `{{DBP}}churchyear_order` (
         `name` varchar(32),
         `idx` smallint UNIQUE,
-        PRIMARY KEY (`name`))"
+        PRIMARY KEY (`name`))";
     $q = $dbh->prepare(replaceDBP($sql));
     $q->execute() or die(array_pop($q->errorInfo()));
     $allsql[] = replaceDBP($sql, "");
@@ -163,18 +163,18 @@ if (! $dbh->query("SELECT 1 FROM `{$dbp}churchyear`")) {
         exit(0);
     }
     // Write table descriptions to createtables.sql
-    const CY_BEGIN_MARKER = "# BEGIN Church Year Tables\n";
-    const CY_END_MARKER = "# END Church Year Tables\n";
-    const CREATE_TABLES_FILE = "./utility/createtables.sql";
-    $tabledesc = CY_BEGIN_MARKER . implode("\n", $allsql) . CY_END_MARKER;
-    $createtables = file_get_contents(CREATE_TABLES_FILE);
-    if (false === strpos($createtables, CY_BEGIN_MARKER) {
+    $cy_begin_marker = "# BEGIN Church Year Tables\n";
+    $cy_end_marker = "# END Church Year Tables\n";
+    $create_tables_file = "./utility/createtables.sql";
+    $tabledesc = $cy_begin_marker . implode("\n", $allsql) . $cy_end_marker;
+    $createtables = file_get_contents($create_tables_file);
+    if (false === strpos($createtables, $cy_begin_marker)) {
         $fh = fopen($createtablesfile, "a");
         fwrite($fh, $tabledesc);
         fclose($fh);
     } else {
-        $start = strpos($createtables, CY_BEGIN_MARKER);
-        $len = strpos($createtables, CY_END_MARKER) - $start;
+        $start = strpos($createtables, $cy_begin_marker);
+        $len = strpos($createtables, $cy_end_marker) - $start;
         $newcontents = substr_replace($createtables, $tabledesc, $start, $len);
         $fh = fopen($createtablesfile, "w");
         fwrite($fh, $newcontents);
@@ -193,6 +193,26 @@ if (! $dbh->query("SHOW FUNCTION STATUS LIKE 'easter_in_year'")) {
     $dbh->commit();
 }
 
+/* churchyear.php?daysfordate=date
+ * Returns a comma-separated list of daynames that match the date given.
+ */
+if ($_GET['daysfordate']) {
+    $date = date_parse($_GET['daysfordate']);
+    $q = $dbh->prepare("SELECT dayname FROM `{$dbp}churchyear`
+        WHERE date_in_year(:year1, dayname) = :date1
+        OR observed_date_in_year(:year2, dayname) = :date1");
+    $q->bindValue(':year1', $date['year']);
+    $q->bindValue(':year2', $date['year']);
+    $q->bindValue(':date1', $_GET['daysfordate']);
+    $q->bindValue(':date2', $_GET['daysfordate']);
+    $result = $q->execute();
+    while ($row = $q->fetch(PDO::FETCH_NUM)) {
+        $found[] = $row[0];
+    }
+    echo json_encode(array($result, $found));
+    exit(0);
+}
+
 /* churchyear.php?params=dayname
  * Returns the db parameters for dayname in the church year as json.
  */
@@ -201,10 +221,9 @@ if ($_GET['params']) {
         echo json_encode("Access denied.  Please log in.");
         exit(0);
     }
-    /* header('Cache-Control: no-cache, must-revalidate');
+    header('Cache-Control: no-cache, must-revalidate');
     header('Expires: Mon, 01 Jan 1996 00:00:00 GMT');
     header("Content-type: application/json");
-     */
     $q = $dbh->prepare("SELECT `season`, `base`, `offset`, `month`, `day`,
         `observed_month`, `observed_sunday`
         FROM `{$dbp}churchyear`
