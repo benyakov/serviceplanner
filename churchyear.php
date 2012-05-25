@@ -91,11 +91,22 @@ function churchyear_listing($query) {
     return ob_get_clean();
 }
 
+function replaceDBP($text, $prefix=false) {
+    // Where replace occurrences of {{DBP}} with $prefix or $dbp in text.
+    global $dbp;
+    if ($prefix !== false) {
+        return str_replace('{{DBP}}', $prefix, $text);
+    } else {
+        return str_replace('{{DBP}}', $dbp, $text);
+    }
+}
+
 /* Create the church year table if necessary.
  */
 if (! $dbh->query("SELECT 1 FROM `{$dbp}churchyear`")) {
     $dbh->beginTransaction();
-    $q = $dbh->prepare("CREATE TABLE `{$dbp}churchyear` (
+    $allsql = array();
+    $sql = 'CREATE TABLE `{{DBP}}churchyear` (
         `dayname` varchar(255),
         `season` varchar(64) default \"\",
         `base` varchar(255) default NULL,
@@ -105,8 +116,10 @@ if (! $dbh->query("SELECT 1 FROM `{$dbp}churchyear`")) {
         `observed_month` tinyint default 0,
         `observed_sunday` tinyint default 0,
         PRIMARY KEY (`dayname`)
-    ) ENGINE=InnoDB DEFAULT CHARSET=utf8") ;
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8';
+    $q = $dbh->prepare(replaceDBP($sql)) ;
     $q->execute() or die(array_pop($q->errorInfo()));
+    $allsql[] = replaceDBP($sql, "");
     $fh = fopen("historictable.csv", "r");
     $headings = fgetcsv($fh);
     while (($record = fgetcsv($fh, 250)) != FALSE) {
@@ -126,11 +139,13 @@ if (! $dbh->query("SELECT 1 FROM `{$dbp}churchyear`")) {
         $q->execute() or dieWithRollback($q, "\n".__FILE__.":".__LINE__);
     }
     // Define helper table for ordering the presentation of days
-    $q = $dbh->prepare("CREATE TABLE `{$dbp}churchyear_order` (
+    $sql = "CREATE TABLE `{{DBP}}churchyear_order` (
         `name` varchar(32),
         `idx` smallint UNIQUE,
-        PRIMARY KEY (`name`))");
+        PRIMARY KEY (`name`))"
+    $q = $dbh->prepare(replaceDBP($sql));
     $q->execute() or die(array_pop($q->errorInfo()));
+    $allsql[] = replaceDBP($sql, "");
     $q = $dbh->prepare("INSERT INTO `{$dbp}churchyear_order`
         (name, idx) VALUES
         (\"Advent\", 1),
@@ -147,11 +162,33 @@ if (! $dbh->query("SELECT 1 FROM `{$dbp}churchyear`")) {
         echo "Problem inserting seasons: " . array_pop($q->errorInfo());
         exit(0);
     }
+    // Write table descriptions to createtables.sql
+    const CY_BEGIN_MARKER = "# BEGIN Church Year Tables\n";
+    const CY_END_MARKER = "# END Church Year Tables\n";
+    const CREATE_TABLES_FILE = "./utility/createtables.sql";
+    $tabledesc = CY_BEGIN_MARKER . implode("\n", $allsql) . CY_END_MARKER;
+    $createtables = file_get_contents(CREATE_TABLES_FILE);
+    if (false === strpos($createtables, CY_BEGIN_MARKER) {
+        $fh = fopen($createtablesfile, "a");
+        fwrite($fh, $tabledesc);
+        fclose($fh);
+    } else {
+        $start = strpos($createtables, CY_BEGIN_MARKER);
+        $len = strpos($createtables, CY_END_MARKER) - $start;
+        $newcontents = substr_replace($createtables, $tabledesc, $start, $len);
+        $fh = fopen($createtablesfile, "w");
+        fwrite($fh, $newcontents);
+        fclose($fh);
+    }
+}
+/* (Re-)Create church year functions if necessary
+ */
+if (! $dbh->query("SHOW FUNCTION STATUS LIKE 'easter_in_year'")) {
     // Define helper functions on the db for getting the dates of days
-    $functionsfile = "utility/churchyearfunctions.sql";
+    $functionsfile = "./utility/churchyearfunctions.sql";
     $functionsfh = fopen($functionsfile, "rb");
     $functionstext = fread($functionsfh, filesize($functionsfile));
-    $result = $dbh->exec(str_replace('{$dbp}', $dbp, $functionstext));
+    $result = $dbh->exec(replaceDBP($functionstext));
     fclose($functionsfh);
     $dbh->commit();
 }
@@ -159,7 +196,6 @@ if (! $dbh->query("SELECT 1 FROM `{$dbp}churchyear`")) {
 /* churchyear.php?params=dayname
  * Returns the db parameters for dayname in the church year as json.
  */
-
 if ($_GET['params']) {
     if (! $auth) {
         echo json_encode("Access denied.  Please log in.");

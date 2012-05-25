@@ -1,4 +1,3 @@
-- Have churchyear db setup add its profile to the createtables.php script.
 - Have the add page automatically enter a dayname when the date is changed
 - Add a table storing propers for the named days
 - Possibly a table storing synonyms for the named days.
