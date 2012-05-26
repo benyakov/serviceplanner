@@ -64,11 +64,11 @@ BEGIN
         RETURN CONCAT_WS('-', p_year, month, day);
     END IF;
     IF base = "Easter" THEN
-        RETURN easter_in_year(p_year) + INTERVAL offset DAY;
+        RETURN `{{DBP}}easter_in_year`(p_year) + INTERVAL offset DAY;
     ELSEIF base = "Christmas 1" THEN
-        RETURN christmas1_in_year(p_year) + INTERVAL offset DAY;
+        RETURN `{{DBP}}christmas1_in_year`(p_year) + INTERVAL offset DAY;
     ELSEIF base = "Michaelmas 1" THEN
-        RETURN michaelmas1_in_year(p_year) + INTERVAL offset DAY;
+        RETURN `{{DBP}}michaelmas1_in_year`(p_year) + INTERVAL offset DAY;
     ELSE
         RETURN 0;
     END IF;
@@ -85,7 +85,7 @@ BEGIN
         FROM `{{DBP}}churchyear`
         WHERE dayname=p_dayname
         INTO v_base, v_offset, v_month, v_day;
-    RETURN calc_date_in_year(p_year, p_dayname,
+    RETURN `{{DBP}}calc_date_in_year`(p_year, p_dayname,
         v_base, v_offset, v_month, v_day);
 END;
 
@@ -99,7 +99,7 @@ BEGIN
     DECLARE actual, firstofmonth, lastofmonth DATE;
     IF base IS NULL THEN
         IF observed_month = 0 THEN
-            SET actual = date_in_year(p_year, p_dayname);
+            SET actual = `{{DBP}}date_in_year`(p_year, p_dayname);
             IF DAYOFWEEK(actual) > 1 THEN
                 RETURN actual + INTERVAL 8-DAYOFWEEK(actual) DAY;
             END IF;
@@ -138,7 +138,7 @@ BEGIN
         FROM `{{DBP}}churchyear`
         WHERE dayname=p_dayname
         INTO v_base, v_observed_month, v_observed_sunday;
-RETURN calc_observed_date_in_year(p_year, p_dayname, v_base, v_observed_month,
+RETURN `{{DBP}}calc_observed_date_in_year`(p_year, p_dayname, v_base, v_observed_month,
     v_observed_sunday);
 END;
 
