@@ -41,7 +41,7 @@ READS SQL DATA
 BEGIN
     DECLARE mike_observed, wdmichaelmas, oct1wd INTEGER;
     DECLARE michaelmas, oct1 DATE;
-    SELECT observed_sunday FROM `{$dbp}churchyear`
+    SELECT observed_sunday FROM `{{DBP}}churchyear`
         WHERE dayname="Michaelmas" INTO mike_observed;
     SET michaelmas = CONCAT_WS('-', p_year, 9, 29);
     SET wdmichaelmas = DAYOFWEEK(michaelmas);
@@ -78,7 +78,7 @@ READS SQL DATA
 BEGIN
     DECLARE base, offset, month, day INTEGER;
     SELECT base, offset, month, day
-        FROM `{$dbp}churchyear`
+        FROM `{{DBP}}churchyear`
         WHERE dayname=p_dayname
         INTO base, offset, month, day;
     RETURN calc_date_in_year(p_year, p_dayname, base, offset, month, day);
@@ -126,7 +126,7 @@ READS SQL DATA
 BEGIN
     DECLARE base, observed_month, observed_sunday INTEGER;
     SELECT base, observed_month, observed_sunday
-        FROM `{$dbp}churchyear`
+        FROM `{{DBP}}churchyear`
         WHERE dayname=p_dayname
         INTO base, observed_month, observed_sunday;
 RETURN calc_observed_date_in_year(p_year, p_dayname, base, observed_month,

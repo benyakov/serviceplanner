@@ -3,6 +3,7 @@
  */
 require("init.php");
 $auth = auth();
+$dbh->beginTransaction();
 
 function get_date_for($dayname, $year, $specifics) {
     /* TODO: Compare the db calculation below to a php implementation
@@ -104,11 +105,10 @@ function replaceDBP($text, $prefix=false) {
 /* Create the church year table if necessary.
  */
 if (! $dbh->query("SELECT 1 FROM `{$dbp}churchyear`")) {
-    $dbh->beginTransaction();
     $allsql = array();
     $sql = 'CREATE TABLE `{{DBP}}churchyear` (
         `dayname` varchar(255),
-        `season` varchar(64) default \"\",
+        `season` varchar(64) default "",
         `base` varchar(255) default NULL,
         `offset` smallint default 0,
         `month` tinyint default 0,
@@ -169,28 +169,37 @@ if (! $dbh->query("SELECT 1 FROM `{$dbp}churchyear`")) {
     $tabledesc = $cy_begin_marker . implode("\n", $allsql) . $cy_end_marker;
     $createtables = file_get_contents($create_tables_file);
     if (false === strpos($createtables, $cy_begin_marker)) {
-        $fh = fopen($createtablesfile, "a");
+        $fh = fopen($create_tables_file, "a");
         fwrite($fh, $tabledesc);
         fclose($fh);
     } else {
         $start = strpos($createtables, $cy_begin_marker);
         $len = strpos($createtables, $cy_end_marker) - $start;
         $newcontents = substr_replace($createtables, $tabledesc, $start, $len);
-        $fh = fopen($createtablesfile, "w");
+        $fh = fopen($create_tables_file, "w");
         fwrite($fh, $newcontents);
         fclose($fh);
     }
 }
 /* (Re-)Create church year functions if necessary
  */
-if (! $dbh->query("SHOW FUNCTION STATUS LIKE 'easter_in_year'")) {
+$result = $dbh->query("SHOW FUNCTION STATUS LIKE 'easter_in_year'");
+if (! $result->fetch(PDO::FETCH_NUM)) {
+    echo "Loading functions";
     // Define helper functions on the db for getting the dates of days
     $functionsfile = "./utility/churchyearfunctions.sql";
     $functionsfh = fopen($functionsfile, "rb");
     $functionstext = fread($functionsfh, filesize($functionsfile));
-    $result = $dbh->exec(replaceDBP($functionstext));
     fclose($functionsfh);
+    $q = $dbh->prepare(replaceDBP($functionstext));
+    if (!$q->execute()) {
+        die ("Problem loading churchyear functions: "
+            . array_pop($q->errorInfo()) . "<br>"
+            . implode("<br>\n", explode("\n", $functionstext)));
+    }
+    echo "Loaded functions";
     $dbh->commit();
+    $dbh->beginTransaction();
 }
 
 /* churchyear.php?daysfordate=date
@@ -482,6 +491,6 @@ $q = query_churchyear();
 <div id="dialog"></div>
 </body>
 </html>
-
-
-
+<?
+$dbh->commit();
+?>
