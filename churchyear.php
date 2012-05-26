@@ -3,7 +3,6 @@
  */
 require("init.php");
 $auth = auth();
-$dbh->beginTransaction();
 
 function get_date_for($dayname, $year, $specifics) {
     /* TODO: Compare the db calculation below to a php implementation
@@ -20,7 +19,7 @@ function db_calc_date_for($dayname, $year, $specifics) {
      * return the db's stored function calculation of the day's date
      * in that year. */
     global $dbh;
-    $q = $dbh->prepare("SELECT calc_date_in_year(:year, :dayname,
+    $q = $dbh->prepare("SELECT `{$dbp}calc_date_in_year`(:year, :dayname,
         :base, :offset, :month, :day)");
     $q->bindParam(":year", $year);
     $q->bindParam(":dayname", $dayname);
@@ -43,8 +42,7 @@ function query_churchyear($json=false) {
         FROM `{$dbp}churchyear` AS cy
         LEFT OUTER JOIN `{$dbp}churchyear_order` AS cyo
             ON (cy.season = cyo.name)
-        ORDER BY cyo.idx, cy.offset, cy.month, cy.day
-        ");
+            ORDER BY cyo.idx, cy.offset, cy.month, cy.day");
     if (! $q->execute()) {
         if ($json) {
             echo json_encode(array(false, array_pop($q->errorInfo())));
@@ -53,12 +51,12 @@ function query_churchyear($json=false) {
         }
         exit(0);
     } else {
-        return $q;
+        return $q->fetchAll(PDO::FETCH_ASSOC);
     }
 }
 
-function churchyear_listing($query) {
-    /* Given an executed query on the churchyear database,
+function churchyear_listing($rows) {
+    /* Given an array of matched db rows,
      * list all items in a table with edit/delete links.
      */
     ob_start();
@@ -67,7 +65,7 @@ function churchyear_listing($query) {
 <tr><td></td><th>Name</th><th>Season</th><th>Base Day</th><th>Days Offset</th><th>Month</th>
     <th>Day</th><th>Observed Month</th><th>Observed Sunday</th></tr>
 <? $even = "";
-    while ($row = $query->fetch(PDO::FETCH_ASSOC)) {
+    foreach ($rows as $row) {
         if ($even == "class=\"even\"") {
             $even = "";
         } else {
@@ -104,7 +102,9 @@ function replaceDBP($text, $prefix=false) {
 
 /* Create the church year table if necessary.
  */
-if (! $dbh->query("SELECT 1 FROM `{$dbp}churchyear`")) {
+$dbh->beginTransaction();
+$tableTest = $dbh->query("SELECT 1 FROM `{$dbp}churchyear`");
+if (! $tableTest->fetchAll()) {
     $allsql = array();
     $sql = 'CREATE TABLE `{{DBP}}churchyear` (
         `dayname` varchar(255),
@@ -183,21 +183,14 @@ if (! $dbh->query("SELECT 1 FROM `{$dbp}churchyear`")) {
 }
 /* (Re-)Create church year functions if necessary
  */
-$result = $dbh->query("SHOW FUNCTION STATUS LIKE 'easter_in_year'");
-if (! $result->fetch(PDO::FETCH_NUM)) {
-    echo "Loading functions";
+$result = $dbh->query("SHOW FUNCTION STATUS LIKE '{$dbp}easter_in_year'");
+if (! $result->fetchAll(PDO::FETCH_NUM)) {
     // Define helper functions on the db for getting the dates of days
     $functionsfile = "./utility/churchyearfunctions.sql";
     $functionsfh = fopen($functionsfile, "rb");
     $functionstext = fread($functionsfh, filesize($functionsfile));
     fclose($functionsfh);
-    $q = $dbh->prepare(replaceDBP($functionstext));
-    if (!$q->execute()) {
-        die ("Problem loading churchyear functions: "
-            . array_pop($q->errorInfo()) . "<br>"
-            . implode("<br>\n", explode("\n", $functionstext)));
-    }
-    echo "Loaded functions";
+    $dbh->exec(replaceDBP($functionstext));
     $dbh->commit();
     $dbh->beginTransaction();
 }
@@ -208,8 +201,8 @@ if (! $result->fetch(PDO::FETCH_NUM)) {
 if ($_GET['daysfordate']) {
     $date = date_parse($_GET['daysfordate']);
     $q = $dbh->prepare("SELECT dayname FROM `{$dbp}churchyear`
-        WHERE date_in_year(:year1, dayname) = :date1
-        OR observed_date_in_year(:year2, dayname) = :date1");
+        WHERE `{$dbp}date_in_year`(:year1, dayname) = :date1
+        OR `{$dbp}observed_date_in_year`(:year2, dayname) = :date1");
     $q->bindValue(':year1', $date['year']);
     $q->bindValue(':year2', $date['year']);
     $q->bindValue(':date1', $_GET['daysfordate']);
@@ -395,7 +388,6 @@ if (! $auth) {
     exit(0);
 }
 
-$q = query_churchyear();
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -486,7 +478,7 @@ $q = query_churchyear();
 <?=sitetabs($sitetabs, $script_basename)?>
 <div id="content-container">
 <h1>Church Year Configuration</h1>
-<?=churchyear_listing($q)?>
+<?=churchyear_listing(query_churchyear())?>
 </div>
 <div id="dialog"></div>
 </body>

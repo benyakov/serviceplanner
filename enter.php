@@ -20,36 +20,35 @@ if (array_key_exists("date", $_POST)) {
 <?=html_head("Service Entry Form: ${this_script}")?>
 <body>
     <script type="text/javascript">
-    function updateDayname() {
+    function updateFromDate(dateitem) {
         var sdate = new Date($("#date").val());
         sdate = sdate.toISOString().split("T")[0];
         $.get("churchyear.php", {daysfordate: sdate},
             function(rv) {
+                rv = eval(rv);
                 if (rv[0]) {
                     if (rv.length) {
-                        $("#liturgicalname").val(rv[1].join(", "));
+                        $("#liturgicalname").val(Array(rv[1]).join(", "));
                     }
                 }
             });
-    }
-    function updateFromDate() {
-        updateDayname();
-        updateExisting();
+        updateExisting(dateitem);
     }
     $(document).ready(function() {
         $("#existing-services").hide();
-        $("#date").focus()
-            .keyup(function(){
-                $(this).doTimeout('update-existing', 250, updateFromDate)
-            })
+        $("#date").keyup(function(){
+            $(this).doTimeout('update-existing', 500, function() {
+                updateFromDate(this);
+            })})
             .change(function() {
-                updateFromDate();
+                updateFromDate(this);
             })
             .datepicker({showOn:"button", numberOfMonths: [2,2],
                 stepMonths: 4, onClose: function() {
-                    $("#date").change();
                     $("#location").focus();
+                    $("#date").change();
                 }})
+            .focus()
         $(".hymn-number").keyup(function(evt){
             if (evt.which != 9 &&
                 evt.which != 17) {
@@ -87,22 +86,22 @@ if (array_key_exists("date", $_POST)) {
     <section id="service-items">
     <ul>
     <li>
-        <label for="date">Date:</label>
+        <label for="date">Date:</label><br>
         <input tabindex="1" type="date" id="date"
             name="date" value="<?=$date?>" autofocus required>
     </li>
     <li>
-        <label for="location">Location:</label>
+        <label for="location">Location:</label><br>
         <input tabindex="2" type="text" required
             id="location" name="location" value="" >
     </li>
     <li>
-        <label for="liturgical_name">Liturgical Name:</label>
+        <label for="liturgical_name">Liturgical Name:</label><br>
         <input tabindex="26" type="text"
             id="liturgicalname" name="liturgicalname" value="">
     </li>
     <li>
-        <label for="rite">Rite or Order:</label>
+        <label for="rite">Rite or Order:</label><br>
         <input tabindex="27" type="text" id="rite" name="rite" value="">
     </li>
     <li class="vcenter">

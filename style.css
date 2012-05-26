@@ -383,11 +383,14 @@ section#service-items li {
 }
 
 section#service-items label {
-    width: 10em;
-    display: inline-block;
-    text-align: right;
     font-weight: bold;
     font-family: sans-serif;
+}
+
+input#location,
+input#liturgicalname,
+input#rite {
+    width: 25em;
 }
 
 #manuscript-link {

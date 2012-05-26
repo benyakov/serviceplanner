@@ -1,6 +1,6 @@
-DELIMITER $$
-DROP FUNCTION IF EXISTS easter_in_year;
-CREATE FUNCTION easter_in_year(p_year INTEGER) RETURNS DATE
+#DELIMITER $$
+DROP FUNCTION IF EXISTS `{{DBP}}easter_in_year`;
+CREATE FUNCTION `{{DBP}}easter_in_year`(p_year INTEGER) RETURNS DATE
 DETERMINISTIC
 BEGIN
     DECLARE century, shiftedEpact, adjustedEpact INTEGER;
@@ -20,10 +20,10 @@ BEGIN
     SET apr19 = CONCAT_WS('-', p_year, 4, 19) ;
     SET paschalMoon = apr19 - INTERVAL adjustedEpact DAY;
     RETURN paschalMoon + INTERVAL (8 - DAYOFWEEK(paschalMoon)) DAY;
-END$$
+END;
 
-DROP FUNCTION IF EXISTS christmas1_in_year;
-CREATE FUNCTION christmas1_in_year(p_year INTEGER) RETURNS DATE
+DROP FUNCTION IF EXISTS `{{DBP}}christmas1_in_year`;
+CREATE FUNCTION `{{DBP}}christmas1_in_year`(p_year INTEGER) RETURNS DATE
 DETERMINISTIC
 BEGIN
     DECLARE wdchristmas INTEGER;
@@ -33,10 +33,10 @@ BEGIN
     ELSE
         RETURN CONCAT_WS('-', p_year, 12, 25) + INTERVAL (8-wdchristmas) DAY;
     END IF;
-END$$
+END;
 
-DROP FUNCTION IF EXISTS michaelmas1_in_year;
-CREATE FUNCTION michaelmas1_in_year(p_year INTEGER) RETURNS DATE
+DROP FUNCTION IF EXISTS `{{DBP}}michaelmas1_in_year`;
+CREATE FUNCTION `{{DBP}}michaelmas1_in_year`(p_year INTEGER) RETURNS DATE
 READS SQL DATA
 BEGIN
     DECLARE mike_observed, wdmichaelmas, oct1wd INTEGER;
@@ -51,11 +51,12 @@ BEGIN
     SET oct1 = CONCAT_WS('-', p_year, 10, 1);
     SET oct1wd = DAYOFWEEK(oct1);
     RETURN oct1 + INTERVAL 8-oct1wd DAY;
-END$$
+END;
 
-DROP FUNCTION IF EXISTS calc_date_in_year;
-CREATE FUNCTION calc_date_in_year (p_year INTEGER, p_dayname VARCHAR(255),
-    base VARCHAR(255), offset INTEGER, month INTEGER, day INTEGER)
+DROP FUNCTION IF EXISTS `{{DBP}}calc_date_in_year`;
+CREATE FUNCTION `{{DBP}}calc_date_in_year`(p_year INTEGER,
+    p_dayname VARCHAR(255), base VARCHAR(255), offset INTEGER,
+    month INTEGER, day INTEGER)
     RETURNS DATE
 DETERMINISTIC
 BEGIN
@@ -68,24 +69,28 @@ BEGIN
         RETURN christmas1_in_year(p_year) + INTERVAL offset DAY;
     ELSEIF base = "Michaelmas 1" THEN
         RETURN michaelmas1_in_year(p_year) + INTERVAL offset DAY;
+    ELSE
+        RETURN 0;
     END IF;
-END$$
+END;
 
-DROP FUNCTION IF EXISTS date_in_year;
-CREATE FUNCTION date_in_year (p_year INTEGER, p_dayname VARCHAR(255))
-RETURNS DATE
+DROP FUNCTION IF EXISTS `{{DBP}}date_in_year`;
+CREATE FUNCTION `{{DBP}}date_in_year`(p_year INTEGER, p_dayname VARCHAR(255))
+RETURNS TEXT
 READS SQL DATA
 BEGIN
-    DECLARE base, offset, month, day INTEGER;
+    DECLARE v_base VARCHAR(255);
+    DECLARE v_offset, v_month, v_day INTEGER;
     SELECT base, offset, month, day
         FROM `{{DBP}}churchyear`
         WHERE dayname=p_dayname
-        INTO base, offset, month, day;
-    RETURN calc_date_in_year(p_year, p_dayname, base, offset, month, day);
-END$$
+        INTO v_base, v_offset, v_month, v_day;
+    RETURN calc_date_in_year(p_year, p_dayname,
+        v_base, v_offset, v_month, v_day);
+END;
 
-DROP FUNCTION IF EXISTS calc_observed_date_in_year;
-CREATE FUNCTION calc_observed_date_in_year (p_year INTEGER,
+DROP FUNCTION IF EXISTS `{{DBP}}calc_observed_date_in_year`;
+CREATE FUNCTION `{{DBP}}calc_observed_date_in_year`(p_year INTEGER,
     p_dayname VARCHAR(255), base VARCHAR(255),
     observed_month INTEGER, observed_sunday INTEGER)
 RETURNS DATE
@@ -116,21 +121,25 @@ BEGIN
             END IF;
             RETURN lastofmonth + INTERVAL (observed_sunday+1)*7 DAY;
         END IF;
+    ELSE
+        RETURN 0;
     END IF;
-END$$
+END;
 
-DROP FUNCTION IF EXISTS observed_date_in_year;
-CREATE FUNCTION observed_date_in_year (p_year INTEGER, p_dayname VARCHAR(255))
+DROP FUNCTION IF EXISTS `{{DBP}}observed_date_in_year`;
+CREATE FUNCTION `{{DBP}}observed_date_in_year` (p_year INTEGER,
+    p_dayname VARCHAR(255))
 RETURNS DATE
 READS SQL DATA
 BEGIN
-    DECLARE base, observed_month, observed_sunday INTEGER;
+    DECLARE v_base VARCHAR(255);
+    DECLARE v_observed_month, v_observed_sunday INTEGER;
     SELECT base, observed_month, observed_sunday
         FROM `{{DBP}}churchyear`
         WHERE dayname=p_dayname
-        INTO base, observed_month, observed_sunday;
-RETURN calc_observed_date_in_year(p_year, p_dayname, base, observed_month,
-    observed_sunday);
-END$$
+        INTO v_base, v_observed_month, v_observed_sunday;
+RETURN calc_observed_date_in_year(p_year, p_dayname, v_base, v_observed_month,
+    v_observed_sunday);
+END;
 
-DELIMITER ;
+#DELIMITER ;

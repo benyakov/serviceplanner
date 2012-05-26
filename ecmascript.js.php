@@ -91,8 +91,8 @@ function showJsOnly() {
     $(".jsonly").removeClass("jsonly");
 }
 
-function updateExisting() {
-    var dateEntered = Date.parse($(this).val())/1000;
+function updateExisting(dateitem) {
+    var dateEntered = Date.parse($(dateitem).val())/1000;
     if (! dateEntered) return;
     var xhr = $.get("existing.php", { date: dateEntered },
             function(newBloc) {
