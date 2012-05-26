@@ -104,7 +104,7 @@ function replaceDBP($text, $prefix=false) {
  */
 $dbh->beginTransaction();
 $tableTest = $dbh->query("SELECT 1 FROM `{$dbp}churchyear`");
-if (! $tableTest->fetchAll()) {
+if (! ($tableTest && $tableTest->fetchAll())) {
     $allsql = array();
     $sql = 'CREATE TABLE `{{DBP}}churchyear` (
         `dayname` varchar(255),
