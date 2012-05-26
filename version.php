@@ -1,3 +1,3 @@
 <?
-$version = array('major' => 0, 'minor' => 2, 'tick' => 2);
+$version = array('major' => 0, 'minor' => 2, 'tick' => 3);
 ?>
