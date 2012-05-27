@@ -4,8 +4,10 @@ if (! $auth) {
     header("Location: index.php");
     exit(0);
 }
-$tabledescfile = "./utility/createtables.sql";
-$tabledesclines = file($tabledescfile, FILE_IGNORE_NEW_LINES);
+$tabledescfiles = array(
+    "./utility/createtables.sql",
+    "./utility/dynamictables.sql"
+);
 function gettablename ($line) {
     if (preg_match('/TABLE `(\w+)/', $line, $matches)) {
         return $matches[1];
@@ -13,12 +15,18 @@ function gettablename ($line) {
         return False;
     }
 }
-$tablenamelines = array_filter($tabledesclines, gettablename);
-$tablenames = array_map(gettablename, $tablenamelines);
 function adddbpfix ($name) {
     global $dbp;
     return "{$dbp}{$name}";
 }
+$tabledesclines = array();
+foreach ($tabledescfiles as $tabledescfile) {
+    $tabledesclines =
+        array_merge($tabledesclines,
+            file($tabledescfile, FILE_IGNORE_NEW_LINES));
+}
+$tablenamelines = array_filter($tabledesclines, gettablename);
+$tablenames = array_map(gettablename, $tablenamelines);
 $finaltablenames = array_map(adddbpfix, $tablenames);
 $tablenamestring = implode(" ", $finaltablenames);
 if (touch(".my.cnf") && chmod(".my.cnf", 0600)) {

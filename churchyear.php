@@ -3,6 +3,9 @@
  */
 require("init.php");
 $auth = auth();
+$cy_begin_marker = "# BEGIN Church Year Tables";
+$cy_end_marker = "# END Church Year Tables";
+$create_tables_file = "./utility/dynamictables.sql";
 
 function get_date_for($dayname, $year, $specifics) {
     /* TODO: Compare the db calculation below to a php implementation
@@ -142,7 +145,8 @@ if (! ($tableTest && $tableTest->fetchAll())) {
     $sql = "CREATE TABLE `{{DBP}}churchyear_order` (
         `name` varchar(32),
         `idx` smallint UNIQUE,
-        PRIMARY KEY (`name`))";
+        PRIMARY KEY (`name`)
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8";
     $q = $dbh->prepare(replaceDBP($sql));
     $q->execute() or die(array_pop($q->errorInfo()));
     $allsql[] = replaceDBP($sql, "");
@@ -163,10 +167,12 @@ if (! ($tableTest && $tableTest->fetchAll())) {
         exit(0);
     }
     // Write table descriptions to createtables.sql
-    $cy_begin_marker = "# BEGIN Church Year Tables\n";
-    $cy_end_marker = "# END Church Year Tables\n";
-    $create_tables_file = "./utility/createtables.sql";
-    $tabledesc = $cy_begin_marker . implode("\n", $allsql) . $cy_end_marker;
+    $tabledesc = $cy_begin_marker."\n"
+        .implode("\n", $allsql)."\n"
+        .$cy_end_marker."\n";
+    if (! file_exists($create_tables_file)) {
+        touch($create_tables_file);
+    }
     $createtables = file_get_contents($create_tables_file);
     if (false === strpos($createtables, $cy_begin_marker)) {
         $fh = fopen($create_tables_file, "a");
@@ -193,6 +199,49 @@ if (! $result->fetchAll(PDO::FETCH_NUM)) {
     $dbh->exec(replaceDBP($functionstext));
     $dbh->commit();
     $dbh->beginTransaction();
+}
+
+/* churchyear.php?dropfunctions=1
+ * Drops all the churchyear functions and sets a message about
+ * creating them again.
+ */
+if ($_GET['dropfunctions'] == 1) {
+    $dbh->exec("DROP FUNCTION `{$dbp}easter_in_year`;
+    DROP FUNCTION `{$dbp}christmas1_in_year`;
+    DROP FUNCTION `{$dbp}michaelmas1_in_year`;
+    DROP FUNCTION `{$dbp}calc_date_in_year`;
+    DROP FUNCTION `{$dbp}date_in_year`;
+    DROP FUNCTION `{$dbp}calc_observed_date_in_year`;
+    DROP FUNCTION `{$dbp}observed_date_in_year`");
+    setMessage("Church year functions dropped.  To re-create them, visit"
+        ." the Church Year tab.  They will be created automatically.");
+    $dbh->commit();
+    header("location: index.php");
+    exit(0);
+}
+
+/* churchyear.php?droptables=1
+ * Drop the churchyear tables and sets a message about creating
+ * them again.
+ */
+if ($_GET['droptables'] == 1) {
+    $dbh->exec("DROP TABLE `{$dbp}churchyear`, `{$dbp}churchyear_order`");
+    setMessage("Church year tables dropped.  They will be re-created "
+        ."with default values next time you visit the Church Year tab.");
+    $dbh->commit();
+    if (file_exists($create_tables_file)) {
+        $dt = file_get_contents($create_tables_file);
+        $start = strpos($dt, $cy_begin_marker);
+        if ($start !== false) {
+            $end = strpos($dt, $cy_end_marker) + strlen($cy_end_marker);
+            $newdt = substr($dt, 0, $start) . substr($dt, $end);
+            $fh = fopen($create_tables_file, "w");
+            fwrite($fh, $newdt);
+            fclose($fh);
+        }
+    }
+    header("location: index.php");
+    exit(0);
 }
 
 /* churchyear.php?daysfordate=date
