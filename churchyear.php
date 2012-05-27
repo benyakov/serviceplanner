@@ -166,6 +166,31 @@ if (! ($tableTest && $tableTest->fetchAll())) {
         echo "Problem inserting seasons: " . array_pop($q->errorInfo());
         exit(0);
     }
+    // Define table containing synonyms for the day names
+    $sql = "CREATE TABLE `{{DBP}}churchyear_synonyms` (
+        `canonical` varchar(255),
+        `synonym`   varchar(255),
+        PRIMARY KEY (`canonical`)
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8";
+    $q = $dbh->prepare(replaceDBP($sql));
+    $q->execute() or die(array_pop($q->errorInfo()));
+    $allsql[] = replaceDBP($sql, "");
+    // Define table containing propers for the day names
+    $sql = "CREATE TABLE `{{DBP}}churchyear_propers` (
+        `dayname`   varchar(255),
+        `color`     varchar(32),
+        `collect`   text,
+        `collect2`  text,
+        `collect3`  text,
+        `gradual`   varchar(255),
+        `introit`   varchar(255)
+        `note`      text,
+        PRIMARY KEY (`dayname`)
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8";
+    $q = $dbh->prepare(replaceDBP($sql));
+    $q->execute() or die(array_pop($q->errorInfo()));
+    $allsql[] = replaceDBP($sql, "");
+    // TODO: fill churchyear_propers with data
     // Write table descriptions to createtables.sql
     $tabledesc = $cy_begin_marker."\n"
         .implode("\n", $allsql)."\n"
