@@ -79,7 +79,7 @@ function churchyear_listing($rows) {
     <td class="controls">
     <a class="edit" href="" data-day="<?=$row['dayname']?>">Edit</a><br>
     <a class="delete" href="" data-day="<?=$row['dayname']?>">Delete</a></td>
-    <td class="dayname"><?=$row['dayname']?></td>
+    <td class="dayname"><a href="" class="synonym" data-day="<?=$row['dayname']?>">=</a> <a href="" class="propers"><?=$row['dayname']?></a></td>
     <td class="season"><?=$row['season']?></td>
     <td class="base"><?=$row['base']?></td>
     <td class="offset"><?=$row['offset']?></td>
@@ -183,7 +183,7 @@ if (! ($tableTest && $tableTest->fetchAll())) {
         `collect2`  text,
         `collect3`  text,
         `gradual`   varchar(255),
-        `introit`   varchar(255)
+        `introit`   varchar(255),
         `note`      text,
         PRIMARY KEY (`dayname`)
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8";
@@ -250,7 +250,8 @@ if ($_GET['dropfunctions'] == 1) {
  * them again.
  */
 if ($_GET['droptables'] == 1) {
-    $dbh->exec("DROP TABLE `{$dbp}churchyear`, `{$dbp}churchyear_order`");
+    $dbh->exec("DROP TABLE `{$dbp}churchyear`, `{$dbp}churchyear_order`,
+        `{$dbp}churchyear_synonyms`, `{$dbp}churchyear_propers`");
     setMessage("Church year tables dropped.  They will be re-created "
         ."with default values next time you visit the Church Year tab.");
     $dbh->commit();
@@ -475,6 +476,16 @@ if (! $auth) {
             function(params) {
                 sessionStorage.michaelmasObserved = params['observed_sunday'];
             });
+        $(".synonyms").click(function(evt) {
+            evt.preventDefault();
+            // TODO: open a small dialog with a text field containing
+            // synonyms for the chosen day.
+        });
+        $(".propers").click(function(evt) {
+            evt.preventDefault();
+            // TODO: open a dialog allowing the propers for this day to be
+            // adjusted.
+        });
     });
 
     function setupEdit() {
