@@ -170,7 +170,9 @@ if (! ($tableTest && $tableTest->fetchAll())) {
     $sql = "CREATE TABLE `{{DBP}}churchyear_synonyms` (
         `canonical` varchar(255),
         `synonym`   varchar(255),
-        PRIMARY KEY (`canonical`)
+        FOREIGN KEY (`canonical`) REFERENCES `{{DBP}}churchyear` (`dayname`)
+            ON DELETE CASCADE
+            ON UPDATE CASCADE
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8";
     $q = $dbh->prepare(replaceDBP($sql));
     $q->execute() or die(array_pop($q->errorInfo()));
@@ -185,7 +187,9 @@ if (! ($tableTest && $tableTest->fetchAll())) {
         `gradual`   varchar(255),
         `introit`   varchar(255),
         `note`      text,
-        PRIMARY KEY (`dayname`)
+        FOREIGN KEY (`dayname`) REFERENCES `{{DBP}}churchyear` (`dayname`)
+            ON DELETE CASCADE
+            ON UPDATE CASCADE
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8";
     $q = $dbh->prepare(replaceDBP($sql));
     $q->execute() or die(array_pop($q->errorInfo()));

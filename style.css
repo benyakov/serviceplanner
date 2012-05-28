@@ -202,17 +202,26 @@ td.title {
 td.controls {
     font: bold 50% sans-serif;
 }
-td.controls a:link {
+td.controls a:link,
+a.synonym:link,
+a.propers:link {
     color: blue;
     background-color: transparent;
+    text-decoration: none;
 }
-td.controls a:visited {
+td.controls a:visited,
+a.synonym:visited,
+a.propers:visited {
     color: blue;
     background-color: transparent;
+    text-decoration: none;
 }
-td.controls a:active {
+td.controls a:active,
+a.synonym:active,
+a.propers:active {
     color: white;
     background-color: blue;
+    text-decoration: none;
 }
 
 table#userlist {
