@@ -36,7 +36,7 @@ if (! $dbh->query("SELECT 1 FROM {$dbp}xref")) {
     $q->execute() or die(array_pop($q->errorInfo()));
 
     $dbh->beginTransaction();
-    $fh = fopen("hymnindex.csv", "r");
+    $fh = fopen("./utility/hymnindex.csv", "r");
     $headings = fgetcsv($fh);
     while (($record = fgetcsv($fh, 250)) != FALSE) {
         $r = array();

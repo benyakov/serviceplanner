@@ -7,34 +7,6 @@ $cy_begin_marker = "# BEGIN Church Year Tables";
 $cy_end_marker = "# END Church Year Tables";
 $create_tables_file = "./utility/dynamictables.sql";
 
-function get_date_for($dayname, $year, $specifics) {
-    /* TODO: Compare the db calculation below to a php implementation
-     * of the same thing. */
-    $start = microtime();
-    $rv = db_calc_date_for($dayname, $year, $specifics);
-    $dbruntime = microtime() - $start;
-    // Insert php implementation here.
-    return $rv;
-}
-
-function db_calc_date_for($dayname, $year, $specifics) {
-    /* Given a liturgical day name, a year, and some defining specifics,
-     * return the db's stored function calculation of the day's date
-     * in that year. */
-    global $dbh;
-    $q = $dbh->prepare("SELECT `{$dbp}calc_date_in_year`(:year, :dayname,
-        :base, :offset, :month, :day)");
-    $q->bindParam(":year", $year);
-    $q->bindParam(":dayname", $dayname);
-    $q->bindParam(":base", $specifics["base"]);
-    $q->bindParam(":offset", $specifics["offset"]);
-    $q->bindParam(":month", $specifics["month"]);
-    $q->bindParam(":day", $specifics["day"]);
-    $q->execute();
-    return $q->fetchColumn(0);
-        //strptime($q->fetchColumn(0), "Y-m-d");
-}
-
 function query_churchyear($json=false) {
     /* Return an executed query for all rows of the churchyear db
      */
@@ -123,8 +95,12 @@ if (! ($tableTest && $tableTest->fetchAll())) {
     $q = $dbh->prepare(replaceDBP($sql)) ;
     $q->execute() or die(array_pop($q->errorInfo()));
     $allsql[] = replaceDBP($sql, "");
-    $fh = fopen("historictable.csv", "r");
+    $fh = fopen("./utility/historictable.csv", "r");
     $headings = fgetcsv($fh);
+    $q = $dbh->prepare("INSERT INTO {$dbp}churchyear
+        (season, dayname, base, offset, month, day,
+            observed_month, observed_sunday)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
     while (($record = fgetcsv($fh, 250)) != FALSE) {
         $r = array();
         $record = quote_array($record);
@@ -137,9 +113,7 @@ if (! ($tableTest && $tableTest->fetchAll())) {
             }
             $r[] = $f;
         }
-        $q = $dbh->prepare("INSERT INTO {$dbp}churchyear (season, dayname, base, offset, month, day, observed_month, observed_sunday)
-            VALUES ({$r[0]}, {$r[1]}, {$r[2]}, {$r[3]}, {$r[4]}, {$r[5]}, {$r[6]}, {$r[7]})");
-        $q->execute() or dieWithRollback($q, "\n".__FILE__.":".__LINE__);
+        $q->execute($r) or dieWithRollback($q, "\n".__FILE__.":".__LINE__);
     }
     // Define helper table for ordering the presentation of days
     $sql = "CREATE TABLE `{{DBP}}churchyear_order` (
@@ -177,6 +151,15 @@ if (! ($tableTest && $tableTest->fetchAll())) {
     $q = $dbh->prepare(replaceDBP($sql));
     $q->execute() or die(array_pop($q->errorInfo()));
     $allsql[] = replaceDBP($sql, "");
+    // Populate synonyms table
+    $fh = fopen("./utility/synonyms.csv", "r");
+    $q = $dbh->prepare("INSERT INTO {$dbp}churchyear_synonyms
+        (canonical, synonym))
+        VALUES (?, ?)");
+    while (($record = fgetcsv($fh)) != FALSE) {
+        $q->execute(array($record[0], $record[1]))
+            or die(array_pop($q->errorInfo()));
+    }
     // Define table containing propers for the day names
     $sql = "CREATE TABLE `{{DBP}}churchyear_propers` (
         `dayname`   varchar(255),
@@ -184,8 +167,20 @@ if (! ($tableTest && $tableTest->fetchAll())) {
         `collect`   text,
         `collect2`  text,
         `collect3`  text,
-        `gradual`   varchar(255),
-        `introit`   varchar(255),
+        `oldtestament` varchar(56),
+        `oldtestament2` varchar(56),
+        `oldtestament3` varchar(56),
+        `gospel`    varchar(56),
+        `gospel2`   varchar(56),
+        `gospel3`   varchar(56),
+        `epistle`   varchar(56),
+        `epistle2`  varchar(56),
+        `epistle3`  varchar(56),
+        `psalm`     varchar(56),
+        `psalm2`     varchar(56),
+        `psalm3`     varchar(56),
+        `theme`     varchar(56),
+        `title`     varchar(56),
         `note`      text,
         FOREIGN KEY (`dayname`) REFERENCES `{{DBP}}churchyear` (`dayname`)
             ON DELETE CASCADE
@@ -194,7 +189,43 @@ if (! ($tableTest && $tableTest->fetchAll())) {
     $q = $dbh->prepare(replaceDBP($sql));
     $q->execute() or die(array_pop($q->errorInfo()));
     $allsql[] = replaceDBP($sql, "");
-    // TODO: fill churchyear_propers with data
+    // Fill churchyear_propers with data
+    $fh = fopen("./utility/propers.csv", "r");
+    $headings = fgetcsv($fh);
+    $q = $dbh->prepare("INSERT INTO {$dbp}churchyear_propers
+        (dayname, color, collect, collect2)
+        VALUES (:dayname, :color, :collect, :collect2,
+            :oldtestament, :gospel, :epistle, :epistle2, :gospel2,
+            :epistle3, :gospel3, :theme, :title, :psalm)");
+    while (($record = fgetcsv($fh, 250)) != FALSE) {
+        $record = quote_array($record);
+        $r = array();
+        foreach ($record as $field) {
+            $f = trim($field);
+            if (! $f) {
+                $f = "NULL";
+            } elseif (! is_numeric($f)) {
+                $f = "'$f'";
+            }
+            $r[] = $f;
+        }
+        $dict = array_combine($headings, $r);
+        $q->execute(array(":dayname"=>$dict['dayname'],
+            ":color"=>$dict['color'],
+            ":collect"=>$dict['Collect'],
+            ":collect2"=>$dict['Deitrich Collect']
+            ":oldtestament"=>$dict['Old Testament'],
+            ":gospel"=>$dict['Gospel'],
+            ":epistle"=>$dict['Epistle'],
+            ":epistle2"=>$dict['Series 2 Lesson'],
+            ":gospel2"=>$dict['Series 2 Gospel'],
+            ":epistle3"=>$dict['Series 3 Lesson'],
+            ":gospel3"=>$dict['Series 3 Gospel'],
+            ":theme"=>$dict['Theme'],
+            ":title"=>$dict['Title'],
+            ":psalm"=>$dict['Psalm']))
+            or dieWithRollback($q, "\n".__FILE__.":".__LINE__);
+    }
     // Write table descriptions to createtables.sql
     $tabledesc = $cy_begin_marker."\n"
         .implode("\n", $allsql)."\n"
