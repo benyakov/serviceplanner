@@ -103,14 +103,8 @@ if (! ($tableTest && $tableTest->fetchAll())) {
         VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
     while (($record = fgetcsv($fh, 250)) != FALSE) {
         $r = array();
-        $record = quote_array($record);
         foreach ($record as $field) {
             $f = trim($field);
-            if (! $f) {
-                $f = "NULL";
-            } elseif (! is_numeric($f)) {
-                $f = "'$f'";
-            }
             $r[] = $f;
         }
         $q->execute($r) or dieWithRollback($q, "\n".__FILE__.":".__LINE__);
@@ -144,9 +138,7 @@ if (! ($tableTest && $tableTest->fetchAll())) {
     $sql = "CREATE TABLE `{{DBP}}churchyear_synonyms` (
         `canonical` varchar(255),
         `synonym`   varchar(255),
-        FOREIGN KEY (`canonical`) REFERENCES `{{DBP}}churchyear` (`dayname`)
-            ON DELETE CASCADE
-            ON UPDATE CASCADE
+        INDEX (`canonical`)
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8";
     $q = $dbh->prepare(replaceDBP($sql));
     $q->execute() or die(array_pop($q->errorInfo()));
@@ -154,11 +146,10 @@ if (! ($tableTest && $tableTest->fetchAll())) {
     // Populate synonyms table
     $fh = fopen("./utility/synonyms.csv", "r");
     $q = $dbh->prepare("INSERT INTO {$dbp}churchyear_synonyms
-        (canonical, synonym))
-        VALUES (?, ?)");
+        (canonical, synonym) VALUES (?, ?)");
     while (($record = fgetcsv($fh)) != FALSE) {
         $q->execute(array($record[0], $record[1]))
-            or die(array_pop($q->errorInfo()));
+            or die(array_pop($q->errorInfo())."{$record[0]}, {$record[1]}");
     }
     // Define table containing propers for the day names
     $sql = "CREATE TABLE `{{DBP}}churchyear_propers` (
@@ -180,7 +171,6 @@ if (! ($tableTest && $tableTest->fetchAll())) {
         `psalm2`     varchar(56),
         `psalm3`     varchar(56),
         `theme`     varchar(56),
-        `title`     varchar(56),
         `note`      text,
         FOREIGN KEY (`dayname`) REFERENCES `{{DBP}}churchyear` (`dayname`)
             ON DELETE CASCADE
@@ -193,38 +183,30 @@ if (! ($tableTest && $tableTest->fetchAll())) {
     $fh = fopen("./utility/propers.csv", "r");
     $headings = fgetcsv($fh);
     $q = $dbh->prepare("INSERT INTO {$dbp}churchyear_propers
-        (dayname, color, collect, collect2)
-        VALUES (:dayname, :color, :collect, :collect2,
-            :oldtestament, :gospel, :epistle, :epistle2, :gospel2,
-            :epistle3, :gospel3, :theme, :title, :psalm)");
+        (dayname, color, collect, collect2, oldtestament,
+        gospel, gospel2, gospel3, epistle, epistle2, epistle3,
+        theme, psalm)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
     while (($record = fgetcsv($fh, 250)) != FALSE) {
-        $record = quote_array($record);
         $r = array();
         foreach ($record as $field) {
             $f = trim($field);
             if (! $f) {
-                $f = "NULL";
-            } elseif (! is_numeric($f)) {
-                $f = "'$f'";
+                $f = PDO::PARAM_NULL;
             }
             $r[] = $f;
         }
+        if (count($headings) != count($r)) {
+            print_r($headings);
+            print_r($r);
+        }
         $dict = array_combine($headings, $r);
-        $q->execute(array(":dayname"=>$dict['dayname'],
-            ":color"=>$dict['color'],
-            ":collect"=>$dict['Collect'],
-            ":collect2"=>$dict['Deitrich Collect']
-            ":oldtestament"=>$dict['Old Testament'],
-            ":gospel"=>$dict['Gospel'],
-            ":epistle"=>$dict['Epistle'],
-            ":epistle2"=>$dict['Series 2 Lesson'],
-            ":gospel2"=>$dict['Series 2 Gospel'],
-            ":epistle3"=>$dict['Series 3 Lesson'],
-            ":gospel3"=>$dict['Series 3 Gospel'],
-            ":theme"=>$dict['Theme'],
-            ":title"=>$dict['Title'],
-            ":psalm"=>$dict['Psalm']))
-            or dieWithRollback($q, "\n".__FILE__.":".__LINE__);
+        $q->execute(array($dict['dayname'], $dict['color'], $dict['Collect'],
+            $dict['Deitrich Collect'], $dict['Old Testament'],
+            $dict['Gospel'], $dict['Series 2 Gospel'], $dict['Series 3 Gospel'],
+            $dict['Epistle'], $dict['Series 2 Lesson'], $dict['Series 3 Lesson'],
+            $dict['Theme'], $dict['Psalm']))
+            or dieWithRollback($q, "\n".__FILE__.":".__LINE__.$dict['dayname']);
     }
     // Write table descriptions to createtables.sql
     $tabledesc = $cy_begin_marker."\n"
@@ -285,8 +267,10 @@ if ($_GET['dropfunctions'] == 1) {
  * them again.
  */
 if ($_GET['droptables'] == 1) {
-    $dbh->exec("DROP TABLE `{$dbp}churchyear`, `{$dbp}churchyear_order`,
-        `{$dbp}churchyear_synonyms`, `{$dbp}churchyear_propers`");
+    $dbh->exec("DROP TABLE `{$dbp}churchyear_synonyms`,
+        `{$dbp}churchyear_propers`, `{$dbp}churchyear_order`,
+        `{$dbp}churchyear`");
+
     setMessage("Church year tables dropped.  They will be re-created "
         ."with default values next time you visit the Church Year tab.");
     $dbh->commit();
