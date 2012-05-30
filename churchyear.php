@@ -371,6 +371,8 @@ if ($_GET['dayname']) {
                 <?=$specifics['base']=="Easter"?"selected=\"selected\"":""?>>Easter</option>
             <option value="Christmas 1"
                 <?=$specifics['base']=="Christmas 1"?"selected=\"selected\"":""?>>Christmas 1</option>
+            <option value="Epiphany 1"
+                <?=$specifics['base']=="Epiphany 1"?"selected=\"selected\"":""?>>Epiphany 1</option>
             <option value="Michaelmas 1"
                 <?=$specifics['base']=="Michaelmas 1"?"selected=\"selected\"":""?>>Michaelmas 1</option>
             </select></dd>

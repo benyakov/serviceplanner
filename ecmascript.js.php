@@ -251,6 +251,16 @@ function calcChristmas1(year) {
         return base;
     }
 }
+function calcEpiphany1(year) {
+    var base = new Date(year, 0, 6); // Epiphany
+    if (base.getDay() == 0) {
+        return base;
+    } else {
+        var offset = new Number(7-base.getDay());
+        base.setDate(base.getDate() + offset);
+        return base;
+    }
+}
 function calcMichaelmas1(year, callback) {
     var michaelmas = new Date(year, 8, 29);
     if (sessionStorage.michaelmasObserved != -1 && michaelmas.getDay == 6) {
@@ -265,6 +275,7 @@ function calcMichaelmas1(year, callback) {
 function getDateFor(year) {
     // With the current settings of the form, calculate the date
     // in the given year
+    var offset = new Number($("#offset").val());
     if ($("#base").val() == "None") {
         if ($("#observed-month").val()) {
             if (Number($("#observed-sunday").val())>0) {
@@ -285,17 +296,18 @@ function getDateFor(year) {
         }
     } else if ("Easter" == $("#base").val()) {
         var base = calcEaster(year);
-        var offset = new Number($("#offset").val());
         base.setDate(base.getDate()+offset);
         return base;
     } else if ("Christmas 1" == $("#base").val()) {
         var base = calcChristmas1(year);
-        var offset = new Number($("#offset").val());
         base.setDate(base.getDate()+offset);
         return base;
     } else if ("Michaelmas 1" == $("#base").val()) {
         var base = calcMichaelmas1(year);
-        var offset = new Number($("#offset").val());
+        base.setDate(base.getDate()+offset);
+        return base;
+    } else if ("Epiphany 1" == $("#base").val()) {
+        var base = calcEpiphany1(year);
         base.setDate(base.getDate()+offset);
         return base;
     }

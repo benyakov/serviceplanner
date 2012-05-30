@@ -53,6 +53,20 @@ BEGIN
     RETURN oct1 + INTERVAL 8-oct1wd DAY;
 END;
 
+DROP FUNCTION IF EXISTS `{{DBP}}epiphany1_in_year`;
+CREATE FUNCTION `{{DBP}}epiphany1_in_year`(p_year INTEGER) RETURNS DATE
+DETERMINISTIC
+BEGIN
+    DECLARE wdepiphany INTEGER;
+    SET wdepiphany = DAYOFWEEK(CONCAT_WS('-', p_year, 1, 6));
+    IF wdepiphany = 1 THEN
+        RETURN CONCAT_WS('-', p_year, 1, 6);
+    ELSE
+        RETURN CONCAT_WS('-', p_year, 1, 6) + INTERVAL (8-wdepiphany) DAY;
+    END IF;
+END;
+END;
+
 DROP FUNCTION IF EXISTS `{{DBP}}calc_date_in_year`;
 CREATE FUNCTION `{{DBP}}calc_date_in_year`(p_year INTEGER,
     p_dayname VARCHAR(255), base VARCHAR(255), offset INTEGER,
@@ -69,6 +83,8 @@ BEGIN
         RETURN `{{DBP}}christmas1_in_year`(p_year) + INTERVAL offset DAY;
     ELSEIF base = "Michaelmas 1" THEN
         RETURN `{{DBP}}michaelmas1_in_year`(p_year) + INTERVAL offset DAY;
+    ELSEIF base = "Epiphany 1" THEN
+        RETURN `{{DBP}}epiphany1_in_year`(p_year) + INTERVAL offset DAY;
     ELSE
         RETURN 0;
     END IF;
