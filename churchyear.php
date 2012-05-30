@@ -478,6 +478,24 @@ if ($_POST['submit_day']==1) {
     }
 }
 
+if ($_GET['synonyms']) {
+    if (! $auth) {
+        echo json_encode(array(false));
+        exit(0);
+    }
+    $q = $dbh->prepare("SELECT `synonym` FROM `{$dbp}churchyear_synonyms`
+        WHERE `canonical` = ?");
+    if ($q->execute(array($_GET['synonyms']))) {
+        $rv = array();
+        while ($aval = $q->fetch(PDO::FETCH_NUM)) {
+            array_push($rv, $aval[0]);
+        }
+        if ($rv) echo json_encode(array(true, $rv));
+        else echo json_encode(array(false));
+    } else echo json_encode(array(false));
+    exit(0);
+}
+
 if (! $auth) {
     setMessage("Access denied.  Please log in.");
     header("location: index.php");
@@ -497,11 +515,53 @@ if (! $auth) {
             function(params) {
                 sessionStorage.michaelmasObserved = params['observed_sunday'];
             });
-        $(".synonyms").click(function(evt) {
+        $(".synonym").click(function(evt) {
             evt.preventDefault();
+            var loc = $(this).offset();
+            var orig = $(this).attr("data-day");
+            $.get("churchyear.php", {synonyms: orig},
+                function(rv) {
+                    rv = eval(rv);
+                    if (rv[0]) {
+                        var lines = rv[1].join("\n");
+                    } else {
+                        var lines = "";
+                    }
+                    $("#dialog").html('<form id="synonymsform" method="post">'
+                        +'<textarea id="synonyms">'+lines+'</textarea><br>'
+                        +'<button type="submit" id="submit">Submit</button>'
+                        +'<button type="reset" id="reset">Reset</button>'
+                        +'</form>');
+                    $("#synonymsform").submit(function(evt) {
+                        evt.preventDefault();
+                        $.post("churchyear.php",
+                            {synonyms: $("#synonyms").val()}, function(rv) {
+                            if (rv) {
+                                setMessage(rv);
+                            } else {
+                                setMessage("Failed to save synonyms");
+                            }
+                        });
+                    });
+                    $("#dialog").dialog({modal: true,
+                        title: "Synonyms for "+orig,
+                        width: $(window).width()*0.4,
+                        maxHeight: $(window).height()*0.4,
+                        position: [30, loc.top],
+                        /*
+                        create: function() {
+                            setupDialog();
+                        },
+                        open: function() {
+                            setupDialog();
+                        }});
+                        */
+                    });
+                });
+        });
+
             // TODO: open a small dialog with a text field containing
             // synonyms for the chosen day.
-        });
         $(".propers").click(function(evt) {
             evt.preventDefault();
             // TODO: open a dialog allowing the propers for this day to be
@@ -513,15 +573,15 @@ if (! $auth) {
         // Set up edit links
         $(".edit").click(function(evt) {
             evt.preventDefault();
+            var dtitle = $(this).attr("data-day");
             $("#dialog")
                 .load(encodeURI("churchyear.php?dayname="
                     +$(this).attr("data-day")), function() {
                         $("#dialog").dialog({modal: true,
+                            position: "center",
+                            title: dtitle,
                             width: $(window).width()*0.7,
                             maxHeight: $(window).height()*0.7,
-                            close: function() {
-                                setMessage("Edit cancelled.");
-                            },
                             create: function() {
                                 setupDialog();
                             },
