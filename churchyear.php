@@ -478,6 +478,30 @@ if ($_POST['submit_day']==1) {
     }
 }
 
+if ($_POST['synonyms']) {
+    if (! $auth) {
+        echo json_encode(array(false));
+        exit(0);
+    }
+    $synonyms = explode("\n", $_POST['synonyms']);
+    $canonical = $_POST['canonical'];
+    // Remove current entries for canonical
+    $q = $dbh->prepare("DELETE FROM `{$dbp}churchyear_synonyms`
+        WHERE canonical = ?");
+    $success = $q->execute(array($canonical));
+    if ($success) {
+        $q = $dbh->prepare("INSERT INTO `{$dbp}churchyear_synonyms`
+            (canonical, synonym) VALUES (?, ?)");
+        foreach ($synonyms as $synonym) {
+            $success = $q->execute(array($canonical, $synonym));
+            if (! $success) break;
+        }
+        if ($success) $dbh->commit();
+    }
+    echo json_encode($success);
+    exit(0);
+}
+
 if ($_GET['synonyms']) {
     if (! $auth) {
         echo json_encode(array(false));
@@ -535,12 +559,15 @@ if (! $auth) {
                     $("#synonymsform").submit(function(evt) {
                         evt.preventDefault();
                         $.post("churchyear.php",
-                            {synonyms: $("#synonyms").val()}, function(rv) {
-                            if (rv) {
-                                setMessage(rv);
-                            } else {
-                                setMessage("Failed to save synonyms");
-                            }
+                    {synonyms: $("#synonyms").val(),
+                     canonical: orig}, function(rv) {
+                                $("#dialog").dialog("close");
+                                rv = eval(rv);
+                                if (rv) {
+                                    setMessage("Saved synonyms.");
+                                } else {
+                                    setMessage("Failed to save synonyms");
+                                }
                         });
                     });
                     $("#dialog").dialog({modal: true,
