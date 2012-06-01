@@ -398,6 +398,7 @@ if ($_POST['propers']) {
     } else {
         echo json_encode(array(false, array_pop($q->errorInfo())));
     }
+    exit(0);
 }
 
 if ($_GET['propers']) {
@@ -422,44 +423,47 @@ if ($_GET['propers']) {
     ob_start();
 ?>
     <form id="propersform" method="post">
-    <dl>
-    <dt><label for="color">Color</label></dt>
-    <dd><input type="text" value="<?=$rvdata['color']?>" name="color"></dd>
-    <dt><label for="theme">Theme</label></dt>
-    <dd><input type="text" value="<?=$rvdata['theme']?>" name="theme"></dd>
-    <dt><label for="note">Note</label></dt>
-    <dd><textarea name="note"><?=$rvdata['note']?></textarea></dd>
-    <dt><label for="oldtestament">Old Testament</label></dt>
-    <dd><input type="text" value="<?=$rvdata['oldtestament']?>" name="oldtestament"></dd>
-    <dt><label for="epistle">Epistle</label></dt>
-    <dd><input type="text" value="<?=$rvdata['epistle']?>" name="epistle"></dd>
-    <dt><label for="gospel">Gospel</label></dt>
-    <dd><input type="text" value="<?=$rvdata['gospel']?>" name="gospel"></dd>
-    <dt><label for="psalm">Psalm</label></dt>
-    <dd><input type="text" value="<?=$rvdata['psalm']?>" name="psalm"></dd>
-    <dt><label for="oldtestament2">Old Testament 2</label></dt>
-    <dd><input type="text" value="<?=$rvdata['oldtestament2']?>" name="oldtestament2"></dd>
-    <dt><label for="epistle2">Epistle 2</label></dt>
-    <dd><input type="text" value="<?=$rvdata['epistle2']?>" name="epistle2"></dd>
-    <dt><label for="gospel2">Gospel 2</label></dt>
-    <dd><input type="text" value="<?=$rvdata['gospel2']?>" name="gospel2"></dd>
-    <dt><label for="psalm2">Psalm 2</label></dt>
-    <dd><input type="text" value="<?=$rvdata['psalm2']?>" name="psalm2"></dd>
-    <dt><label for="oldtestament3">Old Testament 3</label></dt>
-    <dd><input type="text" value="<?=$rvdata['oldtestament3']?>" name="oldtestament3"></dd>
-    <dt><label for="epistle3">Epistle 3</label></dt>
-    <dd><input type="text" value="<?=$rvdata['epistle3']?>" name="epistle3"></dd>
-    <dt><label for="gospel3">Gospel 3</label></dt>
-    <dd><input type="text" value="<?=$rvdata['gospel3']?>" name="gospel3"></dd>
-    <dt><label for="psalm3">Psalm 3</label></dt>
-    <dd><input type="text" value="<?=$rvdata['psalm3']?>" name="psalm3"></dd>
-    <dt><label for="collect">Collect</label><dt>
-    <dd><textarea name="collect"><?=$rvdata['collect']?></textarea></dd>
-    <dt><label for="collect2">Collect 2</label><dt>
-    <dd><textarea name="collect2"><?=$rvdata['collect2']?></textarea></dd>
-    <dt><label for="collect3">Collect 3</label><dt>
-    <dd><textarea name="collect3"><?=$rvdata['collect3']?></textarea></dd>
-    </dl>
+    <div class="formblock"><label for="color">Color</label><br>
+    <input type="text" value="<?=$rvdata['color']?>" name="color"></div>
+    <div class="formblock"><label for="theme">Theme</label><br>
+    <input type="text" value="<?=$rvdata['theme']?>" name="theme"></div>
+    <div class="formblock fullwidth"><label for="note">Note</label><br>
+    <textarea name="note"><?=$rvdata['note']?></textarea></div>
+    <div class="propersbox">
+    <div class="formblock"><label for="oldtestament">Old Testament</label><br>
+    <input type="text" value="<?=$rvdata['oldtestament']?>" name="oldtestament"></div>
+    <div class="formblock"><label for="epistle">Epistle</label><br>
+    <input type="text" value="<?=$rvdata['epistle']?>" name="epistle"></div>
+    <div class="formblock"><label for="gospel">Gospel</label><br>
+    <input type="text" value="<?=$rvdata['gospel']?>" name="gospel"></div>
+    <div class="formblock"><label for="psalm">Psalm</label><br>
+    <input type="text" value="<?=$rvdata['psalm']?>" name="psalm"></div>
+    </div><div class="propersbox">
+    <div class="formblock"><label for="oldtestament2">Old Testament 2</label><br>
+    <input type="text" value="<?=$rvdata['oldtestament2']?>" name="oldtestament2"></div>
+    <div class="formblock"><label for="epistle2">Epistle 2</label><br>
+    <input type="text" value="<?=$rvdata['epistle2']?>" name="epistle2"></div>
+    <div class="formblock"><label for="gospel2">Gospel 2</label><br>
+    <input type="text" value="<?=$rvdata['gospel2']?>" name="gospel2"></div>
+    <div class="formblock"><label for="psalm2">Psalm 2</label><br>
+    <input type="text" value="<?=$rvdata['psalm2']?>" name="psalm2"></div>
+    </div><div class="propersbox">
+    <div class="formblock"><label for="oldtestament3">Old Testament 3</label><br>
+    <input type="text" value="<?=$rvdata['oldtestament3']?>" name="oldtestament3"></div>
+    <div class="formblock"><label for="epistle3">Epistle 3</label><br>
+    <input type="text" value="<?=$rvdata['epistle3']?>" name="epistle3"></div>
+    <div class="formblock"><label for="gospel3">Gospel 3</label><br>
+    <input type="text" value="<?=$rvdata['gospel3']?>" name="gospel3"></div>
+    <div class="formblock"><label for="psalm3">Psalm 3</label><br>
+    <input type="text" value="<?=$rvdata['psalm3']?>" name="psalm3"></div>
+    </div>
+    <div class="formblock fullwidth"><label for="collect">Collect</label><br>
+    <textarea name="collect"><?=$rvdata['collect']?></textarea></div>
+    <div class="formblock fullwidth"><label for="collect2">Collect 2</label><br>
+    <textarea name="collect2"><?=$rvdata['collect2']?></textarea></div>
+    <div class="formblock fullwidth"><label for="collect3">Collect 3</label><br>
+    <textarea name="collect3"><?=$rvdata['collect3']?></textarea></div>
+
     <button type="submit" id="submit">Submit</button>
     <button type="reset">Reset</button>
     </form>

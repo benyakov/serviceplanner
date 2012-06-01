@@ -120,7 +120,7 @@ while (($record = fgetcsv($fh, 250)) != FALSE) {
         print_r($r);
     }
     $dict = array_combine($headings, $r);
-    $q->execute(array($dict['dayname'], $dict['color'], $dict['Collect'],
+    $q->execute(array($dict['dayname'], $dict['Color'], $dict['Collect'],
         $dict['Deitrich Collect'], $dict['Old Testament'],
         $dict['Gospel'], $dict['Series 2 Gospel'], $dict['Series 3 Gospel'],
         $dict['Epistle'], $dict['Series 2 Lesson'], $dict['Series 3 Lesson'],
