@@ -51,7 +51,10 @@ function churchyear_listing($rows) {
     <td class="controls">
     <a class="edit" href="" data-day="<?=$row['dayname']?>">Edit</a><br>
     <a class="delete" href="" data-day="<?=$row['dayname']?>">Delete</a></td>
-    <td class="dayname"><a href="" class="synonym" data-day="<?=$row['dayname']?>">=</a> <a href="" class="propers"><?=$row['dayname']?></a></td>
+    <td class="dayname"><a href="" class="synonym"
+            data-day="<?=$row['dayname']?>">=</a>
+        <a href="" data-day="<?=$row['dayname']?>"
+            class="propers"><?=$row['dayname']?></a></td>
     <td class="season"><?=$row['season']?></td>
     <td class="base"><?=$row['base']?></td>
     <td class="offset"><?=$row['offset']?></td>
@@ -407,7 +410,8 @@ if ($_GET['propers']) {
         epistle, epistle2, epistle3,
         gospel, gospel2, gospel3, psalm, psalm2, psalm3, theme, note
         FROM `{$dbp}churchyear_propers` WHERE dayname = :dayname");
-    if (! ($q->execute() && $rvdata = $q->fetch(PDO::FETCH_ASSOC))) {
+    if (! ($q->execute(array("dayname"=>$_GET['propers']))
+        && $rvdata = $q->fetch(PDO::FETCH_ASSOC))) {
         $rvdata = array("color"=>"", "collect"=>"", "collect2"=>"",
             "collect3"=>"", "oldtestament"=>"", "oldtestament2"=>"",
             "oldtestament3"=>"", "epistle"=>"", "epistle2"=>"",
@@ -460,7 +464,7 @@ if ($_GET['propers']) {
     <button type="reset">Reset</button>
     </form>
 <?
-    return (json_encode(ob_get_clean()));
+    echo json_encode(array(true, ob_get_clean()));
     exit(0);
 }
 
@@ -529,7 +533,10 @@ if (! $auth) {
             $.get("churchyear.php", {propers: orig},
                 function(rv) {
                     rv = eval(rv);
-                    $("#dialog").html(rv);
+                    if (! rv[0]) {
+                        return;
+                    }
+                    $("#dialog").html(rv[1]);
                     $("#propersform").submit(function(evt) {
                         evt.preventDefault();
                         $.post("churchyear.php", $("#propersform").serialize(),
