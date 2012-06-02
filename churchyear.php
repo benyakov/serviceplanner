@@ -105,12 +105,14 @@ if (! $result->fetchAll(PDO::FETCH_NUM)) {
  */
 if ($_GET['dropfunctions'] == 1) {
     $dbh->exec("DROP FUNCTION `{$dbp}easter_in_year`;
-    DROP FUNCTION `{$dbp}christmas1_in_year`;
-    DROP FUNCTION `{$dbp}michaelmas1_in_year`;
-    DROP FUNCTION `{$dbp}calc_date_in_year`;
-    DROP FUNCTION `{$dbp}date_in_year`;
-    DROP FUNCTION `{$dbp}calc_observed_date_in_year`;
-    DROP FUNCTION `{$dbp}observed_date_in_year`");
+    DROP FUNCTION IF EXISTS `{$dbp}christmas1_in_year`;
+    DROP FUNCTION IF EXISTS `{$dbp}michaelmas1_in_year`;
+    DROP FUNCTION IF EXISTS `{$dbp}epiphany1_in_year`;
+    DROP FUNCTION IF EXISTS `{$dbp}calc_date_in_year`;
+    DROP FUNCTION IF EXISTS `{$dbp}date_in_year`;
+    DROP FUNCTION IF EXISTS `{$dbp}calc_observed_date_in_year`;
+    DROP FUNCTION IF EXISTS `{$dbp}observed_date_in_year`;
+    DROP PROCEDURE IF EXISTS `{$dbp}get_days_for_date`");
     setMessage("Church year functions dropped.  To re-create them, visit"
         ." the Church Year tab.  They will be created automatically.");
     $dbh->commit();
@@ -149,14 +151,9 @@ if ($_GET['droptables'] == 1) {
  * Returns a comma-separated list of daynames that match the date given.
  */
 if ($_GET['daysfordate']) {
-    $date = date_parse($_GET['daysfordate']);
-    $q = $dbh->prepare("SELECT dayname FROM `{$dbp}churchyear`
-        WHERE `{$dbp}date_in_year`(:year1, dayname) = :date1
-        OR `{$dbp}observed_date_in_year`(:year2, dayname) = :date1");
-    $q->bindValue(':year1', $date['year']);
-    $q->bindValue(':year2', $date['year']);
-    $q->bindValue(':date1', $_GET['daysfordate']);
-    $q->bindValue(':date2', $_GET['daysfordate']);
+    $date = strtotime($_GET['daysfordate']);
+    $q = $dbh->prepare("call {$dbp}get_days_for_date(:date)");
+    $q->bindValue(':date', strftime('%Y-%m-%d', $date));
     $result = $q->execute();
     while ($row = $q->fetch(PDO::FETCH_NUM)) {
         $found[] = $row[0];

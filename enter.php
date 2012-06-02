@@ -27,8 +27,9 @@ if (array_key_exists("date", $_POST)) {
             function(rv) {
                 rv = eval(rv);
                 if (rv[0]) {
-                    if (rv.length) {
-                        $("#liturgicalname").val(Array(rv[1]).join(", "));
+                    if (rv[1] != null) {
+                        var names = eval(rv[1]);
+                        $("#liturgicalname").val(names.join(", "));
                     }
                 }
             });

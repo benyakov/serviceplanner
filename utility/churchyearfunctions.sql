@@ -65,7 +65,6 @@ BEGIN
         RETURN CONCAT_WS('-', p_year, 1, 6) + INTERVAL (8-wdepiphany) DAY;
     END IF;
 END;
-END;
 
 DROP FUNCTION IF EXISTS `{{DBP}}calc_date_in_year`;
 CREATE FUNCTION `{{DBP}}calc_date_in_year`(p_year INTEGER,
@@ -156,6 +155,14 @@ BEGIN
         INTO v_base, v_observed_month, v_observed_sunday;
 RETURN `{{DBP}}calc_observed_date_in_year`(p_year, p_dayname, v_base, v_observed_month,
     v_observed_sunday);
+END;
+
+DROP PROCEDURE IF EXISTS `{{DBP}}get_days_for_date`;
+CREATE PROCEDURE `{{DBP}}get_days_for_date` (p_date DATE)
+BEGIN
+    SELECT dayname FROM `{{DBP}}churchyear`
+    WHERE `{{DBP}}date_in_year`(YEAR(p_date), dayname) = p_date
+    OR `{{DBP}}observed_date_in_year`(YEAR(p_date), dayname) = p_date;
 END;
 
 #DELIMITER ;
