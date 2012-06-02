@@ -16,15 +16,14 @@ if (! $auth) {
         </span>
         <h1>Sermon Plan</h1>
     <?
-        $q = $dbh->prepare("SELECT sermons.bibletext, sermons.outline,
-            sermons.notes, DATE_FORMAT(days.caldate, '%e %b %Y') as date,
-            days.name, days.rite
-            FROM {$dbp}sermons AS sermons
-            JOIN {$dbp}days AS DAYS
-                ON (sermons.service=days.pkey)
+        $q = $dbh->prepare("SELECT s.bibletext, s.outline,
+            s.notes, DATE_FORMAT(d.caldate, '%e %b %Y') as date,
+            d.name, d.rite
+            FROM `{$dbp}sermons` AS s
+            JOIN `{$dbp}days` AS d ON (s.service=d.pkey)
             WHERE service=:id");
-        $q->bindParam('id', $_GET['id']);
-        $q->execute() or die(array_pop($q->errorInfo()));
+        $q->execute(array("id"=>$_GET['id']))
+            or die(array_pop($q->errorInfo()));
         $row = $q->fetch(PDO::FETCH_ASSOC);
     ?>
         <dl>

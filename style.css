@@ -177,10 +177,12 @@ tr.heading {
 }
 
 tr.table-topline td {
-    border-top: thin solid black;
+    border-top: 2px solid #BBB;
+    background-color: #E2E2E2;
+    font-family: sans-serif;
 }
 .table-leftborder {
-    border-left: thin solid black;
+    border-left: 3px solid #88B;
 }
 .table-preformat {
     padding: 1ex;
@@ -204,6 +206,9 @@ td.title {
 
 td.controls {
     font: bold 50% sans-serif;
+}
+#dialog {
+    font-size: 85%;
 }
 td.controls a:link,
 a.synonym:link,

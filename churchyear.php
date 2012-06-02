@@ -393,8 +393,9 @@ if ($_POST['propers']) {
         $_POST['gospel2'], $_POST['gospel3'], $_POST['epistle'],
         $_POST['epistle2'], $_POST['epistle3'], $_POST['psalm'],
         $_POST['psalm2'], $_POST['psalm3'], $_POST['theme'], $_POST['note'],
-        $_POST['dayname']))) {
-        echo json_encode(array(true));
+        $_POST['propers']))) {
+        echo json_encode(array($q->rowCount()));
+        $dbh->commit();
     } else {
         echo json_encode(array(false, array_pop($q->errorInfo())));
     }
@@ -423,6 +424,7 @@ if ($_GET['propers']) {
     ob_start();
 ?>
     <form id="propersform" method="post">
+    <input type="hidden" name="propers" value="<?=$_GET['propers']?>">
     <div class="formblock"><label for="color">Color</label><br>
     <input type="text" value="<?=$rvdata['color']?>" name="color"></div>
     <div class="formblock"><label for="theme">Theme</label><br>
