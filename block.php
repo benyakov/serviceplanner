@@ -23,5 +23,43 @@
     The Dalles, OR 97058
     USA
  */
+require("init.php");
+$auth = auth();
 
-?>
+// Display the block planning table
+if (! $auth) {
+    setMessage("Access denied.  Please log in.");
+    header("location: index.php");
+}
+$result = $dbh->exec("SELECT blockstart, blockend, label, notes, oldtestament,
+    epistle, gospel, psalm, collect, seq FROM blocks
+    ORDER BY (blockstart, blockend)");
+?><!DOCTYPE html>
+<html lang="en">
+<?=html_head("Block Planning")?>
+<body>
+    <header>
+    <?=getLoginForm()?>
+    <?=getUserActions()?>
+    <? showMessage(); ?>
+    </header>
+    <?=sitetabs($sitetabs, $script_basename)?>
+    <div id="content-container">
+    <table id="block-listing">
+    <tr><th>Start</th><th>End</th><th colspan="2">Label</th></tr>
+    <tr><th>OT</th><th>Epistle</th><th>Gospel</th></th><th>Psalm</th></tr>
+    <tr><th colspan="4">Notes</th><th>Collect</th>
+    <?
+while ($row = $result->fetch(PDO::FETCH_ASSOC)) { ?>
+    <tr><td><?=$row['blockstart']?></td><td><?=$row['blockend']?></td>
+        <td><?=$row['label']?></td>
+        <td><a title="edit" href="" data-seq="<?=$row['seq']?>" class="edit">Edit</a>
+        <a title="delete" href="" data-seq="<?=$row['seq']?>" class="delete">Delete</a></td></tr>
+    <tr><td><?=$row['oldtestament']?></td><td><?=$row['epistle']?></td>
+        <td><?=$row['gospel']?></td><td><?=$row['psalm']?></td></tr>
+    <tr><th colspan="4"><?=$row['notes']?></td><td><?=$row['collect']?></td></tr>
+<? } ?>
+    </table>
+    </div>
+</body>
+</html>
