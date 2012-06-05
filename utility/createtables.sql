@@ -70,4 +70,17 @@ CREATE TABLE `users` (
   `resetkey` text default NULL,
   `resetexpiry` datetime default NULL,
   PRIMARY KEY (`uid`)
-) TYPE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+CREATE TABLE `blocks` (
+  `blockstart` date,
+  `blockend` date,
+  `label` varchar(128),
+  `notes` text,
+  `oldtestament` varchar(56),
+  `epistle` varchar(56),
+  `gospel` varchar(56),
+  `psalm` varchar(56),
+  `collect` varchar(56),
+  UNIQUE KEY `span` (`blockstart`, `blockend`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
