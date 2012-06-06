@@ -25,19 +25,88 @@
  */
 require("init.php");
 $auth = auth();
+
+/* block?action=new
+ * Show an empty block edit form
+ */
+if ($_GET['action'] == "new") {
+    if (! $auth) {
+        echo json_encode(array(false, ""));
+        exit(0);
+    }
+    ob_start();
+    // TODO: Put the following form into a function that accepts defaults
+    // so that we can use it for editing too.
+?>
+    <form id="block-plan-form" action="block.php" method="post">
+    <label for="label">Label</label><input type="text" id="label" name="label"><br>
+    <label for="startdate">Start</label>
+    <input type="date" id="startdate" name="startdate">
+    <div id="startday"></div><br>
+    <label for="startdate">End</label>
+    <input type="date" id="enddate" name="enddate">
+    <div id="endday"></div><br>
+    <label for="oldtestament">Old Testament</label>
+    <select name="oldtestament" id="oldtestament">
+        <option value="1">First</option>
+        <option value="2">Second</option>
+        <option value="3">Third</option>
+        <option value="Custom">Custom</option>
+    </select>
+    <label for="otcustom">Custom OT Series</label>
+    <input type="text" name="otcustom" id="otcustom"><br>
+    <label for="epistle">Epistle</label>
+    <select name="epistle" id="epistle">
+        <option value="1">First</option>
+        <option value="2">Second</option>
+        <option value="3">Third</option>
+        <option value="Custom">Custom</option>
+    </select>
+    <label for="epcustom">Custom Epistle Series</label>
+    <input type="text" name="epcustom" id="epcustom"><br>
+    <label for="gospel">Gospel</label>
+    <select name="gospel" id="gospel">
+        <option value="1">First</option>
+        <option value="2">Second</option>
+        <option value="3">Third</option>
+        <option value="Custom">Custom</option>
+    </select>
+    <label for="gocustom">Custom Gospel Series</label>
+    <input type="text" name="gocustom" id="gocustom"><br>
+    <label for="psalm">Psalm</label>
+    <select name="psalm" id="psalm">
+        <option value="1">First</option>
+        <option value="2">Second</option>
+        <option value="3">Third</option>
+        <option value="Custom">Custom</option>
+    </select>
+    <label for="pscustom">Custom Psalm Series</label>
+    <input type="text" name="pscustom" id="pscustom"><br>
+    <label for="collect">Collect</label>
+    <select name="collect" id="collect">
+        <option value="1">First</option>
+        <option value="2">Second</option>
+        <option value="3">Third</option>
+        <option value="Custom">Custom</option>
+    </select>
+    <label for="cocustom">Custom Collect Series</label>
+    <input type="text" name="cocustom" id="cocustom"><br>
+    <label for="notes">Block Notes</label>
+    <textarea name="notes" id="notes"></textarea><br>
+    <button type="submit">Submit</button>
+    <button type="reset">Reset</button>
+    </form>
+<?
+    echo json_encode(array(true, ob_get_clean()));
+    exit(0);
+}
+
+// Display the block planning table
 if (! $auth) {
     setMessage("Access denied.  Please log in.");
     header("location: index.php");
 }
 
-/* block?action=new
- * Show an empty block edit form
-if ($_GET['action'] == "new") {
-
-}
- */
-
-// Display the block planning table
 $q = $dbh->prepare("SELECT blockstart, blockend, label, notes, oldtestament,
     epistle, gospel, psalm, collect, seq FROM blocks
     ORDER BY (blockstart, blockend)");
@@ -47,7 +116,22 @@ $q = $dbh->prepare("SELECT blockstart, blockend, label, notes, oldtestament,
 <body>
     <script type="text/javascript">
     $(document).ready(function() {
-        return;
+        $("#new-block").click(function(evt) {
+            evt.preventDefault();
+            $("#dialog").load(encodeURI("block.php?action=new"), function() {
+                $("#dialog").dialog({modal: true,
+                            position: "center",
+                            title: "New Block Plan",
+                            width: $(window).width()*0.7,
+                            maxHeight: $(window).height()*0.7,
+                            create: function() {
+                                setupEntryDialog();
+                            },
+                            open: function() {
+                                setupEntryDialog();
+                            }});
+            });
+        });
     });
     </script>
     <header>
@@ -66,7 +150,8 @@ $q = $dbh->prepare("SELECT blockstart, blockend, label, notes, oldtestament,
     <?
 if ($q->execute()) {
     while ($row = $q->fetch(PDO::FETCH_ASSOC)) { ?>
-    <tr><td><?=$row['blockstart']?></td><td><?=$row['blockend']?></td>
+    <tr class="heading"><td><?=$row['blockstart']?></td>
+        <td><?=$row['blockend']?></td>
         <td><?=$row['label']?></td>
         <td><a title="edit" href="" data-seq="<?=$row['seq']?>" class="edit">Edit</a>
         <a title="delete" href="" data-seq="<?=$row['seq']?>" class="delete">Delete</a></td></tr>
@@ -77,5 +162,6 @@ if ($q->execute()) {
 } ?>
     </table>
     </div>
+    <div id="dialog"></div>
 </body>
 </html>
