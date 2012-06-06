@@ -151,6 +151,7 @@ div#content-container {
     color: black;
 }
 
+table#block-listing,
 table#churchyear-listing,
 table#xref-listing,
 table#modify-listing,
@@ -162,6 +163,7 @@ table#sermonplan-listing {
     width: 100%;
 }
 
+table#block-listing,
 table#churchyear-listing th,
 table#xref-listing th,
 table#modify-listing th,
@@ -353,7 +355,7 @@ div#sitetabs-background {
     border: none;
     margin: 0;
 }
-#goto-now {
+#quicklinks {
     float: right;
 }
 

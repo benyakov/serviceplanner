@@ -94,7 +94,7 @@ if (array_key_exists("date", $_POST)) {
     <?=getUserActions()?>
     <?showMessage();?>
     </header>
-    <?=sitetabs($sitetabs, $script_basename)?>
+    <?=sitetabs($sitetabs, "modify")?>
     <div id="content-container">
     <header>
     <h1>Service Entry Form</h1>

@@ -25,19 +25,31 @@
  */
 require("init.php");
 $auth = auth();
-
-// Display the block planning table
 if (! $auth) {
     setMessage("Access denied.  Please log in.");
     header("location: index.php");
 }
-$result = $dbh->exec("SELECT blockstart, blockend, label, notes, oldtestament,
+
+/* block?action=new
+ * Show an empty block edit form
+if ($_GET['action'] == "new") {
+
+}
+ */
+
+// Display the block planning table
+$q = $dbh->prepare("SELECT blockstart, blockend, label, notes, oldtestament,
     epistle, gospel, psalm, collect, seq FROM blocks
     ORDER BY (blockstart, blockend)");
 ?><!DOCTYPE html>
 <html lang="en">
 <?=html_head("Block Planning")?>
 <body>
+    <script type="text/javascript">
+    $(document).ready(function() {
+        return;
+    });
+    </script>
     <header>
     <?=getLoginForm()?>
     <?=getUserActions()?>
@@ -45,12 +57,15 @@ $result = $dbh->exec("SELECT blockstart, blockend, label, notes, oldtestament,
     </header>
     <?=sitetabs($sitetabs, $script_basename)?>
     <div id="content-container">
+    <div id="quicklinks"><a href="block.php?action=new" title="New Block" id="new-block">New Block</a></div>
+    <h1>Block Planning Records</h1>
     <table id="block-listing">
     <tr><th>Start</th><th>End</th><th colspan="2">Label</th></tr>
     <tr><th>OT</th><th>Epistle</th><th>Gospel</th></th><th>Psalm</th></tr>
     <tr><th colspan="4">Notes</th><th>Collect</th>
     <?
-while ($row = $result->fetch(PDO::FETCH_ASSOC)) { ?>
+if ($q->execute()) {
+    while ($row = $q->fetch(PDO::FETCH_ASSOC)) { ?>
     <tr><td><?=$row['blockstart']?></td><td><?=$row['blockend']?></td>
         <td><?=$row['label']?></td>
         <td><a title="edit" href="" data-seq="<?=$row['seq']?>" class="edit">Edit</a>
@@ -58,7 +73,8 @@ while ($row = $result->fetch(PDO::FETCH_ASSOC)) { ?>
     <tr><td><?=$row['oldtestament']?></td><td><?=$row['epistle']?></td>
         <td><?=$row['gospel']?></td><td><?=$row['psalm']?></td></tr>
     <tr><th colspan="4"><?=$row['notes']?></td><td><?=$row['collect']?></td></tr>
-<? } ?>
+<? }
+} ?>
     </table>
     </div>
 </body>

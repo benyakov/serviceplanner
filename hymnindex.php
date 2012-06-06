@@ -107,7 +107,7 @@ $q = $dbh->query("SELECT * FROM {$dbp}xref{$sort_by}") ;
 } ?>
 <div id="content-container">
 <?  if ($sorted_on) { ?>
-<div id="goto-now"><a href="#sortstart">Jump to Beginning of Sorted</a></div>
+<div id="quicklinks"><a href="#sortstart">Jump to Beginning of Sorted</a></div>
 <?  } ?>
 <h1>Cross Reference Table</h1>
 <table id="xref-listing" cols="8">

@@ -54,7 +54,7 @@ $q = $dbh->prepare("CREATE TABLE `blocks` (
   UNIQUE KEY `span` (`blockstart`, `blockend`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8");
 if ($q->execute()) {
-    $rv[] = "Done."
+    $rv[] = "Done.";
 } else {
     $rv[] = "Couldn't finish: " . array_pop($q->errorInfo());
 }
