@@ -53,18 +53,18 @@ $q = $dbh->prepare("CREATE TABLE `blocks` (
   `collect` varchar(64),
   `id` integer,
   UNIQUE KEY `span` (`blockstart`, `blockend`),
-  PRIMARY KEY (`id`);
+  PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8");
 if ($q->execute()) {
     $rv[] = "Done.";
+    // write a new dbversion.txt
+    require('./version.php');
+    $fh = fopen("./dbversion.txt", "wb");
+    fwrite($fh, "{$version['major']}.{$version['minor']}.{$version['tick']}");
+fclose($fh);
 } else {
     $rv[] = "Couldn't finish: " . array_pop($q->errorInfo());
 }
-// write a new dbversion.txt
-require('./version.php');
-$fh = fopen("./dbversion.txt", "wb");
-fwrite($fh, "{$version['major']}.{$version['minor']}.{$version['tick']}");
-fclose($fh);
 // redirect with a message.
 setMessage(implode("<br />\n", $rv));
 $serverdir = dirname(dirname(dirname($_SERVER['PHP_SELF'])));

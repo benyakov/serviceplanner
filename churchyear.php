@@ -502,7 +502,7 @@ if (! $auth) {
 ?>
 <!DOCTYPE html>
 <html lang="en">
-<?=html_head("Church Service")?>
+<?=html_head("Church Year")?>
 <body>
 <script type="text/javascript">
     $(document).ready(function() {

@@ -306,7 +306,11 @@ function getDayFor(datestr, target) {
             if (rv[0]) {
                 if (rv[1] != null) {
                     var names = eval(rv[1]);
-                    target.val(names.join(", "));
+                    if (target.is("input")) {
+                        target.val(names.join(", "));
+                    } else {
+                        target.html(names.join(", "));
+                    }
                 }
             }
         });

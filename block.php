@@ -42,6 +42,14 @@ function ifSel($ary, $key, $val) {
     else return "";
 }
 
+/* If the given values are equal, return "disabled".
+ * Otherwise, an empty string.
+ */
+function disableUnless($value, $test) {
+    if ($value != $test) return "disabled";
+    else return "";
+}
+
 /* Display the form for a block plan, including values if provided.
  */
 function blockPlanForm($vals=array()) {
@@ -62,59 +70,70 @@ function blockPlanForm($vals=array()) {
     else $vals['cocustom'] = $vals['collect'];
 ?>
     <form id="block-plan-form" action="block.php" method="post">
-    <label for="label">Label</label><input type="text" id="label" name="label"><br>
+    <input type="hidden" name="id" value="<?=$vals['id']?>">
+    <label for="label">Label</label>
+    <input type="text" id="label" name="label" required><br>
+    <section id="block-dates">
     <label for="startdate">Start</label>
     <input type="date" id="startdate" name="startdate" <?=ifVal($vals, 'startdate')?> required>
     <div id="startday"></div><br>
     <label for="enddate">End</label>
     <input type="date" id="enddate" name="enddate" <?=ifVal($vals, 'enddate')?> required>
     <div id="endday"></div><br>
-    <label for="oldtestament">Old Testament</label>
+    </section>
+    <section id="block-series">
+    <label for="oldtestament">OT Series</label>
     <select name="oldtestament" id="oldtestament">
         <option value="1" <?=ifSel($vals, 'oldtestament', 1)?>>First</option>
         <option value="2" <?=ifSel($vals, 'oldtestament', 2)?>>Second</option>
         <option value="3" <?=ifSel($vals, 'oldtestament', 3)?>>Third</option>
         <option value="custom" <?=ifSel($vals, 'oldtestament', "custom")?>>Custom</option>
     </select>
-    <label for="otcustom">Custom OT Series</label>
-    <input type="text" name="otcustom" id="otcustom" <?=ifVal($vals, 'otcustom')?>><br>
-    <label for="epistle">Epistle</label>
+    <label for="otcustom">Custom</label>
+    <input type="text" name="otcustom" id="otcustom"
+    <?=disableUnless($vals['oldtestament'], 'custom')?> <?=ifVal($vals, 'otcustom')?>><br>
+    <label for="epistle">Epistle Series</label>
     <select name="epistle" id="epistle">
         <option value="1" <?=ifSel($vals, 'epistle', 1)?>>First</option>
         <option value="2" <?=ifSel($vals, 'epistle', 2)?>>Second</option>
         <option value="3" <?=ifSel($vals, 'epistle', 3)?>>Third</option>
         <option value="custom" <?=ifSel($vals, 'epistle', "custom")?>>Custom</option>
     </select>
-    <label for="epcustom">Custom Epistle Series</label>
-    <input type="text" name="epcustom" id="epcustom" <?=ifVal($vals, 'epcustom')?>><br>
-    <label for="gospel">Gospel</label>
+    <label for="epcustom">Custom</label>
+    <input type="text" name="epcustom" id="epcustom"
+    <?=ifVal($vals, 'epcustom')?><?=disableUnless($vals['epistle'], 'custom')?>><br>
+    <label for="gospel">Gospel Series</label>
     <select name="gospel" id="gospel">
         <option value="1" <?=ifSel($vals, 'gospel', 1)?>>First</option>
         <option value="2" <?=ifSel($vals, 'gospel', 2)?>>Second</option>
         <option value="3" <?=ifSel($vals, 'gospel', 3)?>>Third</option>
         <option value="custom" <?=ifSel($vals, 'gospel', 'custom')?>>Custom</option>
     </select>
-    <label for="gocustom">Custom Gospel Series</label>
-    <input type="text" name="gocustom" id="gocustom" <?=ifVal($vals, 'gocustom')?>><br>
-    <label for="psalm">Psalm</label>
+    <label for="gocustom">Custom</label>
+    <input type="text" name="gocustom" id="gocustom"
+    <?=disableUnless($vals['gospel'], 'custom')?> <?=ifVal($vals, 'gocustom')?>><br>
+    <label for="psalm">Psalm Series</label>
     <select name="psalm" id="psalm">
         <option value="1" <?=ifSel($vals, 'psalm', 1)?>>First</option>
         <option value="2" <?=ifSel($vals, 'psalm', 2)?>>Second</option>
         <option value="3" <?=ifSel($vals, 'psalm', 3)?>>Third</option>
         <option value="Custom" <?=ifSel($vals, 'psalm', 'custom')?>>Custom</option>
     </select>
-    <label for="pscustom">Custom Psalm Series</label>
-    <input type="text" name="pscustom" id="pscustom" <?=ifVal($vals, 'pscustom')?>><br>
-    <label for="collect">Collect</label>
+    <label for="pscustom">Custom</label>
+    <input type="text" name="pscustom" id="pscustom"
+    <?=disableUnless($vals['psalm'], 'custom')?> <?=ifVal($vals, 'pscustom')?>><br>
+    <label for="collect">Collect Series</label>
     <select name="collect" id="collect">
         <option value="1" <?=ifSel($vals, 'collect', 1)?>>First</option>
         <option value="2" <?=ifSel($vals, 'collect', 2)?>>Second</option>
         <option value="3" <?=ifSel($vals, 'collect', 3)?>>Third</option>
         <option value="Custom" <?=ifSel($vals, 'collect', 'custom')?>>Custom</option>
     </select>
-    <label for="cocustom">Custom Collect Series</label>
-    <input type="text" name="cocustom" id="cocustom" <?=ifVal($vals, 'cocustom')?>><br>
-    <label for="notes">Block Notes</label>
+    <label for="cocustom">Custom</label>
+    <input type="text" name="cocustom" id="cocustom"
+    <?=disableUnless($vals['collect'], 'custom')?> <?=ifVal($vals, 'cocustom')?>><br>
+    </section>
+    <label for="notes">Block Notes</label><br>
     <textarea name="notes" id="notes"><?=$vals['notes']?$vals['notes']:''?></textarea><br>
     <button type="submit">Submit</button>
     <button type="reset">Reset</button>
@@ -127,12 +146,10 @@ function blockPlanForm($vals=array()) {
  */
 if ($_GET['action'] == "new") {
     if (! $auth) {
-        echo json_encode(array(false, ""));
+        echo "Access denied.  Please log in.";
         exit(0);
     }
-    ob_start();
     blockPlanForm();
-    echo json_encode(array(true, ob_get_clean()));
     exit(0);
 }
 
@@ -141,19 +158,17 @@ if ($_GET['action'] == "new") {
  */
 if ($_GET['action'] == "edit" && $_GET['id']) {
     if (! $auth) {
-        echo json_encode(array(false, ""));
+        echo "Access denied.  Please log in.";
         exit(0);
     }
     $q = $dbh->query("SELECT blockstart, blockend, label, notes, oldtestament,
-    epistle, gospel, psalm, collect FROM blocks
+    epistle, gospel, psalm, collect, id FROM blocks
     WHERE id = ?");
     if ($q->execute($_GET['id']) && $row = $q->fetch(PDO::FETCH_ASSOC)) {
-        ob_start;
         blockPlanForm($row);
-        echo json_encode(array(true, ob_get_clean()));
         exit(0);
     } else {
-        echo json_encode(array(false, array_pop($q->errorInfo())));
+        echo array_pop($q->errorInfo());
     }
 }
 
@@ -171,6 +186,20 @@ $q = $dbh->prepare("SELECT blockstart, blockend, label, notes, oldtestament,
 <?=html_head("Block Planning")?>
 <body>
     <script type="text/javascript">
+    function checkOverlap(evt) {
+        evt.preventDefault();
+        // TODO: Implement the check below
+        $.get("block.php", {overlapstart: $("#startdate").val(),
+            overlapend: $("#enddate").val()},
+            function(rv) {
+                rv = eval(rv);
+                if (rv[0]) {
+                    $("#block-plan-form").submit();
+                } else {
+                    setMessage(rv[1]);
+                }
+            });
+    }
     function setupEntryDialog() {
         $('#startdate').change(function() {
             getDayFor($(this).val(), $("#startday"));
@@ -178,10 +207,42 @@ $q = $dbh->prepare("SELECT blockstart, blockend, label, notes, oldtestament,
         $('#enddate').change(function() {
             getDayFor($(this).val(), $("#endday"));
         });
-        $('#block-plan-form').submit(evt) {
-            evt.preventDefault();
-            // TODO: Check for overlap of date span with existing blocks
-        }
+        $('#collect').change(function() {
+            if ($(this).val() == "custom") {
+                $("#cocustom").attr("disabled", false);
+            } else {
+                $("#cocustom").attr("disabled", true);
+            }
+        });
+        $('#psalm').change(function() {
+            if ($(this).val() == "custom") {
+                $("#pscustom").attr("disabled", false);
+            } else {
+                $("#pscustom").attr("disabled", true);
+            }
+        });
+        $('#oldtestament').change(function() {
+            if ($(this).val() == "custom") {
+                $("#otcustom").attr("disabled", false);
+            } else {
+                $("#otcustom").attr("disabled", true);
+            }
+        });
+        $('#epistle').change(function() {
+            if ($(this).val() == "custom") {
+                $("#epcustom").attr("disabled", false);
+            } else {
+                $("#epcustom").attr("disabled", true);
+            }
+        });
+        $('#gospel').change(function() {
+            if ($(this).val() == "custom") {
+                $("#gocustom").attr("disabled", false);
+            } else {
+                $("#gocustom").attr("disabled", true);
+            }
+        });
+        $('#block-plan-form').submit(checkOverlap);
     }
     $(document).ready(function() {
         $("#new-block").click(function(evt) {
@@ -200,6 +261,24 @@ $q = $dbh->prepare("SELECT blockstart, blockend, label, notes, oldtestament,
                             }});
             });
         });
+        $(".edit").click(function(evt) {
+            evt.preventDefault();
+            $("#dialog").load(
+                encodeURI("block.php?action=edit&id="+$(this).attr("data-id")),
+                function() {
+                    $("#dialog").dialog({modal: true,
+                                position: "center",
+                                title: "New Block Plan",
+                                width: $(window).width()*0.7,
+                                maxHeight: $(window).height()*0.7,
+                                create: function() {
+                                    setupEntryDialog();
+                                },
+                                open: function() {
+                                    setupEntryDialog();
+                                }});
+            });
+        });
     });
     </script>
     <header>
@@ -213,8 +292,8 @@ $q = $dbh->prepare("SELECT blockstart, blockend, label, notes, oldtestament,
     <h1>Block Planning Records</h1>
     <table id="block-listing">
     <tr><th>Start</th><th>End</th><th colspan="2">Label</th></tr>
-    <tr><th>OT</th><th>Epistle</th><th>Gospel</th></th><th>Psalm</th></tr>
-    <tr><th colspan="4">Notes</th><th>Collect</th>
+    <tr><th>OT</th><th>Epistle</th><th>Gospel</th></th><th>Psalm</th><th>Collect</th></tr>
+    <tr><th colspan="5">Notes</th>
     <?
 if ($q->execute()) {
     while ($row = $q->fetch(PDO::FETCH_ASSOC)) { ?>
@@ -224,8 +303,9 @@ if ($q->execute()) {
         <td><a title="edit" href="" data-id="<?=$row['id']?>" class="edit">Edit</a>
         <a title="delete" href="" data-id="<?=$row['id']?>" class="delete">Delete</a></td></tr>
     <tr><td><?=$row['oldtestament']?></td><td><?=$row['epistle']?></td>
-        <td><?=$row['gospel']?></td><td><?=$row['psalm']?></td></tr>
-    <tr><th colspan="4"><?=$row['notes']?></td><td><?=$row['collect']?></td></tr>
+        <td><?=$row['gospel']?></td><td><?=$row['psalm']?></td>
+        <td><?=$row['collect']?></td></tr>
+    <tr><th colspan="5"><?=$row['notes']?></td></tr>
 <? }
 } ?>
     </table>
