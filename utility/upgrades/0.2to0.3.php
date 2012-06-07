@@ -46,12 +46,14 @@ $q = $dbh->prepare("CREATE TABLE `blocks` (
   `blockend` date,
   `label` varchar(128),
   `notes` text,
-  `oldtestament` varchar(56),
-  `epistle` varchar(56),
-  `gospel` varchar(56),
-  `psalm` varchar(56),
-  `collect` varchar(56),
-  UNIQUE KEY `span` (`blockstart`, `blockend`)
+  `oldtestament` varchar(64),
+  `epistle` varchar(64),
+  `gospel` varchar(64),
+  `psalm` varchar(64),
+  `collect` varchar(64),
+  `id` integer,
+  UNIQUE KEY `span` (`blockstart`, `blockend`),
+  PRIMARY KEY (`id`);
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8");
 if ($q->execute()) {
     $rv[] = "Done.";

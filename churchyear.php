@@ -585,6 +585,47 @@ if (! $auth) {
         });
     });
 
+    function getDateFor(year) {
+        // With the current settings of the form, calculate the date
+        // in the given year
+        var offset = new Number($("#offset").val());
+        if ($("#base").val() == "None") {
+            if ($("#observed-month").val()) {
+                if (Number($("#observed-sunday").val())>0) {
+                    var odate = new Date(year, $("#observed-month").val()-1, 1);
+                    odate.setDate(odate.getDate() + (7-odate.getDay()));
+                    odate.setDate(odate.getDate() +
+                        ($("#observed-sunday").val()-1));
+                    return odate;
+                } else {
+                    var odate = new Date(year, $("#observed-month").val(), 0);
+                    odate.setDate(odate.getDate() - odate.getDay());
+                    odate.setDate(odate.getDate() +
+                        (Number($("#observed-sunday").val())+1));
+                    return odate;
+                }
+            } else {
+                return new Date(year, $("#month").val()-1, $("#day").val());
+            }
+        } else if ("Easter" == $("#base").val()) {
+            var base = calcEaster(year);
+            base.setDate(base.getDate()+offset);
+            return base;
+        } else if ("Christmas 1" == $("#base").val()) {
+            var base = calcChristmas1(year);
+            base.setDate(base.getDate()+offset);
+            return base;
+        } else if ("Michaelmas 1" == $("#base").val()) {
+            var base = calcMichaelmas1(year);
+            base.setDate(base.getDate()+offset);
+            return base;
+        } else if ("Epiphany 1" == $("#base").val()) {
+            var base = calcEpiphany1(year);
+            base.setDate(base.getDate()+offset);
+            return base;
+        }
+    }
+
     function setupEdit() {
         // Set up edit links
         $(".edit").click(function(evt) {

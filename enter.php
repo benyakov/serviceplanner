@@ -45,18 +45,7 @@ if (array_key_exists("date", $_POST)) {
 <body>
     <script type="text/javascript">
     function updateFromDate(dateitem) {
-        var sdate = new Date($("#date").val());
-        sdate = sdate.toISOString().split("T")[0];
-        $.get("churchyear.php", {daysfordate: sdate},
-            function(rv) {
-                rv = eval(rv);
-                if (rv[0]) {
-                    if (rv[1] != null) {
-                        var names = eval(rv[1]);
-                        $("#liturgicalname").val(names.join(", "));
-                    }
-                }
-            });
+        getDayFor($("#date").val(), $("#liturgicalname"));
         updateExisting(dateitem);
     }
     $(document).ready(function() {

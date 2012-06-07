@@ -286,7 +286,7 @@ function calcEpiphany1(year) {
         return base;
     }
 }
-function calcMichaelmas1(year, callback) {
+function calcMichaelmas1(year) {
     var michaelmas = new Date(year, 8, 29);
     if (sessionStorage.michaelmasObserved != -1 && michaelmas.getDay == 6) {
         return new Date(year, 8, 30);
@@ -297,45 +297,19 @@ function calcMichaelmas1(year, callback) {
         return base
     }
 }
-function getDateFor(year) {
-    // With the current settings of the form, calculate the date
-    // in the given year
-    var offset = new Number($("#offset").val());
-    if ($("#base").val() == "None") {
-        if ($("#observed-month").val()) {
-            if (Number($("#observed-sunday").val())>0) {
-                var odate = new Date(year, $("#observed-month").val()-1, 1);
-                odate.setDate(odate.getDate() + (7-odate.getDay()));
-                odate.setDate(odate.getDate() +
-                    ($("#observed-sunday").val()-1));
-                return odate;
-            } else {
-                var odate = new Date(year, $("#observed-month").val(), 0);
-                odate.setDate(odate.getDate() - odate.getDay());
-                odate.setDate(odate.getDate() +
-                    (Number($("#observed-sunday").val())+1));
-                return odate;
+function getDayFor(datestr, target) {
+    var sdate = new Date(datestr);
+    sdate = sdate.toISOString().split("T")[0];
+    $.get("churchyear.php", {daysfordate: sdate},
+        function(rv) {
+            rv = eval(rv);
+            if (rv[0]) {
+                if (rv[1] != null) {
+                    var names = eval(rv[1]);
+                    target.val(names.join(", "));
+                }
             }
-        } else {
-            return new Date(year, $("#month").val()-1, $("#day").val());
-        }
-    } else if ("Easter" == $("#base").val()) {
-        var base = calcEaster(year);
-        base.setDate(base.getDate()+offset);
-        return base;
-    } else if ("Christmas 1" == $("#base").val()) {
-        var base = calcChristmas1(year);
-        base.setDate(base.getDate()+offset);
-        return base;
-    } else if ("Michaelmas 1" == $("#base").val()) {
-        var base = calcMichaelmas1(year);
-        base.setDate(base.getDate()+offset);
-        return base;
-    } else if ("Epiphany 1" == $("#base").val()) {
-        var base = calcEpiphany1(year);
-        base.setDate(base.getDate()+offset);
-        return base;
-    }
+        });
 }
 
 $(document).ready(function() {
