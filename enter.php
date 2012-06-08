@@ -62,7 +62,7 @@ if (array_key_exists("date", $_POST)) {
                     $("#location").focus();
                     $("#date").change();
                 }})
-            .focus()
+            .focus();
         $(".hymn-number").keyup(function(evt){
             if (evt.which != 9 &&
                 evt.which != 17) {

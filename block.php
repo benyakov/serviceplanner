@@ -223,12 +223,16 @@ $q = $dbh->prepare("SELECT blockstart, blockend, label, notes, oldtestament,
             });
     }
     function setupEntryDialog() {
-        $('#startdate').change(function() {
-            getDayFor($(this).val(), $("#startday"));
+        $('#startdate').datepicker({showOn:"button", numberOfMonths:[2,2],
+            stepMonths: 4})
+            .change(function() {
+                getDayFor($(this).val(), $("#startday"));
         });
         $('#enddate').change(function() {
             getDayFor($(this).val(), $("#endday"));
-        });
+        })
+            .datepicker({showOn:"button", numberOfMonths:[2,2],
+                stepMonths: 4});
         $('#collect').change(function() {
             if ($(this).val() == "custom") {
                 $("#cocustom").attr("disabled", false);
