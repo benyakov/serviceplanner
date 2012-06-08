@@ -172,6 +172,29 @@ if ($_GET['action'] == "edit" && $_GET['id']) {
     }
 }
 
+/* block.php?overlapstart=date&overlapend=date
+ * Return whether the dates overlap an existing block
+ */
+if ($_GET['overlapstart'] && $_GET['overlapend']) {
+    $q = $dbh->prepare("SELECT 1 FROM `{$dbp}blocks`
+        WHERE (blockstart < :date1 AND blockend > :date1)
+        OR (blockstart < :date2 AND blockend > :date2)");
+    $q->bindParam(":date1", $_GET['overlapstart']);
+    $q->bindParam(":date2", $_GET['overlapend']);
+    if ($q->execute()) {
+        if ($q->fetch()) {
+            // Don't go ahead, there is an overlap
+            echo json_encode(false);
+        } else {
+            // Go ahead, no overlap
+            echo json_encode(true);
+        }
+    } else {
+        echo array_pop($q->errorInfo());
+    }
+    exit(0);
+}
+
 // Display the block planning table
 if (! $auth) {
     setMessage("Access denied.  Please log in.");
@@ -188,7 +211,6 @@ $q = $dbh->prepare("SELECT blockstart, blockend, label, notes, oldtestament,
     <script type="text/javascript">
     function checkOverlap(evt) {
         evt.preventDefault();
-        // TODO: Implement the check below
         $.get("block.php", {overlapstart: $("#startdate").val(),
             overlapend: $("#enddate").val()},
             function(rv) {
