@@ -432,5 +432,28 @@ function jsString($s, $q="'") {
     return str_replace( array($q, "\n"), array("\\$q", "\\n"), $s);
 }
 
+function ordinal($n) {
+    $ords = array("zeroth", "first", "second", "third", "fourth", "fifth",
+        "sixth", "seventh", "eighth", "ninth", "tenth");
+    if (is_numeric($n) && $n > -1 && $n < 11) {
+        return $ords[$n];
+    } else return $n;
+}
+
+function daysForDate($date) {
+    // Return an array of day names matching the given English-format date.
+    global $dbh, $dbp;
+    if (! $date) return array();
+    $found = array();
+    $date = strtotime($date);
+    $q = $dbh->prepare("call {$dbp}get_days_for_date(:date)");
+    $q->bindValue(':date', strftime('%Y-%m-%d', $date));
+    $result = $q->execute();
+    while ($row = $q->fetch(PDO::FETCH_NUM)) {
+        $found[] = $row[0];
+    }
+    return $found;
+}
+
 // vim: set foldmethod=indent :
 ?>

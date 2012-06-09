@@ -168,7 +168,7 @@ table#sermonplan-listing {
     width: 100%;
 }
 
-table#block-listing,
+table#block-listing th,
 table#churchyear-listing th,
 table#xref-listing th,
 table#modify-listing th,
@@ -360,7 +360,7 @@ div#sitetabs-background {
     border: none;
     margin: 0;
 }
-#quicklinks {
+.quicklinks {
     float: right;
 }
 

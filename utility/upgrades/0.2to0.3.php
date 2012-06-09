@@ -51,7 +51,7 @@ $q = $dbh->prepare("CREATE TABLE `blocks` (
   `gospel` varchar(64),
   `psalm` varchar(64),
   `collect` varchar(64),
-  `id` integer,
+  `id` integer auto_increment,
   UNIQUE KEY `span` (`blockstart`, `blockend`),
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8");

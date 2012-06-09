@@ -173,14 +173,7 @@ if ($_GET['droptables'] == 1) {
  * Returns a comma-separated list of daynames that match the date given.
  */
 if ($_GET['daysfordate']) {
-    $date = strtotime($_GET['daysfordate']);
-    $q = $dbh->prepare("call {$dbp}get_days_for_date(:date)");
-    $q->bindValue(':date', strftime('%Y-%m-%d', $date));
-    $result = $q->execute();
-    while ($row = $q->fetch(PDO::FETCH_NUM)) {
-        $found[] = $row[0];
-    }
-    echo json_encode(array($result, $found));
+    echo json_encode(array($result, daysForDate($_GET['daysfordate'])));
     exit(0);
 }
 

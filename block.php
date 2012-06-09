@@ -53,33 +53,53 @@ function disableUnless($value, $test) {
 /* Display the form for a block plan, including values if provided.
  */
 function blockPlanForm($vals=array()) {
-    if ($vals['oldtestament'] && is_numeric($vals['oldtestament']))
-        $vals['otcustom'] = "";
-    else $vals['otcustom'] = $vals['oldtestament'];
-    if ($vals['epistle'] && is_numeric($vals['epistle']))
-        $vals['epcustom'] = "";
-    else $vals['epcustom'] = $vals['epistle'];
-    if ($vals['gospel'] && is_numeric($vals['gospel']))
-        $vals['gocustom'] = "";
-    else $vals['gocustom'] = $vals['gospel'];
-    if ($vals['psalm'] && is_numeric($vals['psalm']))
-        $vals['pscustom'] = "";
-    else $vals['pscustom'] = $vals['psalm'];
-    if ($vals['collect'] && is_numeric($vals['collect']))
-        $vals['cocustom'] = "";
-    else $vals['cocustom'] = $vals['collect'];
+    if ($vals['oldtestament'])
+        if (is_numeric($vals['oldtestament']))
+            $vals['otcustom'] = "";
+        else {
+            $vals['otcustom'] = $vals['oldtestament'];
+            $vals['oldtestament'] = "custom";
+        }
+    if ($vals['epistle'])
+        if (is_numeric($vals['epistle']))
+            $vals['epcustom'] = "";
+        else {
+            $vals['epcustom'] = $vals['epistle'];
+            $vals['epistle'] = "custom";
+        }
+    if ($vals['gospel'])
+        if (is_numeric($vals['gospel']))
+            $vals['gocustom'] = "";
+        else {
+            $vals['gocustom'] = $vals['gospel'];
+            $vals['gospel'] = "custom";
+        }
+    if ($vals['psalm'])
+        if (is_numeric($vals['psalm']))
+            $vals['pscustom'] = "";
+        else {
+            $vals['pscustom'] = $vals['psalm'];
+            $vals['psalm'] = "custom";
+        }
+    if ($vals['collect'])
+        if (is_numeric($vals['collect']))
+            $vals['cocustom'] = "";
+        else {
+            $vals['cocustom'] = $vals['collect'];
+            $vals['collect'] = "custom";
+        }
 ?>
     <form id="block-plan-form" action="block.php" method="post">
     <input type="hidden" name="id" value="<?=$vals['id']?>">
     <label for="label">Label</label>
-    <input type="text" id="label" name="label" required><br>
+    <input type="text" id="label" name="label" required <?=ifVal($vals, 'label')?>><br>
     <section id="block-dates">
     <label for="startdate">Start</label>
-    <input type="date" id="startdate" name="startdate" <?=ifVal($vals, 'startdate')?> required>
-    <div id="startday"></div><br>
+    <input type="date" id="startdate" name="startdate" <?=ifVal($vals, 'blockstart')?> required>
+    <div id="startday"><?=implode(", ", daysForDate($vals['blockstart']))?></div><br>
     <label for="enddate">End</label>
-    <input type="date" id="enddate" name="enddate" <?=ifVal($vals, 'enddate')?> required>
-    <div id="endday"></div><br>
+    <input type="date" id="enddate" name="enddate" <?=ifVal($vals, 'blockend')?> required>
+    <div id="endday"><?=implode(", ", daysForDate($vals['blockend']))?></div><br>
     <div id="overlap-notice"></div>
     </section>
     <section id="block-series">
@@ -118,7 +138,7 @@ function blockPlanForm($vals=array()) {
         <option value="1" <?=ifSel($vals, 'psalm', 1)?>>First</option>
         <option value="2" <?=ifSel($vals, 'psalm', 2)?>>Second</option>
         <option value="3" <?=ifSel($vals, 'psalm', 3)?>>Third</option>
-        <option value="Custom" <?=ifSel($vals, 'psalm', 'custom')?>>Custom</option>
+        <option value="custom" <?=ifSel($vals, 'psalm', 'custom')?>>Custom</option>
     </select>
     <label for="pscustom">Custom</label>
     <input type="text" name="pscustom" id="pscustom"
@@ -128,7 +148,7 @@ function blockPlanForm($vals=array()) {
         <option value="1" <?=ifSel($vals, 'collect', 1)?>>First</option>
         <option value="2" <?=ifSel($vals, 'collect', 2)?>>Second</option>
         <option value="3" <?=ifSel($vals, 'collect', 3)?>>Third</option>
-        <option value="Custom" <?=ifSel($vals, 'collect', 'custom')?>>Custom</option>
+        <option value="custom" <?=ifSel($vals, 'collect', 'custom')?>>Custom</option>
     </select>
     <label for="cocustom">Custom</label>
     <input type="text" name="cocustom" id="cocustom"
@@ -151,13 +171,46 @@ if ($_POST['label']) {
         header("location: index.php");
         exit(0);
     }
+    $_POST['startdate'] = date('Y-m-d', strtotime($_POST['startdate']));
+    $_POST['enddate'] = date('Y-m-d', strtotime($_POST['enddate']));
+    if ("custom" == $_POST['oldtestament']) {
+        $_POST['oldtestament'] = $_POST['otcustom'];
+    }
+    if ("custom" == $_POST['epistle']) {
+        $_POST['epistle'] = $_POST['epcustom'];
+    }
+    if ("custom" == $_POST['gospel']) {
+        $_POST['gospel'] = $_POST['gocustom'];
+    }
+    if ("custom" == $_POST['psalm']) {
+        $_POST['psalm'] = $_POST['pscustom'];
+    }
+    if ("custom" == $_POST['collect']) {
+        $_POST['collect'] = $_POST['cocustom'];
+    }
     if ($_POST['id']) { // Update existing record
         $q = $dbh->prepare("UPDATE `{$dbp}blocks`
             SET label = ?, blockstart = ?, blockend = ?, notes = ?,
             oldtestament = ?, epistle = ?, gospel = ?, psalm = ?,
             collect = ?
             WHERE id = ?");
-        // TODO: Execute this
+        $binding = array($_POST['label'], $_POST['startdate'],
+            $_POST['enddate'], $_POST['notes'], $_POST['oldtestament'],
+            $_POST['epistle'], $_POST['gospel'], $_POST['psalm'],
+            $_POST['collect'], $_POST['id']);
+    } else { // Create new record
+        $q = $dbh->prepare("INSERT INTO `{$dbp}blocks`
+            (label, blockstart, blockend, notes, oldtestament, epistle,
+            gospel, psalm, collect)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
+        $binding = array($_POST['label'], $_POST['startdate'],
+            $_POST['enddate'], $_POST['notes'], $_POST['oldtestament'],
+            $_POST['epistle'], $_POST['gospel'], $_POST['psalm'],
+            $_POST['collect']);
+    }
+    if (! $q->execute($binding)) {
+        setMessage("Problem saving block:" . array_pop($q->errorInfo()));
+    }
 }
 
 /* block.php?action=new
@@ -180,15 +233,16 @@ if ($_GET['action'] == "edit" && $_GET['id']) {
         echo "Access denied.  Please log in.";
         exit(0);
     }
-    $q = $dbh->query("SELECT blockstart, blockend, label, notes, oldtestament,
-    epistle, gospel, psalm, collect, id FROM blocks
+    $q = $dbh->prepare("SELECT DATE_FORMAT(blockstart, '%c/%e/%Y') AS blockstart,
+    DATE_FORMAT(blockend, '%c/%e/%Y') AS blockend, label, notes, oldtestament,
+    epistle, gospel, psalm, collect, id FROM `{$dbp}blocks`
     WHERE id = ?");
-    if ($q->execute($_GET['id']) && $row = $q->fetch(PDO::FETCH_ASSOC)) {
+    if ($q->execute(array($_GET['id'])) && $row = $q->fetch(PDO::FETCH_ASSOC)) {
         blockPlanForm($row);
-        exit(0);
     } else {
         echo array_pop($q->errorInfo());
     }
+    exit(0);
 }
 
 /* block.php?overlapstart=date&overlapend=date
@@ -220,9 +274,6 @@ if (! $auth) {
     header("location: index.php");
 }
 
-$q = $dbh->prepare("SELECT blockstart, blockend, label, notes, oldtestament,
-    epistle, gospel, psalm, collect FROM blocks
-    ORDER BY (blockstart, blockend)");
 ?><!DOCTYPE html>
 <html lang="en">
 <?=html_head("Block Planning")?>
@@ -241,17 +292,19 @@ $q = $dbh->prepare("SELECT blockstart, blockend, label, notes, oldtestament,
             });
     }
     function setupEntryDialog() {
-        $('#startdate').datepicker({showOn:"button", numberOfMonths:[2,2],
-            stepMonths: 4})
-            .change(function() {
+        $('#startdate').unbind('change')
+            .bind('change', function() {
                 getDayFor($(this).val(), $("#startday"));
                 var thisDate = new Date($(this).val());
                 $("#enddate").attr("min", thisDate.toISOString().split("T")[0]);
                 if ($("#startdate").val() && $("#enddate").val()) {
                     checkOverlap();
                 }
-        });
-        $('#enddate').change(function() {
+            })
+            .datepicker({showOn:"button", numberOfMonths:[2,2],
+                stepMonths: 4});
+        $('#enddate').unbind('change')
+            .bind('change', function() {
                 getDayFor($(this).val(), $("#endday"));
                 var thisDate = new Date($(this).val());
                 $("#startdate").attr("max", thisDate.toISOString().split("T")[0]);
@@ -321,7 +374,7 @@ $q = $dbh->prepare("SELECT blockstart, blockend, label, notes, oldtestament,
                 function() {
                     $("#dialog").dialog({modal: true,
                                 position: "center",
-                                title: "New Block Plan",
+                                title: "Edit Block Plan",
                                 width: $(window).width()*0.7,
                                 maxHeight: $(window).height()*0.7,
                                 create: function() {
@@ -341,26 +394,29 @@ $q = $dbh->prepare("SELECT blockstart, blockend, label, notes, oldtestament,
     </header>
     <?=sitetabs($sitetabs, $script_basename)?>
     <div id="content-container">
-    <div id="quicklinks"><a href="block.php?action=new" title="New Block" id="new-block">New Block</a></div>
-    <h1>Block Planning Records</h1>
+    <div class="quicklinks"><a href="block.php?action=new" title="New Block" id="new-block">New Block</a></div>
+    <h1>Block Plans</h1>
     <table id="block-listing">
-    <tr><th>Start</th><th>End</th><th colspan="2">Label</th></tr>
-    <tr><th>OT</th><th>Epistle</th><th>Gospel</th></th><th>Psalm</th><th>Collect</th></tr>
-    <tr><th colspan="5">Notes</th>
     <?
+$q = $dbh->prepare("SELECT DATE_FORMAT(blockstart, '%c/%e/%Y') AS blockstart,
+    DATE_FORMAT(blockend, '%c/%e/%Y') AS blockend, label, notes, oldtestament,
+    epistle, gospel, psalm, collect, id FROM blocks
+    ORDER BY blockstart, blockend");
 if ($q->execute()) {
     while ($row = $q->fetch(PDO::FETCH_ASSOC)) { ?>
-    <tr class="heading"><td><?=$row['blockstart']?></td>
-        <td><?=$row['blockend']?></td>
-        <td><?=$row['label']?></td>
-        <td><a title="edit" href="" data-id="<?=$row['id']?>" class="edit">Edit</a>
-        <a title="delete" href="" data-id="<?=$row['id']?>" class="delete">Delete</a></td></tr>
-    <tr><td><?=$row['oldtestament']?></td><td><?=$row['epistle']?></td>
-        <td><?=$row['gospel']?></td><td><?=$row['psalm']?></td>
-        <td><?=$row['collect']?></td></tr>
-    <tr><th colspan="5"><?=$row['notes']?></td></tr>
+    <tr class="heading">
+        <td colspan="2"><?=$row['blockstart']?> to <?=$row['blockend']?></td>
+        <td colspan="3"><?=$row['label']?>
+        <div class="quicklinks">[ <a title="edit" href="" data-id="<?=$row['id']?>" class="edit">Edit</a>
+        | <a title="delete" href="" data-id="<?=$row['id']?>" class="delete">Delete</a> ]</div></td></tr>
+    <tr><td class="otcell"><b>OT:</b> <?=ordinal($row['oldtestament'])?></td>
+        <td class="epcell"><b>Epistle:</b> <?=ordinal($row['epistle'])?></td>
+        <td class="gocell"><b>Gospel:</b> <?=ordinal($row['gospel'])?></td>
+        <td class="pscell"><b>Psalm:</b> <?=ordinal($row['psalm'])?></td>
+        <td class="cocell"><b>Collect:</b> <?=ordinal($row['collect'])?></td></tr>
+    <tr><td colspan="5"><?=$row['notes']?></td></tr>
 <? }
-} ?>
+} else echo "Problem getting blocks: " . array_pop($q->errorInfo()); ?>
     </table>
     </div>
     <div id="dialog"></div>
