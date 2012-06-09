@@ -68,13 +68,18 @@ p.hymnlist {
     font-size: smaller;
     margin: 0.2em 0 0.2em 2em;
 }
-.message {
-    float: clear;
+#message {
+    position: absolute;
+    right: 3px;
+    top: .75in;
+    width: 30em;
+    height: 4ex;
     color: black;
     background-color: #EEEEFF;
     border: medium solid blue;
     padding: 1ex;
     margin-top: 2ex;
+    z-index: 2001;
 }
 .explanation {
     color: #724F13;

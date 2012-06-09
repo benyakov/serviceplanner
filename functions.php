@@ -367,7 +367,7 @@ function dieWithRollback($q, $errorstr = "") {
 function showMessage() {
     global $sprefix;
     if (array_key_exists('message', $_SESSION[$sprefix])) { ?>
-        <div class="message"><?=$_SESSION[$sprefix]['message']?></div>
+        <div id="message"><?=$_SESSION[$sprefix]['message']?></div>
         <? unset($_SESSION[$sprefix]['message']);
     }
 }

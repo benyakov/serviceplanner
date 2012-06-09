@@ -80,6 +80,7 @@ function blockPlanForm($vals=array()) {
     <label for="enddate">End</label>
     <input type="date" id="enddate" name="enddate" <?=ifVal($vals, 'enddate')?> required>
     <div id="endday"></div><br>
+    <div id="overlap-notice"></div>
     </section>
     <section id="block-series">
     <label for="oldtestament">OT Series</label>
@@ -141,7 +142,25 @@ function blockPlanForm($vals=array()) {
 <?
 }
 
-/* block?action=new
+/* block.php with $_POST
+ * Process the submitted block form
+ */
+if ($_POST['label']) {
+    if (! $auth) {
+        setMessage("Access denied.  Please log in.");
+        header("location: index.php");
+        exit(0);
+    }
+    if ($_POST['id']) { // Update existing record
+        $q = $dbh->prepare("UPDATE `{$dbp}blocks`
+            SET label = ?, blockstart = ?, blockend = ?, notes = ?,
+            oldtestament = ?, epistle = ?, gospel = ?, psalm = ?,
+            collect = ?
+            WHERE id = ?");
+        // TODO: Execute this
+}
+
+/* block.php?action=new
  * Show an empty block edit form
  */
 if ($_GET['action'] == "new") {
@@ -153,7 +172,7 @@ if ($_GET['action'] == "new") {
     exit(0);
 }
 
-/* block?action=edit&id=N
+/* block.php?action=edit&id=N
  * Edit the block indicated by the id
  */
 if ($_GET['action'] == "edit" && $_GET['id']) {
@@ -176,21 +195,21 @@ if ($_GET['action'] == "edit" && $_GET['id']) {
  * Return whether the dates overlap an existing block
  */
 if ($_GET['overlapstart'] && $_GET['overlapend']) {
-    $q = $dbh->prepare("SELECT 1 FROM `{$dbp}blocks`
+    $q = $dbh->prepare("SELECT label FROM `{$dbp}blocks`
         WHERE (blockstart < :date1 AND blockend > :date1)
-        OR (blockstart < :date2 AND blockend > :date2)");
+        OR (blockstart < :date2 AND blockend > :date2)
+        OR (:date1 < blockstart AND :date2 > blockend)");
     $q->bindParam(":date1", $_GET['overlapstart']);
     $q->bindParam(":date2", $_GET['overlapend']);
     if ($q->execute()) {
-        if ($q->fetch()) {
-            // Don't go ahead, there is an overlap
-            echo json_encode(false);
-        } else {
-            // Go ahead, no overlap
-            echo json_encode(true);
+        $rv = array();
+        while ($label = $q->fetchColumn(0)) {
+            array_push($rv, $label);
         }
+        echo json_encode(array((bool)count($rv),
+            'Overlaps "' . implode('", "', $rv) . '"'));
     } else {
-        echo array_pop($q->errorInfo());
+        echo json_encode(array(false, array_pop($q->errorInfo())));
     }
     exit(0);
 }
@@ -209,16 +228,15 @@ $q = $dbh->prepare("SELECT blockstart, blockend, label, notes, oldtestament,
 <?=html_head("Block Planning")?>
 <body>
     <script type="text/javascript">
-    function checkOverlap(evt) {
-        evt.preventDefault();
+    function checkOverlap() {
         $.get("block.php", {overlapstart: $("#startdate").val(),
             overlapend: $("#enddate").val()},
             function(rv) {
                 rv = eval(rv);
                 if (rv[0]) {
-                    $("#block-plan-form").submit();
+                    $("#overlap-message").html(rv[1]);
                 } else {
-                    setMessage(rv[1]);
+                    $("#overlap-message").html("");
                 }
             });
     }
@@ -227,10 +245,20 @@ $q = $dbh->prepare("SELECT blockstart, blockend, label, notes, oldtestament,
             stepMonths: 4})
             .change(function() {
                 getDayFor($(this).val(), $("#startday"));
+                var thisDate = new Date($(this).val());
+                $("#enddate").attr("min", thisDate.toISOString().split("T")[0]);
+                if ($("#startdate").val() && $("#enddate").val()) {
+                    checkOverlap();
+                }
         });
         $('#enddate').change(function() {
-            getDayFor($(this).val(), $("#endday"));
-        })
+                getDayFor($(this).val(), $("#endday"));
+                var thisDate = new Date($(this).val());
+                $("#startdate").attr("max", thisDate.toISOString().split("T")[0]);
+                if ($("#startdate").val() && $("#enddate").val()) {
+                    checkOverlap();
+                }
+            })
             .datepicker({showOn:"button", numberOfMonths:[2,2],
                 stepMonths: 4});
         $('#collect').change(function() {
@@ -268,7 +296,6 @@ $q = $dbh->prepare("SELECT blockstart, blockend, label, notes, oldtestament,
                 $("#gocustom").attr("disabled", true);
             }
         });
-        $('#block-plan-form').submit(checkOverlap);
     }
     $(document).ready(function() {
         $("#new-block").click(function(evt) {

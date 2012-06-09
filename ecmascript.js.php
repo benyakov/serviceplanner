@@ -232,13 +232,13 @@ function logout(evt) {
 
 function setMessage(msg) {
     var timestamp = (new Date).toTimeString();
-    if ($(".message").length > 0) {
-        $(".message").html(timestamp + " " + msg).slideDown()
+    if ($("#message").length > 0) {
+        $("#message").html(timestamp + " " + msg).slideDown()
         .delay(5000).slideUp();
     } else {
-        $("body>header").append('<div class="message">'+
+        $("body>header").append('<div id="message">'+
             timestamp+" "+msg+'</div>');
-        $(".message").delay(5000).slideUp();
+        $("#message").delay(5000).slideUp();
     }
 }
 
@@ -321,6 +321,7 @@ $(document).ready(function() {
         evt.preventDefault();
         submitLogin();
     });
+    $("#message").delay(5000).slideUp();
 });
 
 
