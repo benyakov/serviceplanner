@@ -47,6 +47,8 @@ if (array_key_exists("date", $_POST)) {
     function updateFromDate(dateitem) {
         getDayFor($("#date").val(), $("#liturgicalname"));
         updateExisting(dateitem);
+        // TODO Write updateBlocksAvail
+        updateBlocksAvail(dateitem);
     }
     $(document).ready(function() {
         $("#existing-services").hide();
@@ -123,6 +125,11 @@ if (array_key_exists("date", $_POST)) {
         <textarea tabindex="28" id="servicenotes"
             name="servicenotes"></textarea>
     </li>
+    <li>
+        <label for="block">Block Plan:</label><br>
+        <select tabindex="29" id="block" name="block">
+            <option value="None" selected>None</option>
+        </select>
     </ul>
     </section>
     <h2>Hymns to Enter (Book, Number, Note)</h2>
