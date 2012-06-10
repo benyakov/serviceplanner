@@ -42,7 +42,7 @@ $rv = array();
 require('./db-connection.php');
 $rv[] = "Creating table for block planning...";
 $dbh->beginTransation();
-$q = $dbh->prepare("CREATE TABLE `blocks` (
+$q = $dbh->prepare("CREATE TABLE `{$dbp}blocks` (
   `blockstart` date,
   `blockend` date,
   `label` varchar(128),
@@ -59,15 +59,18 @@ $q = $dbh->prepare("CREATE TABLE `blocks` (
 if (!$q->execute()) {
     $rv[] = "Couldn't create blocks table: " . array_pop($q->errorInfo());
 } else {
-    // TODO: Modify days table to add a block reference.
-    $rv[] = "Done.";
-    // write a new dbversion.txt
-    require('./version.php');
-    $fh = fopen("./dbversion.txt", "wb");
-    fwrite($fh, "{$version['major']}.{$version['minor']}.{$version['tick']}");
-fclose($fh);
-} else {
-    $rv[] = "Couldn't finish: " . array_pop($q->errorInfo());
+    $q = $dbh->prepare("ALTER TABLE `{$dbp}days`
+        ADD COLUMN `block` integer AFTER `servicenotes` default NULL");
+    if ($q->execute()) {
+        $rv[] = "Done.";
+        // write a new dbversion.txt
+        require('./version.php');
+        $fh = fopen("./dbversion.txt", "wb");
+        fwrite($fh, "{$version['major']}.{$version['minor']}.{$version['tick']}");
+        fclose($fh);
+    } else {
+        $rv[] = "Couldn't add column to days table: " . array_pop($q->errorInfo());
+    }
 }
 // redirect with a message.
 setMessage(implode("<br />\n", $rv));
