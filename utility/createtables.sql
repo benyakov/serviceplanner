@@ -29,6 +29,7 @@ CREATE TABLE `days` (
   `name` varchar(50) default NULL,
   `rite` varchar(50) default NULL,
   `servicenotes` text default NULL,
+  `block` integer,
   KEY `pkey` (`pkey`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
 CREATE TABLE `hymns` (

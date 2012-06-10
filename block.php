@@ -218,7 +218,8 @@ if ($_POST['label']) {
  */
 if ($_GET['action'] == "new") {
     if (! $auth) {
-        echo "Access denied.  Please log in.";
+        setMessage("Access denied.  Please log in.");
+        header("location:index.php");
         exit(0);
     }
     blockPlanForm();
@@ -230,7 +231,8 @@ if ($_GET['action'] == "new") {
  */
 if ($_GET['action'] == "edit" && $_GET['id']) {
     if (! $auth) {
-        echo "Access denied.  Please log in.";
+        setMessage("Access denied.  Please log in.");
+        header("location:index.php");
         exit(0);
     }
     $q = $dbh->prepare("SELECT DATE_FORMAT(blockstart, '%c/%e/%Y') AS blockstart,
@@ -243,6 +245,23 @@ if ($_GET['action'] == "edit" && $_GET['id']) {
         echo array_pop($q->errorInfo());
     }
     exit(0);
+}
+
+/* block.php?delete=N
+ * Delete the block with id N
+ */
+if ($_GET['delete']) {
+    if (! $auth) {
+        setMessage("Access denied.  Please log in.");
+        header("location:index.php");
+        exit(0);
+    }
+    $q = $dbh->prepare("DELETE FROM `{$dbp}blocks` WHERE id = ?");
+    if ($q->execute(array($_GET['delete']))) {
+        setMessage($q->rowCount() . " blocks deleted.");
+    } else {
+        setMessage("Problem deleting block: ".array_pop($q->errorInfo()));
+    }
 }
 
 /* block.php?overlapstart=date&overlapend=date
@@ -385,6 +404,12 @@ if (! $auth) {
                                 }});
             });
         });
+        $(".delete").click(function(evt) {
+            evt.preventDefault();
+            if (confirm("Delete '"+$(this).attr("data-label")+"'?")) {
+                location.replace("block.php?delete="+$(this).attr("data-id"));
+            }
+        });
     });
     </script>
     <header>
@@ -408,13 +433,13 @@ if ($q->execute()) {
         <td colspan="2"><?=$row['blockstart']?> to <?=$row['blockend']?></td>
         <td colspan="3"><?=$row['label']?>
         <div class="quicklinks">[ <a title="edit" href="" data-id="<?=$row['id']?>" class="edit">Edit</a>
-        | <a title="delete" href="" data-id="<?=$row['id']?>" class="delete">Delete</a> ]</div></td></tr>
+        | <a title="delete" href="" data-label="<?=$row['label']?>" data-id="<?=$row['id']?>" class="delete">Delete</a> ]</div></td></tr>
     <tr><td class="otcell"><b>OT:</b> <?=ordinal($row['oldtestament'])?></td>
         <td class="epcell"><b>Epistle:</b> <?=ordinal($row['epistle'])?></td>
         <td class="gocell"><b>Gospel:</b> <?=ordinal($row['gospel'])?></td>
         <td class="pscell"><b>Psalm:</b> <?=ordinal($row['psalm'])?></td>
         <td class="cocell"><b>Collect:</b> <?=ordinal($row['collect'])?></td></tr>
-    <tr><td colspan="5"><?=$row['notes']?></td></tr>
+    <tr><td colspan="5"><?=translate_markup($row['notes'])?></td></tr>
 <? }
 } else echo "Problem getting blocks: " . array_pop($q->errorInfo()); ?>
     </table>

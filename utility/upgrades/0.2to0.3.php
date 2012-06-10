@@ -41,6 +41,7 @@ if (file_exists("./dbversion.txt")) {
 $rv = array();
 require('./db-connection.php');
 $rv[] = "Creating table for block planning...";
+$dbh->beginTransation();
 $q = $dbh->prepare("CREATE TABLE `blocks` (
   `blockstart` date,
   `blockend` date,
@@ -55,7 +56,10 @@ $q = $dbh->prepare("CREATE TABLE `blocks` (
   UNIQUE KEY `span` (`blockstart`, `blockend`),
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8");
-if ($q->execute()) {
+if (!$q->execute()) {
+    $rv[] = "Couldn't create blocks table: " . array_pop($q->errorInfo());
+} else {
+    // TODO: Modify days table to add a block reference.
     $rv[] = "Done.";
     // write a new dbversion.txt
     require('./version.php');
