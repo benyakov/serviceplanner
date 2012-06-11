@@ -117,7 +117,7 @@ function showJsOnly() {
 }
 
 function updateExisting(dateitem) {
-    var dateEntered = Date.parse($(dateitem).val())/1000;
+    var dateEntered = Date.parse(dateitem)/1000;
     if (! dateEntered) return;
     var xhr = $.get("existing.php", { date: dateEntered },
             function(newBloc) {
@@ -300,8 +300,7 @@ function calcMichaelmas1(year) {
     }
 }
 function getDayFor(datestr, target) {
-    var sdate = new Date(datestr);
-    sdate = sdate.toISOString().split("T")[0];
+    var sdate = dateValToSQL(datestr);
     $.get("churchyear.php", {daysfordate: sdate},
         function(rv) {
             rv = eval(rv);
@@ -319,16 +318,22 @@ function getDayFor(datestr, target) {
 }
 
 function updateBlocksAvailable(datestr) {
-    var date = new Date(datestr);
-    $.get("block.php", {available: date}, function(rv) {
+    var dateval = dateValToSQL(datestr);
+    $.get("block.php", {available: dateval}, function(rv) {
         rv = eval(rv);
         $("#block").empty();
+        $("#block").append('<option value="None">None</option>');
         if (rv[0]) {
             for (var blockId in rv[1]) {
                 $("#block").append('<option value="'+blockId+'">'+rv[1][blockId]+'</option>');
             }
         }
     });
+}
+
+function dateValToSQL(dateval) {
+    var dateobj = new Date(dateval);
+    return dateobj.toISOString().split("T")[0];
 }
 
 $(document).ready(function() {

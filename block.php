@@ -268,13 +268,12 @@ if ($_GET['delete']) {
  * Return a json list of blocks available for the date given
  */
 if ($_GET['available']) {
-    $q = $dbh->prepare("SELECT index, label FROM `{$dbp}blocks`
-        WHERE blockstart = :date OR blockend = :date");
-    $q->bindParam($_GET['available']);
-    if ($q->execute()) {
+    $q = $dbh->prepare("SELECT id, label FROM `{$dbp}blocks`
+        WHERE blockstart <= ? AND blockend >= ?");
+    if ($q->execute(array($_GET['available'], $_GET['available']))) {
         $rv = array();
-        while ($row = $q->fetch(PDO::FETCH-ASSOC)) {
-            $rv[$row['index']] = $row['label'];
+        while ($row = $q->fetch(PDO::FETCH_ASSOC)) {
+            $rv[$row['id']] = $row['label'];
         }
         echo json_encode(array(true, $rv));
     } else {
@@ -318,14 +317,15 @@ if (! $auth) {
 <body>
     <script type="text/javascript">
     function checkOverlap() {
-        $.get("block.php", {overlapstart: $("#startdate").val(),
-            overlapend: $("#enddate").val()},
+        var olstart = dateValToSQL($("#startdate").val());
+        var olend = dateValToSQL($("#enddate").val());
+        $.get("block.php", {overlapstart: olstart, overlapend: olend},
             function(rv) {
                 rv = eval(rv);
                 if (rv[0]) {
-                    $("#overlap-message").html(rv[1]);
+                    $("#overlap-notice").html(rv[1]);
                 } else {
-                    $("#overlap-message").html("");
+                    $("#overlap-notice").html("");
                 }
             });
     }
