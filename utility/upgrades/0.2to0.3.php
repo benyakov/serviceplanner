@@ -40,8 +40,7 @@ if (file_exists("./dbversion.txt")) {
 // Update the database definition
 $rv = array();
 require('./db-connection.php');
-$rv[] = "Creating table for block planning...";
-$dbh->beginTransation();
+$rv[] = "Creating table for block planning and adding block column to days...";
 $q = $dbh->prepare("CREATE TABLE `{$dbp}blocks` (
   `blockstart` date,
   `blockend` date,
@@ -60,7 +59,7 @@ if (!$q->execute()) {
     $rv[] = "Couldn't create blocks table: " . array_pop($q->errorInfo());
 } else {
     $q = $dbh->prepare("ALTER TABLE `{$dbp}days`
-        ADD COLUMN `block` integer AFTER `servicenotes` default NULL");
+        ADD COLUMN `block` integer default NULL AFTER `servicenotes`");
     if ($q->execute()) {
         $rv[] = "Done.";
         // write a new dbversion.txt

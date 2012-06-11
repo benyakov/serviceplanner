@@ -180,12 +180,17 @@ function processFormData() {
     }
     if (! $serviceid) { // Create a new service
         $q = $dbh->prepare("INSERT INTO {$dbp}days
-            (caldate, name, rite, servicenotes)
-            VALUES (:date, :dayname, :rite, :servicenotes)");
+            (caldate, name, rite, servicenotes, block)
+            VALUES (:date, :dayname, :rite, :servicenotes, :block)");
         $q->bindParam(':date', $date);
         $q->bindParam(':dayname', $_POST['liturgicalname']);
         $q->bindParam(':rite', $_POST['rite']);
         $q->bindParam(':servicenotes', $_POST['servicenotes']);
+        if (is_numeric($_POST['block'])) {
+            $q->bindParam(':block', $_POST['block']);
+        } else {
+            $q->bindParam(':block', NULL);
+        }
         $q->execute() or dieWithRollback($q, ".");
         // Grab the pkey of the newly inserted row.
         $q = $dbh->prepare("SELECT LAST_INSERT_ID()");
