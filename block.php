@@ -264,6 +264,25 @@ if ($_GET['delete']) {
     }
 }
 
+/* block.php?available=date
+ * Return a json list of blocks available for the date given
+ */
+if ($_GET['available']) {
+    $q = $dbh->prepare("SELECT index, label FROM `{$dbp}blocks`
+        WHERE blockstart = :date OR blockend = :date");
+    $q->bindParam($_GET['available']);
+    if ($q->execute()) {
+        $rv = array();
+        while ($row = $q->fetch(PDO::FETCH-ASSOC)) {
+            $rv[$row['index']] = $row['label'];
+        }
+        echo json_encode(array(true, $rv));
+    } else {
+        echo json_encode(array(false, array_pop($q->errorInfo())));
+    }
+    exit(0);
+}
+
 /* block.php?overlapstart=date&overlapend=date
  * Return whether the dates overlap an existing block
  */

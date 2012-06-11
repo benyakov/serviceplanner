@@ -47,8 +47,7 @@ if (array_key_exists("date", $_POST)) {
     function updateFromDate(dateitem) {
         getDayFor($("#date").val(), $("#liturgicalname"));
         updateExisting(dateitem);
-        // TODO Write updateBlocksAvail
-        updateBlocksAvail(dateitem);
+        updateBlocksAvailable(dateitem.val());
     }
     $(document).ready(function() {
         $("#existing-services").hide();

@@ -318,6 +318,19 @@ function getDayFor(datestr, target) {
         });
 }
 
+function updateBlocksAvailable(datestr) {
+    var date = new Date(datestr);
+    $.get("block.php", {available: date}, function(rv) {
+        rv = eval(rv);
+        $("#block").empty();
+        if (rv[0]) {
+            for (var blockId in rv[1]) {
+                $("#block").append('<option value="'+blockId+'">'+rv[1][blockId]+'</option>');
+            }
+        }
+    });
+}
+
 $(document).ready(function() {
     $("#loginform").submit(function(evt) {
         evt.preventDefault();
