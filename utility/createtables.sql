@@ -111,7 +111,9 @@ CREATE TABLE `churchyear_lessons` (
     `psalm`     varchar(64),
     `collect`   text,
     `introit`   text,
-    FOREIGN KEY (`dayname`) REFERENCES `churchyear` (`dayname`)
+    `id`        integer auto_increment,
+    FOREIGN KEY (`dayname`) REFERENCES `churchyear` (`dayname`),
+    PRIMARY KEY (`id`)
     ON DELETE CASCADE
     ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;

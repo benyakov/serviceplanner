@@ -112,7 +112,9 @@ $q = $dbh->prepare("CREATE TABLE `{$dbp}churchyear_lessons` (
     `psalm`     varchar(64),
     `collect`   text,
     `introit`   text,
-    FOREIGN KEY (`dayname`) REFERENCES `{$dbp}churchyear` (`dayname`)
+    `id`        integer,
+    FOREIGN KEY (`dayname`) REFERENCES `{$dbp}churchyear` (`dayname`),
+    PRIMARY KEY (`id`) auto_increment
     ON DELETE CASCADE
     ON UPDATE CASCADE
 ) ENGINE = InnoDB DEFAULT CHARSET=utf8");

@@ -334,6 +334,9 @@ if ($_POST['submit_day']==1) {
     }
 }
 
+/* churchyear.php with $_POST of synonyms (lines) and canonical (dayname)
+ * Update synonyms for canonical.
+ */
 if ($_POST['synonyms']) {
     if (! $auth) {
         echo json_encode(array(false));
@@ -358,6 +361,9 @@ if ($_POST['synonyms']) {
     exit(0);
 }
 
+/* churchyear.php?synonyms=dayname
+ * Get synonyms for dayname.
+ */
 if ($_GET['synonyms']) {
     if (! $auth) {
         echo json_encode(array(false));
@@ -376,99 +382,138 @@ if ($_GET['synonyms']) {
     exit(0);
 }
 
+/* churchyear.php with $_POST data from propers form
+ * Update propers for the dayname.
+ */
 if ($_POST['propers']) {
     if (! $auth) {
         echo json_encode(array(false));
         exit(0);
     }
-    $q = $dbh->prepare("UPDATE `{$dbp}churchyear_propers` SET
-        color=?, collect=?, collect2=?, collect3=?,
-        oldtestament=?, oldtestament2=?, oldtestament3=?, gospel=?,
-        gospel2=?, gospel3=?, epistle=?, epistle2=?, epistle3=?,
-        psalm=?, psalm2=?, psalm3=?, theme=?, note=?
-        WHERE dayname=?");
-    if ($q->execute(array($_POST['color'], $_POST['collect'],
-        $_POST['collect2'], $_POST['collect3'], $_POST['oldtestament'],
-        $_POST['oldtestament2'], $_POST['oldtestament3'], $_POST['gospel'],
-        $_POST['gospel2'], $_POST['gospel3'], $_POST['epistle'],
-        $_POST['epistle2'], $_POST['epistle3'], $_POST['psalm'],
-        $_POST['psalm2'], $_POST['psalm3'], $_POST['theme'], $_POST['note'],
-        $_POST['propers']))) {
-        echo json_encode(array($q->rowCount()));
-        $dbh->commit();
-    } else {
-        echo json_encode(array(false, array_pop($q->errorInfo())));
+    $qi = $dbh->prepare("INSERT INTO `{$dbp}churchyear_propers`
+        (color, theme, note, dayname)
+        VALUES (?, ?, ?, ?)");
+    $qu = $dbh->prepare("UPDATE `{$dbp}churchyear_propers` SET
+        color=?, theme=?, note=? WHERE dayname=?");
+    $valarray = array($_POST['color'], $_POST['theme'], $_POST['note'],
+        $_POST['propers']);
+    if (!($qi->execute($valarray) || $qu->execute($valarray))) {
+        echo json_encode(array_pop($q->errorInfo()));
+        exit(0);
+    }
+    $i=1;
+    $qi = $dbh->prepare("INSERT INTO `{$dbp}churchyear_lessons`
+        (oldtestament, epistle, gospel, psalm, introit, collect, label, dayname)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
+    $qu = $dbh->prepare("UPDATE `{$dbp}churchyear_lessons`
+        SET oldtestament=?, epistle=?, gospel=?, psalm=?, introit=?,
+        collect=?, label=?, dayname=? WHERE id=?");
+    while (array_key_exists("lessons-{$i}", $_POST)) {
+        $id = $_POST["lessons-{$i}"];
+        $values_insert = array($_POST["ot-{$id}"], $_POST["ep-{$id}"],
+            $_POST["go-{$id}"], $_POST["ps-{$id}"], $_POST["in-{$id}"],
+            $_POST["co-{$id}"], $_POST["la-{$id}"], $_POST['propers']);
+        $values_update = $values_insert;
+        array_push($values_update, $_POST["id-{$id}"]);
+        $valarray
+        if (! ($qi->execute($values_insert) || $qu->execute($values_update))) {
+            echo json_encode(array_pop($q->errorInfo()));
+        }
+        $i++;
     }
     exit(0);
 }
 
+/* churchyear.php?propers=dayname
+ * Show populated form for the propers of the given dayname
+ */
 if ($_GET['propers']) {
     if (! $auth) {
         echo json_encode(array(false));
         exit(0);
     }
-    $q = $dbh->prepare("SELECT color, collect, collect2, collect3,
-        oldtestament, oldtestament2, oldtestament3,
-        epistle, epistle2, epistle3,
-        gospel, gospel2, gospel3, psalm, psalm2, psalm3, theme, note
-        FROM `{$dbp}churchyear_propers` WHERE dayname = :dayname");
-    if (! ($q->execute(array("dayname"=>$_GET['propers']))
-        && $rvdata = $q->fetch(PDO::FETCH_ASSOC))) {
-        $rvdata = array("color"=>"", "collect"=>"", "collect2"=>"",
-            "collect3"=>"", "oldtestament"=>"", "oldtestament2"=>"",
-            "oldtestament3"=>"", "epistle"=>"", "epistle2"=>"",
-            "epistle3"=>"", "gospel"=>"", "gospel2"=>"", "gospel3"=>"",
-            "psalm"=>"", "psalm2"=>"", "psalm3"=>"", "theme"=>"",
-            "note"=>"");
+    $q = $dbh->prepare("SELECT pr.color, pr.theme, pr.note,
+        l.oldtestament, l.epistle, l.gospel, l.psalm, l.collect,
+        l.introit, l.label, l.id
+        FROM `{$dbp}churchyear_propers` AS pr
+        LEFT OUTER JOIN `{$dbp}churchyear_lessons` AS l ON (pr.dayname=l.dayname)
+        WHERE pr.dayname = :dayname");
+    if (! $q->execute(array("dayname"=>$_GET['propers']))) {
+        $rvdata = array("color"=>"", "collect"=>"",
+            "oldtestament"=>"", "epistle"=>"", "gospel"=>"",
+            "psalm"=>"", "introit"=>"", "theme"=>"", "note"=>"");
+    } else {
+        $rvdata = ($q->fetchAll(PDO::FETCH_ASSOC));
     }
     ob_start();
 ?>
     <form id="propersform" method="post">
     <input type="hidden" name="propers" value="<?=$_GET['propers']?>">
     <div class="formblock"><label for="color">Color</label><br>
-    <input type="text" value="<?=$rvdata['color']?>" name="color"></div>
+    <input type="text" value="<?=$rvdata[0]['color']?>" name="color"></div>
     <div class="formblock"><label for="theme">Theme</label><br>
-    <input type="text" value="<?=$rvdata['theme']?>" name="theme"></div>
+    <input type="text" value="<?=$rvdata[0]['theme']?>" name="theme"></div>
     <div class="formblock fullwidth"><label for="note">Note</label><br>
-    <textarea name="note"><?=$rvdata['note']?></textarea></div>
+    <textarea name="note"><?=$rvdata[0]['note']?></textarea></div>
+    <div id="accordion">
+    <? $i = 1;
+    foreach ($rvdata as $lset) {
+        if (! $lset['label']) continue;
+    ?>
+    <h3><a href="#"><?=$lset['label']?></a></h3>
     <div class="propersbox">
-    <div class="formblock"><label for="oldtestament">Old Testament</label><br>
-    <input type="text" value="<?=$rvdata['oldtestament']?>" name="oldtestament"></div>
-    <div class="formblock"><label for="epistle">Epistle</label><br>
-    <input type="text" value="<?=$rvdata['epistle']?>" name="epistle"></div>
-    <div class="formblock"><label for="gospel">Gospel</label><br>
-    <input type="text" value="<?=$rvdata['gospel']?>" name="gospel"></div>
-    <div class="formblock"><label for="psalm">Psalm</label><br>
-    <input type="text" value="<?=$rvdata['psalm']?>" name="psalm"></div>
-    </div><div class="propersbox">
-    <div class="formblock"><label for="oldtestament2">Old Testament 2</label><br>
-    <input type="text" value="<?=$rvdata['oldtestament2']?>" name="oldtestament2"></div>
-    <div class="formblock"><label for="epistle2">Epistle 2</label><br>
-    <input type="text" value="<?=$rvdata['epistle2']?>" name="epistle2"></div>
-    <div class="formblock"><label for="gospel2">Gospel 2</label><br>
-    <input type="text" value="<?=$rvdata['gospel2']?>" name="gospel2"></div>
-    <div class="formblock"><label for="psalm2">Psalm 2</label><br>
-    <input type="text" value="<?=$rvdata['psalm2']?>" name="psalm2"></div>
-    </div><div class="propersbox">
-    <div class="formblock"><label for="oldtestament3">Old Testament 3</label><br>
-    <input type="text" value="<?=$rvdata['oldtestament3']?>" name="oldtestament3"></div>
-    <div class="formblock"><label for="epistle3">Epistle 3</label><br>
-    <input type="text" value="<?=$rvdata['epistle3']?>" name="epistle3"></div>
-    <div class="formblock"><label for="gospel3">Gospel 3</label><br>
-    <input type="text" value="<?=$rvdata['gospel3']?>" name="gospel3"></div>
-    <div class="formblock"><label for="psalm3">Psalm 3</label><br>
-    <input type="text" value="<?=$rvdata['psalm3']?>" name="psalm3"></div>
+    <input type="hidden" name="lessons-<?=$i?>" value="<?=$lset['id']?>">
+    <label for="la-<?=$lset['id']?>">Label</label>
+    <input type="text" value="<?=$lset['label']?>" name="la-<?=$lset['id']?>">
+    <div class="formblock"><label for="ot-<?=$lset['id']?>">Old Testament</label><br>
+    <input type="text" value="<?=$lset['oldtestament']?>" name="ot-<?=$lset['id']?>"></div>
+    <div class="formblock"><label for="ep-<?=$lset['id']?>">Epistle</label><br>
+    <input type="text" value="<?=$lset['epistle']?>" name="ep-<?=$lset['id']?>"></div>
+    <div class="formblock"><label for="go-<?=$lset['id']?>">Gospel</label><br>
+    <input type="text" value="<?=$lset['gospel']?>" name="go-<?=$lset['id']?>"></div>
+    <div class="formblock"><label for="ps-<?=$lset['id']?>">Psalm</label><br>
+    <input type="text" value="<?=$lset['psalm']?>" name="ps-<?=$lset['id']?>"></div>
+    <div class="formblock fullwidth"><label for="in-<?=$lset['id']?>">Introit</label><br>
+    <textarea name="in-<?=$lset['id']?>"><?=$lset['introit']?></textarea></div>
+    <div class="formblock fullwidth"><label for="co-<?=$lset['id']?>">Collect</label><br>
+    <textarea name="co-<?=$lset['id']?>"><?=$lset['collect']?></textarea></div>
     </div>
-    <div class="formblock fullwidth"><label for="collect">Collect</label><br>
-    <textarea name="collect"><?=$rvdata['collect']?></textarea></div>
-    <div class="formblock fullwidth"><label for="collect2">Collect 2</label><br>
-    <textarea name="collect2"><?=$rvdata['collect2']?></textarea></div>
-    <div class="formblock fullwidth"><label for="collect3">Collect 3</label><br>
-    <textarea name="collect3"><?=$rvdata['collect3']?></textarea></div>
-
+    <? $i++; } $i++; ?>
+    </div>
+    <div id="hiddentemplate" data-identifier="<?=$i?>">
+    <h3><a href="#">New Propers</a></h3>
+    <div class="propersbox">
+    <input type="hidden" name="lessons-{{id}}" value="new{{id}}">
+    <label for="la-new{{id}}">Label</label>
+    <input type="text" value="" name="la-new{{id}}">
+    <div class="formblock"><label for="ot-new{{id}}">Old Testament</label><br>
+    <input type="text" value="" name="ot-new{{id}}"></div>
+    <div class="formblock"><label for="ep-new{{id}}">Epistle</label><br>
+    <input type="text" value="" name="ep-new{{id}}"></div>
+    <div class="formblock"><label for="go-new{{id}}">Gospel</label><br>
+    <input type="text" value="" name="go-new{{id}}"></div>
+    <div class="formblock"><label for="ps-new{{id}}">Psalm</label><br>
+    <input type="text" value="" name="ps-new{{id}}"></div>
+    <div class="formblock fullwidth"><label for="in-new{{id}}">Introit</label><br>
+    <textarea name="in-new{{id}}"></textarea></div>
+    <div class="formblock fullwidth"><label for="co-new{{id}}">Collect</label><br>
+    <textarea name="co-new{{id}}"></textarea></div>
+    </div>
+    </div>
     <button type="submit" id="submit">Submit</button>
     <button type="reset">Reset</button>
+    <button id="addpropers">Add Propers</button>
     </form>
+    <script type="text/javascript">
+        $("#accordion").accordion();
+        $("#addpropers").click(function() {
+            var template = $("#hiddentemplate").html();
+            var identifier = $("#hiddentemplate").attr("data-identifier");
+            $("#hiddentemplate").attr("data-identifier", identifier+1);
+            template = template.replace("{{id}}", identifier);
+            $("#accordion").append(template);
+        });
+    </script>
 <?
     echo json_encode(array(true, ob_get_clean()));
     exit(0);
