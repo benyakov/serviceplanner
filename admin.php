@@ -54,7 +54,7 @@ if (! $auth) {
             evt.preventDefault();
             if (confirm("This will lose any changes to"+
                 " the days in the church year table.")) {
-                window.location.assign("churchyear.php?droptables=1");
+                window.location.assign("churchyear.php?purgetables=1");
             }
         });
     });
