@@ -38,10 +38,13 @@ if (file_exists("./dbversion.txt")) {
     }
 }
 // Update the database definition
-$rv = array();
 require('./db-connection.php');
-$rv[] = "Creating table for block planning...";
-$dbh->beginTransation();
+$rv = array();
+$rv[] = "Adding block column to days table.";
+$q = $dbh->prepare("ALTER TABLE `{$dbp}days`
+    ADD COLUMN `block` integer AFTER `servicenotes` default NULL");
+$q->execute() or die(array_pop($q->errorInfo()));
+$rv[] = "Creating table for block planning.";
 $q = $dbh->prepare("CREATE TABLE `{$dbp}blocks` (
   `blockstart` date,
   `blockend` date,
@@ -56,22 +59,73 @@ $q = $dbh->prepare("CREATE TABLE `{$dbp}blocks` (
   UNIQUE KEY `span` (`blockstart`, `blockend`),
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8");
-if (!$q->execute()) {
-    $rv[] = "Couldn't create blocks table: " . array_pop($q->errorInfo());
-} else {
-    $q = $dbh->prepare("ALTER TABLE `{$dbp}days`
-        ADD COLUMN `block` integer AFTER `servicenotes` default NULL");
-    if ($q->execute()) {
-        $rv[] = "Done.";
-        // write a new dbversion.txt
-        require('./version.php');
-        $fh = fopen("./dbversion.txt", "wb");
-        fwrite($fh, "{$version['major']}.{$version['minor']}.{$version['tick']}");
-        fclose($fh);
-    } else {
-        $rv[] = "Couldn't add column to days table: " . array_pop($q->errorInfo());
-    }
-}
+$q->execute() or die(array_pop($q->errorInfo()));
+$rv[] = "Creating churchyear table.";
+$q = $dbh->prepare("CREATE TABLE `{$dbp}churchyear` (
+    `dayname` varchar(255),
+    `season` varchar(64) default \"\",
+    `base` varchar(255) default NULL,
+    `offset` smallint default 0,
+    `month` tinyint default 0,
+    `day`   tinyint default 0,
+    `observed_month` tinyint default 0,
+    `observed_sunday` tinyint default 0,
+    PRIMARY KEY (`dayname`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8");
+$q->execute() or die(array_pop($q->errorInfo()));
+// Define helper table for ordering the presentation of days
+$rv[] = "Creating table for ordering seasons.";
+$q = $dbh->prepare("CREATE TABLE `{$dbp}churchyear_order` (
+    `name` varchar(32),
+    `idx` smallint UNIQUE,
+    PRIMARY KEY (`name`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8");
+$q->execute() or die(array_pop($q->errorInfo()));
+// Define table containing synonyms for the day names
+$rv[] = "Creating synonyms table.";
+$q = $dbh->prepare("CREATE TABLE `{$dbp}churchyear_synonyms` (
+    `canonical` varchar(255),
+    `synonym`   varchar(255),
+    INDEX (`canonical`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8");
+$q->execute() or die(array_pop($q->errorInfo()));
+// Define table containing propers for the day names
+$rv[] = "Creating propers table.";
+$q = $dbh->prepare("CREATE TABLE `{$dbp}churchyear_propers` (
+    `dayname`   varchar(255),
+    `color`     varchar(32),
+    `collect`   text,
+    `collect2`  text,
+    `collect3`  text,
+    `oldtestament` varchar(56),
+    `oldtestament2` varchar(56),
+    `oldtestament3` varchar(56),
+    `gospel`    varchar(56),
+    `gospel2`   varchar(56),
+    `gospel3`   varchar(56),
+    `epistle`   varchar(56),
+    `epistle2`  varchar(56),
+    `epistle3`  varchar(56),
+    `psalm`     varchar(56),
+    `psalm2`     varchar(56),
+    `psalm3`     varchar(56),
+    `theme`     varchar(56),
+    `note`      text,
+    FOREIGN KEY (`dayname`) REFERENCES `{$dbp}churchyear` (`dayname`)
+        ON DELETE CASCADE
+        ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8");
+$q->execute() or die(array_pop($q->errorInfo()));
+// Populate church year tables with default values
+$rv[] = "Populating church year tables with default values.";
+require("./utility/fillservicetables");
+// Wrap up.
+$rv[] = "Done.  Writing new dbversion.txt.";
+// write a new dbversion.txt
+require('./version.php');
+$fh = fopen("./dbversion.txt", "wb");
+fwrite($fh, "{$version['major']}.{$version['minor']}.{$version['tick']}");
+fclose($fh);
 // redirect with a message.
 setMessage(implode("<br />\n", $rv));
 $serverdir = dirname(dirname(dirname($_SERVER['PHP_SELF'])));

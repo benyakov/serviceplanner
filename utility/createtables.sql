@@ -72,6 +72,51 @@ CREATE TABLE `users` (
   `resetexpiry` datetime default NULL,
   PRIMARY KEY (`uid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+CREATE TABLE `churchyear` (
+    `dayname` varchar(255),
+    `season` varchar(64) default "",
+    `base` varchar(255) default NULL,
+    `offset` smallint default 0,
+    `month` tinyint default 0,
+    `day`   tinyint default 0,
+    `observed_month` tinyint default 0,
+    `observed_sunday` tinyint default 0,
+    PRIMARY KEY (`dayname`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+CREATE TABLE `churchyear_order` (
+    `name` varchar(32),
+    `idx` smallint UNIQUE,
+    PRIMARY KEY (`name`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+CREATE TABLE `churchyear_synonyms` (
+    `canonical` varchar(255),
+    `synonym`   varchar(255),
+    INDEX (`canonical`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+CREATE TABLE `churchyear_propers` (
+    `dayname`   varchar(255),
+    `color`     varchar(32),
+    `collect`   text,
+    `collect2`  text,
+    `collect3`  text,
+    `oldtestament` varchar(56),
+    `oldtestament2` varchar(56),
+    `oldtestament3` varchar(56),
+    `gospel`    varchar(56),
+    `gospel2`   varchar(56),
+    `gospel3`   varchar(56),
+    `epistle`   varchar(56),
+    `epistle2`  varchar(56),
+    `epistle3`  varchar(56),
+    `psalm`     varchar(56),
+    `psalm2`     varchar(56),
+    `psalm3`     varchar(56),
+    `theme`     varchar(56),
+    `note`      text,
+    FOREIGN KEY (`dayname`) REFERENCES `churchyear` (`dayname`)
+        ON DELETE CASCADE
+        ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 CREATE TABLE `blocks` (
   `blockstart` date,
   `blockend` date,

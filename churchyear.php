@@ -25,9 +25,6 @@
    */
 require("init.php");
 $auth = auth();
-$cy_begin_marker = "# BEGIN Church Year Tables";
-$cy_end_marker = "# END Church Year Tables";
-$create_tables_file = "./utility/dynamictables.sql";
 
 function query_churchyear($json=false) {
     /* Return an executed query for all rows of the churchyear db
@@ -100,12 +97,12 @@ function replaceDBP($text, $prefix=false) {
     }
 }
 
-/* Create the church year table if necessary.
+/* Populate the church year table if necessary.
  */
 $dbh->beginTransaction();
 $tableTest = $dbh->query("SELECT 1 FROM `{$dbp}churchyear`");
 if (! ($tableTest && $tableTest->fetchAll())) {
-    require('./utility/createservicetables.php');
+    require('./utility/fillservicetables.php');
 }
 /* (Re-)Create church year functions if necessary
  */
@@ -142,29 +139,19 @@ if ($_GET['dropfunctions'] == 1) {
     exit(0);
 }
 
-/* churchyear.php?droptables=1
- * Drop the churchyear tables and sets a message about creating
+/* churchyear.php?purgetables=1
+ * Purge the churchyear tables and set a message about populating
  * them again.
  */
-if ($_GET['droptables'] == 1) {
-    $dbh->exec("DROP TABLE `{$dbp}churchyear_synonyms`,
-        `{$dbp}churchyear_propers`, `{$dbp}churchyear_order`,
-        `{$dbp}churchyear`");
+if ($_GET['purgetables'] == 1) {
+    $dbh->exec("DELETE FROM `{$dbp}churchyear_synonyms`");
+    $dbh->exec("DELETE FROM `{$dbp}churchyear_propers`");
+    $dbh->exec("DELETE FROM `{$dbp}churchyear_order`");
+    $dbh->exec("DELETE FROM `{$dbp}churchyear`");
 
-    setMessage("Church year tables dropped.  They will be re-created "
+    setMessage("Church year tables purged.  They will be re-populated "
         ."with default values next time you visit the Church Year tab.");
     $dbh->commit();
-    if (file_exists($create_tables_file)) {
-        $dt = file_get_contents($create_tables_file);
-        $start = strpos($dt, $cy_begin_marker);
-        if ($start !== false) {
-            $end = strpos($dt, $cy_end_marker) + strlen($cy_end_marker);
-            $newdt = substr($dt, 0, $start) . substr($dt, $end);
-            $fh = fopen($create_tables_file, "w");
-            fwrite($fh, $newdt);
-            fclose($fh);
-        }
-    }
     header("location: index.php");
     exit(0);
 }
