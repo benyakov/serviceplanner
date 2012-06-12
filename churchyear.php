@@ -145,6 +145,7 @@ if ($_GET['dropfunctions'] == 1) {
  */
 if ($_GET['purgetables'] == 1) {
     $dbh->exec("DELETE FROM `{$dbp}churchyear_synonyms`");
+    $dbh->exec("DELETE FROM `{$dbp}churchyear_lessons`");
     $dbh->exec("DELETE FROM `{$dbp}churchyear_propers`");
     $dbh->exec("DELETE FROM `{$dbp}churchyear_order`");
     $dbh->exec("DELETE FROM `{$dbp}churchyear`");

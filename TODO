@@ -1,1 +1,3 @@
+- Rewrite block-add and block-edit form(s) to include _lessons, as many
+  as we may have.
 - Generate table displays from a user-modifiable template

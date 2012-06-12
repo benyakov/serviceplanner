@@ -96,26 +96,24 @@ CREATE TABLE `churchyear_synonyms` (
 CREATE TABLE `churchyear_propers` (
     `dayname`   varchar(255),
     `color`     varchar(32),
-    `collect`   text,
-    `collect2`  text,
-    `collect3`  text,
-    `oldtestament` varchar(56),
-    `oldtestament2` varchar(56),
-    `oldtestament3` varchar(56),
-    `gospel`    varchar(56),
-    `gospel2`   varchar(56),
-    `gospel3`   varchar(56),
-    `epistle`   varchar(56),
-    `epistle2`  varchar(56),
-    `epistle3`  varchar(56),
-    `psalm`     varchar(56),
-    `psalm2`     varchar(56),
-    `psalm3`     varchar(56),
     `theme`     varchar(56),
     `note`      text,
     FOREIGN KEY (`dayname`) REFERENCES `churchyear` (`dayname`)
         ON DELETE CASCADE
         ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+CREATE TABLE `churchyear_lessons` (
+    `dayname`   varchar(255),
+    `label`     varchar(56),
+    `oldtestament`  varchar(64),
+    `epistle`   varchar(64),
+    `gospel`    varchar(64),
+    `psalm`     varchar(64),
+    `collect`   text,
+    `introit`   text,
+    FOREIGN KEY (`dayname`) REFERENCES `churchyear` (`dayname`)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 CREATE TABLE `blocks` (
   `blockstart` date,

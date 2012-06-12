@@ -94,28 +94,28 @@ $rv[] = "Creating propers table.";
 $q = $dbh->prepare("CREATE TABLE `{$dbp}churchyear_propers` (
     `dayname`   varchar(255),
     `color`     varchar(32),
-    `collect`   text,
-    `collect2`  text,
-    `collect3`  text,
-    `oldtestament` varchar(56),
-    `oldtestament2` varchar(56),
-    `oldtestament3` varchar(56),
-    `gospel`    varchar(56),
-    `gospel2`   varchar(56),
-    `gospel3`   varchar(56),
-    `epistle`   varchar(56),
-    `epistle2`  varchar(56),
-    `epistle3`  varchar(56),
-    `psalm`     varchar(56),
-    `psalm2`     varchar(56),
-    `psalm3`     varchar(56),
-    `theme`     varchar(56),
+    `theme`     varchar(64),
     `note`      text,
     FOREIGN KEY (`dayname`) REFERENCES `{$dbp}churchyear` (`dayname`)
         ON DELETE CASCADE
         ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8");
 $q->execute() or die(array_pop($q->errorInfo()));
+// Define table containing lessons, multiple sets for each day name
+$rv[] = "Creating table for lessons.";
+$q = $dbh->prepare("CREATE TABLE `{$dbp}churchyear_lessons` (
+    `dayname`   varchar(255),
+    `label`     varchar(56),
+    `oldtestament`  varchar(64),
+    `epistle`   varchar(64),
+    `gospel`    varchar(64),
+    `psalm`     varchar(64),
+    `collect`   text,
+    `introit`   text,
+    FOREIGN KEY (`dayname`) REFERENCES `{$dbp}churchyear` (`dayname`)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE
+) ENGINE = InnoDB DEFAULT CHARSET=utf8");
 // Populate church year tables with default values
 $rv[] = "Populating church year tables with default values.";
 require("./utility/fillservicetables");

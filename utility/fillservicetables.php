@@ -64,10 +64,11 @@ while (($record = fgetcsv($fh)) != FALSE) {
 $fh = fopen("./utility/propers.csv", "r");
 $headings = fgetcsv($fh);
 $q = $dbh->prepare("INSERT INTO {$dbp}churchyear_propers
-    (dayname, color, collect, collect2, oldtestament,
-    gospel, gospel2, gospel3, epistle, epistle2, epistle3,
-    theme, psalm)
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+    (dayname, color, theme)
+    VALUES (?, ?, ?)");
+$ql = $dbh->prepare("INSERT INTO {$dbp}churchyear_lessons
+    (dayname, label, collect, oldtestament, epistle, gospel, psalm)
+    VALUES (?, ?, ?, ?, ?, ?, ?)");
 while (($record = fgetcsv($fh, 250)) != FALSE) {
     $r = array();
     foreach ($record as $field) {
@@ -82,10 +83,17 @@ while (($record = fgetcsv($fh, 250)) != FALSE) {
         print_r($r);
     }
     $dict = array_combine($headings, $r);
-    $q->execute(array($dict['dayname'], $dict['Color'], $dict['Collect'],
-        $dict['Deitrich Collect'], $dict['Old Testament'],
-        $dict['Gospel'], $dict['Series 2 Gospel'], $dict['Series 3 Gospel'],
-        $dict['Epistle'], $dict['Series 2 Lesson'], $dict['Series 3 Lesson'],
-        $dict['Theme'], $dict['Psalm']))
-        or dieWithRollback($q, "\n".__FILE__.":".__LINE__.$dict['dayname']);
+    $q->execute(array($dict['dayname'], $dict['Color'], $dict['Theme']))
+        or die(__FILE__.":".__LINE__.$dict['dayname']);
+    $ql->execute(array($dict['dayname'], 'Historic', $dict['Collect'],
+        $dict['Old Testament'], $dict['Epistle'], $dict['Gospel'],
+        $dict['Psalm']))
+        or die(__FILE__.":".__LINE__.$dict['dayname']);
+    $ql->execute(array($dict['dayname'], 'Series 2',
+        $dict['Deitrich Collect'], "", $dict['Series 2 Lesson'],
+        $dict['Series 2 Gospel'], ""))
+        or die(__FILE__.":".__LINE__.$dict['dayname']);
+    $ql->execute(array($dict['dayname'], 'Series 3', "", "",
+          $dict['Series 3 Lesson'], $dict['Series 3 Gospel'], ""))
+        or die(__FILE__.":".__LINE__.$dict['dayname']);
 }
