@@ -96,25 +96,44 @@ CREATE TABLE `churchyear_synonyms` (
 CREATE TABLE `churchyear_propers` (
     `dayname`   varchar(255),
     `color`     varchar(32),
-    `theme`     varchar(56),
+    `theme`     varchar(64),
+    `introit`   text,
     `note`      text,
     FOREIGN KEY (`dayname`) REFERENCES `churchyear` (`dayname`)
-        ON DELETE CASCADE
-        ON UPDATE CASCADE
+    ON DELETE CASCADE
+    ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 CREATE TABLE `churchyear_lessons` (
     `dayname`   varchar(255),
-    `label`     varchar(56),
-    `oldtestament`  varchar(64),
-    `epistle`   varchar(64),
+    `lectionary`    varchar(56),
+    `lesson1`   varchar(64),
+    `lesson2`   varchar(64),
     `gospel`    varchar(64),
     `psalm`     varchar(64),
-    `collect`   text,
-    `introit`   text,
-    `id`        integer auto_increment,
+    `s2lesson`  varchar(64),
+    `s2gospel`  varchar(64),
+    `s3lesson`  varchar(64),
+    `s3gospel`  varchar(64),
+    `id`        integer,
+    PRIMARY KEY (`id`) auto_increment
     FOREIGN KEY (`dayname`) REFERENCES `churchyear` (`dayname`),
-    PRIMARY KEY (`id`)
     ON DELETE CASCADE
+    ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+CREATE TABLE `churchyear_collects` (
+    `id`     integer auto_increment,
+    `class`  varchar(64),
+    `collect` text,
+    PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+CREATE TABLE `churchyear_collect_index` (
+    `dayname`       varchar(255),
+    `lectionary`    varchar(56),
+    `id`            integer,
+    FOREIGN KEY (`id`) REFERENCES `churchyear_collects` (`id`),
+    ON DELETE CASCADE
+    ON UPDATE CASCADE
+    FOREIGN KEY (`dayname`) REFERENCES `churchyear` (`dayname`),
     ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 CREATE TABLE `blocks` (
