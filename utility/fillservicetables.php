@@ -29,7 +29,7 @@ $q = $dbh->prepare("INSERT INTO {$dbp}churchyear
     (season, dayname, base, offset, month, day,
         observed_month, observed_sunday)
     VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
-while (($record = fgetcsv($fh, 250)) != FALSE) {
+while (($record = fgetcsv($fh)) != FALSE) {
     $r = array();
     foreach ($record as $field) {
         $f = trim($field);
@@ -57,43 +57,78 @@ $fh = fopen("./utility/synonyms.csv", "r");
 $q = $dbh->prepare("INSERT INTO {$dbp}churchyear_synonyms
     (canonical, synonym) VALUES (?, ?)");
 while (($record = fgetcsv($fh)) != FALSE) {
-    $q->execute(array($record[0], $record[1]))
-        or die(array_pop($q->errorInfo())."{$record[0]}, {$record[1]}");
+    $canonical = $record[0];
+    foreach (array_slice($record, 1) as $synonym) {
+        $q->execute(array($canonical, $synonym))
+            or die(array_pop($q->errorInfo())." with {$canonical}, {$synonym}");
+    }
 }
 
+// Fill propers table
 $fh = fopen("./utility/propers.csv", "r");
 $headings = fgetcsv($fh);
-$q = $dbh->prepare("INSERT INTO {$dbp}churchyear_propers
-    (dayname, color, theme)
-    VALUES (?, ?, ?)");
+$qp = $dbh->prepare("INSERT INTO {$dbp}churchyear_propers
+    (dayname, color, theme, introit)
+    VALUES (?, ?, ?, ?)");
+while (($record = fgetcsv($fh)) != FALSE) {
+    $r = blanksToNull($record);
+    $dict = array_combine($headings, $r);
+    $qp->execute(array($dict['dayname'], $dict['color'],
+        $dict['theme'], $dict['introit']))
+        or die(__FILE__.":".__LINE__.$dict['dayname']);
+}
+
+// Fill lessons table
+$fh = fopen("./utility/lessons.csv", "r");
+$headings = fgetcsv($fh);
 $ql = $dbh->prepare("INSERT INTO {$dbp}churchyear_lessons
-    (dayname, label, collect, oldtestament, epistle, gospel, psalm)
-    VALUES (?, ?, ?, ?, ?, ?, ?)");
-while (($record = fgetcsv($fh, 250)) != FALSE) {
+    (dayname, lectionary, lesson1, lesson2, gospel, psalm,
+    s2lesson, s2gospel, s3lesson, s3gospel, hymnabc, hymn)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+while (($record = fgetcsv($fh)) != FALSE) {
+    $r = blanksToNull($record);
+    $dict = array_combine($headings, $r);
+    $ql->execute(array($dict['dayname'], $dict['type'], $dict['lesson1'],
+        $dict['lesson2'], $dict['gospel'], $dict['psalm'],
+        $dict['s2lesson'], $dict['s2gospel'], $dict['s3lesson'],
+        $dict['s3gospel'], $dict['hymnabc'], $dict['hymn']))
+        or die(__FILE__.":".__LINE__.$dict['dayname']);
+}
+
+// Fill collect text
+$fh = fopen("./utility/collect.csv", "r");
+$headings = fgetcsv($fh);
+$ql = $dbh->prepare("INSERT INTO {$dbp}churchyear_collects
+    (id, class, collect)
+    VALUES (?, ?, ?)");
+while (($record = fgetcsv($fh)) != FALSE) {
+    $r = blanksToNull($record);
+    $dict = array_combine($headings, $r);
+    $ql->execute(array($dict['id'], $dict['type'], $dict['collect']))
+        or die(__FILE__.":".__LINE__.$dict['dayname']);
+}
+
+// Fill collect indexes
+$fh = fopen("./utility/collectindex.csv", "r");
+$headings = fgetcsv($fh);
+$ql = $dbh->prepare("INSERT INTO `{$dbp}churchyear_collect_index`
+    (dayname, lectionary, id)
+    VALUES (?, ?, ?)");
+while (($record = fgetcsv($fh)) != FALSE) {
+    $r = blanksToNull($record);
+    $dict = array_combine($headings, $r);
+    $ql->execute(array($dict['dayname'], $dict['type'], $dict['number']))
+        or die(__FILE__.":".__LINE__.$dict['dayname']);
+}
+
+function blanksToNull($arrayin) {
     $r = array();
-    foreach ($record as $field) {
+    foreach ($arrayin as $field) {
         $f = trim($field);
         if (! $f) {
             $f = PDO::PARAM_NULL;
         }
         $r[] = $f;
     }
-    if (count($headings) != count($r)) {
-        print_r($headings);
-        print_r($r);
-    }
-    $dict = array_combine($headings, $r);
-    $q->execute(array($dict['dayname'], $dict['Color'], $dict['Theme']))
-        or die(__FILE__.":".__LINE__.$dict['dayname']);
-    $ql->execute(array($dict['dayname'], 'Historic', $dict['Collect'],
-        $dict['Old Testament'], $dict['Epistle'], $dict['Gospel'],
-        $dict['Psalm']))
-        or die(__FILE__.":".__LINE__.$dict['dayname']);
-    $ql->execute(array($dict['dayname'], 'Series 2',
-        $dict['Deitrich Collect'], "", $dict['Series 2 Lesson'],
-        $dict['Series 2 Gospel'], ""))
-        or die(__FILE__.":".__LINE__.$dict['dayname']);
-    $ql->execute(array($dict['dayname'], 'Series 3', "", "",
-          $dict['Series 3 Lesson'], $dict['Series 3 Gospel'], ""))
-        or die(__FILE__.":".__LINE__.$dict['dayname']);
+    return $r;
 }
