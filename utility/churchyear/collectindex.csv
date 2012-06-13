@@ -1,0 +1,533 @@
+dayname,type,number
+Advent 1,historic,2
+Advent 2,historic,3
+Advent 2,historic,4
+Advent 3,historic,5
+Advent 3,historic,6
+Advent 4,historic,7
+Advent 4,historic,8
+Christmas Vigil,historic,9
+Christmas Day 1st,historic,10
+Christmas Day 1st,historic,11
+Christmas 1,historic,12
+Christmas 1,historic,13
+Christmas 2,historic,14
+Name of Jesus,historic,15
+Name of Jesus,historic,16
+New Year's Eve,historic,17
+Epiphany,historic,18
+Epiphany,historic,19
+Epiphany 1,historic,20
+Epiphany 1,historic,21
+Epiphany 2,historic,22
+Epiphany 2,historic,23
+Epiphany 3,historic,24
+Epiphany 3,historic,25
+Epiphany 4,historic,26
+Epiphany 4,historic,27
+Epiphany 5,historic,28
+Epiphany 5,historic,29
+Transfiguration,historic,30
+Transfiguration,historic,31
+Septuagesima,historic,32
+Septuagesima,historic,33
+Sexagesima,historic,34
+Sexagesima,historic,35
+Quinquagesima,historic,36
+Baptism of Jesus,historic,37
+Baptism of Jesus,historic,38
+Ash Wednesday,historic,39
+Lent 1,historic,40
+Lent 1,historic,41
+Lent 2,historic,42
+Lent 2,historic,43
+Lent 3,historic,44
+Lent 3,historic,45
+Lent 4,historic,46
+Lent 4,historic,47
+Annunciation,historic,48
+Annunciation,historic,49
+Lent 5,historic,50
+Palm Sunday,historic,51
+Palm Sunday,historic,52
+Mon./Holy Week,historic,53
+Tue./Holy Week,historic,54
+Wed./Holy Week,historic,55
+Maundy Thursday,historic,56
+Maundy Thursday,historic,57
+Good Friday,historic,58
+Good Friday,historic,59
+Holy Saturday,historic,60
+Easter Vigil,historic,61
+Easter,historic,62
+Easter Day 2nd,historic,63
+Easter 2,historic,64
+Easter 2,historic,65
+Easter 3,historic,66
+Easter 3,historic,67
+Easter 4,historic,68
+Easter 4,historic,69
+Easter 5,historic,70
+Easter 5,historic,71
+Easter 6,historic,72
+Easter 6,historic,73
+Ascension Sunday,historic,74
+Ascension Sunday,historic,75
+Easter 7,historic,76
+Easter 7,historic,77
+Pentecost,historic,78
+Pentecost,historic,79
+Trinity,historic,80
+Trinity,historic,81
+Trinity 1,historic,82
+Trinity 1,historic,83
+Trinity 2,historic,84
+Trinity 2,historic,85
+Trinity 3,historic,86
+Trinity 3,historic,87
+Trinity 4,historic,88
+Trinity 4,historic,89
+Trinity 5,historic,90
+Trinity 5,historic,91
+Trinity 6,historic,92
+Trinity 6,historic,93
+Trinity 7,historic,94
+Trinity 7,historic,95
+Trinity 8,historic,96
+Trinity 8,historic,97
+Trinity 9,historic,98
+Trinity 9,historic,99
+Trinity 10,historic,100
+Trinity 10,historic,101
+Trinity 11,historic,102
+Trinity 11,historic,103
+Trinity 12,historic,104
+Trinity 12,historic,105
+Trinity 13,historic,106
+Trinity 13,historic,107
+Trinity 14,historic,108
+Trinity 14,historic,109
+Trinity 15,historic,110
+Trinity 15,historic,111
+Trinity 16,historic,112
+Trinity 16,historic,113
+Trinity 17,historic,114
+Trinity 17,historic,115
+Trinity 18,historic,116
+Trinity 18,historic,117
+Michaelmas,historic,118
+Trinity 19,historic,119
+Trinity 19,historic,120
+Trinity 20,historic,121
+Trinity 20,historic,122
+Trinity 21,historic,123
+Trinity 21,historic,124
+Trinity 22,historic,125
+Trinity 22,historic,126
+Trinity 23,historic,127
+Trinity 23,historic,128
+Trinity 24,historic,129
+Trinity 24,historic,130
+3rd Last Sunday,historic,131
+3rd Last Sunday,historic,132
+2nd Last Sunday,historic,133
+2nd Last Sunday,historic,134
+Last Sunday,historic,135
+Last Sunday,historic,136
+All Saints Day,historic,137
+All Saints Day,historic,138
+Mission Festival,historic,139
+Mission Festival,historic,140
+Day of Humiliation and Prayer,historic,141
+Reformation Day,historic,142
+Thanksgiving,historic,143
+Harvest,historic,144
+Presentation,historic,145
+Presentation,historic,146
+Visitation,historic,147
+Visitation,historic,148
+Thomas,historic,149
+Stephen,historic,150
+John the Apostle,historic,151
+Trinity,ilcwb,80
+Trinity,ilcwb,81
+Trinity,ilcwc,80
+Trinity,ilcwc,81
+Trinity,ilcwa,80
+Trinity,ilcwa,81
+Pentecost 4,ilcwb,106
+Pentecost 4,ilcwc,106
+Pentecost 4,ilcwa,106
+Pentecost 5,ilcwb,84
+Pentecost 5,ilcwc,84
+Pentecost 5,ilcwa,84
+Second Last,ilcwb,133
+Second Last,ilcwb,134
+Second Last,ilcwc,133
+Second Last,ilcwc,134
+Second Last,ilcwa,133
+Second Last,ilcwa,134
+Pentecost 7,ilcwb,88
+Pentecost 7,ilcwc,88
+Pentecost 7,ilcwa,88
+Pentecost 2,ilcwb,94
+Pentecost 2,ilcwb,97
+Pentecost 2,ilcwc,94
+Pentecost 2,ilcwc,97
+Pentecost 2,ilcwa,94
+Pentecost 2,ilcwa,97
+Pentecost 3,ilcwb,72
+Pentecost 3,ilcwb,73
+Pentecost 3,ilcwc,72
+Pentecost 3,ilcwc,113
+Pentecost 3,ilcwa,72
+Pentecost 3,ilcwa,73
+Pentecost 8,ilcwb,119
+Pentecost 8,ilcwc,119
+Pentecost 8,ilcwc,107
+Pentecost 8,ilcwa,119
+Pentecost 16,ilcwb,121
+Pentecost 16,ilcwb,112
+Pentecost 16,ilcwc,121
+Pentecost 16,ilcwc,110
+Pentecost 16,ilcwa,121
+Pentecost 16,ilcwa,112
+Pentecost 17,ilcwb,116
+Pentecost 17,ilcwb,126
+Pentecost 17,ilcwc,116
+Pentecost 17,ilcwc,126
+Pentecost 17,ilcwa,116
+Pentecost 17,ilcwa,126
+Pentecost 14,ilcwb,106
+Pentecost 14,ilcwb,107
+Pentecost 14,ilcwa,106
+Pentecost 14,ilcwa,107
+Pentecost 15,ilcwb,92
+Pentecost 15,ilcwc,92
+Pentecost 15,ilcwc,115
+Pentecost 15,ilcwa,92
+Pentecost 12,ilcwb,102
+Pentecost 12,ilcwb,103
+Pentecost 12,ilcwc,102
+Pentecost 12,ilcwc,103
+Pentecost 12,ilcwa,102
+Pentecost 12,ilcwa,103
+Pentecost 13,ilcwb,43
+Pentecost 13,ilcwc,43
+Pentecost 13,ilcwa,43
+Pentecost 10,ilcwb,86
+Pentecost 10,ilcwb,47
+Pentecost 10,ilcwc,86
+Pentecost 10,ilcwa,86
+Pentecost 11,ilcwb,110
+Pentecost 11,ilcwc,110
+Pentecost 11,ilcwa,110
+Christmas second,ilcwb,10
+Christmas second,ilcwb,11
+Christmas second,ilcwc,10
+Christmas second,ilcwc,11
+Christmas second,ilcwa,10
+Christmas second,ilcwa,11
+Pentecost 18,ilcwb,108
+Pentecost 18,ilcwb,33
+Pentecost 18,ilcwc,108
+Pentecost 18,ilcwc,99
+Pentecost 18,ilcwa,108
+Pentecost 18,ilcwa,33
+New Year's Eve,ilcwb,17
+New Year's Eve,ilcwc,17
+New Year's Eve,ilcwa,17
+Last,ilcwb,135
+Last,ilcwb,136
+Last,ilcwc,135
+Last,ilcwc,136
+Last,ilcwa,135
+Last,ilcwa,136
+Epiphany 8,ilcwb,36
+Epiphany 8,ilcwc,36
+Epiphany 8,ilcwc,89
+Epiphany 8,ilcwa,36
+All Saints' Day,ilcwb,137
+All Saints' Day,ilcwb,138
+All Saints' Day,ilcwc,137
+All Saints' Day,ilcwc,138
+All Saints' Day,ilcwa,137
+All Saints' Day,ilcwa,138
+Presentation of our Lord,ilcwb,12
+Presentation of our Lord,ilcwb,13
+Presentation of our Lord,ilcwc,12
+Presentation of our Lord,ilcwc,13
+Presentation of our Lord,ilcwa,12
+Presentation of our Lord,ilcwa,13
+Good Friday,ilcwb,58
+Good Friday,ilcwb,59
+Good Friday,ilcwc,58
+Good Friday,ilcwc,59
+Good Friday,ilcwa,58
+Good Friday,ilcwa,59
+Pentecost 6,ilcwb,90
+Pentecost 6,ilcwc,90
+Pentecost 6,ilcwa,90
+Ash Wednesday,ilcwb,39
+Ash Wednesday,ilcwc,39
+Ash Wednesday,ilcwa,39
+Third Last,ilcwb,131
+Third Last,ilcwb,132
+Third Last,ilcwc,131
+Third Last,ilcwc,132
+Third Last,ilcwa,131
+Third Last,ilcwa,132
+Circumcision and Name of Jesus,ilcwb,15
+Circumcision and Name of Jesus,ilcwb,16
+Circumcision and Name of Jesus,ilcwc,15
+Circumcision and Name of Jesus,ilcwc,16
+Circumcision and Name of Jesus,ilcwa,15
+Circumcision and Name of Jesus,ilcwa,16
+Pentecost,ilcwb,78
+Pentecost,ilcwb,79
+Pentecost,ilcwc,78
+Pentecost,ilcwc,79
+Pentecost,ilcwa,78
+Pentecost,ilcwa,79
+Pentecost 9,ilcwb,29
+Pentecost 9,ilcwb,97
+Pentecost 9,ilcwc,29
+Pentecost 9,ilcwc,97
+Pentecost 9,ilcwa,29
+Pentecost 9,ilcwa,97
+Christmas Vigil,ilcwb,9
+Christmas Vigil,ilcwc,9
+Christmas Vigil,ilcwa,9
+Easter Vigil,ilcwb,60
+Easter Vigil,ilcwc,60
+Easter Vigil,ilcwa,60
+Palm Sunday,ilcwb,51
+Palm Sunday,ilcwb,52
+Palm Sunday,ilcwc,51
+Palm Sunday,ilcwc,52
+Palm Sunday,ilcwa,51
+Palm Sunday,ilcwa,52
+Michaelmas,ilcwb,118
+Michaelmas,ilcwc,118
+Michaelmas,ilcwa,118
+Annunciation,ilcwb,49
+Annunciation,ilcwb,50
+Annunciation,ilcwc,49
+Annunciation,ilcwc,50
+Annunciation,ilcwa,49
+Annunciation,ilcwa,50
+Advent 2,ilcwb,3
+Advent 2,ilcwb,4
+Advent 2,ilcwc,3
+Advent 2,ilcwc,4
+Advent 2,ilcwa,3
+Advent 2,ilcwa,4
+Advent 3,ilcwb,5
+Advent 3,ilcwb,8
+Advent 3,ilcwc,5
+Advent 3,ilcwc,8
+Advent 3,ilcwa,5
+Advent 3,ilcwa,8
+Advent 1,ilcwb,1
+Advent 1,ilcwb,2
+Advent 1,ilcwc,1
+Advent 1,ilcwc,2
+Advent 1,ilcwa,1
+Advent 1,ilcwa,2
+Advent 4,ilcwb,6
+Advent 4,ilcwb,7
+Advent 4,ilcwc,6
+Advent 4,ilcwc,7
+Advent 4,ilcwa,6
+Advent 4,ilcwa,7
+Maundy Thursday,ilcwb,56
+Maundy Thursday,ilcwb,57
+Maundy Thursday,ilcwc,56
+Maundy Thursday,ilcwc,57
+Maundy Thursday,ilcwa,56
+Maundy Thursday,ilcwa,57
+Pentecost Vigil,ilcwb,78
+Pentecost Vigil,ilcwb,79
+Pentecost Vigil,ilcwc,78
+Pentecost Vigil,ilcwc,79
+Pentecost Vigil,ilcwa,78
+Pentecost Vigil,ilcwa,79
+Epiphany,ilcwb,18
+Epiphany,ilcwb,19
+Epiphany,ilcwc,18
+Epiphany,ilcwc,19
+Epiphany,ilcwa,18
+Epiphany,ilcwa,19
+Pentecost second,ilcwb,70
+Pentecost second,ilcwc,70
+Pentecost second,ilcwa,70
+Festival of the Reformation,ilcwb,142
+Festival of the Reformation,ilcwc,142
+Festival of the Reformation,ilcwa,142
+Ascension,ilcwb,74
+Ascension,ilcwb,75
+Ascension,ilcwc,74
+Ascension,ilcwc,75
+Ascension,ilcwa,74
+Ascension,ilcwa,75
+Pentecost 19,ilcwb,82
+Pentecost 19,ilcwb,83
+Pentecost 19,ilcwc,82
+Pentecost 19,ilcwc,83
+Pentecost 19,ilcwa,82
+Lent 5,ilcwb,48
+Lent 5,ilcwc,48
+Lent 5,ilcwa,48
+Lent 4,ilcwb,143
+Lent 4,ilcwb,144
+Lent 4,ilcwc,143
+Lent 4,ilcwc,144
+Lent 4,ilcwa,143
+Lent 4,ilcwa,144
+Easter,ilcwb,61
+Easter,ilcwb,62
+Easter,ilcwb,63
+Easter,ilcwc,61
+Easter,ilcwc,62
+Easter,ilcwc,63
+Easter,ilcwa,61
+Easter,ilcwa,62
+Easter,ilcwa,63
+Christmas,ilcwb,10
+Christmas,ilcwb,11
+Christmas,ilcwc,10
+Christmas,ilcwc,11
+Christmas,ilcwa,10
+Christmas,ilcwa,11
+Lent 3,ilcwb,42
+Lent 3,ilcwc,42
+Lent 3,ilcwa,42
+Lent 2,ilcwb,44
+Lent 2,ilcwb,45
+Lent 2,ilcwa,46
+Lent 1,ilcwb,40
+Lent 1,ilcwb,41
+Lent 1,ilcwc,40
+Lent 1,ilcwc,41
+Lent 1,ilcwa,40
+Lent 1,ilcwa,41
+Visitation,ilcwb,49
+Visitation,ilcwb,50
+Visitation,ilcwc,49
+Visitation,ilcwc,50
+Visitation,ilcwa,49
+Visitation,ilcwa,50
+Transfiguration,ilcwb,30
+Transfiguration,ilcwb,31
+Transfiguration,ilcwc,30
+Transfiguration,ilcwc,31
+Transfiguration,ilcwa,30
+Transfiguration,ilcwa,31
+Baptism of Jesus,ilcwb,37
+Baptism of Jesus,ilcwb,38
+Baptism of Jesus,ilcwc,37
+Baptism of Jesus,ilcwc,38
+Baptism of Jesus,ilcwa,37
+Baptism of Jesus,ilcwa,38
+Epiphany 2,ilcwb,22
+Epiphany 2,ilcwb,23
+Epiphany 2,ilcwc,22
+Epiphany 2,ilcwc,23
+Epiphany 2,ilcwa,22
+Epiphany 2,ilcwa,23
+Epiphany 3,ilcwb,24
+Epiphany 3,ilcwb,25
+Epiphany 3,ilcwc,24
+Epiphany 3,ilcwc,25
+Epiphany 3,ilcwa,24
+Epiphany 3,ilcwa,25
+Epiphany 4,ilcwb,26
+Epiphany 4,ilcwb,27
+Epiphany 4,ilcwc,26
+Epiphany 4,ilcwc,27
+Epiphany 4,ilcwa,26
+Epiphany 4,ilcwa,27
+Epiphany 5,ilcwb,28
+Epiphany 5,ilcwc,91
+Epiphany 5,ilcwa,28
+Epiphany 6,ilcwb,93
+Epiphany 6,ilcwc,93
+Epiphany 6,ilcwa,93
+Epiphany 7,ilcwb,29
+Epiphany 7,ilcwc,28
+Epiphany 7,ilcwa,28
+Pentecost 20,ilcwb,100
+Pentecost 20,ilcwc,100
+Pentecost 20,ilcwa,100
+Christmas 2,ilcwb,12
+Christmas 2,ilcwc,12
+Christmas 2,ilcwa,12
+Christmas 1,ilcwb,12
+Christmas 1,ilcwb,13
+Christmas 1,ilcwc,12
+Christmas 1,ilcwc,21
+Christmas 1,ilcwa,12
+Christmas 1,ilcwa,13
+Easter 2,ilcwb,64
+Easter 2,ilcwb,65
+Easter 2,ilcwc,64
+Easter 2,ilcwc,65
+Easter 2,ilcwa,64
+Easter 2,ilcwa,65
+Easter 3,ilcwb,68
+Easter 3,ilcwb,69
+Easter 3,ilcwc,68
+Easter 3,ilcwc,69
+Easter 3,ilcwa,68
+Easter 3,ilcwa,69
+Easter 6,ilcwb,72
+Easter 6,ilcwb,73
+Easter 6,ilcwa,72
+Easter 6,ilcwa,73
+Easter 7,ilcwb,76
+Easter 7,ilcwb,77
+Easter 7,ilcwc,76
+Easter 7,ilcwc,77
+Easter 7,ilcwa,76
+Easter 7,ilcwa,77
+Easter 4,ilcwb,66
+Easter 4,ilcwb,67
+Easter 4,ilcwc,66
+Easter 4,ilcwc,67
+Easter 4,ilcwa,66
+Easter 4,ilcwa,67
+Easter 5,ilcwb,70
+Easter 5,ilcwb,71
+Easter 5,ilcwc,70
+Easter 5,ilcwc,71
+Easter 5,ilcwa,70
+Easter 5,ilcwa,71
+Pentecost 23,ilcwb,117
+Pentecost 23,ilcwc,117
+Pentecost 23,ilcwc,103
+Pentecost 23,ilcwa,117
+Pentecost 22,ilcwb,128
+Pentecost 22,ilcwc,128
+Pentecost 22,ilcwa,128
+Pentecost 21,ilcwb,122
+Pentecost 21,ilcwc,122
+Pentecost 21,ilcwc,109
+Pentecost 21,ilcwa,122
+Pentecost 24,ilcwb,116
+Pentecost 24,ilcwb,117
+Pentecost 24,ilcwa,123
+Pentecost 25,ilcwb,133
+Pentecost 25,ilcwb,134
+Pentecost 25,ilcwc,133
+Pentecost 25,ilcwc,134
+Pentecost 25,ilcwa,133
+Pentecost 25,ilcwa,134
+Easter second,ilcwb,61
+Easter second,ilcwb,62
+Easter second,ilcwb,63
+Easter second,ilcwc,61
+Easter second,ilcwc,62
+Easter second,ilcwc,63
+Easter second,ilcwa,61
+Easter second,ilcwa,62
+Easter second,ilcwa,63
