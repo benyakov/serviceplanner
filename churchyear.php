@@ -413,6 +413,7 @@ if ($_POST['propers']) {
  * Show populated form for the propers of the given dayname
  */
 if ($_GET['propers']) {
+    $dayname = $_GET['propers'];
     if (! $auth) {
         echo json_encode(array(false));
         exit(0);
@@ -425,7 +426,7 @@ if ($_GET['propers']) {
             ON (pr.dayname = l.dayname)
             WHERE pr.dayname = ?
         ORDER BY l.lectionary");
-    if (! $q->execute(array($_GET['propers']))) {
+    if (! $q->execute(array($dayname]))) {
         die(array_pop($q->errorInfo()));
         $pdata = array("color"=>"", "theme"=>"", "introit"=>"",
             "note"=>"", "lesson1"=>"", "lesson2"=>"", "gospel"=>"",
@@ -441,7 +442,7 @@ if ($_GET['propers']) {
             ON (i.id = c.id)
         WHERE i.dayname = ?
         ORDER BY i.lectionary, c.class");
-    if (! $q->execute(array($_GET['propers']))) {
+    if (! $q->execute(array($dayname]))) {
         die(array_pop($q->errorInfo()));
         $cdata = array();
     } else {
@@ -450,7 +451,7 @@ if ($_GET['propers']) {
     ob_start();
 ?>
     <form id="propersform" method="post">
-    <input type="hidden" name="propers" value="<?=$_GET['propers']?>">
+    <input type="hidden" name="propers" id="propers" value="<?=$dayname]?>">
     <div class="formblock"><label for="color">Color</label><br>
     <input type="text" value="<?=$pdata[0]['color']?>" name="color"></div>
     <div class="formblock"><label for="theme">Theme</label><br>
@@ -465,7 +466,11 @@ if ($_GET['propers']) {
         $id = $lset['id'];
         if (! $lset['lectionary'] == "historic") {
     ?>
-    <h3><a href="#"><?=strtoupper($lset['lectionary'])?></a></h3>
+    <h3 class="propers-<?=$id?>">
+        <a href="#"><?=strtoupper($lset['lectionary'])?></a></h3>
+    <div class="propers-<?=$id?>">
+    <a href="#" class="delete-these-propers" data-id="<?=$id?>"
+        data-lect="<?=$lset['lectionary']?>">Delete these propers</a>
     <div class="propersbox">
     <input type="hidden" name="lessons-<?=$i?>" value="<?=$id?>">
     <div class="formblock"><label for="l1-<?=$id?>">Lesson 1</label><br>
@@ -500,8 +505,13 @@ if ($_GET['propers']) {
     <a href="#" class="add-collect"
         data-lectionary="<?=$lset['lectionary']?>">New Collect</a>
     </div>
+    </div>
     <? } else { ?>
-    <h3><a href="#"><?=strtoupper($lset['lectionary'])?></a></h3>
+    <h3 class="propers-<?=$id?>">
+        <a href="#"><?=strtoupper($lset['lectionary'])?></a></h3>
+    <div class="propers-<?=$id?>">
+    <a href="#" class="delete-these-propers" data-id="<?=$id?>"
+        data-lect="<?=$lset['lectionary']?>">Delete these propers</a>
     <div class="propersbox">
     <input type="hidden" name="lessons-<?=$i?>" value="<?=$id?>">
     <div class="formblock"><label for="l1-<?=$id?>">Lesson 1</label><br>
@@ -531,17 +541,21 @@ if ($_GET['propers']) {
     }?>
     <a href="#" class="add-collect"
         data-lectionary="<?=$lset['lectionary']?>">New Collect</a>
+    </div>
     </div> <?
-    }}
+    }
     $i++;
     } $i++; ?>
     </div>
     <div class="hiddentemplate" id="propers-template" data-identifier="<?=$i?>">
-    <h3><a href="#">New Propers</a></h3>
+    <h3 class="new-propers-{{id}}"><a href="#">New Propers</a></h3>
+    <div class="new-propers-{{id}}">
+    <a href="#" class="abort-new-propers"
+        data-id="{{id}}">Abort New Propers</a>
     <div class="propersbox">
     <input type="hidden" name="lessons-<?=$i?>" value="{{id}}">
     <div class="formblock"><label for="lectionary-{{id}}">Lectionary</label><br>
-    <input type="text" value="" name="lectionary-{{id}}"></div>
+    <input type="text" value="" name="lectionary-{{id}}" required></div>
     <div class="formblock"><label for="l1-{{id}}">Lesson 1</label><br>
     <input type="text" value="" name="l1-{{id}}"></div>
     <div class="formblock"><label for="l2-{{id}}">Lesson 2</label><br>
@@ -560,6 +574,7 @@ if ($_GET['propers']) {
         data-lectionary="">New Collect</a>
     </div>
     </div>
+    </div>
     <button type="submit" id="submit">Submit</button>
     <button type="reset">Reset</button>
     <button id="addpropers">Add Propers</button>
@@ -571,10 +586,44 @@ if ($_GET['propers']) {
             var identifier = $("#hiddentemplate").attr("data-identifier");
             $("#hiddentemplate").attr("data-identifier", identifier+1);
             template = template.replace("{{id}}", identifier);
+            $('#lectionary-'+identifier).update(function() {
+                $('#addcollect-'+identifier)
+                    .attr("data-lectionary", $(this).val());
+            });
             $("#accordion").append(template);
-            // TODO: handle update of add-collect link's data-lectionary
+            $("a.abort-new-propers").click(function() {
+                if (confirm("Remove new propers?  (Changes will be lost!)")) {
+                    var id=$(this).attr("data-id");
+                    $(".new-propers-"+id).remove();
+                }
+            });
         });
-        // TODO: handle addition and deletion of collects and propers sets
+        $(".delete-these-propers").click(function() {
+            if (confirm("Delete propers? (Listed collects will still exist.)")) {
+                var id = $(this).attr("data-id");
+                // TODO: implement this deletion code on the server side
+                $.get("churchyear.php", {
+                    delpropers: $("#propers").val(),
+                    lectionary: $(this).attr("data-lect")},
+                    function(rv) {
+                        if (rv[0]) {
+                            $(".propers-"+id).remove();
+                        } else {
+                            setMessage(rv[1]);
+                        }
+                    });
+            }
+        });
+        $("#add-collect").click(function() {
+            // TODO: Display new dialog with empty collect form
+            return;
+        });
+        $("#delete-collect").click(function(){
+            // TODO: Display new dialog showing collect and which lectionaries
+            // use it when to confirm deletion.
+            return;
+        });
+        // TODO: handle deletion of propers sets
     </script>
 <?
     echo json_encode(array(true, ob_get_clean()));
