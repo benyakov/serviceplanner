@@ -26,6 +26,79 @@
 require("init.php");
 $auth = auth();
 
+/* Replace occurrences of {{DBP}} with $prefix or $dbp in text.
+ */
+function replaceDBP($text, $prefix=false) {
+    global $dbp;
+    if ($prefix !== false) {
+        return str_replace('{{DBP}}', $prefix, $text);
+    } else {
+        return str_replace('{{DBP}}', $dbp, $text);
+    }
+}
+
+/* Populate the church year table if necessary.
+ */
+$dbh->beginTransaction();
+$tableTest = $dbh->query("SELECT 1 FROM `{$dbp}churchyear`");
+if (! ($tableTest && $tableTest->fetchAll())) {
+    require('./utility/fillservicetables.php');
+}
+/* (Re-)Create church year functions if necessary
+ */
+$result = $dbh->query("SHOW FUNCTION STATUS LIKE '{$dbp}easter_in_year'");
+if (! $result->fetchAll(PDO::FETCH_NUM)) {
+    // Define helper functions on the db for getting the dates of days
+    $functionsfile = "./utility/churchyearfunctions.sql";
+    $functionsfh = fopen($functionsfile, "rb");
+    $functionstext = fread($functionsfh, filesize($functionsfile));
+    fclose($functionsfh);
+    $dbh->exec(replaceDBP($functionstext));
+    $dbh->commit();
+    $dbh->beginTransaction();
+}
+
+/* churchyear.php?dropfunctions=1
+ * Drops all the churchyear functions and sets a message about
+ * creating them again.
+ */
+if ($_GET['dropfunctions'] == 1) {
+    $dbh->exec("DROP FUNCTION `{$dbp}easter_in_year`;
+    DROP FUNCTION IF EXISTS `{$dbp}christmas1_in_year`;
+    DROP FUNCTION IF EXISTS `{$dbp}michaelmas1_in_year`;
+    DROP FUNCTION IF EXISTS `{$dbp}epiphany1_in_year`;
+    DROP FUNCTION IF EXISTS `{$dbp}calc_date_in_year`;
+    DROP FUNCTION IF EXISTS `{$dbp}date_in_year`;
+    DROP FUNCTION IF EXISTS `{$dbp}calc_observed_date_in_year`;
+    DROP FUNCTION IF EXISTS `{$dbp}observed_date_in_year`;
+    DROP PROCEDURE IF EXISTS `{$dbp}get_days_for_date`");
+    setMessage("Church year functions dropped.  To re-create them, visit"
+        ." the Church Year tab.  They will be created automatically.");
+    $dbh->commit();
+    header("location: index.php");
+    exit(0);
+}
+
+/* churchyear.php?purgetables=1
+ * Purge the churchyear tables and set a message about populating
+ * them again.
+ */
+if ($_GET['purgetables'] == 1) {
+    $dbh->exec("DELETE FROM `{$dbp}churchyear_collects_index`");
+    $dbh->exec("DELETE FROM `{$dbp}churchyear_collects`");
+    $dbh->exec("DELETE FROM `{$dbp}churchyear_synonyms`");
+    $dbh->exec("DELETE FROM `{$dbp}churchyear_lessons`");
+    $dbh->exec("DELETE FROM `{$dbp}churchyear_propers`");
+    $dbh->exec("DELETE FROM `{$dbp}churchyear_order`");
+    $dbh->exec("DELETE FROM `{$dbp}churchyear`");
+
+    setMessage("Church year tables purged.  They will be re-populated "
+        ."with default values next time you visit the Church Year tab.");
+    $dbh->commit();
+    header("location: index.php");
+    exit(0);
+}
+
 function query_churchyear($json=false) {
     /* Return an executed query for all rows of the churchyear db
      */
@@ -87,76 +160,6 @@ function churchyear_listing($rows) {
     return ob_get_clean();
 }
 
-function replaceDBP($text, $prefix=false) {
-    // Where replace occurrences of {{DBP}} with $prefix or $dbp in text.
-    global $dbp;
-    if ($prefix !== false) {
-        return str_replace('{{DBP}}', $prefix, $text);
-    } else {
-        return str_replace('{{DBP}}', $dbp, $text);
-    }
-}
-
-/* Populate the church year table if necessary.
- */
-$dbh->beginTransaction();
-$tableTest = $dbh->query("SELECT 1 FROM `{$dbp}churchyear`");
-if (! ($tableTest && $tableTest->fetchAll())) {
-    require('./utility/fillservicetables.php');
-}
-/* (Re-)Create church year functions if necessary
- */
-$result = $dbh->query("SHOW FUNCTION STATUS LIKE '{$dbp}easter_in_year'");
-if (! $result->fetchAll(PDO::FETCH_NUM)) {
-    // Define helper functions on the db for getting the dates of days
-    $functionsfile = "./utility/churchyearfunctions.sql";
-    $functionsfh = fopen($functionsfile, "rb");
-    $functionstext = fread($functionsfh, filesize($functionsfile));
-    fclose($functionsfh);
-    $dbh->exec(replaceDBP($functionstext));
-    $dbh->commit();
-    $dbh->beginTransaction();
-}
-
-/* churchyear.php?dropfunctions=1
- * Drops all the churchyear functions and sets a message about
- * creating them again.
- */
-if ($_GET['dropfunctions'] == 1) {
-    $dbh->exec("DROP FUNCTION `{$dbp}easter_in_year`;
-    DROP FUNCTION IF EXISTS `{$dbp}christmas1_in_year`;
-    DROP FUNCTION IF EXISTS `{$dbp}michaelmas1_in_year`;
-    DROP FUNCTION IF EXISTS `{$dbp}epiphany1_in_year`;
-    DROP FUNCTION IF EXISTS `{$dbp}calc_date_in_year`;
-    DROP FUNCTION IF EXISTS `{$dbp}date_in_year`;
-    DROP FUNCTION IF EXISTS `{$dbp}calc_observed_date_in_year`;
-    DROP FUNCTION IF EXISTS `{$dbp}observed_date_in_year`;
-    DROP PROCEDURE IF EXISTS `{$dbp}get_days_for_date`");
-    setMessage("Church year functions dropped.  To re-create them, visit"
-        ." the Church Year tab.  They will be created automatically.");
-    $dbh->commit();
-    header("location: index.php");
-    exit(0);
-}
-
-/* churchyear.php?purgetables=1
- * Purge the churchyear tables and set a message about populating
- * them again.
- */
-if ($_GET['purgetables'] == 1) {
-    $dbh->exec("DELETE FROM `{$dbp}churchyear_synonyms`");
-    $dbh->exec("DELETE FROM `{$dbp}churchyear_lessons`");
-    $dbh->exec("DELETE FROM `{$dbp}churchyear_propers`");
-    $dbh->exec("DELETE FROM `{$dbp}churchyear_order`");
-    $dbh->exec("DELETE FROM `{$dbp}churchyear`");
-
-    setMessage("Church year tables purged.  They will be re-populated "
-        ."with default values next time you visit the Church Year tab.");
-    $dbh->commit();
-    header("location: index.php");
-    exit(0);
-}
-
 /* churchyear.php?daysfordate=date
  * Returns a comma-separated list of daynames that match the date given.
  */
@@ -196,7 +199,6 @@ if ($_GET['params']) {
 /* churchyear.php?dayname=dayname
  * Returns a form for modifying the db parameters of dayname.
  */
-
 if ($_GET['dayname']) {
     if (! $auth) {
         echo "Access denied.  Please log in.";
@@ -263,7 +265,6 @@ if ($_GET['dayname']) {
 /* churchyear.php with POST of [del=>dayname]
  * Deletes the specified dayname from the churchyear table.
  */
-
 if ($_POST['del']) {
     if (! $auth) {
         echo json_encode(array(0, "Access denied. Please log in."));
@@ -288,7 +289,6 @@ if ($_POST['del']) {
 /* churchyear.php with POST of [submitday=>1]
  * Saves the submitted POST data to the included dayname.
  */
-
 if ($_POST['submit_day']==1) {
     if (! $auth) {
         setMessage("Access denied. Please log in.");
@@ -299,34 +299,18 @@ if ($_POST['submit_day']==1) {
     // Update/save supplied values for the given day
     unset($_POST['submit_day']);
     $q = $dbh->prepare("INSERT INTO `{$dbp}churchyear`
-        (dayname, season, base, offset, month, day,
-        observed_month, observed_sunday)
-        VALUES (:dayname, :season, :base, :offset, :month, :day,
-            :observed_month, :observed_sunday)");
-    $q->bindValue(":dayname", $_POST['dayname']);
-    $q->bindValue(":season", $_POST['season']);
-    $q->bindValue(":base", $_POST['base']);
-    $q->bindValue(":offset", $_POST['offset']);
-    $q->bindValue(":month", $_POST['month']);
-    $q->bindValue(":day", $_POST['day']);
-    $q->bindValue(":observed_month", $_POST['observed_month']);
-    $q->bindValue(":observed_sunday", $_POST['observed_sunday']);
-    if (! $q->execute()) {
+        (season, base, offset, month, day,
+        observed_month, observed_sunday, dayname)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
+    $bound = array($_POST['dayname'], $_POST['season'], $_POST['base'],
+        $_POST['offset'], $_POST['month'], $_POST['day'],
+        $_POST['observed_month'], $_POST['observed_sunday']);
+    if (! $q->execute($bound)) {
         $q = $dbh->prepare("UPDATE `{$dbp}churchyear`
-            SET season=:season,
-            base=:base, offset=:offset,
-            month=:month, day=:day,
-            observed_month=:observed_month, observed_sunday=:observed_sunday
-            WHERE dayname=:dayname");
-        $q->bindValue(":dayname", $_POST['dayname']);
-        $q->bindValue(":season", $_POST['season']);
-        $q->bindValue(":base", $_POST['base']);
-        $q->bindValue(":offset", $_POST['offset']);
-        $q->bindValue(":month", $_POST['month']);
-        $q->bindValue(":day", $_POST['day']);
-        $q->bindValue(":observed_month", $_POST['observed_month']);
-        $q->bindValue(":observed_sunday", $_POST['observed_sunday']);
-        if (! $q->execute()) {
+            SET season=?, base=?, offset=?, month=?, day=?,
+            observed_month=?, observed_sunday=?
+            WHERE dayname=?");
+        if (! $q->execute($bound)) {
             setMessage("Problem saving: ". array_pop($q->errorInfo()));
         }
         header("location: churchyear.php");
@@ -386,6 +370,7 @@ if ($_GET['synonyms']) {
  * Update propers for the dayname.
  */
 if ($_POST['propers']) {
+    // TODO: update this for new form (yikes!)
     if (! $auth) {
         echo json_encode(array(false));
         exit(0);
@@ -432,72 +417,147 @@ if ($_GET['propers']) {
         echo json_encode(array(false));
         exit(0);
     }
-    $q = $dbh->prepare("SELECT pr.color, pr.theme, pr.note,
-        l.oldtestament, l.epistle, l.gospel, l.psalm, l.collect,
-        l.introit, l.label, l.id
+    $q = $dbh->prepare("SELECT pr.color, pr.theme, pr.introit, pr.note,
+        l.lesson1, l.lesson2, l.gospel, l.psalm, l.s2lesson, l.s3gospel,
+        l.s3lesson, l.s3gospel, l.id, l.lectionary, l.hymnabc, l.hymn
         FROM `{$dbp}churchyear_propers` AS pr
-        LEFT OUTER JOIN `{$dbp}churchyear_lessons` AS l ON (pr.dayname=l.dayname)
-        WHERE pr.dayname = :dayname");
-    if (! $q->execute(array("dayname"=>$_GET['propers']))) {
-        $rvdata = array("color"=>"", "collect"=>"",
-            "oldtestament"=>"", "epistle"=>"", "gospel"=>"",
-            "psalm"=>"", "introit"=>"", "theme"=>"", "note"=>"");
+        LEFT OUTER JOIN `{$dbp}churchyear_lessons` AS l
+            ON (pr.dayname = l.dayname)
+            WHERE pr.dayname = ?
+        ORDER BY l.lectionary");
+    if (! $q->execute(array($_GET['propers']))) {
+        die(array_pop($q->errorInfo()));
+        $pdata = array("color"=>"", "theme"=>"", "introit"=>"",
+            "note"=>"", "lesson1"=>"", "lesson2"=>"", "gospel"=>"",
+            "psalm"=>"", "s2lesson"=>"", "s2gospel"=>"", "s3lesson"=>"",
+            "s3gospel"=>"", "id"=>0, "lectionary"=>"",
+            "hymnabc"=>"", "hymn"=>"");
     } else {
-        $rvdata = ($q->fetchAll(PDO::FETCH_ASSOC));
+        $pdata = ($q->fetchAll(PDO::FETCH_ASSOC));
+    }
+    $q = $dbh->prepare("SELECT i.lectionary, c.class, c.collect, c.id
+        FROM `{$dbp}churchyear_collect_index` AS i
+        JOIN `{$dbp}churchyear_collects` AS c
+            ON (i.id = c.id)
+        WHERE i.dayname = ?
+        ORDER BY i.lectionary, c.class");
+    if (! $q->execute(array($_GET['propers']))) {
+        die(array_pop($q->errorInfo()));
+        $cdata = array();
+    } else {
+        $cdata = ($q->fetchAll(PDO::FETCH_ASSOC));
     }
     ob_start();
 ?>
     <form id="propersform" method="post">
     <input type="hidden" name="propers" value="<?=$_GET['propers']?>">
     <div class="formblock"><label for="color">Color</label><br>
-    <input type="text" value="<?=$rvdata[0]['color']?>" name="color"></div>
+    <input type="text" value="<?=$pdata[0]['color']?>" name="color"></div>
     <div class="formblock"><label for="theme">Theme</label><br>
-    <input type="text" value="<?=$rvdata[0]['theme']?>" name="theme"></div>
+    <input type="text" value="<?=$pdata[0]['theme']?>" name="theme"></div>
     <div class="formblock fullwidth"><label for="note">Note</label><br>
-    <textarea name="note"><?=$rvdata[0]['note']?></textarea></div>
-    <div id="accordion">
+    <textarea name="note"><?=$pdata[0]['note']?></textarea><br></div>
+    <div class="formblock fullwidth"><label for="introit">Introit</label><br>
+    <textarea name="introit"><?=$pdata[0]['introit']?></textarea></div>
+    <div id="lessons-accordion">
     <? $i = 1;
-    foreach ($rvdata as $lset) {
-        if (! $lset['label']) continue;
+    foreach ($pdata as $lset) {
+        $id = $lset['id'];
+        if (! $lset['lectionary'] == "historic") {
     ?>
-    <h3><a href="#"><?=$lset['label']?></a></h3>
+    <h3><a href="#"><?=strtoupper($lset['lectionary'])?></a></h3>
     <div class="propersbox">
-    <input type="hidden" name="lessons-<?=$i?>" value="<?=$lset['id']?>">
-    <label for="la-<?=$lset['id']?>">Label</label>
-    <input type="text" value="<?=$lset['label']?>" name="la-<?=$lset['id']?>">
-    <div class="formblock"><label for="ot-<?=$lset['id']?>">Old Testament</label><br>
-    <input type="text" value="<?=$lset['oldtestament']?>" name="ot-<?=$lset['id']?>"></div>
-    <div class="formblock"><label for="ep-<?=$lset['id']?>">Epistle</label><br>
-    <input type="text" value="<?=$lset['epistle']?>" name="ep-<?=$lset['id']?>"></div>
-    <div class="formblock"><label for="go-<?=$lset['id']?>">Gospel</label><br>
-    <input type="text" value="<?=$lset['gospel']?>" name="go-<?=$lset['id']?>"></div>
-    <div class="formblock"><label for="ps-<?=$lset['id']?>">Psalm</label><br>
-    <input type="text" value="<?=$lset['psalm']?>" name="ps-<?=$lset['id']?>"></div>
-    <div class="formblock fullwidth"><label for="in-<?=$lset['id']?>">Introit</label><br>
-    <textarea name="in-<?=$lset['id']?>"><?=$lset['introit']?></textarea></div>
-    <div class="formblock fullwidth"><label for="co-<?=$lset['id']?>">Collect</label><br>
-    <textarea name="co-<?=$lset['id']?>"><?=$lset['collect']?></textarea></div>
+    <input type="hidden" name="lessons-<?=$i?>" value="<?=$id?>">
+    <div class="formblock"><label for="l1-<?=$id?>">Lesson 1</label><br>
+    <input type="text" value="<?=$lset['lesson1']?>" name="l1-<?=$id?>"></div>
+    <div class="formblock"><label for="l2-<?=$id?>">Lesson 2</label><br>
+    <input type="text" value="<?=$lset['lesson2']?>" name="l2-<?=$id?>"></div>
+    <div class="formblock"><label for="go-<?=$id?>">Gospel</label><br>
+    <input type="text" value="<?=$lset['gospel']?>" name="go-<?=$id?>"></div>
+    <div class="formblock"><label for="ps-<?=$id?>">Psalm</label><br>
+    <input type="text" value="<?=$lset['psalm']?>" name="ps-<?=$id?>"></div>
+    <div class="formblock"><label for="s2l-<?=$id?>">Series 2 Lesson</label><br>
+    <input type="text" value="<?=$lset['s2lesson']?>" name="s2l-<?=$id?>"></div>
+    <div class="formblock"><label for="s2go-<?=$id?>">Series 2 Gospel</label><br>
+    <input type="text" value="<?=$lset['s2gospel']?>" name="s2go-<?=$id?>"></div>
+    <div class="formblock"><label for="s3l-<?=$id?>">Series 3 Lesson</label><br>
+    <input type="text" value="<?=$lset['s3lesson']?>" name="s3l-<?=$id?>"></div>
+    <div class="formblock"><label for="s3go-<?=$id?>">Series 3 Gospel</label><br>
+    <input type="text" value="<?=$lset['s3gospel']?>" name="s3go-<?=$id?>"></div>
     </div>
-    <? $i++; } $i++; ?>
+    <div class="propersbox"> <?
+    foreach ($cdata as $cset) {
+        $cid = $cset['id'];
+        if ($cset['lectionary'] = $lset['lectionary']) { ?>
+            <div class="formblock fullwidth">
+            <label for="collect-<?=$cid?>"><?=$cset['class']?></label>
+            <a href="#" class="delete-collect" data-id="<?=$cid?>">Delete</a>
+            <br>
+            <textarea name="collect-<?=$cid?>"><?=$cset['collect']?></textarea>
+            </div> <?
+        }
+    } ?>
+    <a href="#" class="add-collect"
+        data-lectionary="<?=$lset['lectionary']?>">New Collect</a>
     </div>
-    <div id="hiddentemplate" data-identifier="<?=$i?>">
+    <? } else { ?>
+    <h3><a href="#"><?=strtoupper($lset['lectionary'])?></a></h3>
+    <div class="propersbox">
+    <input type="hidden" name="lessons-<?=$i?>" value="<?=$id?>">
+    <div class="formblock"><label for="l1-<?=$id?>">Lesson 1</label><br>
+    <input type="text" value="<?=$lset['lesson1']?>" name="l1-<?=$id?>"></div>
+    <div class="formblock"><label for="l2-<?=$id?>">Lesson 2</label><br>
+    <input type="text" value="<?=$lset['lesson2']?>" name="l2-<?=$id?>"></div>
+    <div class="formblock"><label for="go-<?=$id?>">Gospel</label><br>
+    <input type="text" value="<?=$lset['gospel']?>" name="go-<?=$id?>"></div>
+    <div class="formblock"><label for="ps-<?=$id?>">Psalm</label><br>
+    <input type="text" value="<?=$lset['psalm']?>" name="ps-<?=$id?>"></div>
+    <div class="formblock"><label for="habc-<?=$id?>">General Hymn</label><br>
+    <input type="text" value="<?=$lset['hymnabc']?>" name="habc-<?=$id?>"></div>
+    <div class="formblock"><label for="hymn-<?=$id?>">Series Hymn</label><br>
+    <input type="text" value="<?=$lset['hymn']?>" name="hymn-<?=$id?>"></div>
+    </div>
+    <div class="propersbox"> <?
+    foreach ($cdata as $cset) {
+        $cid = $cset['id'];
+        if ($cset['lectionary'] = $lset['lectionary']) { ?>
+            <div class="formblock fullwidth">
+            <label for="collect-<?=$cid?>"><?=$cset['class']?>
+            <a href="#" class="delete-collect" data-id="<?=$cid?>">Delete</a>
+            <br>
+            <textarea name="collect-<?=$cid?>"><?=$cset['collect']?></textarea>
+            </div> <?
+        }
+    }?>
+    <a href="#" class="add-collect"
+        data-lectionary="<?=$lset['lectionary']?>">New Collect</a>
+    </div> <?
+    }}
+    $i++;
+    } $i++; ?>
+    </div>
+    <div class="hiddentemplate" id="propers-template" data-identifier="<?=$i?>">
     <h3><a href="#">New Propers</a></h3>
     <div class="propersbox">
-    <input type="hidden" name="lessons-{{id}}" value="new{{id}}">
-    <label for="la-new{{id}}">Label</label>
-    <input type="text" value="" name="la-new{{id}}">
-    <div class="formblock"><label for="ot-new{{id}}">Old Testament</label><br>
-    <input type="text" value="" name="ot-new{{id}}"></div>
-    <div class="formblock"><label for="ep-new{{id}}">Epistle</label><br>
-    <input type="text" value="" name="ep-new{{id}}"></div>
-    <div class="formblock"><label for="go-new{{id}}">Gospel</label><br>
-    <input type="text" value="" name="go-new{{id}}"></div>
-    <div class="formblock"><label for="ps-new{{id}}">Psalm</label><br>
-    <input type="text" value="" name="ps-new{{id}}"></div>
-    <div class="formblock fullwidth"><label for="in-new{{id}}">Introit</label><br>
-    <textarea name="in-new{{id}}"></textarea></div>
-    <div class="formblock fullwidth"><label for="co-new{{id}}">Collect</label><br>
-    <textarea name="co-new{{id}}"></textarea></div>
+    <input type="hidden" name="lessons-<?=$i?>" value="{{id}}">
+    <div class="formblock"><label for="lectionary-{{id}}">Lectionary</label><br>
+    <input type="text" value="" name="lectionary-{{id}}"></div>
+    <div class="formblock"><label for="l1-{{id}}">Lesson 1</label><br>
+    <input type="text" value="" name="l1-{{id}}"></div>
+    <div class="formblock"><label for="l2-{{id}}">Lesson 2</label><br>
+    <input type="text" value="" name="l2-{{id}}"></div>
+    <div class="formblock"><label for="go-{{id}}">Gospel</label><br>
+    <input type="text" value="" name="go-{{id}}"></div>
+    <div class="formblock"><label for="ps-{{id}}">Psalm</label><br>
+    <input type="text" value="" name="ps-{{id}}"></div>
+    <div class="formblock"><label for="habc-{{id}}">General Hymn</label><br>
+    <input type="text" value="" name="habc-{{id}}"></div>
+    <div class="formblock"><label for="hymn-{{id}}">Series Hymn</label><br>
+    <input type="text" value="" name="hymn-{{id}}"></div>
+    </div>
+    <div class="propersbox">
+    <a href="#" class="add-collect" id="addcollect-{{id}}"
+        data-lectionary="">New Collect</a>
     </div>
     </div>
     <button type="submit" id="submit">Submit</button>
@@ -512,7 +572,9 @@ if ($_GET['propers']) {
             $("#hiddentemplate").attr("data-identifier", identifier+1);
             template = template.replace("{{id}}", identifier);
             $("#accordion").append(template);
+            // TODO: handle update of add-collect link's data-lectionary
         });
+        // TODO: handle addition and deletion of collects and propers sets
     </script>
 <?
     echo json_encode(array(true, ob_get_clean()));

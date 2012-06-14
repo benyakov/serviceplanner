@@ -115,6 +115,8 @@ $q = $dbh->prepare("CREATE TABLE `{$dbp}churchyear_lessons` (
     `s2gospel`  varchar(64),
     `s3lesson`  varchar(64),
     `s3gospel`  varchar(64),
+    `hymnabc`   varchar(20),
+    `hymn`      varchar(20),
     `id`        integer,
     PRIMARY KEY (`id`) auto_increment
     FOREIGN KEY (`dayname`) REFERENCES `{$dbp}churchyear` (`dayname`),
