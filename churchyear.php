@@ -366,6 +366,50 @@ if ($_GET['synonyms']) {
     exit(0);
 }
 
+/* churchyear.php?collect=get&id=[id]
+ * Return the collect text for the given collect id
+ */
+if ($_GET['collect'] == "get") {
+    $q = $dbh->query("SELECT collect FROM `{$dbp}churchyear_collects`
+        WHERE id = ?");
+    $q->execute(array($_GET['id']));
+    return json_encode($q->fetchColumn(0));
+}
+
+/* churchyear.php?collect=form&lectionary=[lect]&dayname=[name]
+ * Return a form for the new collect dialog.
+ */
+if ($_GET['collect'] == "form") {
+    if (! $auth) {
+        echo "Access denied.  Please log in.";
+        exit(0);
+    }
+    $q = $dbh->query("SELECT c.class, i.dayname, i.lectionary, i.id
+        FROM `{$dbp}churchyear_collects` AS c
+        JOIN `{$dbp}churchyear_collect_index` AS i ON (c.id == i.id)
+        WHERE i.dayname != ? AND i.lectionary != ?");
+    $q->execute(array($_GET['dayname'], $_GET['lectionary']));
+    ?>
+    <form action="churchyear.php" method="post">
+        <h3>Collect used by "<?=$_GET['lectionary']?>" for
+        "<?=$_GET['dayname']?>"</h3>
+        <input type="hidden" name="lectionary" value="<?=$_GET['lectionary']?>">
+        <input type="hidden" name="dayname" value="<?=$_GET['dayname']?>">
+        <select name="existing-collect" id="collect-dropdown">
+        <option value="new">New</option>
+        <? while ($row = $q->fetch(PDO::FETCH_ASSOC)) {
+            echo "<option value=\"{$row['id']}\">".
+                "{$row['dayname']} in {$row['lectionary']} ({$row['class']})".
+                "</option>";
+        } ?>
+        </select>
+        <textarea name="collect-text" id="collect-text">
+        </textarea>
+        <button type="submit" name="submit">Submit</button>
+    </form>
+    <?
+}
+
 /* churchyear.php with $_POST data from propers form
  * Update propers for the dayname.
  */
@@ -582,9 +626,9 @@ if ($_GET['propers']) {
     <script type="text/javascript">
         $("#accordion").accordion();
         $("#addpropers").click(function() {
-            var template = $("#hiddentemplate").html();
-            var identifier = $("#hiddentemplate").attr("data-identifier");
-            $("#hiddentemplate").attr("data-identifier", identifier+1);
+            var template = $("#propers-template").html();
+            var identifier = $("#propers-template").attr("data-identifier");
+            $("#propers-template").attr("data-identifier", identifier+1);
             template = template.replace("{{id}}", identifier);
             $('#lectionary-'+identifier).update(function() {
                 $('#addcollect-'+identifier)
@@ -615,8 +659,30 @@ if ($_GET['propers']) {
             }
         });
         $("#add-collect").click(function() {
-            // TODO: Display new dialog with empty collect form
-            return;
+            $.get("churchyear.php", {
+                collect: form,
+                lectionary: $(this).attr("data-lectionary"),
+                dayname: $("#propers").val()},
+                function(rv) {
+                    if (! ($("#dialog2"))) {
+                        $("#dialog").after('<div id="dialog2"></div>');
+                    }
+                    $("#dialog2").html(rv);
+                    $("#dialog2").dialog({modal: true,
+                        position: "center",
+                        title: "New Collect",
+                        width: $(window).width()*0.6,
+                        maxHeight: $(window).height()*0.7,
+                        create: function() {
+                            setupCollectDialog();
+                        },
+                        open: function() {
+                            setupCollectDialog();
+                        },
+                        close: function() {
+                            $("#dialog2").html("");
+                        }});
+            });
         });
         $("#delete-collect").click(function(){
             // TODO: Display new dialog showing collect and which lectionaries
@@ -777,10 +843,10 @@ if (! $auth) {
                             width: $(window).width()*0.7,
                             maxHeight: $(window).height()*0.7,
                             create: function() {
-                                setupDialog();
+                                setupEditDialog();
                             },
                             open: function() {
-                                setupDialog();
+                                setupEditDialog();
                             }});
                     });
         });
@@ -805,7 +871,13 @@ if (! $auth) {
         });
     }
 
-    function setupDialog() {
+    function setupCollectDialog() {
+        // TODO: Set up action on submit.
+        // TODO: Set up action on select.
+        return;
+    }
+
+    function setupEditDialog() {
         function getDecadeDates() {
             // Return a 10-year span of matching dates.
             var decade = new Array();
