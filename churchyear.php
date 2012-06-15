@@ -390,7 +390,7 @@ if ($_GET['collect'] == "form") {
         WHERE i.dayname != ? AND i.lectionary != ?");
     $q->execute(array($_GET['dayname'], $_GET['lectionary']));
     ?>
-    <form action="churchyear.php" method="post">
+    <form action="churchyear.php" id="collect-form" method="post">
         <h3>Collect used by "<?=$_GET['lectionary']?>" for
         "<?=$_GET['dayname']?>"</h3>
         <input type="hidden" name="lectionary" value="<?=$_GET['lectionary']?>">
@@ -405,7 +405,7 @@ if ($_GET['collect'] == "form") {
         </select>
         <textarea name="collect-text" id="collect-text">
         </textarea>
-        <button type="submit" name="submit">Submit</button>
+        <button type="submit">Submit</button>
     </form>
     <?
 }
@@ -504,7 +504,7 @@ if ($_GET['propers']) {
     <textarea name="note"><?=$pdata[0]['note']?></textarea><br></div>
     <div class="formblock fullwidth"><label for="introit">Introit</label><br>
     <textarea name="introit"><?=$pdata[0]['introit']?></textarea></div>
-    <div id="lessons-accordion">
+    <div id="accordion">
     <? $i = 1;
     foreach ($pdata as $lset) {
         $id = $lset['id'];
@@ -576,7 +576,7 @@ if ($_GET['propers']) {
         $cid = $cset['id'];
         if ($cset['lectionary'] = $lset['lectionary']) { ?>
             <div class="formblock fullwidth">
-            <label for="collect-<?=$cid?>"><?=$cset['class']?>
+            <label for="collect-<?=$cid?>"><?=$cset['class']?></label>
             <a href="#" class="delete-collect" data-id="<?=$cid?>">Delete</a>
             <br>
             <textarea name="collect-<?=$cid?>"><?=$cset['collect']?></textarea>
@@ -614,7 +614,7 @@ if ($_GET['propers']) {
     <input type="text" value="" name="hymn-{{id}}"></div>
     </div>
     <div class="propersbox">
-    <a href="#" class="add-collect" id="addcollect-{{id}}"
+    <a href="#" class="add-collect"
         data-lectionary="">New Collect</a>
     </div>
     </div>
@@ -658,9 +658,9 @@ if ($_GET['propers']) {
                     });
             }
         });
-        $("#add-collect").click(function() {
+        $(".add-collect").click(function() {
             $.get("churchyear.php", {
-                collect: form,
+                collect: 'form',
                 lectionary: $(this).attr("data-lectionary"),
                 dayname: $("#propers").val()},
                 function(rv) {
@@ -674,10 +674,10 @@ if ($_GET['propers']) {
                         width: $(window).width()*0.6,
                         maxHeight: $(window).height()*0.7,
                         create: function() {
-                            setupCollectDialog();
+                            setupCollectDialog(this);
                         },
                         open: function() {
-                            setupCollectDialog();
+                            setupCollectDialog(this);
                         },
                         close: function() {
                             $("#dialog2").html("");
@@ -871,10 +871,30 @@ if (! $auth) {
         });
     }
 
-    function setupCollectDialog() {
-        // TODO: Set up action on submit.
-        // TODO: Set up action on select.
-        return;
+    function setupCollectDialog(addlink) {
+        $("#collect-form").submit(function() {
+            // TODO: Set up submit on server side
+            $.post("churchyear.php", $(this).serialize(), function(rv) {
+                if (rv[0]) {
+                    $("#dialog2").dialog("close");
+                    var cid = rv[1]["cid"];
+                    var html = Array('<div class="formblock fullwidth">',
+                     '<label for="collect-'+cid+'">'+rv[1]["class"]+'</label> ',
+                     '<a href="#" class="delete-collect" data-id="'+cid+'">Delete</a><br>',
+                     '<textarea name="collect-'+cid+'">'+rv[1]["collect"]+'</textarea></div>')
+                     .join("\n");
+                    $("#addlink2").before(html);
+                }
+            });
+        });
+        $("#collect-dropdown").change(function() {
+            var choice = $(this).val();
+            if (choice != "new") {
+                $.get("churchyear.php", { collect: "get", id: choice },
+                    function(rv) {
+                        $("#collect-text").val(rv);
+                });
+        });
     }
 
     function setupEditDialog() {
