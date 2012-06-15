@@ -79,8 +79,8 @@
     <h3 class="propers-<?=$id?>">
         <a href="#"><?=strtoupper($lset['lectionary'])?></a></h3>
     <div class="propers-<?=$id?>">
-    <a href="#" class="delete-these-propers" data-id="<?=$id?>"
-        data-lect="<?=$lset['lectionary']?>">Delete these propers</a>
+    <a href="#" class="delete-these-propers"
+        data-id="<?=$id?>">Delete these propers</a>
     <div class="propersbox">
     <input type="hidden" name="lessons-<?=$i?>" value="<?=$id?>">
     <div class="formblock"><label for="l1-<?=$id?>">Lesson 1</label><br>
@@ -120,8 +120,8 @@
     <h3 class="propers-<?=$id?>">
         <a href="#"><?=strtoupper($lset['lectionary'])?></a></h3>
     <div class="propers-<?=$id?>">
-    <a href="#" class="delete-these-propers" data-id="<?=$id?>"
-        data-lect="<?=$lset['lectionary']?>">Delete these propers</a>
+    <a href="#" class="delete-these-propers"
+        data-id="<?=$id?>">Delete these propers</a>
     <div class="propersbox">
     <input type="hidden" name="lessons-<?=$i?>" value="<?=$id?>">
     <div class="formblock"><label for="l1-<?=$id?>">Lesson 1</label><br>
@@ -209,12 +209,11 @@
             });
         });
         $(".delete-these-propers").click(function() {
-            if (confirm("Delete propers? (Listed collects will still exist.)")) {
+            if (confirm("Delete propers?"+
+               " (Listed collects will still exist.)")) {
                 var id = $(this).attr("data-id");
-                // TODO: implement this deletion code on the server side
                 $.get("churchyear.php", {
-                    delpropers: $("#propers").val(),
-                    lectionary: $(this).attr("data-lect")},
+                    delpropers: id,
                     function(rv) {
                         if (rv[0]) {
                             $(".propers-"+id).remove();
@@ -222,7 +221,7 @@
                             setMessage(rv[1]);
                         }
                     });
-            }
+                }
         });
         $(".add-collect").click(function() {
             $.get("churchyear.php", {

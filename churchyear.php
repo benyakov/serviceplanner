@@ -330,6 +330,23 @@ if ($_GET['propers']) {
     require("./churchyear/get_propersform.php");
 }
 
+/* churchyear.php?delpropers=id
+ * Delete the lessons with the given id
+ */
+if ($_GET['delpropers']) {
+    if (! $auth) {
+        echo json_encode(array(false, "Access denied. Please log in"));
+        exit(0);
+    }
+    $q = $dbh->prepare("DELETE FROM `{$dbh}churchyear_lessons` WHERE id = ?");
+    if ($q->execute(array($_GET['delpropers']))) {
+        echo json_encode(array(true));
+    } else {
+        echo json_encode(array(false, array_pop($q->errorInfo())));
+    }
+    exit(0);
+}
+
 if (! $auth) {
     setMessage("Access denied.  Please log in.");
     header("location: index.php");
