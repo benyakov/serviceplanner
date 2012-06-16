@@ -314,6 +314,18 @@ if ($_GET['requestform'] == "collect") {
     <?
 }
 
+/* churchyear.php?requestform=delete-collect&cid=id
+ * Supply a form for confirming the deletion of collect with given id
+ */
+if ($_POST['requestform'] = "delete-collect") {
+    if (! $auth) {
+        echo "Access denied.  Please log in.";
+        exit(0);
+    }
+    // Show collect, lectionaries using it, and daynames when used
+
+}
+
 /* churchyear.php with $_POST data from propers form
  * Update propers for the dayname.
  */
