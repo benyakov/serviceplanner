@@ -190,71 +190,7 @@
     <button id="addpropers">Add Propers</button>
     </form>
     <script type="text/javascript">
-        $("#accordion").accordion();
-        $("#addpropers").click(function() {
-            var template = $("#propers-template").html();
-            var identifier = $("#propers-template").attr("data-identifier");
-            $("#propers-template").attr("data-identifier", identifier+1);
-            template = template.replace("{{id}}", identifier);
-            $('#lectionary-'+identifier).update(function() {
-                $('#addcollect-'+identifier)
-                    .attr("data-lectionary", $(this).val());
-            });
-            $("#accordion").append(template);
-            $("a.abort-new-propers").click(function() {
-                if (confirm("Remove new propers?  (Changes will be lost!)")) {
-                    var id=$(this).attr("data-id");
-                    $(".new-propers-"+id).remove();
-                }
-            });
-        });
-        $(".delete-these-propers").click(function() {
-            if (confirm("Delete propers?"+
-               " (Listed collects will still exist.)")) {
-                var id = $(this).attr("data-id");
-                $.get("churchyear.php", {
-                    delpropers: id,
-                    function(rv) {
-                        if (rv[0]) {
-                            $(".propers-"+id).remove();
-                        } else {
-                            setMessage(rv[1]);
-                        }
-                    });
-                }
-        });
-        $(".add-collect").click(function() {
-            $.get("churchyear.php", {
-                collect: 'form',
-                lectionary: $(this).attr("data-lectionary"),
-                dayname: $("#propers").val()},
-                function(rv) {
-                    if (! ($("#dialog2"))) {
-                        $("#dialog").after('<div id="dialog2"></div>');
-                    }
-                    $("#dialog2").html(rv);
-                    $("#dialog2").dialog({modal: true,
-                        position: "center",
-                        title: "New Collect",
-                        width: $(window).width()*0.6,
-                        maxHeight: $(window).height()*0.7,
-                        create: function() {
-                            setupCollectDialog(this);
-                        },
-                        open: function() {
-                            setupCollectDialog(this);
-                        },
-                        close: function() {
-                            $("#dialog2").html("");
-                        }});
-            });
-        });
-        $("#delete-collect").click(function(){
-            // TODO: Display new dialog showing collect and which lectionaries
-            // use it when to confirm deletion.
-            return;
-        });
-        // TODO: handle deletion of propers sets
+        setupPropersDialog();
     </script>
 <?
     echo json_encode(array(true, ob_get_clean()));

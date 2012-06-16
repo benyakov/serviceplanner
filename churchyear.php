@@ -52,7 +52,7 @@ if (! $result->fetchAll(PDO::FETCH_NUM)) {
  * Drops all the churchyear functions and sets a message about
  * creating them again.
  */
-if ($_GET['dropfunctions'] == 1) {
+if ($_GET['request'] == 'dropfunctions') {
     $dbh->exec("DROP FUNCTION `{$dbp}easter_in_year`;
     DROP FUNCTION IF EXISTS `{$dbp}christmas1_in_year`;
     DROP FUNCTION IF EXISTS `{$dbp}michaelmas1_in_year`;
@@ -73,7 +73,7 @@ if ($_GET['dropfunctions'] == 1) {
  * Purge the churchyear tables and set a message about populating
  * them again.
  */
-if ($_GET['purgetables'] == 1) {
+if ($_GET['request'] == 'purgetables') {
     $dbh->exec("DELETE FROM `{$dbp}churchyear_collects_index`");
     $dbh->exec("DELETE FROM `{$dbp}churchyear_collects`");
     $dbh->exec("DELETE FROM `{$dbp}churchyear_synonyms`");
@@ -100,7 +100,7 @@ if ($_GET['daysfordate']) {
 /* churchyear.php?params=dayname
  * Returns the db parameters for dayname in the church year as json.
  */
-if ($_GET['params']) {
+if ($_GET['request'] == "params") {
     if (! $auth) {
         echo json_encode("Access denied.  Please log in.");
         exit(0);
@@ -125,10 +125,10 @@ if ($_GET['params']) {
     exit(0);
 }
 
-/* churchyear.php?dayname=dayname
+/* churchyear.php?requestform=dayname
  * Returns a form for modifying the db parameters of dayname.
  */
-if ($_GET['dayname']) {
+if ($_GET['requestform'] == 'dayname') {
     require("./churchyear/get_dayform.php");
 }
 
@@ -218,14 +218,14 @@ if ($_POST['synonyms']) {
 /* churchyear.php?synonyms=dayname
  * Get synonyms for dayname.
  */
-if ($_GET['synonyms']) {
+if ($_GET['request'] == "synonyms") {
     if (! $auth) {
         echo json_encode(array(false));
         exit(0);
     }
     $q = $dbh->prepare("SELECT `synonym` FROM `{$dbp}churchyear_synonyms`
         WHERE `canonical` = ?");
-    if ($q->execute(array($_GET['synonyms']))) {
+    if ($q->execute(array($_GET['name']))) {
         $rv = array();
         while ($aval = $q->fetch(PDO::FETCH_NUM)) {
             array_push($rv, $aval[0]);
@@ -239,17 +239,51 @@ if ($_GET['synonyms']) {
 /* churchyear.php?collect=get&id=[id]
  * Return the collect text for the given collect id
  */
-if ($_GET['collect'] == "get") {
+if ($_GET['request'] == "collect") {
     $q = $dbh->query("SELECT collect FROM `{$dbp}churchyear_collects`
         WHERE id = ?");
     $q->execute(array($_GET['id']));
     return json_encode($q->fetchColumn(0));
 }
 
-/* churchyear.php?collect=form&lectionary=[lect]&dayname=[name]
+/* churchyear.php with _POST from the collect form below
+ * Process the collect form (below) & create/update the collect.
+ */
+if ($_POST['existing-collect']) {
+    if (! $auth) {
+        echo json_encode(array(false, "Access denied. Please log in first."));
+        exit(0);
+    }
+    if ($_POST['existing-collect'] == "new") {
+        $q = $dbh->prepare("INSERT INTO `{$dbp}churchyear_collects`
+            (class, collect) VALUES (?, ?)");
+        if (!$q->execute()) {
+            echo json_encode(false, array_pop($q->errorInfo()));
+            $dbh->rollback();
+            exit(0);
+        }
+        $qid = $dbh->query("SELECT LAST_INSERT_ID()");
+        $qid = $qid->fetchColumn(0);
+        $q = $dbh->prepare("INSERT INTO `{$dbp}churchyear_collect_index`
+            (`dayname`, `lectionary`, `id`)
+            VALUES (?, ?, ?)");
+        if (! $q->execute(array($_POST['dayname'], $_POST['lectionary'], $qid))){
+            echo json_encode(false, array_pop($q->errorInfo()));
+            $dbh->rollback();
+            exit(0);
+        }
+        $dbh->commit();
+        echo json_encode(true);
+        exit(0);
+    }
+    echo json_encode(array(true, array("class"=>"", "cid"=>"", "collect"=>"")));
+    exit(0);
+}
+
+/* churchyear.php?requestform=collect&lectionary=[lect]&dayname=[name]
  * Return a form for the new collect dialog.
  */
-if ($_GET['collect'] == "form") {
+if ($_GET['requestform'] == "collect") {
     if (! $auth) {
         echo "Access denied.  Please log in.";
         exit(0);

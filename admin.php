@@ -50,11 +50,11 @@ if (! $auth) {
             saveCorsfile();
             evt.preventDefault();
         });
-        $("#drop-churchyear").click(function(evt) {
+        $("#purge-churchyear").click(function(evt) {
             evt.preventDefault();
             if (confirm("This will lose any changes to"+
                 " the days in the church year table.")) {
-                window.location.assign("churchyear.php?purgetables=1");
+                window.location.assign("churchyear.php?request=purgetables");
             }
         });
     });
@@ -180,9 +180,9 @@ $(document).ready(function(){var a="http://www.bethanythedalles.org/services-dev
     <button type="submit" id="submit">Import Titles</button>
     </form></li>
     <li>Restore church year to default:
-    <a href="" id="drop-churchyear"
-        title="Drop Church Year Tables">Days in Church Year</a> or
-    <a href="churchyear.php?dropfunctions=1"
+    <a href="" id="purge-churchyear"
+        title="Purge Church Year Tables">Days in Church Year</a> or
+    <a href="churchyear.php?request=dropfunctions"
         title="Drop Church Year Functions">Church Year Functions</a></li>
     <li>You are using Services version <?
         echo "{$version['major']}.{$version['minor']}.{$version['tick']}";

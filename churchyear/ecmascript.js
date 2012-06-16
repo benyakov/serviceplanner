@@ -26,7 +26,8 @@
 $(document).ready(function() {
     setupEdit();
     setupDelete();
-    $.get("churchyear.php", { params: "Michaelmas" },
+    $.get("churchyear.php", { request: "params",
+        params: "Michaelmas" },
         function(params) {
             sessionStorage.michaelmasObserved = params['observed_sunday'];
         });
@@ -34,7 +35,8 @@ $(document).ready(function() {
         evt.preventDefault();
         var loc = $(this).offset();
         var orig = $(this).attr("data-day");
-        $.get("churchyear.php", {synonyms: orig},
+        $.get("churchyear.php", {request: "synonyms",
+            name: orig},
             function(rv) {
                 rv = eval(rv);
                 if (rv[0]) {
@@ -150,7 +152,7 @@ function setupEdit() {
         evt.preventDefault();
         var dtitle = $(this).attr("data-day");
         $("#dialog")
-            .load(encodeURI("churchyear.php?dayname="
+            .load(encodeURI("churchyear.php?requestform=dayname&dayname="
                 +$(this).attr("data-day")), function() {
                     $("#dialog").dialog({modal: true,
                         position: "center",
@@ -188,7 +190,6 @@ function setupDelete() {
 
 function setupCollectDialog(addlink) {
     $("#collect-form").submit(function() {
-        // TODO: Set up submit on server side
         $.post("churchyear.php", $(this).serialize(), function(rv) {
             if (rv[0]) {
                 $("#dialog2").dialog("close");
@@ -205,7 +206,7 @@ function setupCollectDialog(addlink) {
     $("#collect-dropdown").change(function() {
         var choice = $(this).val();
         if (choice != "new") {
-            $.get("churchyear.php", { collect: "get", id: choice },
+            $.get("churchyear.php", { request: "collect", id: choice },
                 function(rv) {
                     $("#collect-text").val(rv);
             });
@@ -235,4 +236,93 @@ function setupEditDialog() {
            sessionStorage.michaelmasObserved = $("#observed-sunday").val();
         }
      });
+}
+
+function setupPropersDialog() {
+    $("#accordion").accordion();
+    $("#addpropers").click(function() {
+        var template = $("#propers-template").html();
+        var identifier = $("#propers-template").attr("data-identifier");
+        $("#propers-template").attr("data-identifier", identifier+1);
+        template = template.replace("{{id}}", identifier);
+        $('#lectionary-'+identifier).update(function() {
+            $('#addcollect-'+identifier)
+                .attr("data-lectionary", $(this).val());
+        });
+        $("#accordion").append(template);
+        $("a.abort-new-propers").click(function() {
+            if (confirm("Remove new propers?  (Changes will be lost!)")) {
+                var id=$(this).attr("data-id");
+                $(".new-propers-"+id).remove();
+            }
+        });
+    });
+    $(".delete-these-propers").click(function() {
+        if (confirm("Delete propers?"+
+           " (Listed collects will still exist.)")) {
+            var id = $(this).attr("data-id");
+            $.get("churchyear.php", {
+                delpropers: id,
+                function(rv) {
+                    if (rv[0]) {
+                        $(".propers-"+id).remove();
+                    } else {
+                        setMessage(rv[1]);
+                    }
+                });
+            }
+    });
+    $(".add-collect").click(function() {
+        $.get("churchyear.php", {
+            requestform: 'collect',
+            lectionary: $(this).attr("data-lectionary"),
+            dayname: $("#propers").val()},
+            function(rv) {
+                if (! ($("#dialog2"))) {
+                    $("#dialog").after('<div id="dialog2"></div>');
+                }
+                $("#dialog2").html(rv);
+                $("#dialog2").dialog({modal: true,
+                    position: "center",
+                    title: "New Collect",
+                    width: $(window).width()*0.65,
+                    maxHeight: $(window).height()*0.7,
+                    create: function() {
+                        setupCollectDialog(this);
+                    },
+                    open: function() {
+                        setupCollectDialog(this);
+                    },
+                    close: function() {
+                        $("#dialog2").html("");
+                    }});
+        });
+    });
+    $("#delete-collect").click(function(){
+        // TODO: handle this on the server side
+        // Display new dialog showing collect and which lectionaries
+        // use it when to confirm deletion.
+        $.get("churchyear.php", { requestform: "delete-collect",
+            cid: $(this).attr("data-id") }, function(rv) {
+                if (! ($("#dialog2"))) {
+                    $("#dialog").after('<div id="dialog2"></div>');
+                }
+                $("#dialog2").html(rv);
+                $("#dialog2").dialog({modal: true,
+                    position: "center",
+                    title: "Confirm Delete Collect?",
+                    width: $(window).width()*0.65,
+                    maxHeight: $(window).height()*0.7,
+                    create: function() {
+                        // TODO: Write setupCollectDeleteDialog in ecmascript
+                        setupCollectDeleteDialog(this);
+                    },
+                    open: function() {
+                        setupCollectDeleteDialog(this);
+                    },
+                    close: function() {
+                        $("#dialog2").html("");
+                    }});
+        });
+    });
 }
