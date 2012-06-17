@@ -323,6 +323,31 @@ if ($_POST['requestform'] = "delete-collect") {
         exit(0);
     }
     // Show collect, lectionaries using it, and daynames when used
+    $q = $dbh->prepare("SELECT
+        c.collect, c.class, i.lectionary, i.dayname, i.id
+        FROM `{$dbp}churchyear_collect_index` AS i
+        JOIN `{$dbp}churchyear_collect` AS c ON (c.id = i.id)
+        WHERE i.id = ?");
+    if (! $q->execute(array($_POST['cid']))) {
+        echo array_pop($q->errorInfo());
+    } else {
+        $row = $q->fetch(PDO::FETCH_ASSOC);
+?>
+    <h4><?=$row['class']?></h4>
+    <p><?=$row['collect']?></p>
+    <h4>Used:</h4>
+    <ul>
+    <li><?=$row['dayname']?> (<?=$row['lectionary']?>)</li>
+    <? while ($q->fetch(PDO::FETCH_ASSOC)) {?>
+    <li><?=$row['dayname']?> (<?=$row['lectionary']?>)</li>
+    <?}?>
+    </ul>
+    <form id="delete-collect-confirm" method="post"
+    action="churchyear.php?deletecollect=<?=$_POST['cid']?>">
+    <button type="submit" name="submit">Confirm Collect</button>
+    <button id="cancel-delete">Cancel Deletion</button>
+    </form>
+<?  }
 
 }
 

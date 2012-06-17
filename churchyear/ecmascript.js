@@ -210,6 +210,13 @@ function setupCollectDialog(addlink) {
                 function(rv) {
                     $("#collect-text").val(rv);
             });
+        });
+    }
+}
+
+function setupCollectDeleteDialog() {
+    $("#cancel-delete").click(function() {
+        $("#dialog2").dialog("close");
     });
 }
 
@@ -271,6 +278,7 @@ function setupPropersDialog() {
                     }
                 });
             }
+        }
     });
     $(".add-collect").click(function() {
         $.get("churchyear.php", {
@@ -299,9 +307,6 @@ function setupPropersDialog() {
         });
     });
     $("#delete-collect").click(function(){
-        // TODO: handle this on the server side
-        // Display new dialog showing collect and which lectionaries
-        // use it when to confirm deletion.
         $.get("churchyear.php", { requestform: "delete-collect",
             cid: $(this).attr("data-id") }, function(rv) {
                 if (! ($("#dialog2"))) {
@@ -314,11 +319,10 @@ function setupPropersDialog() {
                     width: $(window).width()*0.65,
                     maxHeight: $(window).height()*0.7,
                     create: function() {
-                        // TODO: Write setupCollectDeleteDialog in ecmascript
-                        setupCollectDeleteDialog(this);
+                        setupCollectDeleteDialog();
                     },
                     open: function() {
-                        setupCollectDeleteDialog(this);
+                        setupCollectDeleteDialog();
                     },
                     close: function() {
                         $("#dialog2").html("");
