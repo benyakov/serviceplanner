@@ -57,8 +57,8 @@ $queries[] = implode("\n", $query);
 // Execute each SQL query.
 $dbh->beginTransaction();
 foreach ($queries as $query) {
-    $result = $dbh->exec($query);
-    if ($result === false) {
+    $q = $dbh->prepare($query);
+    if (! $q->execute($query)) {
         $dbh->rollback();
         ?>
         <!DOCTYPE html>
@@ -66,6 +66,8 @@ foreach ($queries as $query) {
         <body><h1>Setup Failed</h1>
         <p>Failed SQL Query:</p>
         <pre><?=$query?></pre>
+        <h2>Description of the problem:</h2>
+        <?print_r($q->errorInfo());?>
         </body></html>
         <?
         exit(1);
