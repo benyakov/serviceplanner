@@ -42,7 +42,8 @@ CREATE TABLE `hymns` (
   `sequence` tinyint(3) unsigned default NULL,
   KEY `pkey` (`pkey`),
   KEY `service` (`service`),
-  CONSTRAINT `hymns_ibfk_1` FOREIGN KEY (`service`) REFERENCES `days` (`pkey`) ON DELETE CASCADE
+  CONSTRAINT `hymns_ibfk_1` FOREIGN KEY (`service`) REFERENCES `days` (`pkey`)
+    ON DELETE CASCADE
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
 CREATE TABLE `names` (
   `book` varchar(5) default NULL,
@@ -58,7 +59,7 @@ CREATE TABLE `sermons` (
   `mstype` varchar(50) default NULL,
   `service` int(10) unsigned default NULL,
   UNIQUE KEY `service` (`service`),
-  CONSTRAINT `sermons_ibfk_1` FOREIGN KEY (`service`) REFERENCES `days` (`pkey`) ON DELETE CASCADE
+  CONSTRAINT `sermons_ibfk_1` FOREIGN KEY (`service`) REFERENCES `days` (`pkey`)    ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 CREATE TABLE `users` (
   `uid` smallint NOT NULL auto_increment,
@@ -100,8 +101,8 @@ CREATE TABLE `churchyear_propers` (
     `introit`   text,
     `note`      text,
     FOREIGN KEY (`dayname`) REFERENCES `churchyear` (`dayname`)
-    ON DELETE CASCADE
-    ON UPDATE CASCADE
+        ON DELETE CASCADE
+        ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 CREATE TABLE `churchyear_lessons` (
     `dayname`   varchar(255),
@@ -117,22 +118,26 @@ CREATE TABLE `churchyear_lessons` (
     `hymnabc`   varchar(20),
     `hymn`      varchar(20),
     `id`        integer auto_increment,
-    PRIMARY KEY (`id`)
-    FOREIGN KEY (`dayname`) REFERENCES `churchyear` (`dayname`),
-    ON DELETE CASCADE
-    ON UPDATE CASCADE
+    PRIMARY KEY (`id`),
+    FOREIGN KEY (`dayname`) REFERENCES `churchyear` (`dayname`)
+        ON DELETE CASCADE
+        ON UPDATE CASCADE
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
+CREATE TABLE `churchyear_collects` (
+    `id`     integer auto_increment,
+    `class`  varchar(64),
+    `collect` text,
     PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 CREATE TABLE `churchyear_collect_index` (
     `dayname`       varchar(255),
     `lectionary`    varchar(56),
     `id`            integer,
-    FOREIGN KEY (`id`) REFERENCES `churchyear_collects` (`id`),
-    ON DELETE CASCADE
-    ON UPDATE CASCADE
-    FOREIGN KEY (`dayname`) REFERENCES `churchyear` (`dayname`),
-    ON UPDATE CASCADE
+    FOREIGN KEY (`id`) REFERENCES `churchyear_collects` (`id`)
+        ON DELETE CASCADE
+        ON UPDATE CASCADE,
+    FOREIGN KEY (`dayname`) REFERENCES `churchyear` (`dayname`)
+        ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 CREATE TABLE `blocks` (
   `blockstart` date,

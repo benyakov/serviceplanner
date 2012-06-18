@@ -53,8 +53,9 @@ foreach ($dumplines as $line)
                     '/(REFERENCES `)([^`]+)/',
                     '/(CONSTRAINT `)([^`]+)/'
                 ), "\\1${dbp}\\2", $line);
-    if (strpos('CREATE TABLE', $line) > -1) {
-        $tables[] = preg-replace('/^(CREATE TABLE `)([^`]+).*$/', "{$dbp}\\2");
+    if (strpos($line, 'CREATE TABLE') > -1) {
+        $tables[] = preg_replace('/^(CREATE TABLE `)([^`]+).*$/', "{$dbp}\\2",
+            $line);
     }
 }
 $queries[] = implode("\n", $query);
