@@ -116,16 +116,12 @@ CREATE TABLE `churchyear_lessons` (
     `s3gospel`  varchar(64),
     `hymnabc`   varchar(20),
     `hymn`      varchar(20),
-    `id`        integer,
-    PRIMARY KEY (`id`) auto_increment
+    `id`        integer auto_increment,
+    PRIMARY KEY (`id`)
     FOREIGN KEY (`dayname`) REFERENCES `churchyear` (`dayname`),
     ON DELETE CASCADE
     ON UPDATE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-CREATE TABLE `churchyear_collects` (
-    `id`     integer auto_increment,
-    `class`  varchar(64),
-    `collect` text,
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
     PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 CREATE TABLE `churchyear_collect_index` (
@@ -151,5 +147,5 @@ CREATE TABLE `blocks` (
   `id` integer auto_increment,
   UNIQUE KEY `span` (`blockstart`, `blockend`),
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
 
