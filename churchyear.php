@@ -355,38 +355,57 @@ if ($_POST['requestform'] = "delete-collect") {
  * Update propers for the dayname.
  */
 if ($_POST['propers']) {
-    // TODO: update this for new form (yikes!)
     if (! $auth) {
         echo json_encode(array(false));
         exit(0);
     }
     $qi = $dbh->prepare("INSERT INTO `{$dbp}churchyear_propers`
-        (color, theme, note, dayname)
+        (color, theme, note, introit, dayname)
         VALUES (?, ?, ?, ?)");
     $qu = $dbh->prepare("UPDATE `{$dbp}churchyear_propers` SET
-        color=?, theme=?, note=? WHERE dayname=?");
+        color=?, theme=?, note=?, introit=? WHERE dayname=?");
     $valarray = array($_POST['color'], $_POST['theme'], $_POST['note'],
-        $_POST['propers']);
+        $_POST['propers'], $_POST['introit']);
     if (!($qi->execute($valarray) || $qu->execute($valarray))) {
         echo json_encode(array_pop($q->errorInfo()));
         exit(0);
     }
     $i=1;
-    $qi = $dbh->prepare("INSERT INTO `{$dbp}churchyear_lessons`
-        (oldtestament, epistle, gospel, psalm, introit, collect, label, dayname)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
-    $qu = $dbh->prepare("UPDATE `{$dbp}churchyear_lessons`
-        SET oldtestament=?, epistle=?, gospel=?, psalm=?, introit=?,
-        collect=?, label=?, dayname=? WHERE id=?");
+    $qhi = $dbh->prepare("INSERT INTO `{$dbp}churchyear_lessons`
+        (lesson1, lesson2, gospel, psalm, s2lesson, s2gospel,
+        s3lesson, s3gospel, lectionary, dayname)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+    $qhu = $dbh->prepare("UPDATE `{$dbp}churchyear_lessons`
+        SET lesson1=?, lesson2=?, gospel=?, psalm=?, s2lesson=?,
+        s2gospel=?, s3lesson=?, s3gospel=?,lectionary=?, dayname=? WHERE id=?");
+    $qii = $dbh->prepare("INSERT INTO `{$dbp}churchyear_lessons`
+        (lesson1, lesson2, gospel, psalm, hymnabc, hymn)
+        VALUES (?, ?, ?, ?, ? ,?)");
+    $qiu = $dbh->prepare("UPDATE `{$dbp}churchyear_lessons`
+        SET lesson1=?, lesson2=?, gospel=?, psalm=?, hymnabc=?, hymn=?
+        WHERE id=?");
     while (array_key_exists("lessons-{$i}", $_POST)) {
         $id = $_POST["lessons-{$i}"];
-        $values_insert = array($_POST["ot-{$id}"], $_POST["ep-{$id}"],
-            $_POST["go-{$id}"], $_POST["ps-{$id}"], $_POST["in-{$id}"],
-            $_POST["co-{$id}"], $_POST["la-{$id}"], $_POST['propers']);
-        $values_update = $values_insert;
-        array_push($values_update, $_POST["id-{$id}"]);
-        $valarray
-        if (! ($qi->execute($values_insert) || $qu->execute($values_update))) {
+        if ($_POST['lessontype'] == "ilcw") {
+            $query = array($_POST["l1-{$id}"], $_POST["l2-{$id}"],
+                $_POST["go-{$id}"], $_POST["ps-{$id}"],
+                $_POST["habc-{$id}"], $_POST["hymn-{$id}"], $_POST['propers']);
+            $qi = $qu = $query;
+            array_unshift($qi, $qii);
+            array_push($qu, $_POST["id-{$id}"]);
+            array_unshift($qu, $qiu);
+        } else {
+            $query = array($_POST["l1-{$id}"], $_POST["l2-{$id}"],
+                $_POST["go-{$id}"], $_POST["ps-{$id}"],
+                $_POST["s2l-{$id}"], $_POST["s2go-{$id}"],
+                $_POST["s3l-{$id}"], $_POST["s3go-{$id}"], $_POST['propers']);
+            $qi = $qu = $query;
+            array_unshift($qi, $qhi);
+            array_push($qu, $_POST["id-{$id}"]);
+            array_unshift($qu, $qhu);
+        }
+        if (! ($qi[-1]->execute(array_slice($qi, 1)) ||
+               $qu[-1]->execute(array_slice($qu, 1)))) {
             echo json_encode(array_pop($q->errorInfo()));
         }
         $i++;

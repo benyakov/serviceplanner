@@ -83,6 +83,7 @@
         data-id="<?=$id?>">Delete these propers</a>
     <div class="propersbox">
     <input type="hidden" name="lessons-<?=$i?>" value="<?=$id?>">
+    <input type="hidden" name="lessontype" value="historic">
     <div class="formblock"><label for="l1-<?=$id?>">Lesson 1</label><br>
     <input type="text" value="<?=$lset['lesson1']?>" name="l1-<?=$id?>"></div>
     <div class="formblock"><label for="l2-<?=$id?>">Lesson 2</label><br>
@@ -124,6 +125,7 @@
         data-id="<?=$id?>">Delete these propers</a>
     <div class="propersbox">
     <input type="hidden" name="lessons-<?=$i?>" value="<?=$id?>">
+    <input type="hidden" name="lessontype" value="ilcw">
     <div class="formblock"><label for="l1-<?=$id?>">Lesson 1</label><br>
     <input type="text" value="<?=$lset['lesson1']?>" name="l1-<?=$id?>"></div>
     <div class="formblock"><label for="l2-<?=$id?>">Lesson 2</label><br>
