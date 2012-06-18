@@ -58,7 +58,7 @@ $queries[] = implode("\n", $query);
 $dbh->beginTransaction();
 foreach ($queries as $query) {
     $q = $dbh->prepare($query);
-    if (! $q->execute($query)) {
+    if (! $q->execute()) {
         $dbh->rollback();
         ?>
         <!DOCTYPE html>
