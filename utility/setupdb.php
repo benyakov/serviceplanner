@@ -34,6 +34,7 @@ $dumpfile="createtables.sql";
 $dumplines = file($dumpfile, FILE_IGNORE_NEW_LINES);
 // Separate SQL statements into an array.
 $query = array();
+$tables = array();
 $queries = array();
 foreach ($dumplines as $line)
 {
@@ -52,8 +53,19 @@ foreach ($dumplines as $line)
                     '/(REFERENCES `)([^`]+)/',
                     '/(CONSTRAINT `)([^`]+)/'
                 ), "\\1${dbp}\\2", $line);
+    if (strpos('CREATE TABLE', $line) > -1) {
+        $tables[] = preg-replace('/^(CREATE TABLE `)([^`]+).*$/', "{$dbp}\\2");
+    }
 }
 $queries[] = implode("\n", $query);
+if ($_GET['drop'] = "first") {
+    $dropresults = array();
+    foreach ($tables as $table) {
+        $q = $dbh->prepare("DROP TABLE `{$table}`");
+        if ($q->execute()) $dropresults[] = "Table `{$table}` dropped.";
+        else $dropresults[] = array_pop($q->errorinfo());
+    }
+}
 // Execute each SQL query.
 $dbh->beginTransaction();
 foreach ($queries as $query) {
