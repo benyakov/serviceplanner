@@ -23,21 +23,26 @@
     The Dalles, OR 97058
     USA
  */
-$fh = fopen("./utility/historictable.csv", "r");
+$fh = fopen("./utility/churchyear/historictable.csv", "r");
 $headings = fgetcsv($fh);
 $q = $dbh->prepare("INSERT INTO {$dbp}churchyear
     (season, dayname, base, offset, month, day,
         observed_month, observed_sunday)
     VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
+$daynames = array();
+$propernames = array();
 while (($record = fgetcsv($fh)) != FALSE) {
     $r = array();
     foreach ($record as $field) {
         $f = trim($field);
         $r[] = $f;
     }
+    $daynames[] = $r[1];
     $q->execute($r) or dieWithRollback($q, "\n".__FILE__.":".__LINE__);
 }
 
+// Make sure it's empty.
+$dbh->exec("DELETE FROM `{$dbp}churchyear_order`");
 $q = $dbh->prepare("INSERT INTO `{$dbp}churchyear_order`
     (name, idx) VALUES
     (\"Advent\", 1),
@@ -50,22 +55,23 @@ $q = $dbh->prepare("INSERT INTO `{$dbp}churchyear_order`
     (\"Trinity\", 8),
     (\"Michaelmas\", 9),
     (\"\", 32)");
-$q->execute() or die(array_pop($q->errorInfo());
+$q->execute() or die("Problem populating churchyear_order:" .
+    array_pop($q->errorInfo()));
 
 // Populate synonyms table
-$fh = fopen("./utility/synonyms.csv", "r");
-$q = $dbh->prepare("INSERT INTO {$dbp}churchyear_synonyms
+$fh = fopen("./utility/churchyear/synonyms.csv", "r");
+$qs = $dbh->prepare("INSERT INTO {$dbp}churchyear_synonyms
     (canonical, synonym) VALUES (?, ?)");
 while (($record = fgetcsv($fh)) != FALSE) {
     $canonical = $record[0];
     foreach (array_slice($record, 1) as $synonym) {
-        $q->execute(array($canonical, $synonym))
+        $qs->execute(array($canonical, $synonym))
             or die(array_pop($q->errorInfo())." with {$canonical}, {$synonym}");
     }
 }
 
 // Fill propers table
-$fh = fopen("./utility/propers.csv", "r");
+$fh = fopen("./utility/churchyear/propers.csv", "r");
 $headings = fgetcsv($fh);
 $qp = $dbh->prepare("INSERT INTO {$dbp}churchyear_propers
     (dayname, color, theme, introit)
@@ -73,13 +79,15 @@ $qp = $dbh->prepare("INSERT INTO {$dbp}churchyear_propers
 while (($record = fgetcsv($fh)) != FALSE) {
     $r = blanksToNull($record);
     $dict = array_combine($headings, $r);
+    $propernames[] = $dict['dayname'];
     $qp->execute(array($dict['dayname'], $dict['color'],
         $dict['theme'], $dict['introit']))
-        or die(__FILE__.":".__LINE__.$dict['dayname']);
+        or die(__FILE__.":".__LINE__.$dict['dayname'].
+            array_pop($qp->errorInfo()));
 }
 
 // Fill lessons table
-$fh = fopen("./utility/lessons.csv", "r");
+$fh = fopen("./utility/churchyear/lessons.csv", "r");
 $headings = fgetcsv($fh);
 $ql = $dbh->prepare("INSERT INTO {$dbp}churchyear_lessons
     (dayname, lectionary, lesson1, lesson2, gospel, psalm,
@@ -96,7 +104,7 @@ while (($record = fgetcsv($fh)) != FALSE) {
 }
 
 // Fill collect text
-$fh = fopen("./utility/collect.csv", "r");
+$fh = fopen("./utility/churchyear/collect.csv", "r");
 $headings = fgetcsv($fh);
 $ql = $dbh->prepare("INSERT INTO {$dbp}churchyear_collects
     (id, class, collect)
@@ -109,7 +117,7 @@ while (($record = fgetcsv($fh)) != FALSE) {
 }
 
 // Fill collect indexes
-$fh = fopen("./utility/collectindex.csv", "r");
+$fh = fopen("./utility/churchyear/collectindex.csv", "r");
 $headings = fgetcsv($fh);
 $ql = $dbh->prepare("INSERT INTO `{$dbp}churchyear_collect_index`
     (dayname, lectionary, id)

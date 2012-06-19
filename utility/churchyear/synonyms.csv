@@ -1,60 +1,78 @@
-Pentecost second,Pentecost Monday
-Trinity,Trinity Sunday
-All Saints Day,All Saints' Day
-Quinquagesima,Baptism of our Lord
-Trinity 19,Michaelmas 2
-Easter second,Easter Monday
-Palm Sunday,Sunday of the Passion
-Michaelmas,St. Michael's Day
-Tuesday of Holy Week,Tue./Holy Week
-Annunciation,Annunciation to the Virgin Mary
-Monday of Holy Week,Mon./Holy Week
-Epiphany,The Manifestation of Christ to the Gentiles
-Ascension,Ascension Sunday
-Circumcision and Name of Jesus,Name of Jesus
-Pentecost,Pentecost: first
-Easter,Easter Day: first
-Christmas,Christmas Day 1st
-Lent 5,Judica
-Lent 4,Laetare
-Lent 1,Invocavit
-Lent 3,Oculi
-Lent 2,Reminiscere
-Trinity 1,Pentecost 2
-Trinity 2,Pentecost 3
-Trinity 3,Pentecost 4
-Trinity 4,Pentecost 5
-Trinity 5,Pentecost 6
-Trinity 6,Pentecost 7
-Trinity 7,Pentecost 8
-Trinity 8,Pentecost 9
-Trinity 9,Pentecost 10
-Trinity 10,Pentecost 11
-Trinity 11,Pentecost 12
-Trinity 12,Pentecost 13
-Trinity 13,Pentecost 14
-Trinity 14,Pentecost 15
-Trinity 15,Pentecost 16
-Trinity 16,Pentecost 17
-Trinity 17,Pentecost 18
-Trinity 18,Pentecost 19
-Trinity 19,Pentecost 20,Michaelmas 2
-Trinity 20,Pentecost 21,Michaelmas 3
-Trinity 21,Pentecost 22,Michaelmas 4
-Trinity 22,Pentecost 23,Michaelmas 5
-Trinity 23,Michaelmas 6,Pentecost 24
-Trinity 24,Michaelmas 7,Pentecost 25
-Third Last,Trinity 25,Michaelmas 8,Pentecost 26
-Second Last,Trinity 26,Michaelmas 9,Pentecost 27
-Last,Trinity 27,Michaelmas 10,Pentecost 28
-Presentation,Presentation of our Lord
-Transfiguration,Last Sunday after Epiphany
-Easter 5,Cantate
-Christmas Day 2nd,Day after Christmas
-Christmas 1,Sunday after Christmas
-Easter 2,Quasimodogeniti
-Easter 3,Misericordias Domini
-Easter 6,Rogate
-Easter 7,Exaudi,Sunday after Ascension
-Easter 4,Jubilate
-Festival of the Reformation,Reformation Day
+Pentecost second,Pentecost Monday,Pentecost second
+Trinity,Trinity Sunday,Trinity
+All Saints Day,All Saints' Day,All Saints Day
+Quinquagesima,Baptism of our Lord,Quinquagesima
+Trinity 19,Michaelmas 2,Trinity 19,Pentecost 20,Michaelmas 2
+Easter second,Easter Monday,Easter second
+Palm Sunday,Sunday of the Passion,Palm Sunday
+Michaelmas,St. Michael's Day,Michaelmas
+Tuesday of Holy Week,Tue./Holy Week,Tuesday of Holy Week
+Annunciation,Annunciation to the Virgin Mary,Annunciation
+Monday of Holy Week,Mon./Holy Week,Monday of Holy Week
+Epiphany,The Manifestation of Christ to the Gentiles,Epiphany
+Ascension,Ascension Sunday,Ascension
+Circumcision and Name of Jesus,Name of Jesus,Circumcision and Name of Jesus
+Pentecost,Pentecost: first,Pentecost
+Easter,Easter Day: first,Easter
+Christmas,Christmas Day 1st,Christmas
+Christmas Day 2nd,Day after Christmas,Christmas Day 2nd
+Christmas 1,Sunday after Christmas,Christmas 1
+Michaelmas 1,Michaelmas 1
+Michaelmas 2,Michaelmas 2
+Michaelmas 3,Michaelmas 3
+Michaelmas 4,Michaelmas 4
+Michaelmas 5,Michaelmas 5
+Michaelmas 6,Michaelmas 6
+Michaelmas 7,Michaelmas 7
+Easter 1,Easter 1
+Easter 2,Easter 2,Quasimodogeniti
+Easter 3,Easter 3,Misericordias Domini
+Easter 4,Easter 4,Jubilate
+Easter 5,Easter 5,Cantate
+Easter 6,Easter 6,Rogate
+Easter 7,Easter 7,Exaudi,Sunday after Ascension
+Advent 1,Advent 1
+Advent 2,Advent 2
+Advent 3,Advent 3
+Advent 4,Advent 4
+Lent 5,Judica,Lent 5
+Lent 4,Laetare,Lent 4
+Lent 3,Oculi,Lent 3
+Lent 2,Reminiscere,Lent 2
+Lent 1,Invocavit,Lent 1
+Epiphany 1,Epiphany 1
+Epiphany 2,Epiphany 2
+Epiphany 3,Epiphany 3
+Epiphany 4,Epiphany 4
+Epiphany 5,Epiphany 5
+Epiphany 6,Epiphany 6
+Epiphany 7,Epiphany 7
+Trinity 1,Trinity 1,Pentecost 2
+Trinity 2,Trinity 2,Pentecost 3
+Trinity 3,Trinity 3,Pentecost 4
+Trinity 4,Trinity 4,Pentecost 5
+Trinity 5,Trinity 5,Pentecost 6
+Trinity 6,Trinity 6,Pentecost 7
+Trinity 7,Trinity 7,Pentecost 8
+Trinity 8,Trinity 8,Pentecost 9
+Trinity 9,Trinity 9,Pentecost 10
+Trinity 10,Trinity 10,Pentecost 11
+Trinity 11,Trinity 11,Pentecost 12
+Trinity 12,Trinity 12,Pentecost 13
+Trinity 13,Trinity 13,Pentecost 14
+Trinity 14,Trinity 14,Pentecost 15
+Trinity 15,Trinity 15,Pentecost 16
+Trinity 16,Trinity 16,Pentecost 17
+Trinity 17,Trinity 17,Pentecost 18
+Trinity 18,Trinity 18,Pentecost 19
+Trinity 20,Trinity 20,Pentecost 21,Michaelmas 3
+Trinity 21,Trinity 21,Pentecost 22,Michaelmas 4
+Trinity 22,Trinity 22,Pentecost 23,Michaelmas 5
+Trinity 23,Trinity 23,Michaelmas 6,Pentecost 24
+Trinity 24,Trinity 24,Michaelmas 7,Pentecost 25
+Third Last,Trinity 25,Third Last,Trinity 25,Michaelmas 8,Pentecost 26
+Second Last,Trinity 26,Second Last,Trinity 26,Michaelmas 9,Pentecost 27
+Last,Trinity 27,Last,Trinity 27,Michaelmas 10,Pentecost 28
+Presentation,Presentation of our Lord,Presentation
+Transfiguration,Last Sunday after Epiphany,Transfiguration
+Festival of the Reformation,Reformation Day,Festival of the Reformation

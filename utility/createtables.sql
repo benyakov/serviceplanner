@@ -92,7 +92,10 @@ CREATE TABLE `churchyear_order` (
 CREATE TABLE `churchyear_synonyms` (
     `canonical` varchar(255),
     `synonym`   varchar(255),
-    INDEX (`canonical`)
+    FOREIGN KEY (`canonical`) REFERENCES `churchyear` (`dayname`)
+        ON UPDATE CASCADE
+        ON DELETE CASCADE,
+    INDEX (`synonym`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 CREATE TABLE `churchyear_propers` (
     `dayname`   varchar(255),
@@ -100,7 +103,7 @@ CREATE TABLE `churchyear_propers` (
     `theme`     varchar(64),
     `introit`   text,
     `note`      text,
-    FOREIGN KEY (`dayname`) REFERENCES `churchyear` (`dayname`)
+    FOREIGN KEY (`dayname`) REFERENCES `churchyear_synonyms` (`synonym`)
         ON DELETE CASCADE
         ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
@@ -119,7 +122,7 @@ CREATE TABLE `churchyear_lessons` (
     `hymn`      varchar(20),
     `id`        integer auto_increment,
     PRIMARY KEY (`id`),
-    FOREIGN KEY (`dayname`) REFERENCES `churchyear` (`dayname`)
+    FOREIGN KEY (`dayname`) REFERENCES `churchyear_synonyms` (`synonym`)
         ON DELETE CASCADE
         ON UPDATE CASCADE
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
@@ -136,7 +139,7 @@ CREATE TABLE `churchyear_collect_index` (
     FOREIGN KEY (`id`) REFERENCES `churchyear_collects` (`id`)
         ON DELETE CASCADE
         ON UPDATE CASCADE,
-    FOREIGN KEY (`dayname`) REFERENCES `churchyear` (`dayname`)
+    FOREIGN KEY (`dayname`) REFERENCES `churchyear_synonyms` (`synonym`)
         ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 CREATE TABLE `blocks` (

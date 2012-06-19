@@ -444,7 +444,7 @@ if (! $auth) {
     <?
 $q = $dbh->prepare("SELECT DATE_FORMAT(blockstart, '%c/%e/%Y') AS blockstart,
     DATE_FORMAT(blockend, '%c/%e/%Y') AS blockend, label, notes, oldtestament,
-    epistle, gospel, psalm, collect, id FROM blocks
+    epistle, gospel, psalm, collect, id FROM {$dbp}blocks
     ORDER BY blockstart, blockend");
 if ($q->execute()) {
     while ($row = $q->fetch(PDO::FETCH_ASSOC)) { ?>

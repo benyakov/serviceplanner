@@ -156,7 +156,7 @@ function queryAllHymns($dbh, $dbp="", $limit=0, $future=false) {
     RIGHT OUTER JOIN `{$dbp}days` AS days ON (hymns.service = days.pkey)
     LEFT OUTER JOIN `{$dbp}names` AS names ON (hymns.number = names.number)
         AND (hymns.book = names.book)
-    LEFT OUTER JOIN `{$dbp}block` AS block ON (block.id = days.block)
+    LEFT OUTER JOIN `{$dbp}blocks` AS blocks ON (blocks.id = days.block)
     LEFT JOIN `{$dbp}churchyear_propers` AS cyp ON (cyp.dayname = days.name)
     {$where}
     ORDER BY days.caldate {$order}, hymns.service {$order},
