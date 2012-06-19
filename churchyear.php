@@ -326,7 +326,7 @@ if ($_POST['requestform'] = "delete-collect") {
     $q = $dbh->prepare("SELECT
         c.collect, c.class, i.lectionary, i.dayname, i.id
         FROM `{$dbp}churchyear_collect_index` AS i
-        JOIN `{$dbp}churchyear_collect` AS c ON (c.id = i.id)
+        JOIN `{$dbp}churchyear_collects` AS c ON (c.id = i.id)
         WHERE i.id = ?");
     if (! $q->execute(array($_POST['cid']))) {
         echo array_pop($q->errorInfo());

@@ -60,13 +60,15 @@ $q->execute() or die("Problem populating churchyear_order:" .
 
 // Populate synonyms table
 $fh = fopen("./utility/churchyear/synonyms.csv", "r");
-$qs = $dbh->prepare("INSERT INTO {$dbp}churchyear_synonyms
-    (canonical, synonym) VALUES (?, ?)");
+$qs = $dbh->prepare("INSERT INTO `{$dbp}churchyear_synonyms`
+    (canonical, synonym) VALUES (:canonical, :synonym)");
 while (($record = fgetcsv($fh)) != FALSE) {
     $canonical = $record[0];
     foreach (array_slice($record, 1) as $synonym) {
-        $qs->execute(array($canonical, $synonym))
-            or die(array_pop($q->errorInfo())." with {$canonical}, {$synonym}");
+        $qs->bindValue(":canonical", $canonical);
+        $qs->bindValue(":synonym", $synonym);
+        $qs->execute()
+            or die(var_export($q->errorInfo())." with {$canonical}, {$synonym}");
     }
 }
 
