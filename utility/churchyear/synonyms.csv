@@ -1,10 +1,17 @@
 Pentecost second,Pentecost Monday,Pentecost second
 Trinity,Trinity Sunday,Trinity
 All Saints Day,All Saints' Day,All Saints Day
-Quinquagesima,Baptism of our Lord,Quinquagesima
+Quinquagesima,Baptism of our Lord,Quinquagesima,Baptism of Jesus
+Sexagesima,Sexagesima
+Septuagesima,Septuagesima
 Trinity 19,Michaelmas 2,Trinity 19,Pentecost 20,Michaelmas 2
 Easter second,Easter Monday,Easter second
+Ash Wednesday,Ash Wednesday
 Palm Sunday,Sunday of the Passion,Palm Sunday
+Wednesday of Holy Week,Wednesday of Holy Week
+Maundy Thursday,Maundy Thursday
+Good Friday,Good Friday
+Holy Saturday,Holy Saturday
 Michaelmas,St. Michael's Day,Michaelmas
 Tuesday of Holy Week,Tue./Holy Week,Tuesday of Holy Week
 Annunciation,Annunciation to the Virgin Mary,Annunciation
@@ -17,6 +24,7 @@ Easter,Easter Day: first,Easter
 Christmas,Christmas Day 1st,Christmas
 Christmas second,Day after Christmas,Christmas Day 2nd,Christmas second
 Christmas 1,Sunday after Christmas,Christmas 1
+Christmas 2,Christmas 2
 Michaelmas 1,Michaelmas 1
 Michaelmas 2,Michaelmas 2
 Michaelmas 3,Michaelmas 3
@@ -24,7 +32,6 @@ Michaelmas 4,Michaelmas 4
 Michaelmas 5,Michaelmas 5
 Michaelmas 6,Michaelmas 6
 Michaelmas 7,Michaelmas 7
-Easter 1,Easter 1
 Easter 2,Easter 2,Quasimodogeniti
 Easter 3,Easter 3,Misericordias Domini
 Easter 4,Easter 4,Jubilate
@@ -47,6 +54,7 @@ Epiphany 4,Epiphany 4
 Epiphany 5,Epiphany 5
 Epiphany 6,Epiphany 6
 Epiphany 7,Epiphany 7
+Epiphany 8,Epiphany 8
 Trinity 1,Trinity 1,Pentecost 2
 Trinity 2,Trinity 2,Pentecost 3
 Trinity 3,Trinity 3,Pentecost 4
@@ -76,3 +84,39 @@ Last,Trinity 27,Last,Trinity 27,Michaelmas 10,Pentecost 28
 Presentation,Presentation of our Lord,Presentation
 Transfiguration,Last Sunday after Epiphany,Transfiguration
 Festival of the Reformation,Reformation Day,Festival of the Reformation
+St. James of Jerusalem,St. James of Jerusalem
+St. Thomas the Apostle,St. Thomas the Apostle
+"St. John, Apostle and Evangelist","St. John, Apostle and Evangelist"
+St. Luke the Evangelist,St. Luke the Evangelist
+St. James the Apostle,St. James the Apostle
+"St. Peter and St. Paul, Apostles","St. Peter and St. Paul, Apostles"
+"St. Philip and St. James, Apostles","St. Philip and St. James, Apostles"
+"St. Matthew, Apostle and Evangelist","St. Matthew, Apostle and Evangelist"
+St. Mary Magdalene,St. Mary Magdalene
+St. Stephen the Martyr,St. Stephen the Martyr
+"St. Bartholemew, Apostle","St. Bartholemew, Apostle"
+Holy Family,Holy Family
+St. Matthias the Apostle,St. Matthias the Apostle
+St. Joseph,St. Joseph
+"St. Simon and St. Jude, Apostles","St. Simon and St. Jude, Apostles"
+"Athanasius, Bishop of Alexandria","Athanasius, Bishop of Alexandria"
+"John Chrysostom, Bishop of Constantinople","John Chrysostom, Bishop of Constantinople"
+St. Mary and St. Martha of Bethany,St. Mary and St. Martha of Bethany
+"Nicholas, Bishop of Myra","Nicholas, Bishop of Myra"
+"St. Titus, Confessor and Bishop","St. Titus, Confessor and Bishop"
+"Ambrose, Bishop of Milan","Ambrose, Bishop of Milan"
+St. Barnabas the Apostle,St. Barnabas the Apostle
+Nativity of St. John the Baptist,Nativity of St. John the Baptist
+"Augustine, Bishop and Doctor","Augustine, Bishop and Doctor"
+St. Andrew the Apostle,St. Andrew the Apostle
+Conversion of St. Paul,Conversion of St. Paul
+St. Mark the Evangelist,St. Mark the Evangelist
+Presentation of the Augsburg Confession,Presentation of the Augsburg Confession
+"St. Mary, Mother of our Lord","St. Mary, Mother of our Lord"
+Holy Innocents,Holy Innocents
+"St. Timothy, Bishop and Martyr","St. Timothy, Bishop and Martyr"
+Visitation,Visitation
+New Year's Eve,New Year's Eve
+Christmas Vigil,Christmas Eve,Christmas Vigil
+Easter Vigil,Easter Vigil
+Pentecost Vigil,Pentecost Vigil
