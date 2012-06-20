@@ -505,3 +505,7 @@ form#block-plan-form #label {
     width: 30em;
 }
 
+.hiddentemplate {
+    display: none;
+}
+

@@ -210,8 +210,8 @@ function setupCollectDialog(addlink) {
                 function(rv) {
                     $("#collect-text").val(rv);
             });
-        });
-    }
+        }
+    });
 }
 
 function setupCollectDeleteDialog() {
@@ -220,17 +220,18 @@ function setupCollectDeleteDialog() {
     });
 }
 
-function setupEditDialog() {
-    function getDecadeDates() {
-        // Return a 10-year span of matching dates.
-        var decade = new Array();
-        var now = new Date();
-        var thisyear = now.getFullYear();
-        for (y=thisyear-5; y<=thisyear+5; y++) {
-            decade.push(getDateFor(y).toDateString());
-        }
-        return decade.join(", ");
+function getDecadeDates() {
+    // Return a 10-year span of matching dates.
+    var decade = new Array();
+    var now = new Date();
+    var thisyear = now.getFullYear();
+    for (y=thisyear-5; y<=thisyear+5; y++) {
+        decade.push(getDateFor(y).toDateString());
     }
+    return decade.join(", ");
+}
+
+function setupEditDialog() {
     var origdates = getDecadeDates();
     $("#calculated-dates").html(origdates);
     $("#base, #offset, #month, #day, #observed_month, #observed_sunday")
@@ -268,16 +269,14 @@ function setupPropersDialog() {
         if (confirm("Delete propers?"+
            " (Listed collects will still exist.)")) {
             var id = $(this).attr("data-id");
-            $.get("churchyear.php", {
-                delpropers: id,
+            $.get("churchyear.php", {delpropers: id},
                 function(rv) {
                     if (rv[0]) {
                         $(".propers-"+id).remove();
                     } else {
                         setMessage(rv[1]);
                     }
-                });
-            }
+            });
         }
     });
     $(".add-collect").click(function() {

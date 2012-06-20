@@ -36,7 +36,7 @@
             ON (pr.dayname = l.dayname)
             WHERE pr.dayname = ?
         ORDER BY l.lectionary");
-    if (! $q->execute(array($dayname]))) {
+    if (! $q->execute(array($dayname))) {
         die(array_pop($q->errorInfo()));
         $pdata = array("color"=>"", "theme"=>"", "introit"=>"",
             "note"=>"", "lesson1"=>"", "lesson2"=>"", "gospel"=>"",
@@ -52,7 +52,7 @@
             ON (i.id = c.id)
         WHERE i.dayname = ?
         ORDER BY i.lectionary, c.class");
-    if (! $q->execute(array($dayname]))) {
+    if (! $q->execute(array($dayname))) {
         die(array_pop($q->errorInfo()));
         $cdata = array();
     } else {
@@ -61,7 +61,7 @@
     ob_start();
 ?>
     <form id="propersform" method="post">
-    <input type="hidden" name="propers" id="propers" value="<?=$dayname]?>">
+    <input type="hidden" name="propers" id="propers" value="<?=$dayname?>">
     <div class="formblock"><label for="color">Color</label><br>
     <input type="text" value="<?=$pdata[0]['color']?>" name="color"></div>
     <div class="formblock"><label for="theme">Theme</label><br>
