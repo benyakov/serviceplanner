@@ -97,11 +97,6 @@ $ql = $dbh->prepare("INSERT INTO {$dbp}churchyear_lessons
     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
 while (($record = fgetcsv($fh)) != FALSE) {
     $r = blanksToNull($record);
-    if (count($headings) != count($r)) {
-        print_r($headings);
-        echo "<br>";
-        print_r($r);
-    }
     $dict = array_combine($headings, $r);
     $ql->execute(array($dict['dayname'], $dict['type'], $dict['lesson1'],
         $dict['lesson2'], $dict['gospel'], $dict['psalm'],
@@ -111,7 +106,7 @@ while (($record = fgetcsv($fh)) != FALSE) {
 }
 
 // Fill collect text
-$fh = fopen("./utility/churchyear/collect.csv", "r");
+$fh = fopen("./utility/churchyear/collecttext.csv", "r");
 $headings = fgetcsv($fh);
 $ql = $dbh->prepare("INSERT INTO {$dbp}churchyear_collects
     (id, class, collect)

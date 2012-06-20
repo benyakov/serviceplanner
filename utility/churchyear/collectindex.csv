@@ -50,9 +50,9 @@ Annunciation,historic,49
 Lent 5,historic,50
 Palm Sunday,historic,51
 Palm Sunday,historic,52
-Mon./Holy Week,historic,53
-Tue./Holy Week,historic,54
-Wed./Holy Week,historic,55
+Monday of Holy Week,historic,53
+Tuesday of Holy Week,historic,54
+Wednesday of Holy Week,historic,55
 Maundy Thursday,historic,56
 Maundy Thursday,historic,57
 Good Friday,historic,58
@@ -60,7 +60,7 @@ Good Friday,historic,59
 Holy Saturday,historic,60
 Easter Vigil,historic,61
 Easter,historic,62
-Easter Day 2nd,historic,63
+Easter second,historic,63
 Easter 2,historic,64
 Easter 2,historic,65
 Easter 3,historic,66
@@ -128,12 +128,12 @@ Trinity 23,historic,127
 Trinity 23,historic,128
 Trinity 24,historic,129
 Trinity 24,historic,130
-3rd Last Sunday,historic,131
-3rd Last Sunday,historic,132
-2nd Last Sunday,historic,133
-2nd Last Sunday,historic,134
-Last Sunday,historic,135
-Last Sunday,historic,136
+Third Last,historic,131
+Third Last,historic,132
+Second Last,historic,133
+Second Last,historic,134
+Last,historic,135
+Last,historic,136
 All Saints Day,historic,137
 All Saints Day,historic,138
 Mission Festival,historic,139
