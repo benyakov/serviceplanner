@@ -247,7 +247,7 @@ function setupEditDialog() {
 }
 
 function setupPropersDialog() {
-    $("#accordion").accordion();
+    $("#accordion").accordion({ fillSpace: true });
     $("#addpropers").click(function() {
         var template = $("#propers-template").html();
         var identifier = $("#propers-template").attr("data-identifier");
