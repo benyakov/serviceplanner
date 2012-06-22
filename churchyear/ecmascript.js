@@ -251,23 +251,6 @@ function setupEditDialog() {
 
 function setupPropersDialog() {
     $("#tabs").tabs();
-    $("#addpropers").click(function() {
-        var template = $("#template-tab").html();
-        var identifier = $("#template-tab").attr("data-identifier");
-        $("#template-tab").attr("data-identifier", identifier+1);
-        template = template.replace("{{id}}", identifier);
-        $('#lectionary-'+identifier).update(function() {
-            $('#addcollect-'+identifier)
-                .attr("data-lectionary", $(this).val());
-        });
-        $("#tabs").tabs("add", "#newtab;
-        $("a.abort-new-propers").click(function() {
-            if (confirm("Remove new propers?  (Changes will be lost!)")) {
-                var id=$(this).attr("data-id");
-                $(".new-propers-"+id).remove();
-            }
-        });
-    });
     $(".delete-these-propers").click(function() {
         if (confirm("Delete propers?"+
            " (Listed collects will still exist.)")) {

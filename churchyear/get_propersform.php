@@ -68,6 +68,7 @@
         <li><a href="#ilcwa-tab"><span>ILCW A</span></a></li>
         <li><a href="#ilcwb-tab"><span>ILCW B</span></a></li>
         <li><a href="#ilcwc-tab"><span>ILCW C</span></a></li>
+        <li><a href="#newpropers-tab"><span>New Propers</span></a></li>
     </ul>
     <div id="propers-tab">
     <form id="propersform" method="post">
@@ -86,42 +87,40 @@
     </div>
     </form>
     </div>
-    <? $i = 1;
+    <?
     foreach ($pdata as $lset) {
         $id = $lset['id'];
         if (! $lset['lectionary'] == "historic") {
     ?>
     <div id="historic-tab">
-    <h3 class="propers-<?=$id?>">
-        <a href="#"><?=strtoupper($lset['lectionary'])?></a></h3>
-    <div class="propers-<?=$id?>">
-    <form id="lessons-<?=$id?>" method="post">
+    <div class="propers">
+    <form class="lessons" method="post">
     <a href="#" class="delete-these-propers"
         data-id="<?=$id?>">Delete these propers</a>
     <div class="propersbox">
-    <input type="hidden" name="lessons-<?=$i?>" value="<?=$id?>">
+    <input type="hidden" name="lessons" value="<?=$id?>">
     <input type="hidden" name="lessontype" value="historic">
-    <div class="formblock"><label for="l1-<?=$id?>">Lesson 1</label><br>
-    <input type="text" value="<?=$lset['lesson1']?>" name="l1-<?=$id?>"></div>
-    <div class="formblock"><label for="l2-<?=$id?>">Lesson 2</label><br>
-    <input type="text" value="<?=$lset['lesson2']?>" name="l2-<?=$id?>"></div>
-    <div class="formblock"><label for="go-<?=$id?>">Gospel</label><br>
-    <input type="text" value="<?=$lset['gospel']?>" name="go-<?=$id?>"></div>
-    <div class="formblock"><label for="ps-<?=$id?>">Psalm</label><br>
-    <input type="text" value="<?=$lset['psalm']?>" name="ps-<?=$id?>"></div>
-    <div class="formblock"><label for="s2l-<?=$id?>">Series 2 Lesson</label><br>
-    <input type="text" value="<?=$lset['s2lesson']?>" name="s2l-<?=$id?>"></div>
-    <div class="formblock"><label for="s2go-<?=$id?>">Series 2 Gospel</label><br>
-    <input type="text" value="<?=$lset['s2gospel']?>" name="s2go-<?=$id?>"></div>
-    <div class="formblock"><label for="s3l-<?=$id?>">Series 3 Lesson</label><br>
-    <input type="text" value="<?=$lset['s3lesson']?>" name="s3l-<?=$id?>"></div>
-    <div class="formblock"><label for="s3go-<?=$id?>">Series 3 Gospel</label><br>
-    <input type="text" value="<?=$lset['s3gospel']?>" name="s3go-<?=$id?>"></div>
-    <button type="submit" class="submit-lessons" data-id="<?=$id?>">Submit</button>
+    <div class="formblock"><label for="l1">Lesson 1</label><br>
+    <input type="text" value="<?=$lset['lesson1']?>" name="l1"></div>
+    <div class="formblock"><label for="l2">Lesson 2</label><br>
+    <input type="text" value="<?=$lset['lesson2']?>" name="l2"></div>
+    <div class="formblock"><label for="go">Gospel</label><br>
+    <input type="text" value="<?=$lset['gospel']?>" name="go"></div>
+    <div class="formblock"><label for="ps">Psalm</label><br>
+    <input type="text" value="<?=$lset['psalm']?>" name="ps"></div>
+    <div class="formblock"><label for="s2l">Series 2 Lesson</label><br>
+    <input type="text" value="<?=$lset['s2lesson']?>" name="s2l"></div>
+    <div class="formblock"><label for="s2go">Series 2 Gospel</label><br>
+    <input type="text" value="<?=$lset['s2gospel']?>" name="s2go"></div>
+    <div class="formblock"><label for="s3l">Series 3 Lesson</label><br>
+    <input type="text" value="<?=$lset['s3lesson']?>" name="s3l"></div>
+    <div class="formblock"><label for="s3go">Series 3 Gospel</label><br>
+    <input type="text" value="<?=$lset['s3gospel']?>" name="s3go"></div>
+    <button type="submit" class="submit-lessons">Submit</button>
     <button type="reset">Reset</button>
     </div>
     </form>
-    <form id="collects-<?=$id?>" method="post">
+    <form class="collects" method="post">
     <div class="propersbox"> <?
     foreach ($cdata as $cset) {
         $cid = $cset['id'];
@@ -136,7 +135,7 @@
     } ?>
     <a href="#" class="add-collect"
         data-lectionary="<?=$lset['lectionary']?>">New Collect</a>
-    <button type="submit" class="submit-collects" data-id="<?=$id?>">Submit</button>
+    <button type="submit" class="submit-collects">Submit</button>
     <button type="reset">Reset</button>
     </div>
     </form>
@@ -144,32 +143,30 @@
     </div>
     <? } else { ?>
     <div id="<?=$lset["lectionary"]?>-tab">
-    <h3 class="propers-<?=$id?>">
-        <a href="#"><?=strtoupper($lset['lectionary'])?></a></h3>
-    <div class="propers-<?=$id?>">
-    <form id="lessons-<?=$id?>" method="post">
+    <div class="propers">
+    <form class="lessons" method="post">
     <a href="#" class="delete-these-propers"
         data-id="<?=$id?>">Delete these propers</a>
     <div class="propersbox">
-    <input type="hidden" name="lessons-<?=$i?>" value="<?=$id?>">
+    <input type="hidden" name="lessons" value="<?=$id?>">
     <input type="hidden" name="lessontype" value="ilcw">
-    <div class="formblock"><label for="l1-<?=$id?>">Lesson 1</label><br>
-    <input type="text" value="<?=$lset['lesson1']?>" name="l1-<?=$id?>"></div>
-    <div class="formblock"><label for="l2-<?=$id?>">Lesson 2</label><br>
-    <input type="text" value="<?=$lset['lesson2']?>" name="l2-<?=$id?>"></div>
-    <div class="formblock"><label for="go-<?=$id?>">Gospel</label><br>
-    <input type="text" value="<?=$lset['gospel']?>" name="go-<?=$id?>"></div>
-    <div class="formblock"><label for="ps-<?=$id?>">Psalm</label><br>
-    <input type="text" value="<?=$lset['psalm']?>" name="ps-<?=$id?>"></div>
-    <div class="formblock"><label for="habc-<?=$id?>">General Hymn</label><br>
-    <input type="text" value="<?=$lset['hymnabc']?>" name="habc-<?=$id?>"></div>
-    <div class="formblock"><label for="hymn-<?=$id?>">Series Hymn</label><br>
-    <input type="text" value="<?=$lset['hymn']?>" name="hymn-<?=$id?>"></div>
-    <button type="submit" class="submit-lessons" data-id="<?=$id?>">Submit</button>
+    <div class="formblock"><label for="l1">Lesson 1</label><br>
+    <input type="text" value="<?=$lset['lesson1']?>" name="l1"></div>
+    <div class="formblock"><label for="l2">Lesson 2</label><br>
+    <input type="text" value="<?=$lset['lesson2']?>" name="l2"></div>
+    <div class="formblock"><label for="go">Gospel</label><br>
+    <input type="text" value="<?=$lset['gospel']?>" name="go"></div>
+    <div class="formblock"><label for="ps">Psalm</label><br>
+    <input type="text" value="<?=$lset['psalm']?>" name="ps"></div>
+    <div class="formblock"><label for="habc">General Hymn</label><br>
+    <input type="text" value="<?=$lset['hymnabc']?>" name="habc"></div>
+    <div class="formblock"><label for="hymn">Series Hymn</label><br>
+    <input type="text" value="<?=$lset['hymn']?>" name="hymn"></div>
+    <button type="submit" class="submit-lessons">Submit</button>
     <button type="reset">Reset</button>
     </div>
     </form>
-    <form id="collects-<?=$id?>" method="post">
+    <form class="collects" method="post">
     <div class="propersbox"> <?
     foreach ($cdata as $cset) {
         $cid = $cset['id'];
@@ -184,46 +181,41 @@
     }?>
     <a href="#" class="add-collect"
         data-lectionary="<?=$lset['lectionary']?>">New Collect</a>
-    <button type="submit" class="submit-collects" data-id="<?=$id?>">Submit</button>
+    <button type="submit" class="submit-collects">Submit</button>
     <button type="reset">Reset</button>
     </div>
     </form>
     </div>
     </div> <?
-    }
-    $i++;
-    } $i++; ?>
-    <div class="hiddentemplate" id="template-tab" data-identifier="<?=$i?>">
-    <h3 class="new-propers-{{id}}"><a href="#">New Propers</a></h3>
-    <div class="new-propers-{{id}}">
-    <form id="lessons-{{id}}" method="post">
-    <a href="#" class="abort-new-propers"
-        data-id="{{id}}">Abort New Propers</a>
+    }} ?>
+    <div class="hiddentemplate" id="newpropers-tab">
+    <div class="propers">
+    <form class="lessons" id="newlessons" method="post">
     <div class="propersbox">
-    <input type="hidden" name="lessons-<?=$i?>" value="{{id}}">
-    <div class="formblock"><label for="lectionary-{{id}}">Lectionary</label><br>
-    <input type="text" value="" name="lectionary-{{id}}" required></div>
-    <div class="formblock"><label for="l1-{{id}}">Lesson 1</label><br>
-    <input type="text" value="" name="l1-{{id}}"></div>
-    <div class="formblock"><label for="l2-{{id}}">Lesson 2</label><br>
-    <input type="text" value="" name="l2-{{id}}"></div>
-    <div class="formblock"><label for="go-{{id}}">Gospel</label><br>
-    <input type="text" value="" name="go-{{id}}"></div>
-    <div class="formblock"><label for="ps-{{id}}">Psalm</label><br>
-    <input type="text" value="" name="ps-{{id}}"></div>
-    <div class="formblock"><label for="habc-{{id}}">General Hymn</label><br>
-    <input type="text" value="" name="habc-{{id}}"></div>
-    <div class="formblock"><label for="hymn-{{id}}">Series Hymn</label><br>
-    <input type="text" value="" name="hymn-{{id}}"></div>
-    <button type="submit" class="submit-lessons" data-id="{{id}}">Submit</button>
+    <input type="hidden" name="lessons" value="New">
+    <div class="formblock"><label for="lectionary">Lectionary</label><br>
+    <input type="text" value="" name="lectionary" required></div>
+    <div class="formblock"><label for="l1">Lesson 1</label><br>
+    <input type="text" value="" name="l1"></div>
+    <div class="formblock"><label for="l2">Lesson 2</label><br>
+    <input type="text" value="" name="l2"></div>
+    <div class="formblock"><label for="go">Gospel</label><br>
+    <input type="text" value="" name="go"></div>
+    <div class="formblock"><label for="ps">Psalm</label><br>
+    <input type="text" value="" name="ps"></div>
+    <div class="formblock"><label for="habc">General Hymn</label><br>
+    <input type="text" value="" name="habc"></div>
+    <div class="formblock"><label for="hymn">Series Hymn</label><br>
+    <input type="text" value="" name="hymn"></div>
+    <button type="submit" class="submit-lessons">Submit</button>
     <button type="reset">Reset</button>
     </div>
     </form>
-    <form id="collets-{{id}}" method="post">
+    <form class="collects" id="newcollects" method="post">
     <div class="propersbox">
     <a href="#" class="add-collect"
         data-lectionary="">New Collect</a>
-    <button type="submit" class="submit-collects" data-id="{{id}}">Submit</button>
+    <button type="submit" class="submit-collects">Submit</button>
     <button type="reset">Reset</button>
     </div>
     </form>
