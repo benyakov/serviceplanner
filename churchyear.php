@@ -240,10 +240,11 @@ if ($_GET['request'] == "synonyms") {
  * Return the collect text for the given collect id
  */
 if ($_GET['request'] == "collect") {
-    $q = $dbh->query("SELECT collect FROM `{$dbp}churchyear_collects`
+    $q = $dbh->prepare("SELECT collect FROM `{$dbp}churchyear_collects`
         WHERE id = ?");
     $q->execute(array($_GET['id']));
-    return json_encode($q->fetchColumn(0));
+    echo json_encode($q->fetchColumn(0));
+    exit(0);
 }
 
 /* churchyear.php with _POST from the collect form below
@@ -288,15 +289,20 @@ if ($_GET['requestform'] == "collect") {
         echo "Access denied.  Please log in.";
         exit(0);
     }
-    $q = $dbh->query("SELECT c.class, i.dayname, i.lectionary, i.id
-        FROM `{$dbp}churchyear_collects` AS c
-        JOIN `{$dbp}churchyear_collect_index` AS i ON (c.id == i.id)
-        WHERE i.dayname != ? AND i.lectionary != ?");
-    $q->execute(array($_GET['dayname'], $_GET['lectionary']));
+    $q = $dbh->prepare("SELECT c.class, i.dayname, i.lectionary, i.id
+        FROM `{$dbp}churchyear_collect_index` AS i
+        JOIN `{$dbp}churchyear_collects` AS c ON (c.id = i.id)
+        WHERE i.dayname != ? OR i.lectionary != ?");
+    if (! $q->execute(array($_GET['dayname'], $_GET['lectionary']))) {
+        echo "Problem getting available collects: " .
+            array_pop($q->errorInfo());
+        exit(0);
+    }
     ?>
     <form action="churchyear.php" id="collect-form" method="post">
         <h3>Collect used by "<?=$_GET['lectionary']?>" for
         "<?=$_GET['dayname']?>"</h3>
+        <div class="fullwidth">
         <input type="hidden" name="lectionary" value="<?=$_GET['lectionary']?>">
         <input type="hidden" name="dayname" value="<?=$_GET['dayname']?>">
         <select name="existing-collect" id="collect-dropdown">
@@ -306,12 +312,15 @@ if ($_GET['requestform'] == "collect") {
                 "{$row['dayname']} in {$row['lectionary']} ({$row['class']})".
                 "</option>";
         } ?>
-        </select>
+        </select><br>
         <textarea name="collect-text" id="collect-text">
-        </textarea>
+        </textarea><br>
         <button type="submit">Submit</button>
+        <button type="reset">Reset</button>
+        </div>
     </form>
     <?
+    exit(0);
 }
 
 /* churchyear.php?requestform=delete-collect&cid=id

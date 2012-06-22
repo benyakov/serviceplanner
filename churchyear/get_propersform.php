@@ -125,6 +125,8 @@
     <a href="#" class="add-collect"
         data-lectionary="<?=$lset['lectionary']?>">New Collect</a>
     </div>
+    <button type="submit" class="submit-collects" data-id="<?=$id?>">Submit</button>
+    <button type="reset">Reset</button>
     </form>
     </div>
     <? } else { ?>
@@ -169,6 +171,8 @@
     <a href="#" class="add-collect"
         data-lectionary="<?=$lset['lectionary']?>">New Collect</a>
     </div>
+    <button type="submit" class="submit-collects" data-id="<?=$id?>">Submit</button>
+    <button type="reset">Reset</button>
     </form>
     </div> <?
     }
@@ -206,6 +210,8 @@
     <a href="#" class="add-collect"
         data-lectionary="">New Collect</a>
     </div>
+    <button type="submit" class="submit-collects" data-id="{{id}}">Submit</button>
+    <button type="reset">Reset</button>
     </form>
     </div>
     </div>
@@ -219,3 +225,4 @@
 <?
     echo json_encode(array(true, ob_get_clean()));
     exit(0);
+?>
