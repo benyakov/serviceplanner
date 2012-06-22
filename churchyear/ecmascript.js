@@ -208,8 +208,11 @@ function setupCollectDialog(addlink) {
         if (choice != "new") {
             $.get("churchyear.php", { request: "collect", id: choice },
                 function(rv) {
+                    rv = eval(rv);
                     $("#collect-text").val(rv);
             });
+        } else {
+            $("#collect-text").val("");
         }
     });
 }
@@ -247,17 +250,17 @@ function setupEditDialog() {
 }
 
 function setupPropersDialog() {
-    $("#accordion").accordion({ fillSpace: true });
+    $("#tabs").tabs();
     $("#addpropers").click(function() {
-        var template = $("#propers-template").html();
-        var identifier = $("#propers-template").attr("data-identifier");
-        $("#propers-template").attr("data-identifier", identifier+1);
+        var template = $("#template-tab").html();
+        var identifier = $("#template-tab").attr("data-identifier");
+        $("#template-tab").attr("data-identifier", identifier+1);
         template = template.replace("{{id}}", identifier);
         $('#lectionary-'+identifier).update(function() {
             $('#addcollect-'+identifier)
                 .attr("data-lectionary", $(this).val());
         });
-        $("#accordion").append(template);
+        $("#tabs").tabs("add", "#newtab;
         $("a.abort-new-propers").click(function() {
             if (confirm("Remove new propers?  (Changes will be lost!)")) {
                 var id=$(this).attr("data-id");
@@ -285,11 +288,12 @@ function setupPropersDialog() {
             lectionary: $(this).attr("data-lectionary"),
             dayname: $("#propers").val()},
             function(rv) {
-                if (! ($("#dialog2"))) {
+                if (! ($("#dialog2").length)) {
                     $("#dialog").after('<div id="dialog2"></div>');
                 }
                 $("#dialog2").html(rv);
                 $("#dialog2").dialog({modal: true,
+                    stack: true,
                     position: "center",
                     title: "New Collect",
                     width: $(window).width()*0.65,
@@ -308,7 +312,7 @@ function setupPropersDialog() {
     $("#delete-collect").click(function(){
         $.get("churchyear.php", { requestform: "delete-collect",
             cid: $(this).attr("data-id") }, function(rv) {
-                if (! ($("#dialog2"))) {
+                if (! ($("#dialog2").length)) {
                     $("#dialog").after('<div id="dialog2"></div>');
                 }
                 $("#dialog2").html(rv);
