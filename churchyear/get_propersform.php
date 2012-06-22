@@ -60,6 +60,15 @@
     }
     ob_start();
 ?>
+    <div id="tabs">
+    <ul>
+        <li><a href="#propers-tab"><span>Basic Propers</span></a></li>
+        <li><a href="#historic-tab"><span>Historic</span></a></li>
+        <li><a href="#ilcwa-tab"><span>ILCW A</span></a></li>
+        <li><a href="#ilcwb-tab"><span>ILCW B</span></a></li>
+        <li><a href="#ilcwc-tab"><span>ILCW C</span></a></li>
+    </ul>
+    <div id="propers-tab">
     <form id="propersform" method="post">
     <input type="hidden" name="propers" id="propers" value="<?=$dayname?>">
     <div class="formblock"><label for="color">Color</label><br>
@@ -70,12 +79,13 @@
     <textarea name="note"><?=$pdata[0]['note']?></textarea><br></div>
     <div class="formblock fullwidth"><label for="introit">Introit</label><br>
     <textarea name="introit"><?=$pdata[0]['introit']?></textarea></div>
-    <div id="accordion">
+    </div>
     <? $i = 1;
     foreach ($pdata as $lset) {
         $id = $lset['id'];
         if (! $lset['lectionary'] == "historic") {
     ?>
+    <div id="historic-tab">
     <h3 class="propers-<?=$id?>">
         <a href="#"><?=strtoupper($lset['lectionary'])?></a></h3>
     <div class="propers-<?=$id?>">
@@ -117,7 +127,9 @@
         data-lectionary="<?=$lset['lectionary']?>">New Collect</a>
     </div>
     </div>
+    </div>
     <? } else { ?>
+    <div id="<?=$lset["lectionary"]?>-tab">
     <h3 class="propers-<?=$id?>">
         <a href="#"><?=strtoupper($lset['lectionary'])?></a></h3>
     <div class="propers-<?=$id?>">
@@ -154,6 +166,7 @@
     <a href="#" class="add-collect"
         data-lectionary="<?=$lset['lectionary']?>">New Collect</a>
     </div>
+    </div>
     </div> <?
     }
     $i++;
@@ -187,9 +200,6 @@
     </div>
     </div>
     </div>
-    <button type="submit" id="submit">Submit</button>
-    <button type="reset">Reset</button>
-    <button id="addpropers">Add Propers</button>
     </form>
     <script type="text/javascript">
         setupPropersDialog();
