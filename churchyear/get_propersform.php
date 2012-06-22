@@ -51,6 +51,7 @@
         JOIN `{$dbp}churchyear_collects` AS c
             ON (i.id = c.id)
         WHERE i.dayname = ?
+        GROUP BY i.id
         ORDER BY i.lectionary, c.class");
     if (! $q->execute(array($dayname))) {
         die(array_pop($q->errorInfo()));
@@ -60,16 +61,19 @@
     }
     ob_start();
 ?>
+    <div class="formblock"><label for="color">Color</label><br>
     <form id="propersform" method="post">
     <input type="hidden" name="propers" id="propers" value="<?=$dayname?>">
-    <div class="formblock"><label for="color">Color</label><br>
     <input type="text" value="<?=$pdata[0]['color']?>" name="color"></div>
     <div class="formblock"><label for="theme">Theme</label><br>
     <input type="text" value="<?=$pdata[0]['theme']?>" name="theme"></div>
     <div class="formblock fullwidth"><label for="note">Note</label><br>
     <textarea name="note"><?=$pdata[0]['note']?></textarea><br></div>
     <div class="formblock fullwidth"><label for="introit">Introit</label><br>
-    <textarea name="introit"><?=$pdata[0]['introit']?></textarea></div>
+    <textarea name="introit"><?=$pdata[0]['introit']?></textarea>
+    <button type="submit" id="propersform-submit">Submit</button>
+    <button type="reset">Reset</button></div>
+    </form>
     <div id="accordion">
     <? $i = 1;
     foreach ($pdata as $lset) {
@@ -79,6 +83,7 @@
     <h3 class="propers-<?=$id?>">
         <a href="#"><?=strtoupper($lset['lectionary'])?></a></h3>
     <div class="propers-<?=$id?>">
+    <form id="lessons-<?=$id?>" method="post">
     <a href="#" class="delete-these-propers"
         data-id="<?=$id?>">Delete these propers</a>
     <div class="propersbox">
@@ -101,6 +106,10 @@
     <div class="formblock"><label for="s3go-<?=$id?>">Series 3 Gospel</label><br>
     <input type="text" value="<?=$lset['s3gospel']?>" name="s3go-<?=$id?>"></div>
     </div>
+    <button type="submit" class="submit-lessons" data-id="<?=$id?>">Submit</button>
+    <button type="reset">Reset</button>
+    </form>
+    <form id="collects-<?=$id?>" method="post">
     <div class="propersbox"> <?
     foreach ($cdata as $cset) {
         $cid = $cset['id'];
@@ -116,11 +125,13 @@
     <a href="#" class="add-collect"
         data-lectionary="<?=$lset['lectionary']?>">New Collect</a>
     </div>
+    </form>
     </div>
     <? } else { ?>
     <h3 class="propers-<?=$id?>">
         <a href="#"><?=strtoupper($lset['lectionary'])?></a></h3>
     <div class="propers-<?=$id?>">
+    <form id="lessons-<?=$id?>" method="post">
     <a href="#" class="delete-these-propers"
         data-id="<?=$id?>">Delete these propers</a>
     <div class="propersbox">
@@ -139,6 +150,10 @@
     <div class="formblock"><label for="hymn-<?=$id?>">Series Hymn</label><br>
     <input type="text" value="<?=$lset['hymn']?>" name="hymn-<?=$id?>"></div>
     </div>
+    <button type="submit" class="submit-lessons" data-id="<?=$id?>">Submit</button>
+    <button type="reset">Reset</button>
+    </form>
+    <form id="collects-<?=$id?>" method="post">
     <div class="propersbox"> <?
     foreach ($cdata as $cset) {
         $cid = $cset['id'];
@@ -154,6 +169,7 @@
     <a href="#" class="add-collect"
         data-lectionary="<?=$lset['lectionary']?>">New Collect</a>
     </div>
+    </form>
     </div> <?
     }
     $i++;
@@ -162,6 +178,7 @@
     <div class="hiddentemplate" id="propers-template" data-identifier="<?=$i?>">
     <h3 class="new-propers-{{id}}"><a href="#">New Propers</a></h3>
     <div class="new-propers-{{id}}">
+    <form id="lessons-{{id}}" method="post">
     <a href="#" class="abort-new-propers"
         data-id="{{id}}">Abort New Propers</a>
     <div class="propersbox">
@@ -181,10 +198,15 @@
     <div class="formblock"><label for="hymn-{{id}}">Series Hymn</label><br>
     <input type="text" value="" name="hymn-{{id}}"></div>
     </div>
+    <button type="submit" class="submit-lessons" data-id="{{id}}">Submit</button>
+    <button type="reset">Reset</button>
+    </form>
+    <form id="collets-{{id}}" method="post">
     <div class="propersbox">
     <a href="#" class="add-collect"
         data-lectionary="">New Collect</a>
     </div>
+    </form>
     </div>
     </div>
     <button type="submit" id="submit">Submit</button>
