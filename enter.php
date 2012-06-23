@@ -190,7 +190,7 @@ function processFormData() {
         if (is_numeric($_POST['block'])) {
             $q->bindParam(':block', $_POST['block']);
         } else {
-            $q->bindParam(':block', NULL);
+            $q->bindValue(':block', NULL);
         }
         $q->execute() or dieWithRollback($q, ".");
         // Grab the pkey of the newly inserted row.
