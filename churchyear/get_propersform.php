@@ -90,14 +90,14 @@
     <?
     foreach ($pdata as $lset) {
         $id = $lset['id'];
-        if (! $lset['lectionary'] == "historic") {
+        if ($lset['lectionary'] == "historic") {
     ?>
     <div id="historic-tab">
     <div class="propers">
     <form class="lessons" method="post">
-    <a href="#" class="delete-these-propers"
-        data-id="<?=$id?>">Delete these propers</a>
     <div class="propersbox">
+    <a href="#" class="delete-these-propers"
+        data-id="<?=$id?>">Delete These</a><br>
     <input type="hidden" name="lessons" value="<?=$id?>">
     <input type="hidden" name="lessontype" value="historic">
     <div class="formblock"><label for="l1">Lesson 1</label><br>
@@ -115,7 +115,7 @@
     <div class="formblock"><label for="s3l">Series 3 Lesson</label><br>
     <input type="text" value="<?=$lset['s3lesson']?>" name="s3l"></div>
     <div class="formblock"><label for="s3go">Series 3 Gospel</label><br>
-    <input type="text" value="<?=$lset['s3gospel']?>" name="s3go"></div>
+    <input type="text" value="<?=$lset['s3gospel']?>" name="s3go"></div><br>
     <button type="submit" class="submit-lessons">Submit</button>
     <button type="reset">Reset</button>
     </div>
@@ -134,7 +134,7 @@
         }
     } ?>
     <a href="#" class="add-collect"
-        data-lectionary="<?=$lset['lectionary']?>">New Collect</a>
+        data-lectionary="<?=$lset['lectionary']?>">New Collect</a><br>
     <button type="submit" class="submit-collects">Submit</button>
     <button type="reset">Reset</button>
     </div>
@@ -145,9 +145,9 @@
     <div id="<?=$lset["lectionary"]?>-tab">
     <div class="propers">
     <form class="lessons" method="post">
-    <a href="#" class="delete-these-propers"
-        data-id="<?=$id?>">Delete these propers</a>
     <div class="propersbox">
+    <a href="#" class="delete-these-propers"
+        data-id="<?=$id?>">Delete These</a><br>
     <input type="hidden" name="lessons" value="<?=$id?>">
     <input type="hidden" name="lessontype" value="ilcw">
     <div class="formblock"><label for="l1">Lesson 1</label><br>
@@ -161,7 +161,7 @@
     <div class="formblock"><label for="habc">General Hymn</label><br>
     <input type="text" value="<?=$lset['hymnabc']?>" name="habc"></div>
     <div class="formblock"><label for="hymn">Series Hymn</label><br>
-    <input type="text" value="<?=$lset['hymn']?>" name="hymn"></div>
+    <input type="text" value="<?=$lset['hymn']?>" name="hymn"></div><br>
     <button type="submit" class="submit-lessons">Submit</button>
     <button type="reset">Reset</button>
     </div>
@@ -180,7 +180,7 @@
         }
     }?>
     <a href="#" class="add-collect"
-        data-lectionary="<?=$lset['lectionary']?>">New Collect</a>
+        data-lectionary="<?=$lset['lectionary']?>">New Collect</a><br>
     <button type="submit" class="submit-collects">Submit</button>
     <button type="reset">Reset</button>
     </div>
@@ -206,7 +206,7 @@
     <div class="formblock"><label for="habc">General Hymn</label><br>
     <input type="text" value="" name="habc"></div>
     <div class="formblock"><label for="hymn">Series Hymn</label><br>
-    <input type="text" value="" name="hymn"></div>
+    <input type="text" value="" name="hymn"></div><br>
     <button type="submit" class="submit-lessons">Submit</button>
     <button type="reset">Reset</button>
     </div>
@@ -214,7 +214,7 @@
     <form class="collects" id="newcollects" method="post">
     <div class="propersbox">
     <a href="#" class="add-collect"
-        data-lectionary="">New Collect</a>
+        data-lectionary="">New Collect</a><br>
     <button type="submit" class="submit-collects">Submit</button>
     <button type="reset">Reset</button>
     </div>
