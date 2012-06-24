@@ -255,14 +255,7 @@ function setupPropersDialog() {
         if (confirm("Delete propers?"+
            " (Listed collects will still exist.)")) {
             var id = $(this).attr("data-id");
-            $.get("churchyear.php", {delpropers: id},
-                function(rv) {
-                    if (rv[0]) {
-                        $(".propers-"+id).remove();
-                    } else {
-                        setMessage(rv[1]);
-                    }
-            });
+            window.location.replace("churchyear.php?delpropers="+id);
         }
     });
     $(".add-collect").click(function() {

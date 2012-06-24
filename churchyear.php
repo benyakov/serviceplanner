@@ -292,7 +292,8 @@ if ($_GET['requestform'] == "collect") {
     $q = $dbh->prepare("SELECT c.class, i.dayname, i.lectionary, i.id
         FROM `{$dbp}churchyear_collect_index` AS i
         JOIN `{$dbp}churchyear_collects` AS c ON (c.id = i.id)
-        WHERE i.dayname != ? OR i.lectionary != ?");
+        WHERE i.dayname != ? OR i.lectionary != ?
+        ORDER BY i.dayname, i.lectionary, c.class");
     if (! $q->execute(array($_GET['dayname'], $_GET['lectionary']))) {
         echo "Problem getting available collects: " .
             array_pop($q->errorInfo());
@@ -434,14 +435,19 @@ if ($_GET['propers']) {
  */
 if ($_GET['delpropers']) {
     if (! $auth) {
-        echo json_encode(array(false, "Access denied. Please log in"));
+        setMessage("Access denied. Please log in.");
+        header("Location: churchyear.php");
         exit(0);
     }
-    $q = $dbh->prepare("DELETE FROM `{$dbh}churchyear_lessons` WHERE id = ?");
+    $q = $dbh->prepare("DELETE i, l
+        FROM `{$dbp}churchyear_collect_index` AS i
+        INNER JOIN  `{$dbp}churchyear_lessons` AS l
+        ON (i.dayname = l.dayname AND  i.lectionary = l.lectionary)
+        WHERE l.id = ?");
     if ($q->execute(array($_GET['delpropers']))) {
-        echo json_encode(array(true));
+        setMessage("Propers deleted.");
     } else {
-        echo json_encode(array(false, array_pop($q->errorInfo())));
+        setMessage("Problem deleting prpers: ".array_pop($q->errorInfo()));
     }
     exit(0);
 }

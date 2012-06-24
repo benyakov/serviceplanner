@@ -266,23 +266,21 @@ a.propers:active {
 
 div.formblock {
     display: inline-block;
-    margin: .5ex .5em;
-    width: 45%;
+    width: 48%;
+    padding: .5%;
 }
 div.formblock > input {
     width: 100%;
 }
 div.fullwidth {
-    width: 100%;
+    width: 99%;
 }
 div.fullwidth > textarea {
-    width: 100%;
-    height: 4em;
+    width: 95%;
+    height: 6em;
 }
 div.propersbox {
     width: 100%;
-    margin: 0;
-    padding: 3px;
     border: thin solid blue;
 }
 
