@@ -252,32 +252,41 @@ if ($_GET['request'] == "collect") {
  */
 if ($_POST['existing-collect']) {
     if (! $auth) {
-        echo json_encode(array(false, "Access denied. Please log in first."));
+        setMessage("Access denied. Please log in first.");
+        header("location: index.php");
         exit(0);
     }
     if ($_POST['existing-collect'] == "new") {
         $q = $dbh->prepare("INSERT INTO `{$dbp}churchyear_collects`
             (class, collect) VALUES (?, ?)");
-        if (!$q->execute()) {
-            echo json_encode(false, array_pop($q->errorInfo()));
-            $dbh->rollback();
-            exit(0);
+        if (!$q->execute(array($_POST['class'], $_POST['collect-text']))) {
+            die(array_pop($q->errorInfo()));
         }
         $qid = $dbh->query("SELECT LAST_INSERT_ID()");
         $qid = $qid->fetchColumn(0);
         $q = $dbh->prepare("INSERT INTO `{$dbp}churchyear_collect_index`
             (`dayname`, `lectionary`, `id`)
             VALUES (?, ?, ?)");
-        if (! $q->execute(array($_POST['dayname'], $_POST['lectionary'], $qid))){
-            echo json_encode(false, array_pop($q->errorInfo()));
-            $dbh->rollback();
+        if (! $q->execute(array($_POST['dayname'],
+            $_POST['lectionary'], $qid))){
+            die(array_pop($q->errorInfo()));
             exit(0);
         }
         $dbh->commit();
-        echo json_encode(true);
-        exit(0);
+        setMessage("New collect inserted for {$_POST['dayname']}");
+        header("location: churchyear.php");
+    } else {
+        $q = $dbh->prepare("INSERT INTO `{$dbp}churchyear_collect_index`
+            (`dayname`, `lectionary`, `id`)
+            VALUES (?, ?, ?)");
+        if (! $q->execute(array($_POST['dayname'], $_POST['lectionary'],
+            $_POST['existing-collect']))) {
+            die(array_pop($q->errorInfo()));
+            }
+        $dbh->commit();
+        setMessage("Existing collect attached to {$_POST['dayname']}");
+        header("location: churchyear.php");
     }
-    echo json_encode(array(true, array("class"=>"", "cid"=>"", "collect"=>"")));
     exit(0);
 }
 
@@ -313,9 +322,10 @@ if ($_GET['requestform'] == "collect") {
                 "{$row['dayname']} in {$row['lectionary']} ({$row['class']})".
                 "</option>";
         } ?>
-        </select><br>
-        <textarea name="collect-text" id="collect-text">
-        </textarea><br>
+        </select>
+        <input type="text" required id="collect-class" name="collect-class"
+            placeholder="Type or Series"></input><br>
+        <textarea name="collect-text" id="collect-text"></textarea><br>
         <button type="submit">Submit</button>
         <button type="reset">Reset</button>
         </div>
@@ -327,7 +337,7 @@ if ($_GET['requestform'] == "collect") {
 /* churchyear.php?requestform=delete-collect&cid=id
  * Supply a form for confirming the deletion of collect with given id
  */
-if ($_POST['requestform'] == "delete-collect") {
+if ($_GET['requestform'] == "delete-collect") {
     if (! $auth) {
         echo "Access denied.  Please log in.";
         exit(0);
@@ -338,7 +348,7 @@ if ($_POST['requestform'] == "delete-collect") {
         FROM `{$dbp}churchyear_collect_index` AS i
         JOIN `{$dbp}churchyear_collects` AS c ON (c.id = i.id)
         WHERE i.id = ?");
-    if (! $q->execute(array($_POST['cid']))) {
+    if (! $q->execute(array($_GET['cid']))) {
         echo array_pop($q->errorInfo());
     } else {
         $row = $q->fetch(PDO::FETCH_ASSOC);
@@ -347,19 +357,28 @@ if ($_POST['requestform'] == "delete-collect") {
     <p><?=$row['collect']?></p>
     <h4>Used:</h4>
     <ul>
-    <li><?=$row['dayname']?> (<?=$row['lectionary']?>)</li>
+    <li><?=$row['dayname']?> (<?=$row['lectionary']?>) <a href="churchyear.php?detachcollect=<?=$_GET['cid']?>&lectionary=<?=$row['lectionary']?>&dayname=<?=$row['dayname']?>">Detach From This Day and Lectionary</a></li>
     <? while ($q->fetch(PDO::FETCH_ASSOC)) {?>
     <li><?=$row['dayname']?> (<?=$row['lectionary']?>)</li>
     <?}?>
     </ul>
-    <form id="delete-collect-confirm" method="post"
-    action="churchyear.php?deletecollect=<?=$_POST['cid']?>">
-    <button type="submit" name="submit">Confirm Collect</button>
-    <button id="cancel-delete">Cancel Deletion</button>
+    <form id="delete-collect-confirm" method="post" action="churchyear.php">
+    <input type="hidden" name="deletecollect" value="<?=$_GET['cid']?>">
+    <button type="submit" name="submit">Delete Collect Entirely</button>
     </form>
 <?  }
-
+    exit(0);
 }
+
+/* churchyear.php with $_POST of deletecollect=collectid
+ * Delete the collect with the given id
+ */
+// TODO
+
+/* churchyear.php?detachcollect=id&lectionary=name&dayname=day
+ * Detach the collect from the given day in the given lectionary
+ */
+// TODO
 
 /* churchyear.php with $_POST data from propers form
  * Update propers for the dayname.

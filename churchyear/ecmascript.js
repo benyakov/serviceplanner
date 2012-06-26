@@ -189,20 +189,6 @@ function setupDelete() {
 }
 
 function setupCollectDialog(addlink) {
-    $("#collect-form").submit(function() {
-        $.post("churchyear.php", $(this).serialize(), function(rv) {
-            if (rv[0]) {
-                $("#dialog2").dialog("close");
-                var cid = rv[1]["cid"];
-                var html = Array('<div class="formblock fullwidth">',
-                 '<label for="collect-'+cid+'">'+rv[1]["class"]+'</label> ',
-                 '<a href="#" class="delete-collect" data-id="'+cid+'">Delete</a><br>',
-                 '<textarea name="collect-'+cid+'">'+rv[1]["collect"]+'</textarea></div>')
-                 .join("\n");
-                $("#addlink2").before(html);
-            }
-        });
-    });
     $("#collect-dropdown").change(function() {
         var choice = $(this).val();
         if (choice != "new") {
@@ -211,8 +197,10 @@ function setupCollectDialog(addlink) {
                     rv = eval(rv);
                     $("#collect-text").val(rv);
             });
+            $("#collect-class").attr('disabled', true);
         } else {
             $("#collect-text").val("");
+            $("#collect-class").attr('disabled', false);
         }
     });
 }
@@ -285,7 +273,7 @@ function setupPropersDialog() {
                     }});
         });
     });
-    $("#delete-collect").click(function(){
+    $(".delete-collect").click(function(){
         $.get("churchyear.php", { requestform: "delete-collect",
             cid: $(this).attr("data-id") }, function(rv) {
                 if (! ($("#dialog2").length)) {
