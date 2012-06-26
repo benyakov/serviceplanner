@@ -29,7 +29,6 @@ $auth = auth();
 
 /* Populate the church year table if necessary.
  */
-$dbh->beginTransaction();
 $tableTest = $dbh->query("SELECT 1 FROM `{$dbp}churchyear`");
 if (! ($tableTest && $tableTest->fetchAll())) {
     require('./utility/fillservicetables.php');
@@ -43,9 +42,9 @@ if (! $result->fetchAll(PDO::FETCH_NUM)) {
     $functionsfh = fopen($functionsfile, "rb");
     $functionstext = fread($functionsfh, filesize($functionsfile));
     fclose($functionsfh);
-    $dbh->exec(replaceDBP($functionstext));
-    $dbh->commit();
-    $dbh->beginTransaction();
+    $q = $dbh->prepare(replaceDBP($functionstext));
+    $q->execute();
+    $q->closeCursor();
 }
 
 /* churchyear.php?dropfunctions=1
@@ -53,6 +52,7 @@ if (! $result->fetchAll(PDO::FETCH_NUM)) {
  * creating them again.
  */
 if ($_GET['request'] == 'dropfunctions') {
+    $dbh->beginTransaction();
     $dbh->exec("DROP FUNCTION `{$dbp}easter_in_year`;
     DROP FUNCTION IF EXISTS `{$dbp}christmas1_in_year`;
     DROP FUNCTION IF EXISTS `{$dbp}michaelmas1_in_year`;
@@ -74,6 +74,7 @@ if ($_GET['request'] == 'dropfunctions') {
  * them again.
  */
 if ($_GET['request'] == 'purgetables') {
+    $dbh->beginTransaction();
     $dbh->exec("DELETE FROM `{$dbp}churchyear_collects_index`");
     $dbh->exec("DELETE FROM `{$dbp}churchyear_collects`");
     $dbh->exec("DELETE FROM `{$dbp}churchyear_synonyms`");
@@ -199,6 +200,7 @@ if ($_POST['synonyms']) {
     $synonyms = explode("\n", $_POST['synonyms']);
     $canonical = $_POST['canonical'];
     // Remove current entries for canonical
+    $dbh->beginTransaction();
     $q = $dbh->prepare("DELETE FROM `{$dbp}churchyear_synonyms`
         WHERE canonical = ?");
     $success = $q->execute(array($canonical));
@@ -256,6 +258,7 @@ if ($_POST['existing-collect']) {
         header("location: index.php");
         exit(0);
     }
+    $dbh->beginTransaction();
     if ($_POST['existing-collect'] == "new") {
         $q = $dbh->prepare("INSERT INTO `{$dbp}churchyear_collects`
             (class, collect) VALUES (?, ?)");
@@ -498,6 +501,3 @@ if (! $auth) {
 <div id="dialog"></div>
 </body>
 </html>
-<?
-$dbh->commit();
-?>
