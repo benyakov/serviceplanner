@@ -195,7 +195,8 @@ function setupCollectDialog(addlink) {
             $.get("churchyear.php", { request: "collect", id: choice },
                 function(rv) {
                     rv = eval(rv);
-                    $("#collect-text").val(rv);
+                    $("#collect-text").val(rv[0]);
+                    $("#collect-class").val(rv[1]);
             });
             $("#collect-class").attr('disabled', true);
         } else {

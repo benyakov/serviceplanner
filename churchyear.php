@@ -242,10 +242,10 @@ if ($_GET['request'] == "synonyms") {
  * Return the collect text for the given collect id
  */
 if ($_GET['request'] == "collect") {
-    $q = $dbh->prepare("SELECT collect FROM `{$dbp}churchyear_collects`
+    $q = $dbh->prepare("SELECT collect, class FROM `{$dbp}churchyear_collects`
         WHERE id = ?");
     $q->execute(array($_GET['id']));
-    echo json_encode($q->fetchColumn(0));
+    echo json_encode($q->fetch(PDO::FETCH_NUM));
     exit(0);
 }
 
@@ -262,7 +262,7 @@ if ($_POST['existing-collect']) {
     if ($_POST['existing-collect'] == "new") {
         $q = $dbh->prepare("INSERT INTO `{$dbp}churchyear_collects`
             (class, collect) VALUES (?, ?)");
-        if (!$q->execute(array($_POST['class'], $_POST['collect-text']))) {
+        if (!$q->execute(array($_POST['collect-class'], $_POST['collect-text']))) {
             die(array_pop($q->errorInfo()));
         }
         $qid = $dbh->query("SELECT LAST_INSERT_ID()");
@@ -349,8 +349,9 @@ if ($_GET['requestform'] == "delete-collect") {
     $q = $dbh->prepare("SELECT
         c.collect, c.class, i.lectionary, i.dayname, i.id
         FROM `{$dbp}churchyear_collect_index` AS i
-        JOIN `{$dbp}churchyear_collects` AS c ON (c.id = i.id)
-        WHERE i.id = ?");
+        RIGHT OUTER JOIN `{$dbp}churchyear_collects` AS c ON (c.id = i.id)
+        WHERE c.id = ?
+        GROUP BY i.lectionary, i.dayname");
     if (! $q->execute(array($_GET['cid']))) {
         echo array_pop($q->errorInfo());
     } else {
@@ -360,8 +361,8 @@ if ($_GET['requestform'] == "delete-collect") {
     <p><?=$row['collect']?></p>
     <h4>Used:</h4>
     <ul>
-    <li><?=$row['dayname']?> (<?=$row['lectionary']?>) <a href="churchyear.php?detachcollect=<?=$_GET['cid']?>&lectionary=<?=$row['lectionary']?>&dayname=<?=$row['dayname']?>">Detach From This Day and Lectionary</a></li>
-    <? while ($q->fetch(PDO::FETCH_ASSOC)) {?>
+    <li><?=$row['dayname']?> (<?=$row['lectionary']?>) <a href="churchyear.php?detachcollect=<?=$_GET['cid']?>&lectionary=<?=urlencode($row['lectionary'])?>&dayname=<?=urlencode($row['dayname'])?>">Detach From This Day and Lectionary</a></li>
+    <? while ($row = $q->fetch(PDO::FETCH_ASSOC)) {?>
     <li><?=$row['dayname']?> (<?=$row['lectionary']?>)</li>
     <?}?>
     </ul>
@@ -376,12 +377,45 @@ if ($_GET['requestform'] == "delete-collect") {
 /* churchyear.php with $_POST of deletecollect=collectid
  * Delete the collect with the given id
  */
-// TODO
+if ($_POST['deletecollect']) {
+    if (! $auth) {
+        setMessage("Access denied.  Please log in.");
+        header("location: index.php");
+    }
+    $q = $dbh->prepare("DELETE i, c FROM `{$dbp}churchyear_collect_index` AS i
+        JOIN `{$dbp}churchyear_collects` AS c
+        ON (i.id = c.id)
+        WHERE i.id = :index");
+    if (! $q->execute(array('index'=>$_POST['deletecollect']))) {
+        setMessage("Problem deleting collect: ".array_pop($q->errorInfo()));
+        header("location: churchyear.php");
+    } else {
+        setMessage("Collect deleted.");
+        header("location: churchyear.php");
+    }
+    exit(0);
+}
 
 /* churchyear.php?detachcollect=id&lectionary=name&dayname=day
  * Detach the collect from the given day in the given lectionary
  */
-// TODO
+if ($_GET['detachcollect']) {
+    if (! $auth) {
+        setMessage("Access denied.  Please log in.");
+        header("location: index.php");
+    }
+    $q = $dbh->prepare("DELETE FROM `{$dbp}churchyear_collect_index`
+        WHERE dayname = ? AND lectionary = ? AND id = ?");
+    if (! $q->execute(array($_GET['dayname'], $_GET['lectionary'],
+        $_GET['detachcollect']))) {
+        setMessage("Problem detaching collect: ".array_pop($q->errorInfo()));
+        header("location: churchyear.php");
+    } else {
+        setMessage("Collect detached from lectionary '{$_GET['lectionary']}' on {$_GET['dayname']}.");
+        header("location: churchyear.php");
+    }
+    exit(0);
+}
 
 /* churchyear.php with $_POST data from propers form
  * Update propers for the dayname.
