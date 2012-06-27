@@ -46,13 +46,19 @@
     } else {
         $pdata = ($q->fetchAll(PDO::FETCH_ASSOC));
     }
-    $q = $dbh->prepare("SELECT i.lectionary, c.class, c.collect, c.id
+    $lectionaries = array();
+    foreach ($pdata as $p) {
+        if ($p['lectionary'] != "historic") {
+            $lectionaries[$p['lectionary']] = 1;
+        }
+    }
+    $lectionaries = array_keys($lectionaries);
+    sort($lectionaries);
+    $q = $dbh->prepare("SELECT c.class, c.collect, i.lectionary, i.id
         FROM `{$dbp}churchyear_collect_index` AS i
-        JOIN `{$dbp}churchyear_collects` AS c
-            ON (i.id = c.id)
+        LEFT OUTER JOIN `{$dbp}churchyear_collects` AS c ON (i.id = c.id)
         WHERE i.dayname = ?
-        GROUP BY i.id
-        ORDER BY i.lectionary, c.class");
+        ORDER BY i.lectionary");
     if (! $q->execute(array($dayname))) {
         die(array_pop($q->errorInfo()));
         $cdata = array();
@@ -65,9 +71,9 @@
     <ul>
         <li><a href="#propers-tab"><span>Basic Propers</span></a></li>
         <li><a href="#historic-tab"><span>Historic</span></a></li>
-        <li><a href="#ilcwa-tab"><span>ILCW A</span></a></li>
-        <li><a href="#ilcwb-tab"><span>ILCW B</span></a></li>
-        <li><a href="#ilcwc-tab"><span>ILCW C</span></a></li>
+        <? foreach ($lectionaries as $l) { ?>
+        <li><a href="#<?=$l?>-tab"><span><?=$l?></span></a></li>
+        <? } ?>
         <li><a href="#newpropers-tab"><span>New Propers</span></a></li>
     </ul>
     <div id="propers-tab">
@@ -96,8 +102,6 @@
     <div class="propers">
     <form class="lessons" method="post">
     <div class="propersbox">
-    <a href="#" class="delete-these-propers"
-        data-id="<?=$id?>">Delete These</a><br>
     <input type="hidden" name="lessons" value="<?=$id?>">
     <input type="hidden" name="lessontype" value="historic">
     <div class="formblock"><label for="l1">Lesson 1</label><br>
@@ -124,11 +128,11 @@
     <div class="propersbox"> <?
     foreach ($cdata as $cset) {
         $cid = $cset['id'];
-        if ($cset['lectionary'] = $lset['lectionary']) { ?>
+        if ($cset['lectionary'] == $lset['lectionary']) { ?>
             <div class="formblock fullwidth">
             <label for="collect-<?=$cid?>"><?=$cset['class']?></label>
             <a href="#" class="delete-collect" data-id="<?=$cid?>">Delete</a>
-            <br>
+            <br><?=$cset['lectionary']?><br>
             <textarea name="collect-<?=$cid?>"><?=$cset['collect']?></textarea>
             </div> <?
         }
@@ -146,8 +150,10 @@
     <div class="propers">
     <form class="lessons" method="post">
     <div class="propersbox">
+    <? if (strpos('ilcw', $lset['lectionary']) != 0) { ?>
     <a href="#" class="delete-these-propers"
         data-id="<?=$id?>">Delete These</a><br>
+    <?}?>
     <input type="hidden" name="lessons" value="<?=$id?>">
     <input type="hidden" name="lessontype" value="ilcw">
     <div class="formblock"><label for="l1">Lesson 1</label><br>
@@ -170,11 +176,11 @@
     <div class="propersbox"> <?
     foreach ($cdata as $cset) {
         $cid = $cset['id'];
-        if ($cset['lectionary'] = $lset['lectionary']) { ?>
+        if ($cset['lectionary'] == $lset['lectionary']) { ?>
             <div class="formblock fullwidth">
             <label for="collect-<?=$cid?>"><?=$cset['class']?></label>
             <a href="#" class="delete-collect" data-id="<?=$cid?>">Delete</a>
-            <br>
+            <br><?=$cset['lectionary']?><br>
             <textarea name="collect-<?=$cid?>"><?=$cset['collect']?></textarea>
             </div> <?
         }
@@ -193,8 +199,8 @@
     <form class="lessons" id="newlessons" method="post">
     <div class="propersbox">
     <input type="hidden" name="lessons" value="New">
-    <div class="formblock"><label for="lectionary">Lectionary</label><br>
-    <input type="text" value="" name="lectionary" required></div>
+    <div class="formblock"><label for="lectionary">Lectionary (letters & numbers only)</label><br>
+    <input type="text" value="" name="lectionary" required pattern="[A-Za-z0-9]+"></div>
     <div class="formblock"><label for="l1">Lesson 1</label><br>
     <input type="text" value="" name="l1"></div>
     <div class="formblock"><label for="l2">Lesson 2</label><br>

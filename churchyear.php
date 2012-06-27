@@ -388,11 +388,10 @@ if ($_POST['deletecollect']) {
         WHERE i.id = :index");
     if (! $q->execute(array('index'=>$_POST['deletecollect']))) {
         setMessage("Problem deleting collect: ".array_pop($q->errorInfo()));
-        header("location: churchyear.php");
     } else {
         setMessage("Collect deleted.");
-        header("location: churchyear.php");
     }
+    header("location: churchyear.php");
     exit(0);
 }
 
@@ -409,11 +408,10 @@ if ($_GET['detachcollect']) {
     if (! $q->execute(array($_GET['dayname'], $_GET['lectionary'],
         $_GET['detachcollect']))) {
         setMessage("Problem detaching collect: ".array_pop($q->errorInfo()));
-        header("location: churchyear.php");
     } else {
         setMessage("Collect detached from lectionary '{$_GET['lectionary']}' on {$_GET['dayname']}.");
-        header("location: churchyear.php");
     }
+    header("location: churchyear.php");
     exit(0);
 }
 
@@ -486,6 +484,11 @@ if ($_GET['propers']) {
     require("./churchyear/get_propersform.php");
 }
 
+/* churchyear.php with $_POST of "lessons" = "New"
+ * Save the propers in the indicated lectionary
+ */
+// TODO
+
 /* churchyear.php?delpropers=id
  * Delete the lessons with the given id
  */
@@ -505,6 +508,7 @@ if ($_GET['delpropers']) {
     } else {
         setMessage("Problem deleting prpers: ".array_pop($q->errorInfo()));
     }
+    header("location: churchyear.php");
     exit(0);
 }
 
