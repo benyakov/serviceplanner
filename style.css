@@ -507,3 +507,10 @@ form#block-plan-form #label {
     display: none;
 }
 
+textarea.datalist {
+    display: none;
+}
+
+#new-propers-collect {
+    display: none;
+}

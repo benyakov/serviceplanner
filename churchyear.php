@@ -487,7 +487,25 @@ if ($_GET['propers']) {
 /* churchyear.php with $_POST of "lessons" = "New"
  * Save the propers in the indicated lectionary
  */
-// TODO
+if ($_POST['lessons'] == "New") {
+    if (! $auth) {
+        setMessage("Access denied.  Please log in.");
+        header("location: index.php");
+        exit(0);
+    }
+    $q = $dbh->prepare("INSERT INTO `{$dbp}churchyear_lessons`
+        (dayname, lectionary, lesson1, lesson2, gospel, psalm, hymnabc, hymn)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
+    if (! $q->execute(array($_POST['dayname'], $_POST['lectionary'],
+        $_POST['l1'], $_POST['l2'], $_POST['go'], $_POST['ps'], $_POST['habc'],
+        $_POST['hymn']))) {
+        setMessage("Problem saving new lessons: ".array_pop($q->errorInfo()));
+    } else {
+        setMessage("New lessons saved in lectionary '{$_POST['lectionary']}'.");
+    }
+    header("location: churchyear.php");
+    exit(0);
+}
 
 /* churchyear.php?delpropers=id
  * Delete the lessons with the given id
@@ -495,18 +513,18 @@ if ($_GET['propers']) {
 if ($_GET['delpropers']) {
     if (! $auth) {
         setMessage("Access denied. Please log in.");
-        header("Location: churchyear.php");
+        header("Location: index.php");
         exit(0);
     }
     $q = $dbh->prepare("DELETE i, l
-        FROM `{$dbp}churchyear_collect_index` AS i
-        INNER JOIN  `{$dbp}churchyear_lessons` AS l
+        FROM `{$dbp}churchyear_lessons` AS l
+        LEFT OUTER JOIN `{$dbp}churchyear_collect_index` AS i
         ON (i.dayname = l.dayname AND  i.lectionary = l.lectionary)
         WHERE l.id = ?");
-    if ($q->execute(array($_GET['delpropers']))) {
-        setMessage("Propers deleted.");
+    if (! $q->execute(array($_GET['delpropers']))) {
+        setMessage("Problem deleting propers: ".array_pop($q->errorInfo()));
     } else {
-        setMessage("Problem deleting prpers: ".array_pop($q->errorInfo()));
+        setMessage("Propers deleted.");
     }
     header("location: churchyear.php");
     exit(0);

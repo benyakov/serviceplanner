@@ -121,6 +121,7 @@ CREATE TABLE `churchyear_lessons` (
     `hymnabc`   varchar(20),
     `hymn`      varchar(20),
     `id`        integer auto_increment,
+    UNIQUE KEY `onedayperlect` (`lectionary`, `dayname`),
     PRIMARY KEY (`id`),
     FOREIGN KEY (`dayname`) REFERENCES `churchyear_synonyms` (`synonym`)
         ON DELETE CASCADE

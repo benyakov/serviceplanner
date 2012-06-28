@@ -34,7 +34,9 @@
         FROM `{$dbp}churchyear_propers` AS pr
         LEFT OUTER JOIN `{$dbp}churchyear_lessons` AS l
             ON (pr.dayname = l.dayname)
-            WHERE pr.dayname = ?
+        LEFT OUTER JOIN `{$dbp}churchyear_synonyms` AS s
+            ON (pr.dayname = s.synonym)
+        WHERE s.canonical = ?
         ORDER BY l.lectionary");
     if (! $q->execute(array($dayname))) {
         die(array_pop($q->errorInfo()));
@@ -132,7 +134,7 @@
             <div class="formblock fullwidth">
             <label for="collect-<?=$cid?>"><?=$cset['class']?></label>
             <a href="#" class="delete-collect" data-id="<?=$cid?>">Delete</a>
-            <br><?=$cset['lectionary']?><br>
+            <br>
             <textarea name="collect-<?=$cid?>"><?=$cset['collect']?></textarea>
             </div> <?
         }
@@ -150,9 +152,9 @@
     <div class="propers">
     <form class="lessons" method="post">
     <div class="propersbox">
-    <? if (strpos('ilcw', $lset['lectionary']) != 0) { ?>
+    <? if (strpos($lset['lectionary'], 'ilcw') !== 0) { ?>
     <a href="#" class="delete-these-propers"
-        data-id="<?=$id?>">Delete These</a><br>
+    data-id="<?=$id?>">Delete these from <?=$lset['lectionary']?>.</a><br>
     <?}?>
     <input type="hidden" name="lessons" value="<?=$id?>">
     <input type="hidden" name="lessontype" value="ilcw">
@@ -180,7 +182,7 @@
             <div class="formblock fullwidth">
             <label for="collect-<?=$cid?>"><?=$cset['class']?></label>
             <a href="#" class="delete-collect" data-id="<?=$cid?>">Delete</a>
-            <br><?=$cset['lectionary']?><br>
+            <br>
             <textarea name="collect-<?=$cid?>"><?=$cset['collect']?></textarea>
             </div> <?
         }
@@ -199,8 +201,11 @@
     <form class="lessons" id="newlessons" method="post">
     <div class="propersbox">
     <input type="hidden" name="lessons" value="New">
+    <input type="hidden" name="dayname" value="<?=$dayname?>">
+    <textarea class="datalist"
+    id="lectionaries-for-dayname"><?=implode("\n", $lectionaries)?></textarea>
     <div class="formblock"><label for="lectionary">Lectionary (letters & numbers only)</label><br>
-    <input type="text" value="" name="lectionary" required pattern="[A-Za-z0-9]+"></div>
+    <input type="text" value="" name="lectionary" id="new-lectionary" required pattern="[A-Za-z0-9]+"></div>
     <div class="formblock"><label for="l1">Lesson 1</label><br>
     <input type="text" value="" name="l1"></div>
     <div class="formblock"><label for="l2">Lesson 2</label><br>
@@ -214,14 +219,6 @@
     <div class="formblock"><label for="hymn">Series Hymn</label><br>
     <input type="text" value="" name="hymn"></div><br>
     <button type="submit" class="submit-lessons">Submit</button>
-    <button type="reset">Reset</button>
-    </div>
-    </form>
-    <form class="collects" id="newcollects" method="post">
-    <div class="propersbox">
-    <a href="#" class="add-collect"
-        data-lectionary="">New Collect</a><br>
-    <button type="submit" class="submit-collects">Submit</button>
     <button type="reset">Reset</button>
     </div>
     </form>

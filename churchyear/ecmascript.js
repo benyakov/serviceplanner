@@ -242,7 +242,8 @@ function setupPropersDialog() {
     $("#tabs").tabs();
     $(".delete-these-propers").click(function() {
         if (confirm("Delete propers?"+
-           " (Listed collects will still exist.)")) {
+           " (Listed collects will be detached "+
+           "from this day & lectionary.)")) {
             var id = $(this).attr("data-id");
             window.location.replace("churchyear.php?delpropers="+id);
         }
@@ -296,5 +297,15 @@ function setupPropersDialog() {
                         $("#dialog2").html("");
                     }});
         });
+    });
+    $("#new-lectionary").change(function() {
+        var currentLects = $("#lectionaries-for-dayname").val().split("\n");
+        if (-1 < currentLects.indexOf($(this).val())) {
+            setMessage("Propers already exist for today in that lectionary! "+
+                "Please edit the existing propers instead, "+
+                "or use a different lectionary.");
+            $(this).val("");
+            $(this).focus();
+        }
     });
 }
