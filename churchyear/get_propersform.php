@@ -79,7 +79,7 @@
         <li><a href="#newpropers-tab"><span>New Propers</span></a></li>
     </ul>
     <div id="propers-tab">
-    <form id="propersform" method="post">
+    <form class="propersform" method="post">
     <div class="propersbox">
     <input type="hidden" name="propers" id="propers" value="<?=$dayname?>">
     <div class="formblock"><label for="color">Color</label><br>
@@ -90,7 +90,7 @@
     <textarea name="note"><?=$pdata[0]['note']?></textarea><br></div>
     <div class="formblock fullwidth"><label for="introit">Introit</label><br>
     <textarea name="introit"><?=$pdata[0]['introit']?></textarea></div>
-    <button type="submit" id="propersform-submit">Submit</button>
+    <button type="submit">Submit</button>
     <button type="reset">Reset</button>
     </div>
     </form>
@@ -102,7 +102,7 @@
     ?>
     <div id="historic-tab">
     <div class="propers">
-    <form class="lessons" method="post">
+    <form class="lessons propersform" method="post">
     <div class="propersbox">
     <input type="hidden" name="lessons" value="<?=$id?>">
     <input type="hidden" name="lessontype" value="historic">
@@ -150,7 +150,7 @@
     <? } else { ?>
     <div id="<?=$lset["lectionary"]?>-tab">
     <div class="propers">
-    <form class="lessons" method="post">
+    <form class="lessons propersform" method="post">
     <div class="propersbox">
     <? if (strpos($lset['lectionary'], 'ilcw') !== 0) { ?>
     <a href="#" class="delete-these-propers"

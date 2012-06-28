@@ -328,7 +328,7 @@ if ($_GET['requestform'] == "collect") {
         </select>
         <input type="text" required id="collect-class" name="collect-class"
             placeholder="Type or Series"></input><br>
-        <textarea name="collect-text" id="collect-text"></textarea><br>
+        <textarea name="collect-text" id="collect-text" required></textarea><br>
         <button type="submit">Submit</button>
         <button type="reset">Reset</button>
         </div>
@@ -415,73 +415,82 @@ if ($_GET['detachcollect']) {
     exit(0);
 }
 
-/* churchyear.php with $_POST data from propers form
- * Update propers for the dayname.
- */
-if ($_POST['propers']) {
-    if (! $auth) {
-        echo json_encode(array(false));
-        exit(0);
-    }
-    $qi = $dbh->prepare("INSERT INTO `{$dbp}churchyear_propers`
-        (color, theme, note, introit, dayname)
-        VALUES (?, ?, ?, ?)");
-    $qu = $dbh->prepare("UPDATE `{$dbp}churchyear_propers` SET
-        color=?, theme=?, note=?, introit=? WHERE dayname=?");
-    $valarray = array($_POST['color'], $_POST['theme'], $_POST['note'],
-        $_POST['propers'], $_POST['introit']);
-    if (!($qi->execute($valarray) || $qu->execute($valarray))) {
-        echo json_encode(array_pop($q->errorInfo()));
-        exit(0);
-    }
-    $i=1;
-    $qhi = $dbh->prepare("INSERT INTO `{$dbp}churchyear_lessons`
-        (lesson1, lesson2, gospel, psalm, s2lesson, s2gospel,
-        s3lesson, s3gospel, lectionary, dayname)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
-    $qhu = $dbh->prepare("UPDATE `{$dbp}churchyear_lessons`
-        SET lesson1=?, lesson2=?, gospel=?, psalm=?, s2lesson=?,
-        s2gospel=?, s3lesson=?, s3gospel=?,lectionary=?, dayname=? WHERE id=?");
-    $qii = $dbh->prepare("INSERT INTO `{$dbp}churchyear_lessons`
-        (lesson1, lesson2, gospel, psalm, hymnabc, hymn)
-        VALUES (?, ?, ?, ?, ? ,?)");
-    $qiu = $dbh->prepare("UPDATE `{$dbp}churchyear_lessons`
-        SET lesson1=?, lesson2=?, gospel=?, psalm=?, hymnabc=?, hymn=?
-        WHERE id=?");
-    while (array_key_exists("lessons-{$i}", $_POST)) {
-        $id = $_POST["lessons-{$i}"];
-        if ($_POST['lessontype'] == "ilcw") {
-            $query = array($_POST["l1-{$id}"], $_POST["l2-{$id}"],
-                $_POST["go-{$id}"], $_POST["ps-{$id}"],
-                $_POST["habc-{$id}"], $_POST["hymn-{$id}"], $_POST['propers']);
-            $qi = $qu = $query;
-            array_unshift($qi, $qii);
-            array_push($qu, $_POST["id-{$id}"]);
-            array_unshift($qu, $qiu);
-        } else {
-            $query = array($_POST["l1-{$id}"], $_POST["l2-{$id}"],
-                $_POST["go-{$id}"], $_POST["ps-{$id}"],
-                $_POST["s2l-{$id}"], $_POST["s2go-{$id}"],
-                $_POST["s3l-{$id}"], $_POST["s3go-{$id}"], $_POST['propers']);
-            $qi = $qu = $query;
-            array_unshift($qi, $qhi);
-            array_push($qu, $_POST["id-{$id}"]);
-            array_unshift($qu, $qhu);
-        }
-        if (! ($qi[-1]->execute(array_slice($qi, 1)) ||
-               $qu[-1]->execute(array_slice($qu, 1)))) {
-            echo json_encode(array_pop($q->errorInfo()));
-        }
-        $i++;
-    }
-    exit(0);
-}
-
 /* churchyear.php?propers=dayname
  * Show populated form for the propers of the given dayname
  */
 if ($_GET['propers']) {
     require("./churchyear/get_propersform.php");
+}
+
+/* churchyear.php with $_POST containing propers = dayname
+ * Submit provided changes to propers.
+ */
+if ($_POST['propers']) {
+    if (! $auth) {
+        echo json_encode(array(false, "Access denied.  Please log in."));
+        exit(0);
+    }
+    $q = $dbh->prepare("UPDATE `{$dbp}churchyear_propers` SET
+        color=?, theme=?, introit=?, note=? WHERE dayname = ?");
+    if (! $q->execute(array($_POST['color'], $_POST['theme'],
+        $_POST['introit'], $_POST['note'], $_POST['propers'])))
+    {
+        $rv = array(false, "Problem updating propers: ".
+            array_pop($q->errorInfo()));
+    } else {
+        $rv = array(true, "Basic propers saved.");
+    }
+    echo json_encode($rv);
+    exit(0);
+}
+
+/* churchyear.php with $_POST of "lessontype" = "historic"
+ * Update lessons for the day/lectionary with the provided lessons.
+ */
+if ($_POST['lessontype'] == "historic") {
+    if (! $auth) {
+        echo json_encode(array(false, "Access denied.  Please log in."));
+        exit(0);
+    }
+    $q = $dbh->prepare("UPDATE `{$dbp}churchyear_lessons` SET
+       lectionary='historic', lesson1=?, lesson2=?, gospel=?, psalm=?,
+       s2lesson=?, s2gospel=?, s3lesson=?, s3gospel=?, hymnabc='', hymn=''
+       WHERE id=?");
+    if (! $q->execute(array($_POST['l1'], $_POST['l2'], $_POST['go'],
+        $_POST['ps'], $_POST['s2l'], $_POST['s2g'], $_POST['s3l'],
+        $_POST['s3g'], $_POST['lessons'])))
+    {
+        $rv = array(false, "Problem updating propers: ".
+            array_pop($q->errorInfo()));
+    } else {
+        $rv = array(true, "Historic lessons saved.");
+    }
+    echo json_encode($rv);
+    exit(0);
+}
+
+/* churchyear.php with $_POST of "lessontype" = "ilcw"
+ * Update lessons for the day/lectionary with the provided lessons.
+ */
+if ($_POST['lessontype'] == "ilcw") {
+    if (! $auth) {
+        echo json_encode(array(false, "Access denied.  Please log in."));
+        exit(0);
+    }
+    $q = $dbh->prepare("UPDATE `{$dbp}churchyear_lessons` SET
+       lesson1=?, lesson2=?, gospel=?, psalm=?,
+       s2lesson='', s2gospel='', s3lesson='', s3gospel='',
+       hymnabc=?, hymn=?  WHERE id=?");
+    if (! $q->execute(array($_POST['l1'], $_POST['l2'], $_POST['go'],
+        $_POST['ps'], $_POST['hymnabc'], $_POST['hymn'], $_POST['lessons'])))
+    {
+        $rv = array(false, "Problem updating propers: ".
+            array_pop($q->errorInfo()));
+    } else {
+        $rv = array(true, "Lessons saved.");
+    }
+    echo json_encode($rv);
+    exit(0);
 }
 
 /* churchyear.php with $_POST of "lessons" = "New"

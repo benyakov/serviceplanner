@@ -82,17 +82,12 @@ $(document).ready(function() {
                     return;
                 }
                 $("#dialog").html(rv[1]);
-                $("#propersform").submit(function(evt) {
+                $(".propersform").submit(function(evt) {
                     evt.preventDefault();
-                    $.post("churchyear.php", $("#propersform").serialize(),
+                    $.post("churchyear.php", $(this).serialize(),
                         function(rv) {
-                            $("#dialog").dialog("close");
                             rv = eval(rv);
-                            if (rv) {
-                                setMessage("Saved propers.");
-                            } else {
-                                setMessage("Failed to save propers");
-                            }
+                            setMessage(rv[1]);
                     });
                 });
                 $("#dialog").dialog({modal: true,
