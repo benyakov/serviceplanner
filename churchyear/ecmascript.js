@@ -26,78 +26,13 @@
 $(document).ready(function() {
     setupEdit();
     setupDelete();
+    setupSynonym();
+    setupPropers();
     $.get("churchyear.php", { request: "params",
         params: "Michaelmas" },
         function(params) {
             sessionStorage.michaelmasObserved = params['observed_sunday'];
         });
-    $(".synonym").click(function(evt) {
-        evt.preventDefault();
-        var loc = $(this).offset();
-        var orig = $(this).attr("data-day");
-        $.get("churchyear.php", {request: "synonyms",
-            name: orig},
-            function(rv) {
-                rv = eval(rv);
-                if (rv[0]) {
-                    var lines = rv[1].join("\n");
-                } else {
-                    var lines = "";
-                }
-                $("#dialog").html('<form id="synonymsform" method="post">'
-                    +'<textarea id="synonyms">'+lines+'</textarea><br>'
-                    +'<button type="submit" id="submit">Submit</button>'
-                    +'<button type="reset" id="reset">Reset</button>'
-                    +'</form>');
-                $("#synonymsform").submit(function(evt) {
-                    evt.preventDefault();
-                    $.post("churchyear.php",
-                {synonyms: $("#synonyms").val(),
-                 canonical: orig}, function(rv) {
-                            $("#dialog").dialog("close");
-                            rv = eval(rv);
-                            if (rv) {
-                                setMessage("Saved synonyms.");
-                            } else {
-                                setMessage("Failed to save synonyms");
-                            }
-                    });
-                });
-                $("#dialog").dialog({modal: true,
-                    title: "Synonyms for "+orig,
-                    width: $(window).width()*0.4,
-                    maxHeight: $(window).height()*0.4,
-                    position: [30, loc.top],
-                });
-            });
-    });
-    $(".propers").click(function(evt) {
-        evt.preventDefault();
-        var loc = $(this).offset();
-        var orig = $(this).attr("data-day");
-        $.get("churchyear.php", {propers: orig},
-            function(rv) {
-                rv = eval(rv);
-                if (! rv[0]) {
-                    return;
-                }
-                $("#dialog").html(rv[1]);
-                $(".propersform").submit(function(evt) {
-                    evt.preventDefault();
-                    $.post("churchyear.php", $(this).serialize(),
-                        function(rv) {
-                            rv = eval(rv);
-                            setMessage(rv[1]);
-                    });
-                });
-                $("#dialog").dialog({modal: true,
-                    title: "Propers for "+orig,
-                    width: $(window).width()*0.7,
-                    maxHeight: $(window).height()*0.7,
-                    position: "center"
-                });
-            });
-    });
 });
 
 function getDateFor(year) {
@@ -141,6 +76,71 @@ function getDateFor(year) {
     }
 }
 
+function setupPropers() {
+    $(".propers").click(function(evt) {
+        evt.preventDefault();
+        var loc = $(this).offset();
+        var orig = $(this).attr("data-day");
+        $.get("churchyear.php", {propers: orig},
+            function(rv) {
+                rv = eval(rv);
+                if (! rv[0]) {
+                    return;
+                }
+                $("#dialog").html(rv[1])
+                    .dialog({modal: true,
+                        title: "Propers for "+orig,
+                        width: $(window).width()*0.7,
+                        maxHeight: $(window).height()*0.7,
+                        position: "center"
+                    });
+            });
+    });
+}
+
+function setupSynonym() {
+    $(".synonym").click(function(evt) {
+        evt.preventDefault();
+        var loc = $(this).offset();
+        var orig = $(this).attr("data-day");
+        $.get("churchyear.php", {request: "synonyms",
+            name: orig},
+            function(rv) {
+                rv = eval(rv);
+                if (rv[0]) {
+                    var lines = rv[1].join("\n");
+                } else {
+                    var lines = "";
+                }
+                $("#dialog").html('<form id="synonymsform" method="post">'
+                    +'<textarea id="synonyms">'+lines+'</textarea><br>'
+                    +'<button type="submit" id="submit">Submit</button>'
+                    +'<button type="reset" id="reset">Reset</button>'
+                    +'</form>');
+                $("#synonymsform").submit(function(evt) {
+                    evt.preventDefault();
+                    $.post("churchyear.php",
+                {synonyms: $("#synonyms").val(),
+                 canonical: orig}, function(rv) {
+                            $("#dialog").dialog("close");
+                            rv = eval(rv);
+                            if (rv) {
+                                setMessage("Saved synonyms.");
+                            } else {
+                                setMessage("Failed to save synonyms");
+                            }
+                    });
+                });
+                $("#dialog").dialog({modal: true,
+                    title: "Synonyms for "+orig,
+                    width: $(window).width()*0.4,
+                    maxHeight: $(window).height()*0.4,
+                    position: [30, loc.top],
+                });
+            });
+    });
+}
+
 function setupEdit() {
     // Set up edit links
     $(".edit").click(function(evt) {
@@ -154,9 +154,6 @@ function setupEdit() {
                         title: dtitle,
                         width: $(window).width()*0.7,
                         maxHeight: $(window).height()*0.7,
-                        create: function() {
-                            setupEditDialog();
-                        },
                         open: function() {
                             setupEditDialog();
                         }});
@@ -175,6 +172,8 @@ function setupDelete() {
                     $("#churchyear-listing").replaceWith(rv[1]);
                     setupEdit();
                     setupDelete();
+                    setupSynonym();
+                    setupPropers();
                 } else {
                     setMessage(rv[1]);
                 }
@@ -199,11 +198,46 @@ function setupCollectDialog(addlink) {
             $("#collect-class").attr('disabled', false);
         }
     });
+    $("#collect-form").submit(function(evt) {
+        evt.preventDefault();
+        var data = $(this).serialize();
+        $.post('churchyear.php', data, function(rv) {
+            $("#dialog2").dialog("close");
+            rv = eval(rv);
+            if (rv[0]) {
+                $("#dialog").html(rv[2]);
+            }
+            setMessage(rv[1]);
+        });
+    });
 }
 
 function setupCollectDeleteDialog() {
-    $("#cancel-delete").click(function() {
+    $(".detach-collect").click(function(evt) {
+        evt.preventDefault();
         $("#dialog2").dialog("close");
+        $.get("churchyear.php", {
+            detachcollect: $(this).attr("data-cid"),
+            lectionary: $(this).attr("data-lectionary"),
+            dayname: $(this).attr("data-dayname") }, function(rv) {
+                rv = eval(rv);
+                if (rv[0]) {
+                    $("#dialog").html(rv[2]);
+                }
+                setMessage(rv[1]);
+        });
+    });
+    $("#delete-collect-confirm").submit(function(evt) {
+        evt.preventDefault();
+        var vals = $(this).serialize();
+        $.post("churchyear.php", vals, function(rv) {
+            $("#dialog2").dialog("close");
+            rv = eval(rv);
+            if (rv[0]) {
+                $("#dialog").html(rv[2]);
+            }
+            setMessage(rv[1]);
+        });
     });
 }
 
@@ -225,12 +259,28 @@ function setupEditDialog() {
         .change(function() {
             var newdates = getDecadeDates();
             $("#calculated-dates").html(newdates);
-        });
+    });
     $("#dayform").submit(function() {
         if ($('#dayname') == "Michaelmas") {
            sessionStorage.michaelmasObserved = $("#observed-sunday").val();
         }
-     });
+    });
+    $("#dayform").submit(function(evt) {
+        evt.preventDefault();
+        var vals = $(this).serialize();
+        $.post("churchyear.php", vals, function(rv) {
+            $("#dialog").dialog("close");
+            rv = eval(rv);
+            if (rv[0]) {
+                $("#churchyear-listing").replaceWith(rv[2]);
+                setupEdit();
+                setupDelete();
+                setupSynonym();
+                setupPropers();
+            }
+            setMessage(rv[1]);
+        });
+    });
 }
 
 function setupPropersDialog() {
@@ -240,7 +290,13 @@ function setupPropersDialog() {
            " (Listed collects will be detached "+
            "from this day & lectionary.)")) {
             var id = $(this).attr("data-id");
-            window.location.replace("churchyear.php?delpropers="+id);
+            $.get("churchyear.php", { delpropers: id }, function(rv) {
+                rv = eval(rv);
+                if (rv[0]) {
+                    $("#dialog").html(rv[2]);
+                }
+                setMessage(rv[1]);
+            });
         }
     });
     $(".add-collect").click(function() {
@@ -259,9 +315,6 @@ function setupPropersDialog() {
                     title: "New Collect",
                     width: $(window).width()*0.65,
                     maxHeight: $(window).height()*0.7,
-                    create: function() {
-                        setupCollectDialog(this);
-                    },
                     open: function() {
                         setupCollectDialog(this);
                     },
@@ -272,7 +325,8 @@ function setupPropersDialog() {
     });
     $(".delete-collect").click(function(){
         $.get("churchyear.php", { requestform: "delete-collect",
-            cid: $(this).attr("data-id") }, function(rv) {
+            cid: $(this).attr("data-id"),
+            dayname: $('#propers').val()}, function(rv) {
                 if (! ($("#dialog2").length)) {
                     $("#dialog").after('<div id="dialog2"></div>');
                 }
@@ -282,9 +336,6 @@ function setupPropersDialog() {
                     title: "Confirm Delete Collect?",
                     width: $(window).width()*0.65,
                     maxHeight: $(window).height()*0.7,
-                    create: function() {
-                        setupCollectDeleteDialog();
-                    },
                     open: function() {
                         setupCollectDeleteDialog();
                     },
@@ -302,5 +353,24 @@ function setupPropersDialog() {
             $(this).val("");
             $(this).focus();
         }
+    });
+    $(".propersform").submit(function(evt) {
+        evt.preventDefault();
+        $.post("churchyear.php", $(this).serialize(),
+            function(rv) {
+                rv = eval(rv);
+                setMessage(rv[1]);
+        });
+    });
+    $("#newlessons").submit(function(evt) {
+        evt.preventDefault();
+        $.post("churchyear.php", $(this).serialize(),
+            function(rv) {
+                rv = eval(rv);
+                if (rv[0]) {
+                    $("#dialog").html(rv[2]);
+                }
+                setMessage(rv[1]);
+        });
     });
 }

@@ -162,31 +162,40 @@ if ($_POST['del']) {
  */
 if ($_POST['submit_day']==1) {
     if (! $auth) {
-        setMessage("Access denied. Please log in.");
-        header("location: index.php");
+        echo json_encode(array(false, "Access denied. Please log in."));
         exit(0);
     }
-
     // Update/save supplied values for the given day
     unset($_POST['submit_day']);
     $q = $dbh->prepare("INSERT INTO `{$dbp}churchyear`
         (season, base, offset, month, day,
         observed_month, observed_sunday, dayname)
         VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
-    $bound = array($_POST['dayname'], $_POST['season'], $_POST['base'],
+    $bound = array($_POST['season'], $_POST['base'],
         $_POST['offset'], $_POST['month'], $_POST['day'],
-        $_POST['observed_month'], $_POST['observed_sunday']);
+        $_POST['observed_month'], $_POST['observed_sunday'],
+        $_POST['dayname']);
     if (! $q->execute($bound)) {
         $q = $dbh->prepare("UPDATE `{$dbp}churchyear`
             SET season=?, base=?, offset=?, month=?, day=?,
             observed_month=?, observed_sunday=?
             WHERE dayname=?");
         if (! $q->execute($bound)) {
-            setMessage("Problem saving: ". array_pop($q->errorInfo()));
+            $rv = array(false, "Problem saving: ". array_pop($q->errorInfo()));
+        } elseif ($q->rowCount() > 0) {
+            $rv = array(true,
+                "Saved parameters for existing day {$_POST['dayname']}");
+        } else {
+            $rv = array(false, "No changes made.");
         }
-        header("location: churchyear.php");
-        exit(0);
+    } else {
+        $rv = array(true, "Saved parameters for new day {$_POST['dayname']}.");
     }
+    if ($rv[0]) {
+        array_push($rv, churchyear_listing(query_churchyear()));
+    }
+    echo json_encode($rv);
+    exit(0);
 }
 
 /* churchyear.php with $_POST of synonyms (lines) and canonical (dayname)
@@ -254,42 +263,53 @@ if ($_GET['request'] == "collect") {
  */
 if ($_POST['existing-collect']) {
     if (! $auth) {
-        setMessage("Access denied. Please log in first.");
-        header("location: index.php");
+        echo json_encode(false, "Access denied. Please log in first.");
         exit(0);
     }
     $dbh->beginTransaction();
     if ($_POST['existing-collect'] == "new") {
         $q = $dbh->prepare("INSERT INTO `{$dbp}churchyear_collects`
             (class, collect) VALUES (?, ?)");
-        if (!$q->execute(array($_POST['collect-class'], $_POST['collect-text']))) {
-            die(array_pop($q->errorInfo()));
+        if (!$q->execute(array($_POST['collect-class'],
+            $_POST['collect-text'])))
+        {
+            $rv = array(false, "Problem inserting new collect text: ".
+                array_pop($q->errorInfo()));
+        } else {
+            $qid = $dbh->query("SELECT LAST_INSERT_ID()");
+            $qid = $qid->fetchColumn(0);
+            $q = $dbh->prepare("INSERT INTO `{$dbp}churchyear_collect_index`
+                (`dayname`, `lectionary`, `id`) VALUES (?, ?, ?)");
+            if (! $q->execute(array($_POST['dayname'],
+                $_POST['lectionary'], $qid)))
+            {
+                $rv = array(false, "Problem inserting new collect: ".
+                    array_pop($q->errorInfo()));
+            } else {
+                $dbh->commit();
+                $rv = array(true,
+                    "New collect inserted for {$_POST['dayname']}");
+            }
         }
-        $qid = $dbh->query("SELECT LAST_INSERT_ID()");
-        $qid = $qid->fetchColumn(0);
-        $q = $dbh->prepare("INSERT INTO `{$dbp}churchyear_collect_index`
-            (`dayname`, `lectionary`, `id`)
-            VALUES (?, ?, ?)");
-        if (! $q->execute(array($_POST['dayname'],
-            $_POST['lectionary'], $qid))){
-            die(array_pop($q->errorInfo()));
-            exit(0);
-        }
-        $dbh->commit();
-        setMessage("New collect inserted for {$_POST['dayname']}");
-        header("location: churchyear.php");
     } else {
         $q = $dbh->prepare("INSERT INTO `{$dbp}churchyear_collect_index`
-            (`dayname`, `lectionary`, `id`)
-            VALUES (?, ?, ?)");
+            (`dayname`, `lectionary`, `id`) VALUES (?, ?, ?)");
         if (! $q->execute(array($_POST['dayname'], $_POST['lectionary'],
-            $_POST['existing-collect']))) {
-            die(array_pop($q->errorInfo()));
-            }
-        $dbh->commit();
-        setMessage("Existing collect attached to {$_POST['dayname']}");
-        header("location: churchyear.php");
+            $_POST['existing-collect'])))
+        {
+            $rv = array(false, "Problem inserting collect: ".
+                array_pop($q->errorInfo()));
+        } else {
+            $dbh->commit();
+            $rv = array(true,
+                "Existing collect attached to {$_POST['dayname']}");
+        }
     }
+    if ($rv[0]) {
+        require("./churchyear/get_propersform.php");
+        array_push($rv, propersForm($_POST['dayname']));
+    }
+    echo json_encode($rv);
     exit(0);
 }
 
@@ -361,13 +381,14 @@ if ($_GET['requestform'] == "delete-collect") {
     <p><?=$row['collect']?></p>
     <h4>Used:</h4>
     <ul>
-    <li><?=$row['dayname']?> (<?=$row['lectionary']?>) <a href="churchyear.php?detachcollect=<?=$_GET['cid']?>&lectionary=<?=urlencode($row['lectionary'])?>&dayname=<?=urlencode($row['dayname'])?>">Detach From This Day and Lectionary</a></li>
+    <li><?=$row['dayname']?> (<?=$row['lectionary']?>) <a href="#" class="detach-collect" data-cid="<?=$_GET['cid']?>" data-lectionary="<?=$row['lectionary']?>" data-dayname="<?=$row['dayname']?>">Detach from this day and lectionary</a></li>
     <? while ($row = $q->fetch(PDO::FETCH_ASSOC)) {?>
-    <li><?=$row['dayname']?> (<?=$row['lectionary']?>)</li>
+    <li><?=$row['dayname']?> (<?=$row['lectionary']?>) <a href="#" class="detach-collect" data-cid="<?=$_GET['cid']?>" data-lectionary="<?=$row['lectionary']?>" data-dayname="<?=$row['dayname']?>">Detach from this day and lectionary</a></li>
     <?}?>
     </ul>
     <form id="delete-collect-confirm" method="post" action="churchyear.php">
     <input type="hidden" name="deletecollect" value="<?=$_GET['cid']?>">
+    <input type="hidden" name="dayname" value="<?=$_GET['dayname']?>">
     <button type="submit" name="submit">Delete Collect Entirely</button>
     </form>
 <?  }
@@ -379,19 +400,21 @@ if ($_GET['requestform'] == "delete-collect") {
  */
 if ($_POST['deletecollect']) {
     if (! $auth) {
-        setMessage("Access denied.  Please log in.");
-        header("location: index.php");
+        echo json_encode("Access denied.  Please log in.");
+        exit(0);
     }
     $q = $dbh->prepare("DELETE i, c FROM `{$dbp}churchyear_collect_index` AS i
         JOIN `{$dbp}churchyear_collects` AS c
         ON (i.id = c.id)
         WHERE i.id = :index");
     if (! $q->execute(array('index'=>$_POST['deletecollect']))) {
-        setMessage("Problem deleting collect: ".array_pop($q->errorInfo()));
+        $rv = array(false,
+            "Problem deleting collect: ".array_pop($q->errorInfo()));
     } else {
-        setMessage("Collect deleted.");
+        require("./churchyear/get_propersform.php");
+        $rv = array(true, "Collect deleted.", propersForm($_POST['dayname']));
     }
-    header("location: churchyear.php");
+    echo json_encode($rv);
     exit(0);
 }
 
@@ -400,18 +423,23 @@ if ($_POST['deletecollect']) {
  */
 if ($_GET['detachcollect']) {
     if (! $auth) {
-        setMessage("Access denied.  Please log in.");
-        header("location: index.php");
+        echo json_encode("Access denied.  Please log in.");
+        exit(0);
     }
     $q = $dbh->prepare("DELETE FROM `{$dbp}churchyear_collect_index`
         WHERE dayname = ? AND lectionary = ? AND id = ?");
     if (! $q->execute(array($_GET['dayname'], $_GET['lectionary'],
-        $_GET['detachcollect']))) {
-        setMessage("Problem detaching collect: ".array_pop($q->errorInfo()));
+        $_GET['detachcollect'])))
+    {
+        $rv = array(false, "Problem detaching collect: ".
+            array_pop($q->errorInfo()));
     } else {
-        setMessage("Collect detached from lectionary '{$_GET['lectionary']}' on {$_GET['dayname']}.");
+        require("./churchyear/get_propersform.php");
+        $rv = array(true, "Collect detached from lectionary ".
+            "'{$_GET['lectionary']}' on {$_GET['dayname']}.",
+            propersForm($_GET['dayname']));
     }
-    header("location: churchyear.php");
+    echo json_encode($rv);
     exit(0);
 }
 
@@ -419,7 +447,13 @@ if ($_GET['detachcollect']) {
  * Show populated form for the propers of the given dayname
  */
 if ($_GET['propers']) {
+    if (! $auth) {
+        echo json_encode(array(false));
+        exit(0);
+    }
     require("./churchyear/get_propersform.php");
+    echo json_encode(array(true, propersForm($_GET['propers'])));
+    exit(0);
 }
 
 /* churchyear.php with $_POST containing propers = dayname
@@ -498,8 +532,7 @@ if ($_POST['lessontype'] == "ilcw") {
  */
 if ($_POST['lessons'] == "New") {
     if (! $auth) {
-        setMessage("Access denied.  Please log in.");
-        header("location: index.php");
+        echo json_encode(array(false, "Access denied.  Please log in."));
         exit(0);
     }
     $q = $dbh->prepare("INSERT INTO `{$dbp}churchyear_lessons`
@@ -507,12 +540,17 @@ if ($_POST['lessons'] == "New") {
         VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
     if (! $q->execute(array($_POST['dayname'], $_POST['lectionary'],
         $_POST['l1'], $_POST['l2'], $_POST['go'], $_POST['ps'], $_POST['habc'],
-        $_POST['hymn']))) {
-        setMessage("Problem saving new lessons: ".array_pop($q->errorInfo()));
+        $_POST['hymn'])))
+    {
+        $rv = array(false,
+            "Problem saving new lessons: ".array_pop($q->errorInfo()));
     } else {
-        setMessage("New lessons saved in lectionary '{$_POST['lectionary']}'.");
+        require("./churchyear/get_propersform.php");
+        $rv = array(true,
+            "New lessons saved in lectionary '{$_POST['lectionary']}'.",
+            propersForm($_POST['dayname']));
     }
-    header("location: churchyear.php");
+    echo json_encode($rv);
     exit(0);
 }
 
@@ -521,9 +559,18 @@ if ($_POST['lessons'] == "New") {
  */
 if ($_GET['delpropers']) {
     if (! $auth) {
-        setMessage("Access denied. Please log in.");
-        header("Location: index.php");
+        echo json_encode(array(false, "Access denied. Please log in."));
         exit(0);
+    }
+    $dbh->beginTransaction();
+    $q = $dbh->prepare("SELECT dayname FROM `{$dbp}churchyear_lessons` AS l
+        WHERE l.id = ?");
+    if (! $q->execute(array($_GET['delpropers']))) {
+        echo json_encode(array(false,
+            "Could not get dayname for the lessons."));
+        exit(0);
+    } else {
+        $dayname = $q->fetchColumn(0);
     }
     $q = $dbh->prepare("DELETE i, l
         FROM `{$dbp}churchyear_lessons` AS l
@@ -531,11 +578,14 @@ if ($_GET['delpropers']) {
         ON (i.dayname = l.dayname AND  i.lectionary = l.lectionary)
         WHERE l.id = ?");
     if (! $q->execute(array($_GET['delpropers']))) {
-        setMessage("Problem deleting propers: ".array_pop($q->errorInfo()));
+        $rv = array(false,
+            "Problem deleting propers: ".array_pop($q->errorInfo()));
     } else {
-        setMessage("Propers deleted.");
+        $dbh->commit();
+        require("./churchyear/get_propersform.php");
+        $rv = array(true, "Propers deleted.", propersForm($dayname));
     }
-    header("location: churchyear.php");
+    echo json_encode($rv);
     exit(0);
 }
 

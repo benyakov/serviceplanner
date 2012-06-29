@@ -23,11 +23,8 @@
     The Dalles, OR 97058
     USA
    */
-    $dayname = $_GET['propers'];
-    if (! $auth) {
-        echo json_encode(array(false));
-        exit(0);
-    }
+function propersForm($dayname) {
+    global $dbp, $dbh;
     $q = $dbh->prepare("SELECT pr.color, pr.theme, pr.introit, pr.note,
         l.lesson1, l.lesson2, l.gospel, l.psalm, l.s2lesson, l.s3gospel,
         l.s3lesson, l.s3gospel, l.id, l.lectionary, l.hymnabc, l.hymn
@@ -50,9 +47,7 @@
     }
     $lectionaries = array();
     foreach ($pdata as $p) {
-        if ($p['lectionary'] != "historic") {
-            $lectionaries[$p['lectionary']] = 1;
-        }
+        $lectionaries[$p['lectionary']] = 1;
     }
     $lectionaries = array_keys($lectionaries);
     sort($lectionaries);
@@ -71,9 +66,13 @@
 ?>
     <div id="tabs">
     <ul>
-        <li><a href="#propers-tab"><span>Basic Propers</span></a></li>
-        <li><a href="#historic-tab"><span>Historic</span></a></li>
-        <? foreach ($lectionaries as $l) { ?>
+        <li><a href="#propers-tab"><span>Basic Propers</span></a></li> <?
+        $histloc = array_search('historic', $lectionaries);
+        if ($histloc !== false) { ?>
+            <li><a href="#historic-tab"><span>Historic</span></a></li> <?
+            array_splice($lectionaries, $histloc, 1);
+        }
+        foreach ($lectionaries as $l) { ?>
         <li><a href="#<?=$l?>-tab"><span><?=$l?></span></a></li>
         <? } ?>
         <li><a href="#newpropers-tab"><span>New Propers</span></a></li>
@@ -228,7 +227,6 @@
     <script type="text/javascript">
         setupPropersDialog();
     </script>
-<?
-    echo json_encode(array(true, ob_get_clean()));
-    exit(0);
-?>
+    <?
+    return ob_get_clean();
+}
