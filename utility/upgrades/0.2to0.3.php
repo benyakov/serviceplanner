@@ -1,4 +1,4 @@
-<? /* Upgrade from version 0.1 to 0.2
+<? /* Upgrade from version 0.2 to 0.3
     Copyright (C) 2012 Jesse Jacobsen
 
     This program is free software; you can redistribute it and/or modify
@@ -42,7 +42,7 @@ require('./db-connection.php');
 $rv = array();
 $rv[] = "Adding block column to days table.";
 $q = $dbh->prepare("ALTER TABLE `{$dbp}days`
-    ADD COLUMN `block` integer AFTER `servicenotes` default NULL");
+    ADD COLUMN `block` integer default NULL AFTER `servicenotes`");
 $q->execute() or die(array_pop($q->errorInfo()));
 $rv[] = "Creating table for block planning.";
 $q = $dbh->prepare("CREATE TABLE `{$dbp}blocks` (
@@ -91,7 +91,9 @@ $rv[] = "Creating synonyms table.";
 $q = $dbh->prepare("CREATE TABLE `{$dbp}churchyear_synonyms` (
     `canonical` varchar(255),
     `synonym`   varchar(255),
-    INDEX (`canonical`)
+    FOREIGN KEY (`canonical`) REFERENCES `churchyear` (`dayname`)
+        ON UPDATE CASCADE ON DELETE CASCADE,
+    INDEX (`synonym`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8");
 $q->execute() or die(array_pop($q->errorInfo()));
 // Define table containing propers for the day names
@@ -102,7 +104,7 @@ $q = $dbh->prepare("CREATE TABLE `{$dbp}churchyear_propers` (
     `theme`     varchar(64),
     `introit`   text,
     `note`      text,
-    FOREIGN KEY (`dayname`) REFERENCES `{$dbp}churchyear` (`dayname`)
+    FOREIGN KEY (`dayname`) REFERENCES `{$dbp}churchyear_synonyms` (`synonym`)
         ON DELETE CASCADE
         ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8");
@@ -122,11 +124,11 @@ $q = $dbh->prepare("CREATE TABLE `{$dbp}churchyear_lessons` (
     `s3gospel`  varchar(64),
     `hymnabc`   varchar(20),
     `hymn`      varchar(20),
-    `id`        integer,
-    PRIMARY KEY (`id`) auto_increment
-    FOREIGN KEY (`dayname`) REFERENCES `{$dbp}churchyear` (`dayname`),
-        ON DELETE CASCADE
-        ON UPDATE CASCADE
+    `id`        integer auto_increment,
+    UNIQUE KEY `onedayperlect` (`lectionary`, `dayname`),
+    PRIMARY KEY (`id`),
+    FOREIGN KEY (`dayname`) REFERENCES `{$dbp}churchyear_synonyms` (`synonym`)
+        ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE = InnoDB DEFAULT CHARSET=utf8");
 $q->execute() or die(array_pop($q->errorInfo()));
 // Define table to contain collects
@@ -139,21 +141,19 @@ $q = $dbh->prepare("CREATE TABLE `{$dbp}churchyear_collects` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8");
 $q->execute() or die(array_pop($q->errorInfo()));
 // Define table to index collects to lectionaries.
-$q->$dbh->prepare("CREATE TABLE `{$dbp}churchyear_collect_index` (
+$q = $dbh->prepare("CREATE TABLE `{$dbp}churchyear_collect_index` (
     `dayname`       varchar(255),
     `lectionary`    varchar(56),
     `id`            integer,
-    FOREIGN KEY (`id`) REFERENCES `{$dbp}churchyear_collects` (`id`),
-        ON DELETE CASCADE
-        ON UPDATE CASCADE
-    FOREIGN KEY (`dayname`) REFERENCES `{$dbp}churchyear` (`dayname`),
-        ON DELETE CASCADE
+    FOREIGN KEY (`id`) REFERENCES `{$dbp}churchyear_collects` (`id`)
+        ON DELETE CASCADE ON UPDATE CASCADE,
+    FOREIGN KEY (`dayname`) REFERENCES `{$dbp}churchyear_synonyms` (`synonym`)
         ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8");
 $q->execute() or die(array_pop($q->errorInfo()));
 // Populate church year tables with default values
 $rv[] = "Populating church year tables with default values.";
-require("./utility/fillservicetables");
+require("./utility/fillservicetables.php");
 // Wrap up.
 $rv[] = "Done.  Writing new dbversion.txt.";
 // write a new dbversion.txt

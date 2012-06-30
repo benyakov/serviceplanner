@@ -423,6 +423,11 @@ if (! $auth) {
     <div id="content-container">
     <div class="quicklinks"><a href="block.php?action=new" title="New Block" id="new-block">New Block</a></div>
     <h1>Block Plans</h1>
+    <p class="explanation">This page lists the block plans you have created.  A
+block plan allows you to plan a series of services that may share elements in
+common.  Certain common elements will be shown when services are listed, or
+when new services are created.  Services may be assigned to an existing
+applicable block plan when they are created or edited.</p>
     <table id="block-listing">
     <?
 $q = $dbh->prepare("SELECT DATE_FORMAT(blockstart, '%c/%e/%Y') AS blockstart,
