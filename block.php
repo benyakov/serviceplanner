@@ -42,52 +42,17 @@ function ifSel($ary, $key, $val) {
     else return "";
 }
 
-/* If the given values are equal, return "disabled".
- * Otherwise, an empty string.
- */
-function disableUnless($value, $test) {
-    if ($value != $test) return "disabled";
-    else return "";
-}
-
 /* Display the form for a block plan, including values if provided.
  */
 function blockPlanForm($vals=array()) {
-    if ($vals['oldtestament'])
-        if (is_numeric($vals['oldtestament']))
-            $vals['otcustom'] = "";
-        else {
-            $vals['otcustom'] = $vals['oldtestament'];
-            $vals['oldtestament'] = "custom";
-        }
-    if ($vals['epistle'])
-        if (is_numeric($vals['epistle']))
-            $vals['epcustom'] = "";
-        else {
-            $vals['epcustom'] = $vals['epistle'];
-            $vals['epistle'] = "custom";
-        }
-    if ($vals['gospel'])
-        if (is_numeric($vals['gospel']))
-            $vals['gocustom'] = "";
-        else {
-            $vals['gocustom'] = $vals['gospel'];
-            $vals['gospel'] = "custom";
-        }
-    if ($vals['psalm'])
-        if (is_numeric($vals['psalm']))
-            $vals['pscustom'] = "";
-        else {
-            $vals['pscustom'] = $vals['psalm'];
-            $vals['psalm'] = "custom";
-        }
-    if ($vals['collect'])
-        if (is_numeric($vals['collect']))
-            $vals['cocustom'] = "";
-        else {
-            $vals['cocustom'] = $vals['collect'];
-            $vals['collect'] = "custom";
-        }
+    if ($vals['l1lect'] == 'custom') $vals['l1custom'] = $vals['l1series'];
+    else $vals['l1custom'] = "";
+    if ($vals['l2lect'] == 'custom') $vals['l2custom'] = $vals['l2series'];
+    else $vals['l2custom'] = "";
+    if ($vals['golect'] == 'custom') $vals['gocustom'] = $vals['goseries'];
+    else $vals['gocustom'] = "";
+    if ($vals['pslect'] == 'custom') $vals['pscustom'] = $vals['psseries'];
+    else $vals['pscustom'] = "";
 ?>
     <form id="block-plan-form" action="block.php" method="post">
     <input type="hidden" name="id" value="<?=$vals['id']?>">
@@ -103,56 +68,28 @@ function blockPlanForm($vals=array()) {
     <div id="overlap-notice"></div>
     </section>
     <section id="block-series">
-    <label for="oldtestament">OT Series</label>
-    <select name="oldtestament" id="oldtestament">
-        <option value="1" <?=ifSel($vals, 'oldtestament', 1)?>>First</option>
-        <option value="2" <?=ifSel($vals, 'oldtestament', 2)?>>Second</option>
-        <option value="3" <?=ifSel($vals, 'oldtestament', 3)?>>Third</option>
-        <option value="custom" <?=ifSel($vals, 'oldtestament', "custom")?>>Custom</option>
-    </select>
-    <label for="otcustom">Custom</label>
-    <input type="text" name="otcustom" id="otcustom"
-    <?=disableUnless($vals['oldtestament'], 'custom')?> <?=ifVal($vals, 'otcustom')?>><br>
-    <label for="epistle">Epistle Series</label>
-    <select name="epistle" id="epistle">
-        <option value="1" <?=ifSel($vals, 'epistle', 1)?>>First</option>
-        <option value="2" <?=ifSel($vals, 'epistle', 2)?>>Second</option>
-        <option value="3" <?=ifSel($vals, 'epistle', 3)?>>Third</option>
-        <option value="custom" <?=ifSel($vals, 'epistle', "custom")?>>Custom</option>
-    </select>
-    <label for="epcustom">Custom</label>
-    <input type="text" name="epcustom" id="epcustom"
-    <?=ifVal($vals, 'epcustom')?><?=disableUnless($vals['epistle'], 'custom')?>><br>
-    <label for="gospel">Gospel Series</label>
-    <select name="gospel" id="gospel">
-        <option value="1" <?=ifSel($vals, 'gospel', 1)?>>First</option>
-        <option value="2" <?=ifSel($vals, 'gospel', 2)?>>Second</option>
-        <option value="3" <?=ifSel($vals, 'gospel', 3)?>>Third</option>
-        <option value="custom" <?=ifSel($vals, 'gospel', 'custom')?>>Custom</option>
-    </select>
-    <label for="gocustom">Custom</label>
-    <input type="text" name="gocustom" id="gocustom"
-    <?=disableUnless($vals['gospel'], 'custom')?> <?=ifVal($vals, 'gocustom')?>><br>
-    <label for="psalm">Psalm Series</label>
-    <select name="psalm" id="psalm">
-        <option value="1" <?=ifSel($vals, 'psalm', 1)?>>First</option>
-        <option value="2" <?=ifSel($vals, 'psalm', 2)?>>Second</option>
-        <option value="3" <?=ifSel($vals, 'psalm', 3)?>>Third</option>
-        <option value="custom" <?=ifSel($vals, 'psalm', 'custom')?>>Custom</option>
-    </select>
-    <label for="pscustom">Custom</label>
-    <input type="text" name="pscustom" id="pscustom"
-    <?=disableUnless($vals['psalm'], 'custom')?> <?=ifVal($vals, 'pscustom')?>><br>
-    <label for="collect">Collect Series</label>
-    <select name="collect" id="collect">
-        <option value="1" <?=ifSel($vals, 'collect', 1)?>>First</option>
-        <option value="2" <?=ifSel($vals, 'collect', 2)?>>Second</option>
-        <option value="3" <?=ifSel($vals, 'collect', 3)?>>Third</option>
-        <option value="custom" <?=ifSel($vals, 'collect', 'custom')?>>Custom</option>
-    </select>
-    <label for="cocustom">Custom</label>
-    <input type="text" name="cocustom" id="cocustom"
-    <?=disableUnless($vals['collect'], 'custom')?> <?=ifVal($vals, 'cocustom')?>><br>
+    <table>
+    <tr><td></td><th>Lectionary</th><th>Series</th><th>Custom Readings</th></tr>
+    <tr><td><label>Lesson 1</label></td>
+    <td><input name="l1lect" id="l1lect" value="<?=$vals['l1lect']?>"></td>
+    <td><input name="l1series" id="l1series" value="<?=$vals['l1series']?>"></td>
+    <td><input name="l1custom" id="l1custom" value="<?=$vals['l1custom']?>"></td></tr>
+    <tr><td><label>Lesson 2</label></td>
+    <td><input name="l2lect" id="l2lect" value="<?=$vals['l2lect']?>"></td>
+    <td><input name="l2series" id="l2series" value="<?=$vals['l2series']?>"></td>
+    <td><input name="l2custom" id="l2custom" value="<?=$vals['l2custom']?>"></td></tr>
+    <tr><td><label>Gospel</label></td>
+    <td><input name="golect" id="golect" value="<?=$vals['golect']?>"></td>
+    <td><input name="goseries" id="goseries" value="<?=$vals['goseries']?>"></td>
+    <td><input name="gocustom" id="gocustom" value="<?=$vals['gocustom']?>"></td></tr>
+    <tr><td><label>Psalm</label></td>
+    <td><input name="pslect" id="pslect" value="<?=$vals['pslect']?>"></td>
+    <td><input name="psseries" id="psseries" value="<?=$vals['psseries']?>"></td>
+    <td><input name="pscustom" id="pscustom" value="<?=$vals['pscustom']?>"></td></tr>
+    <tr><td><label Collect</label></td>
+    <td><input name="colect" id="colect" value="<?=$vals['colect']?>"></td>
+    <td><input name="coclass" id="coclass" value="<?=$vals['coclass']?>"></td>
+    </tr>
     </section>
     <label for="notes">Block Notes</label><br>
     <textarea name="notes" id="notes"><?=$vals['notes']?$vals['notes']:''?></textarea><br>
@@ -173,40 +110,28 @@ if ($_POST['label']) {
     }
     $_POST['startdate'] = date('Y-m-d', strtotime($_POST['startdate']));
     $_POST['enddate'] = date('Y-m-d', strtotime($_POST['enddate']));
-    if ("custom" == $_POST['oldtestament']) {
-        $_POST['oldtestament'] = $_POST['otcustom'];
-    }
-    if ("custom" == $_POST['epistle']) {
-        $_POST['epistle'] = $_POST['epcustom'];
-    }
-    if ("custom" == $_POST['gospel']) {
-        $_POST['gospel'] = $_POST['gocustom'];
-    }
-    if ("custom" == $_POST['psalm']) {
-        $_POST['psalm'] = $_POST['pscustom'];
-    }
-    if ("custom" == $_POST['collect']) {
-        $_POST['collect'] = $_POST['cocustom'];
-    }
+    if ("custom" == $_POST['l1lect']) $_POST['l1series'] = $_POST['l1custom'];
+    if ("custom" == $_POST['l2lect']) $_POST['l2series'] = $_POST['l2custom'];
+    if ("custom" == $_POST['golect']) $_POST['goseries'] = $_POST['gocustom'];
+    if ("custom" == $_POST['pslect']) $_POST['psseries'] = $_POST['pscustom'];
+    $binding = array($_POST['label'], $_POST['startdate'],
+        $_POST['enddate'], $_POST['notes'], $_POST['l1lect'],
+        $_POST['l1series'], $_POST['l2lect'], $_POST['l2series'],
+        $_POST['golect'], $_POST['goseries'], $_POST['pslect'],
+        $_POST['psseries'], $_POST['colect'], $_POST['psseries']);
     if ($_POST['id']) { // Update existing record
+        array_push($binding, $_POST['id']);
         $q = $dbh->prepare("UPDATE `{$dbp}blocks`
             SET label = ?, blockstart = ?, blockend = ?, notes = ?,
-            oldtestament = ?, epistle = ?, gospel = ?, psalm = ?,
-            collect = ?
+            l1lect = ?, l1series = ?, l2lect = ?, l2series = ?,
+            golect = ?, goseries = ?, pslect = ?, psseries = ?,
+            colect = ?, coclass = ?
             WHERE id = ?");
-        $binding = array($_POST['label'], $_POST['startdate'],
-            $_POST['enddate'], $_POST['notes'], $_POST['oldtestament'],
-            $_POST['epistle'], $_POST['gospel'], $_POST['psalm'],
-            $_POST['collect'], $_POST['id']);
     } else { // Create new record
         $q = $dbh->prepare("INSERT INTO `{$dbp}blocks`
-            (label, blockstart, blockend, notes, oldtestament, epistle,
-            gospel, psalm, collect)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
-        $binding = array($_POST['label'], $_POST['startdate'],
-            $_POST['enddate'], $_POST['notes'], $_POST['oldtestament'],
-            $_POST['epistle'], $_POST['gospel'], $_POST['psalm'],
-            $_POST['collect']);
+            (label, blockstart, blockend, notes, l1lect, l1series, l2lect,
+            l2series, golect, goseries, pslect, psseries, colect, coclass)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
     }
     if (! $q->execute($binding)) {
         setMessage("Problem saving block:" . array_pop($q->errorInfo()));
@@ -236,8 +161,9 @@ if ($_GET['action'] == "edit" && $_GET['id']) {
         exit(0);
     }
     $q = $dbh->prepare("SELECT DATE_FORMAT(blockstart, '%c/%e/%Y') AS blockstart,
-    DATE_FORMAT(blockend, '%c/%e/%Y') AS blockend, label, notes, oldtestament,
-    epistle, gospel, psalm, collect, id FROM `{$dbp}blocks`
+        DATE_FORMAT(blockend, '%c/%e/%Y') AS blockend, label, notes, l1lect,
+        l1series, l2lect, l2series, golect, goseries, pslect, psseries,
+        colect, coclass, id FROM `{$dbp}blocks`
     WHERE id = ?");
     if ($q->execute(array($_GET['id'])) && $row = $q->fetch(PDO::FETCH_ASSOC)) {
         blockPlanForm($row);
@@ -352,41 +278,106 @@ if (! $auth) {
             })
             .datepicker({showOn:"button", numberOfMonths:[2,2],
                 stepMonths: 4});
-        $('#collect').change(function() {
-            if ($(this).val() == "custom") {
-                $("#cocustom").attr("disabled", false);
-            } else {
-                $("#cocustom").attr("disabled", true);
-            }
+        checkCustomPsalm();
+        $('#pscustom').change(function() {
+            checkCustomPsalm();
         });
-        $('#psalm').change(function() {
-            if ($(this).val() == "custom") {
-                $("#pscustom").attr("disabled", false);
-            } else {
-                $("#pscustom").attr("disabled", true);
-            }
+        checkCustomL1();
+        $('#l1custom').change(function() {
+            checkCustomL1();
         });
-        $('#oldtestament').change(function() {
-            if ($(this).val() == "custom") {
-                $("#otcustom").attr("disabled", false);
-            } else {
-                $("#otcustom").attr("disabled", true);
-            }
+        checkCustomL2();
+        $('#l2custom').change(function() {
+            checkCustomL2();
         });
-        $('#epistle').change(function() {
-            if ($(this).val() == "custom") {
-                $("#epcustom").attr("disabled", false);
-            } else {
-                $("#epcustom").attr("disabled", true);
-            }
+        checkCustomGo();
+        $('#gocustom').change(function() {
+            checkCustomGo();
         });
-        $('#gospel').change(function() {
-            if ($(this).val() == "custom") {
-                $("#gocustom").attr("disabled", false);
-            } else {
-                $("#gocustom").attr("disabled", true);
-            }
-        });
+        checkHistoricL1();
+        checkHistoricL2();
+        checkHistoricGo();
+        checkHistoricPs();
+        $('#l1lect').change(function() {
+            checkHistoricL1();
+        }
+        $('#l2lect').change(function() {
+            checkHistoricL2();
+        }
+        $('#golect').change(function() {
+            checkHistoricGo();
+        }
+        $('#pslect').change(function() {
+            checkHistoricPs();
+        }
+    }
+    function checkCustomL1() {
+        if ($('#l1custom').val()) {
+            $('#l1series').attr('disabled', true)
+                .hide();
+            $('#l1lect').val('custom');
+        } else {
+            $('#l1series').val('disabled', false)
+                .show();
+        }
+    }
+    function checkHistoricL1() {
+        if ("historic" == $('#l1lect').val()) {
+            $('#l1series').attr('disabled', false)
+                .show();
+            $('#l1custom').val('')
+        }
+    }
+    function checkCustomL2() {
+        if ($('#l2custom').val()) {
+            $('#l2series').attr('disabled', true)
+                .hide();
+            $('#l2lect').val('custom');
+        } else {
+            $('#l2series').val('disabled', false)
+                .show();
+        }
+    }
+    function checkHistoricl2() {
+        if ("historic" == $('#l2lect').val()) {
+            $('#l2series').attr('disabled', false)
+                .show();
+            $('#l2custom').val('')
+        }
+    }
+    function checkCustomGo() {
+        if ($('#gocustom').val()) {
+            $('#goseries').attr('disabled', true)
+                .hide();
+            $('#golect').val('custom');
+        } else {
+            $('#goseries').val('disabled', false)
+                .show();
+        }
+    }
+    function checkHistoricgo() {
+        if ("historic" == $('#golect').val()) {
+            $('#goseries').attr('disabled', false)
+                .show();
+            $('#gocustom').val('')
+        }
+    }
+    function checkCustomPsalm() {
+        if ($('#pscustom').val()) {
+            $('#psseries').attr('disabled', true)
+                .hide();
+            $('#pslect').val('custom');
+        } else {
+            $('#psseries').val('disabled', false)
+                .show();
+        }
+    }
+    function checkHistoricps() {
+        if ("historic" == $('#pslect').val()) {
+            $('#psseries').attr('disabled', false)
+                .show();
+            $('#pscustom').val('')
+        }
     }
     $(document).ready(function() {
         $("#new-block").click(function(evt) {
@@ -397,12 +388,8 @@ if (! $auth) {
                             title: "New Block Plan",
                             width: $(window).width()*0.7,
                             maxHeight: $(window).height()*0.7,
-                            create: function() {
-                                setupEntryDialog();
-                            },
-                            open: function() {
-                                setupEntryDialog();
-                            }});
+                            open: function() { setupEntryDialog(); },
+                            close: function() { $("#dialog").empty(); }});
             });
         });
         $(".edit").click(function(evt) {
@@ -415,12 +402,8 @@ if (! $auth) {
                                 title: "Edit Block Plan",
                                 width: $(window).width()*0.7,
                                 maxHeight: $(window).height()*0.7,
-                                create: function() {
-                                    setupEntryDialog();
-                                },
-                                open: function() {
-                                    setupEntryDialog();
-                                }});
+                                open: function() { setupEntryDialog(); },
+                                close: function() { $('#dialog').empty(); }});
             });
         });
         $(".delete").click(function(evt) {
