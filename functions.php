@@ -189,7 +189,9 @@ function display_records_table($q) {
                 $datetext = $row['date'];
             }
             echo "<tr class=\"heading\"><td>{$datetext} {$row['location']}</td>
-                <td colspan=2>{$row['dayname']}: {$row['rite']}</td></tr>\n";
+                <td colspan=2>{$row['dayname']}: {$row['rite']} ".
+                "[ <a href=\"print.php?id={$row['id']}\" ".
+                "title=\"print\">Print</a> ]</td></tr>\n";
             if ($row['servicenotes']) {
                 echo "<tr><td colspan=3 class=\"servicenote\">".
                      translate_markup($row['servicenotes'])."</td></tr>\n";
