@@ -26,6 +26,20 @@
 require("init.php");
 $auth = auth();
 
+/* Show the lesson choice in the block plan display
+ */
+function showLesson($lectionary, $series) {
+    if ("historic" == $lectionary) {
+        $s = $series;
+    } elseif ("custom" == $lectionary) {
+        $lectionary = "Custom: ";
+        $s = $series;
+    } else {
+        $s = "";
+    }
+    return "{$lectionary} {$s}";
+}
+
 /* If the given string is an array key, return the value as an html value
  * attribute.  Otherwise, an empty string.
  */
@@ -449,8 +463,9 @@ applicable block plan when they are created or edited.</p>
     <table id="block-listing">
     <?
 $q = $dbh->prepare("SELECT DATE_FORMAT(blockstart, '%c/%e/%Y') AS blockstart,
-    DATE_FORMAT(blockend, '%c/%e/%Y') AS blockend, label, notes, oldtestament,
-    epistle, gospel, psalm, collect, id FROM {$dbp}blocks
+    DATE_FORMAT(blockend, '%c/%e/%Y') AS blockend, label, notes, l1lect,
+    l1series, l2lect, l2series, golect, goseries, pslect, psseries,
+    colect, coclass, id FROM {$dbp}blocks
     ORDER BY blockstart, blockend");
 if ($q->execute()) {
     while ($row = $q->fetch(PDO::FETCH_ASSOC)) { ?>
@@ -459,11 +474,16 @@ if ($q->execute()) {
         <td colspan="3"><?=$row['label']?>
         <div class="quicklinks">[ <a title="edit" href="" data-id="<?=$row['id']?>" class="edit">Edit</a>
         | <a title="delete" href="" data-label="<?=$row['label']?>" data-id="<?=$row['id']?>" class="delete">Delete</a> ]</div></td></tr>
-    <tr><td class="otcell"><b>OT:</b> <?=ordinal($row['oldtestament'])?></td>
-        <td class="epcell"><b>Epistle:</b> <?=ordinal($row['epistle'])?></td>
-        <td class="gocell"><b>Gospel:</b> <?=ordinal($row['gospel'])?></td>
-        <td class="pscell"><b>Psalm:</b> <?=ordinal($row['psalm'])?></td>
-        <td class="cocell"><b>Collect:</b> <?=ordinal($row['collect'])?></td></tr>
+    <tr><td class="otcell"><b>Lesson 1:</b>
+        <?=showLesson($row['l1lect'], $row['l1series'])?></td>
+        <td class="epcell"><b>Lesson 2:</b>
+        <?=showLesson($row['l2lect'], $row['l2series'])?></td>
+        <td class="gocell"><b>Gospel:</b>
+        <?=showLesson($row['golect'], $row['goseries'])?></td>
+        <td class="pscell"><b>Psalm:</b>
+        <?=showLesson($row['pslect'], $row['psseries'])?></td>
+        <td class="cocell"><b>Collect:</b>
+        <?=$row['colect']?> (<?=$row['coclass']?>)</td></tr>
     <tr><td colspan="5"><?=translate_markup($row['notes'])?></td></tr>
 <? }
 } else echo "Problem getting blocks: " . array_pop($q->errorInfo()); ?>
