@@ -45,6 +45,7 @@ function ifSel($ary, $key, $val) {
 /* Display the form for a block plan, including values if provided.
  */
 function blockPlanForm($vals=array()) {
+    global $dbh, $dbp;
     if ($vals['l1lect'] == 'custom') $vals['l1custom'] = $vals['l1series'];
     else $vals['l1custom'] = "";
     if ($vals['l2lect'] == 'custom') $vals['l2custom'] = $vals['l2series'];
@@ -53,6 +54,15 @@ function blockPlanForm($vals=array()) {
     else $vals['gocustom'] = "";
     if ($vals['pslect'] == 'custom') $vals['pscustom'] = $vals['psseries'];
     else $vals['pscustom'] = "";
+    $q = $dbh->prepare("SELECT lectionary FROM `{$dbp}churchyear_lessons`
+        GROUP BY lectionary");
+    $q->execute() or die(array_pop($q->errorInfo()));
+    $lects = $q->fetchAll(PDO::FETCH_COLUMN, 0);
+    array_unshift($lects, "custom");
+    $q = $dbh->prepare("SELECT class FROM `{$dbp}churchyear_collects`
+        GROUP BY class");
+    $q->execute() or die(array_pop($q->errorInfo()));
+    $collect_classes = $q->fetchAll(PDO::FETCH_COLUMN, 0);
 ?>
     <form id="block-plan-form" action="block.php" method="post">
     <input type="hidden" name="id" value="<?=$vals['id']?>">
@@ -71,25 +81,51 @@ function blockPlanForm($vals=array()) {
     <table>
     <tr><td></td><th>Lectionary</th><th>Series</th><th>Custom Readings</th></tr>
     <tr><td><label>Lesson 1</label></td>
-    <td><input name="l1lect" id="l1lect" value="<?=$vals['l1lect']?>"></td>
+    <td><select name="l1lect" id="l1lect">
+<? foreach ($lects as $l) { // TODO: not adding $l  here >---------- v ?>
+<option value="<?=$l?>" <?=($l==$vals['l1lect'])?"selected":""?>><?=$l?></option>
+<? } ?>
+        </select></td>
     <td><input name="l1series" id="l1series" value="<?=$vals['l1series']?>"></td>
     <td><input name="l1custom" id="l1custom" value="<?=$vals['l1custom']?>"></td></tr>
     <tr><td><label>Lesson 2</label></td>
-    <td><input name="l2lect" id="l2lect" value="<?=$vals['l2lect']?>"></td>
+    <td><select name="l2lect" id="l2lect">
+<? foreach ($lects as $l) { ?>
+<option value="<?=$l?>" <?=($l==$vals['l2lect'])?"selected":""?>><?=$l?></option>
+<? } ?>
+        </select></td>
     <td><input name="l2series" id="l2series" value="<?=$vals['l2series']?>"></td>
     <td><input name="l2custom" id="l2custom" value="<?=$vals['l2custom']?>"></td></tr>
     <tr><td><label>Gospel</label></td>
-    <td><input name="golect" id="golect" value="<?=$vals['golect']?>"></td>
+    <td><select name="golect" id="golect">
+<? foreach ($lects as $l) { ?>
+        <option value="<?=$l?>" <?=$l==$vals['golect']?"selected":""?>>
+<? } ?>
+        </select></td>
     <td><input name="goseries" id="goseries" value="<?=$vals['goseries']?>"></td>
     <td><input name="gocustom" id="gocustom" value="<?=$vals['gocustom']?>"></td></tr>
     <tr><td><label>Psalm</label></td>
-    <td><input name="pslect" id="pslect" value="<?=$vals['pslect']?>"></td>
+    <td><select name="pslect" id="pslect">
+<? foreach ($lects as $l) { ?>
+        <option value="<?=$l?>" <?=$l==$vals['pslect']?"selected":""?>>
+<? } ?>
+        </select></td>
     <td><input name="psseries" id="psseries" value="<?=$vals['psseries']?>"></td>
     <td><input name="pscustom" id="pscustom" value="<?=$vals['pscustom']?>"></td></tr>
-    <tr><td><label Collect</label></td>
-    <td><input name="colect" id="colect" value="<?=$vals['colect']?>"></td>
+    <tr><td><label>Collect</label></td>
+    <td><select name="colect" id="colect">
+<? foreach ($lects as $l) { ?>
+        <option value="<?=$l?>" <?=$l==$vals['colect']?"selected":""?>>
+<? } ?>
+        </select></td>
     <td><input name="coclass" id="coclass" value="<?=$vals['coclass']?>"></td>
+    <td><select name="coclass" id="coclass">
+<? foreach ($collect_classes as $c) { ?>
+        <option value="<?=$c?>" <?=$c==$vals['colect']?"selected":""?>>
+<? } ?>
+    </select></td>
     </tr>
+    </table>
     </section>
     <label for="notes">Block Notes</label><br>
     <textarea name="notes" id="notes"><?=$vals['notes']?$vals['notes']:''?></textarea><br>
@@ -242,6 +278,42 @@ if (! $auth) {
 <?=html_head("Block Planning")?>
 <body>
     <script type="text/javascript">
+    function gencheckCustom(abbr) {
+        return function() {
+            if ($('#'+abbr+'custom').val()) {
+                $('#'+abbr+'series').attr('disabled', true)
+                    .hide();
+                $('#'+abbr+'lect').val('custom');
+            } else {
+                $('#'+abbr+'series').attr('disabled', false)
+                    .show();
+                if ($('#'+abbr+'lect').val() == 'custom') {
+                    $('#'+abbr+'lect').val('');
+                }
+            }
+        }
+    }
+    function gencheckHistoric(abbr) {
+        return function() {
+            if ("historic" == $('#'+abbr+'lect').val()) {
+                $('#'+abbr+'series').attr('disabled', false)
+                    .show();
+                $('#'+abbr+'custom').val('')
+            } else {
+                $('#'+abbr+'series').attr('disabled', true)
+                    .hide();
+            }
+        }
+    }
+
+    var checkCustomL1 = gencheckCustom("l1");
+    var checkHistoricL1 = gencheckHistoric("l1");
+    var checkCustomL2 = gencheckCustom("l2");
+    var checkHistoricL2 = gencheckHistoric("l2");
+    var checkCustomGo = gencheckCustom("go");
+    var checkHistoricGo = gencheckHistoric("go");
+    var checkCustomPs = gencheckCustom("ps");
+    var checkHistoricPs = gencheckHistoric("ps");
     function checkOverlap() {
         var olstart = dateValToSQL($("#startdate").val());
         var olend = dateValToSQL($("#enddate").val());
@@ -278,9 +350,9 @@ if (! $auth) {
             })
             .datepicker({showOn:"button", numberOfMonths:[2,2],
                 stepMonths: 4});
-        checkCustomPsalm();
+        checkCustomPs();
         $('#pscustom').change(function() {
-            checkCustomPsalm();
+            checkCustomPs();
         });
         checkCustomL1();
         $('#l1custom').change(function() {
@@ -300,84 +372,16 @@ if (! $auth) {
         checkHistoricPs();
         $('#l1lect').change(function() {
             checkHistoricL1();
-        }
+        });
         $('#l2lect').change(function() {
             checkHistoricL2();
-        }
+        });
         $('#golect').change(function() {
             checkHistoricGo();
-        }
+        });
         $('#pslect').change(function() {
             checkHistoricPs();
-        }
-    }
-    function checkCustomL1() {
-        if ($('#l1custom').val()) {
-            $('#l1series').attr('disabled', true)
-                .hide();
-            $('#l1lect').val('custom');
-        } else {
-            $('#l1series').val('disabled', false)
-                .show();
-        }
-    }
-    function checkHistoricL1() {
-        if ("historic" == $('#l1lect').val()) {
-            $('#l1series').attr('disabled', false)
-                .show();
-            $('#l1custom').val('')
-        }
-    }
-    function checkCustomL2() {
-        if ($('#l2custom').val()) {
-            $('#l2series').attr('disabled', true)
-                .hide();
-            $('#l2lect').val('custom');
-        } else {
-            $('#l2series').val('disabled', false)
-                .show();
-        }
-    }
-    function checkHistoricl2() {
-        if ("historic" == $('#l2lect').val()) {
-            $('#l2series').attr('disabled', false)
-                .show();
-            $('#l2custom').val('')
-        }
-    }
-    function checkCustomGo() {
-        if ($('#gocustom').val()) {
-            $('#goseries').attr('disabled', true)
-                .hide();
-            $('#golect').val('custom');
-        } else {
-            $('#goseries').val('disabled', false)
-                .show();
-        }
-    }
-    function checkHistoricgo() {
-        if ("historic" == $('#golect').val()) {
-            $('#goseries').attr('disabled', false)
-                .show();
-            $('#gocustom').val('')
-        }
-    }
-    function checkCustomPsalm() {
-        if ($('#pscustom').val()) {
-            $('#psseries').attr('disabled', true)
-                .hide();
-            $('#pslect').val('custom');
-        } else {
-            $('#psseries').val('disabled', false)
-                .show();
-        }
-    }
-    function checkHistoricps() {
-        if ("historic" == $('#pslect').val()) {
-            $('#psseries').attr('disabled', false)
-                .show();
-            $('#pscustom').val('')
-        }
+        });
     }
     $(document).ready(function() {
         $("#new-block").click(function(evt) {
