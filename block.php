@@ -118,7 +118,6 @@ function blockPlanForm($vals=array()) {
         <option value="<?=$l?>" <?=$l==$vals['colect']?"selected":""?>>
 <? } ?>
         </select></td>
-    <td><input name="coclass" id="coclass" value="<?=$vals['coclass']?>"></td>
     <td><select name="coclass" id="coclass">
 <? foreach ($collect_classes as $c) { ?>
         <option value="<?=$c?>" <?=$c==$vals['colect']?"selected":""?>>
