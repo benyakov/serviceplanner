@@ -34,14 +34,6 @@ function ifVal($ary, $key) {
     else return "";
 }
 
-/* If the given value is in the array at the given key, return "selected".
- * Otherwise, an empty string.
- */
-function ifSel($ary, $key, $val) {
-    if (array_key_exists($key, $ary) && $ary[$key] == $val) return "selected";
-    else return "";
-}
-
 /* Display the form for a block plan, including values if provided.
  */
 function blockPlanForm($vals=array()) {
@@ -59,10 +51,16 @@ function blockPlanForm($vals=array()) {
     $q->execute() or die(array_pop($q->errorInfo()));
     $lects = $q->fetchAll(PDO::FETCH_COLUMN, 0);
     array_unshift($lects, "custom");
+    $series = array("first", "second", "third");
     $q = $dbh->prepare("SELECT class FROM `{$dbp}churchyear_collects`
         GROUP BY class");
     $q->execute() or die(array_pop($q->errorInfo()));
     $collect_classes = $q->fetchAll(PDO::FETCH_COLUMN, 0);
+    if (!$vals['l1lect']) $vals['l1lect'] = 'historic';
+    if (!$vals['l2lect']) $vals['l2lect'] = 'historic';
+    if (!$vals['golect']) $vals['golect'] = 'historic';
+    if (!$vals['pslect']) $vals['pslect'] = 'historic';
+    if (!$vals['colect']) $vals['colect'] = 'historic';
 ?>
     <form id="block-plan-form" action="block.php" method="post">
     <input type="hidden" name="id" value="<?=$vals['id']?>">
@@ -82,45 +80,61 @@ function blockPlanForm($vals=array()) {
     <tr><td></td><th>Lectionary</th><th>Series</th><th>Custom Readings</th></tr>
     <tr><td><label>Lesson 1</label></td>
     <td><select name="l1lect" id="l1lect">
-<? foreach ($lects as $l) { // TODO: not adding $l  here >---------- v ?>
-<option value="<?=$l?>" <?=($l==$vals['l1lect'])?"selected":""?>><?=$l?></option>
+<? foreach ($lects as $l) { ?>
+<option value="<?=$l?>" <?=($l==$vals['l1lect'])?"selected=\"selected\"":""?>><?=$l?></option>
 <? } ?>
         </select></td>
-    <td><input name="l1series" id="l1series" value="<?=$vals['l1series']?>"></td>
+    <td><select name="l1series" id="l1series">
+<? foreach ($series as $s) { ?>
+<option value="<?=$s?>" <?=($s==$vals['l1series'])?"selected=\"selected\"":""?>><?=$s?></option>
+<? } ?>
+    </select></td>
     <td><input name="l1custom" id="l1custom" value="<?=$vals['l1custom']?>"></td></tr>
     <tr><td><label>Lesson 2</label></td>
     <td><select name="l2lect" id="l2lect">
 <? foreach ($lects as $l) { ?>
-<option value="<?=$l?>" <?=($l==$vals['l2lect'])?"selected":""?>><?=$l?></option>
+<option value="<?=$l?>" <?=($l==$vals['l2lect'])?"selected=\"selected\"":""?>><?=$l?></option>
 <? } ?>
         </select></td>
-    <td><input name="l2series" id="l2series" value="<?=$vals['l2series']?>"></td>
+    <td><select name="l2series" id="l2series">
+<? foreach ($series as $s) { ?>
+<option value="<?=$s?>" <?=($s==$vals['l2series'])?"selected=\"selected\"":""?>><?=$s?></option>
+<? } ?>
+    </select></td>
     <td><input name="l2custom" id="l2custom" value="<?=$vals['l2custom']?>"></td></tr>
     <tr><td><label>Gospel</label></td>
     <td><select name="golect" id="golect">
 <? foreach ($lects as $l) { ?>
-        <option value="<?=$l?>" <?=$l==$vals['golect']?"selected":""?>>
+<option value="<?=$l?>" <?=$l==$vals['golect']?"selected=\"selected\"":""?>><?=$l?></option>
 <? } ?>
         </select></td>
-    <td><input name="goseries" id="goseries" value="<?=$vals['goseries']?>"></td>
+    <td><select name="goseries" id="goseries">
+<? foreach ($series as $s) { ?>
+<option value="<?=$s?>" <?=($s==$vals['goseries'])?"selected=\"selected\"":""?>><?=$s?></option>
+<? } ?>
+    </select></td>
     <td><input name="gocustom" id="gocustom" value="<?=$vals['gocustom']?>"></td></tr>
     <tr><td><label>Psalm</label></td>
     <td><select name="pslect" id="pslect">
 <? foreach ($lects as $l) { ?>
-        <option value="<?=$l?>" <?=$l==$vals['pslect']?"selected":""?>>
+<option value="<?=$l?>" <?=$l==$vals['pslect']?"selected=\"selected\"":""?>><?=$l?></option>
 <? } ?>
         </select></td>
-    <td><input name="psseries" id="psseries" value="<?=$vals['psseries']?>"></td>
+    <td><select name="psseries" id="psseries">
+<? foreach ($series as $s) { ?>
+<option value="<?=$s?>" <?=($s==$vals['psseries'])?"selected=\"selected\"":""?>><?=$s?></option>
+<? } ?>
+    </select></td>
     <td><input name="pscustom" id="pscustom" value="<?=$vals['pscustom']?>"></td></tr>
     <tr><td><label>Collect</label></td>
     <td><select name="colect" id="colect">
 <? foreach ($lects as $l) { ?>
-        <option value="<?=$l?>" <?=$l==$vals['colect']?"selected":""?>>
+<option value="<?=$l?>" <?=$l==$vals['colect']?"selected=\"selected\"":""?>><?=$l?></option>
 <? } ?>
         </select></td>
     <td><select name="coclass" id="coclass">
 <? foreach ($collect_classes as $c) { ?>
-        <option value="<?=$c?>" <?=$c==$vals['colect']?"selected":""?>>
+<option value="<?=$c?>" <?=$c==$vals['coclass']?"selected=\"selected\"":""?>><?=$c?></option>
 <? } ?>
     </select></td>
     </tr>
