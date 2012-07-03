@@ -167,7 +167,7 @@ if ($_POST['label']) {
         $_POST['enddate'], $_POST['notes'], $_POST['l1lect'],
         $_POST['l1series'], $_POST['l2lect'], $_POST['l2series'],
         $_POST['golect'], $_POST['goseries'], $_POST['pslect'],
-        $_POST['psseries'], $_POST['colect'], $_POST['psseries']);
+        $_POST['psseries'], $_POST['colect'], $_POST['coclass']);
     if ($_POST['id']) { // Update existing record
         array_push($binding, $_POST['id']);
         $q = $dbh->prepare("UPDATE `{$dbp}blocks`
@@ -180,7 +180,7 @@ if ($_POST['label']) {
         $q = $dbh->prepare("INSERT INTO `{$dbp}blocks`
             (label, blockstart, blockend, notes, l1lect, l1series, l2lect,
             l2series, golect, goseries, pslect, psseries, colect, coclass)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
     }
     if (! $q->execute($binding)) {
         setMessage("Problem saving block:" . array_pop($q->errorInfo()));
@@ -209,11 +209,12 @@ if ($_GET['action'] == "edit" && $_GET['id']) {
         header("location:index.php");
         exit(0);
     }
-    $q = $dbh->prepare("SELECT DATE_FORMAT(blockstart, '%c/%e/%Y') AS blockstart,
+    $q = $dbh->prepare("SELECT
+        DATE_FORMAT(blockstart, '%c/%e/%Y') AS blockstart,
         DATE_FORMAT(blockend, '%c/%e/%Y') AS blockend, label, notes, l1lect,
         l1series, l2lect, l2series, golect, goseries, pslect, psseries,
         colect, coclass, id FROM `{$dbp}blocks`
-    WHERE id = ?");
+        WHERE id = ?");
     if ($q->execute(array($_GET['id'])) && $row = $q->fetch(PDO::FETCH_ASSOC)) {
         blockPlanForm($row);
     } else {
