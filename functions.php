@@ -245,7 +245,7 @@ function modify_records_table($q, $action) {
             echo "<tr class=\"heading\"><td>
             <input form=\"delete-service\" type=\"checkbox\" name=\"{$row['id']}_{$row['location']}\" id=\"check_{$row['id']}_{$row['location']}\">
             {$datetext} <a href=\"enter.php?date={$urldate}\" title=\"Add another service or hymns on {$row['date']}.\">[add]</a> {$row['location']}</td>
-            <td colspan=2><a href=\"edit.php?id={$row['id']}\">Edit</a> |
+            <td colspan=2><a href=\"#\" class=\"edit-service\" data-id=\"{$row['id']}\">Edit</a> |
             <a href=\"sermon.php?id={$row['id']}\">Sermon</a> |
             {$row['dayname']}: {$row['rite']}</td></tr>\n";
             $date = $row['date'];

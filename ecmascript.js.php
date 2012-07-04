@@ -79,6 +79,7 @@ function addHymnToTable() {
         .attr("name", "title_new-"+tabindexStart)
         .attr("tabindex", tabindexStart+13)
         .val("");
+    $("#hymnentries > tbody > tr").eq(-1).show();
 }
 
 function addHymnToList() {

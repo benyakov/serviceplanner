@@ -31,46 +31,20 @@ if (! $auth) {
 $this_script = $_SERVER['HTTP_HOST'].$_SERVER['SCRIPT_NAME'] ;
 if (! array_key_exists("stage", $_GET))
 {
-    echo "<!DOCTYPE html>\n<html lang=\"en\">\n";
-    echo html_head("Edit a Service");
-    $backlink = "modify.php";
     ?>
-    <script type="text/javascript">
-    $(document).ready(function() {
-        showJsOnly();
-        $("#date").datepicker({showOn:"both"});
-        $(".hymn-number").keyup(function(evt) {
-            if (evt.which != 9 &&
-                evt.which != 17) {
-                $(this).doTimeout('fetch-hymn-title', 250, fetchHymnTitle);
-            }
-        })
-            .change(fetchHymnTitle);
-        $("#addHymn").click(function(evt) {
-            evt.preventDefault();
-            addHymn();
-        });
-        $(".hymn-number").each(fetchHymnTitle);
-    });
-    </script>
-    <body>
-    <div id="content-container">
     <h1>Edit a Service</h1>
-    <p class="explanation">You can change any service- or hymn-related
-    information on this page.</p>
-    <p><a href="<?=$backlink?>">Cancel Edit</a><p>
     <?
         $q = $dbh->prepare("SELECT
             DATE_FORMAT(days.caldate, '%c/%e/%Y') as date,
             hymns.book, hymns.number, hymns.note,
             hymns.pkey as hymnid, hymns.location,
-            hymns.sequence, days.name as dayname, days.rite,
+            hymns.sequence, days.name as dayname, days.rite, days.block,
             days.servicenotes
-            FROM ${dbp}hymns AS hymns
-            RIGHT OUTER JOIN {$dbp}days AS days ON (hymns.service=days.pkey)
-            WHERE days.pkey = '{$_GET['id']}'
+            FROM `${dbp}hymns` AS hymns
+            RIGHT OUTER JOIN `{$dbp}days` AS days ON (hymns.service=days.pkey)
+            WHERE days.pkey = ?
             ORDER BY days.caldate DESC, hymns.location, hymns.sequence");
-        $q->execute() or die(array_pop($q->errorInfo()));
+        $q->execute(array($_GET['id'])) or die(array_pop($q->errorInfo()));
         $row = $q->fetch(PDO::FETCH_ASSOC);
         ?>
         <form action="http://<?=$this_script?>?stage=2" method="POST">
@@ -96,6 +70,12 @@ if (! array_key_exists("stage", $_GET))
             <dt>Service Notes</dt>
             <dd>
                 <textarea id="servicenotes" name="servicenotes"><?=trim($row['servicenotes'])?></textarea>
+            </dd>
+            <dt>Block Plan</dt>
+            <dd>
+                <select id="block" name="block">
+                    <option value="None" selected>None</option>
+                </select>
             </dd>
         </dl>
         <table id="hymnentries"><tbody>
@@ -148,9 +128,10 @@ if (! array_key_exists("stage", $_GET))
             $row = $q->fetch(PDO::FETCH_ASSOC);
         }
         ?>
+        <tr class="table-template"> <!--TODO: finish this.--></tr>
         </tbody></table>
         <a id="addHymn" class="jsonly" tabindex="200"
-            href="javascript: void(0);" >Add another hymn.</a>
+            href="#" >Add another hymn.</a>
         <button type="submit" value="Commit">Commit</button>
         <button type="reset">Reset</button>
         </form>

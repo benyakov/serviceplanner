@@ -42,6 +42,26 @@ if (array_key_exists('listinglimit', $_GET) &&
 <?=html_head("Modify Service Planning Records")?>
 <body>
     <script type="text/javascript">
+        function setupEditDialog() {
+            showJsOnly();
+            $("#date").datepicker({showOn:"both"})
+                .change(function() {
+                    updateBlocksAvailable($(this).val());
+                });
+            $(".hymn-number").keyup(function(evt) {
+                if (evt.which != 9 &&
+                    evt.which != 17) {
+                    $(this).doTimeout('fetch-hymn-title', 250, fetchHymnTitle);
+                }
+            })
+                .change(fetchHymnTitle);
+            $("#addHymn").click(function(evt) {
+                evt.preventDefault();
+                addHymn();
+            });
+            $(".hymn-number").each(fetchHymnTitle);
+            updateBlocksAvailable($("#date").val());
+        }
         $(document).ready(function() {
             $("button.deletesubmit").click(function(evt) {
                 evt.preventDefault();
@@ -60,6 +80,22 @@ if (array_key_exists('listinglimit', $_GET) &&
                                     }});
                     });
                 }
+            });
+            $('.edit-service').click(function(evt) {
+                evt.preventDefault();
+                $("#dialog")
+                    .load(encodeURI("edit.php?id="+$(this).attr('data-id')),
+                    function() {
+                    $("#dialog").dialog({modal: true,
+                                position: "center",
+                                title: "Edit a Service",
+                                width: $(window).width()*0.7,
+                                maxHeight: $(window).height()*0.7,
+                                open: function() { setupEditDialog(); },
+                                close: function() { $("#dialog").empty(); }});
+                });
+
+
             });
         });
     </script>
