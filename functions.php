@@ -151,7 +151,13 @@ function queryAllHymns($dbh, $dbp="", $limit=0, $future=false) {
     $q = $dbh->prepare("SELECT DATE_FORMAT(days.caldate, '%c/%e/%Y') as date,
     hymns.book, hymns.number, hymns.note,
     hymns.location, days.name as dayname, days.rite,
-    days.pkey as id, days.servicenotes, names.title
+    days.pkey as id, days.servicenotes, names.title,
+    b.label, b.notes,
+    GET_LESSON(days.name, 'lesson1', b.l1lect, b.l1series) AS lesson1,
+    GET_LESSON(days.name, 'lesson1', b.l2lect, b.l2series) AS lesson2,
+    GET_LESSON(days.name, 'gospel', b.golect, b.goseries) AS gospel,
+    (SELECT psalm FROM `{$dbp}churchyear_lessons` AS l
+        WHERE l.dayname=days.name AND l.lectionary=b.pslect) AS psalm
     FROM {$dbp}hymns AS hymns
     RIGHT OUTER JOIN `{$dbp}days` AS days ON (hymns.service = days.pkey)
     LEFT OUTER JOIN `{$dbp}names` AS names ON (hymns.number = names.number)
@@ -195,6 +201,9 @@ function display_records_table($q) {
             if ($row['servicenotes']) {
                 echo "<tr><td colspan=3 class=\"servicenote\">".
                      translate_markup($row['servicenotes'])."</td></tr>\n";
+            }
+            if ($row['block']) {
+                // TODO: block data here.
             }
             $date = $row['date'];
             $name = $row['dayname'];

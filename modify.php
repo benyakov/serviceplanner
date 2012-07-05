@@ -48,7 +48,7 @@ if (array_key_exists('listinglimit', $_GET) &&
                 .change(function() {
                     updateBlocksAvailable($(this).val());
                 });
-            $(".hymn-number").keyup(function(evt) {
+            $(".edit-number").keyup(function(evt) {
                 if (evt.which != 9 &&
                     evt.which != 17) {
                     $(this).doTimeout('fetch-hymn-title', 250, fetchHymnTitle);
@@ -59,7 +59,7 @@ if (array_key_exists('listinglimit', $_GET) &&
                 evt.preventDefault();
                 addHymn();
             });
-            $(".hymn-number").each(fetchHymnTitle);
+            $(".edit-number").each(fetchHymnTitle);
             updateBlocksAvailable($("#date").val());
         }
         $(document).ready(function() {
@@ -89,7 +89,7 @@ if (array_key_exists('listinglimit', $_GET) &&
                     $("#dialog").dialog({modal: true,
                                 position: "center",
                                 title: "Edit a Service",
-                                width: $(window).width()*0.7,
+                                width: $(window).width()*0.95,
                                 maxHeight: $(window).height()*0.7,
                                 open: function() { setupEditDialog(); },
                                 close: function() { $("#dialog").empty(); }});

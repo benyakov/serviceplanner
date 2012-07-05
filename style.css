@@ -117,16 +117,16 @@ input {
 input.entryline {
     margin: 1ex;
 }
-input.hymn-number {
+input.edit-number {
     width: 3em;
 }
-input.hymn-note {
+input.edit-note {
     width: 15em;
 }
-input.hymn-title {
+input.edit-title {
     width: 20em;
 }
-input.hymn-location {
+input.edit-location {
     width: 10em;
 }
 input.hidden {
@@ -218,6 +218,10 @@ tr.table-topline td {
 }
 .table-preformat {
     padding: 1ex;
+}
+
+.table-template {
+    display: none;
 }
 
 th.hymn-number,

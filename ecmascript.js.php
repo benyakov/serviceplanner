@@ -38,48 +38,48 @@ function incrElement(elem) {
 }
 
 function addHymnToTable() {
+    if ($("#hymnentries tr").length > 2) {
+        $("#hymnentries > tbody > tr").eq(-1).find('[id^=sequence]')
+            .val(Number($("#hymnentries > tbody > tr").eq(-2)
+                    .find('[id^=sequence]').val())+1);
+    }
+    $("#hymnentries > tbody > tr").eq(-1).attr("data-index",
+        Number($("#hymnentries > tbody > tr").eq(-1).attr("data-index")) + 1);
     $("#hymnentries > tbody > tr").eq(-1).clone()
         .appendTo("#hymnentries > tbody");
-    var tabindexStart = Number($("#hymnentries > tbody > tr").eq(-1)
-        .find('[id^=delete]').attr("tabindex"));
-    $("#hymnentries > tbody > tr").eq(-1).find('[id^=delete]')
-        .attr("id", "delete_new-"+tabindexStart)
-        .attr("name", "delete_new-"+tabindexStart)
-        .attr("tabindex", tabindexStart+7)
+    var indexStart = Number($("#hymnentries > tbody > tr").eq(-2)
+        .attr('data-index'));
+    $("#hymnentries > tbody > tr").eq(-2).find('[id^=delete]')
+        .attr("id", "delete_new-"+indexStart)
+        .attr("name", "delete_new-"+indexStart)
         .attr("disabled", true);
-    incrElement($("#hymnentries > tbody > tr").eq(-1).find('[id^=sequence]')
-        .attr("id", "sequence_new-"+tabindexStart)
-        .attr("name", "sequence_new-"+tabindexStart)
-        .attr("tabindex", tabindexStart+8));
-    $("#hymnentries > tbody > tr").eq(-1).find('[id^=book]')
-        .attr("id", "book_new-"+tabindexStart)
-        .attr("name", "book_new-"+tabindexStart)
-        .attr("tabindex", tabindexStart+9)
+    $("#hymnentries > tbody > tr").eq(-2).find('[id^=sequence]')
+        .attr("id", "sequence_new-"+indexStart)
+        .attr("name", "sequence_new-"+indexStart);
+    $("#hymnentries > tbody > tr").eq(-2).find('[id^=book]')
+        .attr("id", "book_new-"+indexStart)
+        .attr("name", "book_new-"+indexStart)
         .val("");
-    $("#hymnentries > tbody > tr").eq(-1).find('[id^=number]')
-        .attr("id", "number_new-"+tabindexStart)
-        .attr("name", "number_new-"+tabindexStart)
-        .attr("tabindex", tabindexStart+10)
+    $("#hymnentries > tbody > tr").eq(-2).find('[id^=number]')
+        .attr("id", "number_new-"+indexStart)
+        .attr("name", "number_new-"+indexStart)
         .val("")
         .keyup(function() {
             $(this).doTimeout('fetch-hymn-title', 250, fetchHymnTitle)
         })
         .change(fetchHymnTitle);
-    $("#hymnentries > tbody > tr").eq(-1).find('[id^=note]')
-        .attr("id", "note_new-"+tabindexStart)
-        .attr("name", "note_new-"+tabindexStart)
-        .attr("tabindex", tabindexStart+11)
+    $("#hymnentries > tbody > tr").eq(-2).find('[id^=note]')
+        .attr("id", "note_new-"+indexStart)
+        .attr("name", "note_new-"+indexStart)
         .val("");
-    $("#hymnentries > tbody > tr").eq(-1).find('[id^=location]')
-        .attr("id", "location_new-"+tabindexStart)
-        .attr("name", "location_new-"+tabindexStart)
-        .attr("tabindex", tabindexStart+12);
-    $("#hymnentries > tbody > tr").eq(-1).find('[id^=title]')
-        .attr("id", "title_new-"+tabindexStart)
-        .attr("name", "title_new-"+tabindexStart)
-        .attr("tabindex", tabindexStart+13)
+    $("#hymnentries > tbody > tr").eq(-2).find('[id^=location]')
+        .attr("id", "location_new-"+indexStart)
+        .attr("name", "location_new-"+indexStart);
+    $("#hymnentries > tbody > tr").eq(-2).find('[id^=title]')
+        .attr("id", "title_new-"+indexStart)
+        .attr("name", "title_new-"+indexStart)
         .val("");
-    $("#hymnentries > tbody > tr").eq(-1).show();
+    $("#hymnentries > tbody > tr").eq(-2).removeClass("table-template");
 }
 
 function addHymnToList() {
@@ -328,6 +328,10 @@ function updateBlocksAvailable(datestr) {
             for (var blockId in rv[1]) {
                 $("#block").append('<option value="'+blockId+'">'+rv[1][blockId]+'</option>');
             }
+        }
+        var block_default = $("#block").attr("data-default");
+        if (block_default) {
+            $("#block").val(block_default);
         }
     });
 }

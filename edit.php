@@ -73,7 +73,8 @@ if (! array_key_exists("stage", $_GET))
             </dd>
             <dt>Block Plan</dt>
             <dd>
-                <select id="block" name="block">
+                <select id="block" name="block"
+                    data-default="<?=$row['block']?>">
                     <option value="None" selected>None</option>
                 </select>
             </dd>
@@ -96,7 +97,7 @@ if (! array_key_exists("stage", $_GET))
                 <td>
                     <input type="number" id="sequence_<?=$row['hymnid']?>"
                         size="2" name="sequence_<?=$row['hymnid']?>"
-                        value="<?=$row['sequence']?>" class="hymn-sequence">
+                        value="<?=$row['sequence']?>" class="edit-sequence">
                 </td>
                 <td>
                     <select id="book_<?=$row['hymnid']?>" name="book_<?=$row['hymnid']?>">
@@ -107,35 +108,61 @@ if (! array_key_exists("stage", $_GET))
                     <? } ?>
                     </select>
                 </td>
-                <td><input class="hymn-number" type="number"
+                <td><input class="edit-number" type="number"
                     id="number_<?=$row['hymnid']?>" size="5"
                     name="number_<?=$row['hymnid']?>" value="<?=$row['number']?>">
                 </td>
                 <td><input type="text" id="note_<?=$row['hymnid']?>" size="30"
                      maxlength="100" name="note_<?=$row['hymnid']?>"
-                     value="<?=$row['note']?>" class="hymn-note">
+                     value="<?=$row['note']?>" class="edit-note">
                 </td>
                 <td><input type="text" id="location_<?=$row['hymnid']?>"
                     name="location_<?=$row['hymnid']?>"
-                    value="<?=$row['location']?>" class="hymn-location">
+                    value="<?=$row['location']?>" class="edit-location">
                 </td>
                 <td><input type="text" id="title_<?=$row['hymnid']?>" size="50"
                      maxlength="50" name="title_<?=$row['hymnid']?>"
-                     value="<?=$row['title']?>" class="hymn-title">
+                     value="<?=$row['title']?>" class="edit-title">
                 </td>
             </tr>
             <?
             $row = $q->fetch(PDO::FETCH_ASSOC);
         }
         ?>
-        <tr class="table-template"> <!--TODO: finish this.--></tr>
+        <tr class="table-template" data-index="0">
+            <td>
+                <input type="checkbox" id="delete_new" name="delete_new">
+            </td>
+            <td>
+                <input type="number" id="sequence_new" value="1"
+                    size="2" name="sequence_new" class="edit-sequence">
+            </td>
+            <td>
+                <select id="book_new" name="book_new">
+                <? foreach ($option_hymnbooks as $hymnbook) { ?>
+                    <option><?=$hymnbook?></option>
+                <? } ?>
+                </select>
+            </td>
+            <td><input class="edit-number" type="number"
+                id="number_new" size="5" name="number_new">
+            </td>
+            <td><input type="text" id="note_new" size="30"
+                 maxlength="100" name="note_new" class="edit-note">
+            </td>
+            <td><input type="text" id="location_new"
+                name="location_new" class="edit-location">
+            </td>
+            <td><input type="text" id="title_new" size="50"
+                 maxlength="50" name="title_new" class="edit-title">
+            </td>
+        </tr>
         </tbody></table>
         <a id="addHymn" class="jsonly" tabindex="200"
             href="#" >Add another hymn.</a>
         <button type="submit" value="Commit">Commit</button>
         <button type="reset">Reset</button>
         </form>
-        <p><a href="<?=$backlink?>">Cancel Edit</a><p>
         </div>
     </body>
     </html>
@@ -143,8 +170,6 @@ if (! array_key_exists("stage", $_GET))
 } elseif (2 == $_GET['stage']) {
     //// Commit changes to db
     // Pull out changes for each table into separate arrays
-    $dbh->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-
     $dbh->beginTransaction();
     $tohymns = array();
     $tonames = array();
@@ -152,14 +177,16 @@ if (! array_key_exists("stage", $_GET))
     $todelete = array();
     $id = "";
     foreach ($_POST as $key => $value) {
-        if (in_array($key, array("date", "dayname", "rite", "servicenotes"))) {
+        if (in_array($key, array("date", "dayname", "rite",
+            "servicenotes", "block")))
+        {
             $todays[$key] = $value;
         } elseif (preg_match('/delete_(\d+)/', $key, $matches)) {
             $todelete[] = $matches[1];
         } elseif (preg_match('/(\w+)_([-0-9a-z]+)/', $key, $matches)) {
             if ("title" == $matches[1]) {
                 $tonames[$matches[2]] = $value;
-            } else {
+            } elseif ($matches[2] != "new") {
                 $tohymns[$matches[2]][$matches[1]] = $value;
             }
         }
@@ -182,21 +209,20 @@ if (! array_key_exists("stage", $_GET))
         $ititle = $value;
         $inumber = $tohymns[$key]["number"];
         $ibook = $tohymns[$key]["book"];
-        try {
-            $q->execute();
-        } catch (PDOException $e) {
-            $qu->execute() or dieWithRollback($qu, ".");
+        if (! $q->execute()) {
+            $qu->execute() or die(array_pop($qu->errorInfo()));
         }
     }
     // Update day information
     $q = $dbh->prepare("UPDATE `{$dbp}days` SET `caldate`=:date,
         `name`=:name, `rite`=:rite,
-        `servicenotes`=:servicenotes
+        `servicenotes`=:servicenotes, `block`=:block
         WHERE `pkey` = :id");
     $q->bindValue(":date", strftime("%Y-%m-%d", strtotime($todays['date'])));
     $q->bindValue(":name", $todays['dayname']);
     $q->bindValue(":rite", $todays['rite']);
     $q->bindValue(":servicenotes", $todays['servicenotes']);
+    $q->bindValue(":block", $todays['block']);
     $q->bindValue(":id", $_POST['id']);
     $q->execute() or dieWithRollback($q, $q->queryString);
 
