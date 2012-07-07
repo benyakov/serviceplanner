@@ -151,11 +151,20 @@ function queryAllHymns($dbh, $dbp="", $limit=0, $future=false) {
     $q = $dbh->prepare("SELECT DATE_FORMAT(d.caldate, '%c/%e/%Y') as date,
     h.book, h.number, h.note, h.location, d.name as dayname, d.rite,
     d.pkey as id, d.servicenotes, n.title, b.label, b.notes,
-    `{$dbp}get_lesson`(d.name, 'lesson1', b.l1lect, b.l1series) AS lesson1,
-    `{$dbp}get_lesson`(d.name, 'lesson1', b.l2lect, b.l2series) AS lesson2,
-    `{$dbp}get_lesson`(d.name, 'gospel', b.golect, b.goseries) AS gospel,
-    (SELECT psalm FROM `{$dbp}churchyear_lessons` AS l
-        WHERE l.dayname=d.name AND l.lectionary=b.pslect) AS psalm
+    (SELECT `{$dbp}get_lesson_field`('lesson1', b.l1lect, b.l1series)
+        FROM `{$dbp}churchyear_lessons` AS cl
+        WHERE cl.dayname = d.name
+        AND cl.lectionary = b.l1lect) AS lesson1,
+    (SELECT `{$dbp}get_lesson_field`('lesson1', b.l2lect, b.l2series)
+        FROM `{$dbp}churchyear_lessons` AS cl
+        WHERE cl.dayname = d.name
+        AND cl.lectionary = b.l2lect) AS lesson2,
+    (SELECT `{$dbp}get_lesson_field`('gospel', b.golect, b.goseries)
+        FROM `{$dbp}churchyear_lessons` AS cl
+        WHERE cl.dayname = d.name
+        AND cl.lectionary = b.golect) AS gospel,
+    (SELECT psalm FROM `{$dbp}churchyear_lessons` AS cl
+        WHERE cl.dayname=d.name AND cl.lectionary=b.pslect) AS psalm
     FROM {$dbp}hymns AS h
     RIGHT OUTER JOIN `{$dbp}days` AS d ON (h.service = d.pkey)
     LEFT OUTER JOIN `{$dbp}names` AS n ON (h.number = n.number)
@@ -464,6 +473,21 @@ function daysForDate($date) {
         $found[] = $row[0];
     }
     return $found;
+}
+
+function getLessonField($lesson, $lect, $series) {
+    // Return the field name we want in the given circumstances
+    if ($lect == 'historic') {
+        if ($lesson == 'lesson1' or $lesson = 'lesson2') {
+            if ($series == 'first') return $lesson;
+            elseif ($series == 'second') return 's2lesson';
+            elseif ($series == 'third') return 's3lesson';
+        } elseif ($lesson == 'gospel') {
+            if ($series == 'first') return 'gospel';
+            elseif ($series = 'second') return 's2gospel';
+            elseif ($series = 'third') return 's3gospel';
+        }
+    } else return $lesson;
 }
 
 // vim: set foldmethod=indent :

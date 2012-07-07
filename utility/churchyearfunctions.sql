@@ -189,9 +189,9 @@ BEGIN
     OR `{{DBP}}observed_date_in_year`(YEAR(p_date), dayname) = p_date;
 END;
 
-DROP PROCEDURE IF EXISTS `{{DBP}}get_lesson_field`;
-CREATE PROCEDURE `{{DBP}}get_lesson`(lesson VARCHAR(16),
-    lect VARCHAR(56), series VARCHAR(16)) RETURNS VARCHAR(64);
+DROP FUNCTION IF EXISTS `{{DBP}}get_lesson_field`;
+CREATE FUNCTION `{{DBP}}get_lesson_field`(lesson VARCHAR(16),
+    lect VARCHAR(56), series VARCHAR(16)) RETURNS VARCHAR(64)
 DETERMINISTIC
 BEGIN
     IF lect = 'historic' THEN
