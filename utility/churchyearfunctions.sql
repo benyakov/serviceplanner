@@ -94,8 +94,7 @@ END;
 
 DROP FUNCTION IF EXISTS `{{DBP}}calc_date_in_year`;
 CREATE FUNCTION `{{DBP}}calc_date_in_year`(p_year INTEGER,
-    p_dayname VARCHAR(255), base VARCHAR(255), offset INTEGER,
-    month INTEGER, day INTEGER)
+    base VARCHAR(255), offset INTEGER, month INTEGER, day INTEGER)
     RETURNS DATE
 DETERMINISTIC
 BEGIN
@@ -126,8 +125,7 @@ BEGIN
         FROM `{{DBP}}churchyear`
         WHERE dayname=p_dayname
         INTO v_base, v_offset, v_month, v_day;
-    RETURN `{{DBP}}calc_date_in_year`(p_year, p_dayname,
-        v_base, v_offset, v_month, v_day);
+    RETURN `{{DBP}}calc_date_in_year`(p_year, v_base, v_offset, v_month, v_day);
 END;
 
 DROP FUNCTION IF EXISTS `{{DBP}}calc_observed_date_in_year`;
@@ -189,6 +187,46 @@ BEGIN
     SELECT dayname FROM `{{DBP}}churchyear`
     WHERE `{{DBP}}date_in_year`(YEAR(p_date), dayname) = p_date
     OR `{{DBP}}observed_date_in_year`(YEAR(p_date), dayname) = p_date;
+END;
+
+DROP FUNCTION IF EXISTS `{{DBP}}GET_LESSON`;
+CREATE FUNCTION `{{DBP}}GET_LESSON`(dayname VARCHAR(255), lesson VARCHAR(16),
+    lect VARCHAR(56), series VARCHAR(16)) RETURNS VARCHAR(64)
+DETERMINISTIC
+BEGIN
+    DECLARE field VARCHAR(16);
+    DECLARE lesson_text VARCHAR(64);
+    IF lect = 'historic' THEN
+        IF lesson = 'lesson1' OR lesson = 'lesson2' THEN
+            IF series = 'first' THEN
+                SET field = lesson;
+            ELSE IF series = 'second' THEN
+                SET field = 's2lesson';
+            ELSE IF series = 'third' THEN
+                SET field = 's3lesson';
+            END IF
+        ELSE IF lesson = 'gospel' THEN
+            IF series = 'first' THEN
+                SET field = 'gospel';
+            ELSE IF series = 'second' THEN
+                SET field = 's2gospel';
+            ELSE IF series = 'third' THEN
+                SET field = 's3gospel';
+            END IF
+        END IF
+        SET @sql_text = concat('SELECT ', field,
+                ' FROM `{{DBP}}churchyear_lessons` WHERE dayname=''',
+                dayname, ''' INTO lesson_text');
+        PREPARE stmt FROM @sql_text;
+        EXECUTE stmt;
+    ELSE
+        SET @sql_text = concat('SELECT ', lesson,
+            ' FROM `{{DBP}}churchyear_lessons` WHERE dayname = ''',
+            dayname, ''' INTO lesson_text');
+        PREPARE stmt FROM @sql_text;
+        EXECUTE stmt;
+    END IF
+    RETURN lesson_text
 END;
 
 #DELIMITER ;
