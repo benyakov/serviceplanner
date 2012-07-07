@@ -43,7 +43,8 @@ if (! $result->fetchAll(PDO::FETCH_NUM)) {
     $functionstext = fread($functionsfh, filesize($functionsfile));
     fclose($functionsfh);
     $q = $dbh->prepare(replaceDBP($functionstext));
-    $q->execute();
+    $q->execute() or die("Problem creating functions<br>".
+        array_pop($q->errorInfo()));
     $q->closeCursor();
 }
 
