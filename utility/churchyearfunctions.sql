@@ -189,44 +189,29 @@ BEGIN
     OR `{{DBP}}observed_date_in_year`(YEAR(p_date), dayname) = p_date;
 END;
 
-DROP FUNCTION IF EXISTS `{{DBP}}get_lesson`;
-CREATE FUNCTION `{{DBP}}get_lesson`(dayname VARCHAR(255), lesson VARCHAR(16),
-    lect VARCHAR(56), series VARCHAR(16)) RETURNS VARCHAR(64)
+DROP PROCEDURE IF EXISTS `dbpget_lesson`;
+CREATE PROCEDURE `dbpget_lesson`(dayname VARCHAR(255), lesson VARCHAR(16),
+    lect VARCHAR(56), series VARCHAR(16))
 DETERMINISTIC
 BEGIN
-    DECLARE field VARCHAR(16);
-    DECLARE lesson_text VARCHAR(64);
     IF lect = 'historic' THEN
         IF lesson = 'lesson1' OR lesson = 'lesson2' THEN
-            IF series = 'first' THEN
-                SET field = lesson;
-            ELSE IF series = 'second' THEN
-                SET field = 's2lesson';
-            ELSE IF series = 'third' THEN
-                SET field = 's3lesson';
-            END IF
-        ELSE IF lesson = 'gospel' THEN
-            IF series = 'first' THEN
-                SET field = 'gospel';
-            ELSE IF series = 'second' THEN
-                SET field = 's2gospel';
-            ELSE IF series = 'third' THEN
-                SET field = 's3gospel';
-            END IF
-        END IF
-        SET @sql_text = concat('SELECT ', field,
-                ' FROM `{{DBP}}churchyear_lessons` WHERE dayname=''',
-                dayname, ''' INTO lesson_text');
-        PREPARE stmt FROM @sql_text;
-        EXECUTE stmt;
+            IF series = 'first' THEN SET @field = lesson;
+            ELSEIF series = 'second' THEN SET @field = 's2lesson';
+            ELSEIF series = 'third' THEN SET @field = 's3lesson';
+            END IF;
+        ELSEIF lesson = 'gospel' THEN
+            IF series = 'first' THEN SET @field = 'gospel';
+            ELSEIF series = 'second' THEN SET @field = 's2gospel';
+            ELSEIF series = 'third' THEN SET @field = 's3gospel';
+            END IF;
+        END IF;
+        SET @sql_text = concat('SELECT ', @field, ' FROM `dbpchurchyear_lessons` WHERE dayname=''', dayname, ''' AND lectionary=''', lect, '''');
     ELSE
-        SET @sql_text = concat('SELECT ', lesson,
-            ' FROM `{{DBP}}churchyear_lessons` WHERE dayname = ''',
-            dayname, ''' INTO lesson_text');
-        PREPARE stmt FROM @sql_text;
-        EXECUTE stmt;
-    END IF
-    RETURN lesson_text
+        SET @sql_text = concat('SELECT ', lesson, ' FROM `dbpchurchyear_lessons` WHERE dayname = ''', dayname, ''' AND lectionary=''', lect, '''');
+    END IF;
+    PREPARE stmt FROM @sql_text;
+    EXECUTE stmt;
 END;
 
 #DELIMITER ;
