@@ -62,6 +62,7 @@ if ($_GET['request'] == 'dropfunctions') {
     DROP FUNCTION IF EXISTS `{$dbp}date_in_year`;
     DROP FUNCTION IF EXISTS `{$dbp}calc_observed_date_in_year`;
     DROP FUNCTION IF EXISTS `{$dbp}observed_date_in_year`;
+    DROP FUNCTION IF EXISTS `{$dbp}`get_lesson`;
     DROP PROCEDURE IF EXISTS `{$dbp}get_days_for_date`");
     setMessage("Church year functions dropped.  To re-create them, visit"
         ." the Church Year tab.  They will be created automatically.");

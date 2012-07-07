@@ -140,7 +140,7 @@ function checkJsonpReq() {
 
 function queryAllHymns($dbh, $dbp="", $limit=0, $future=false) {
     if ($future) {
-        $where = "WHERE days.caldate >= CURDATE()";
+        $where = "WHERE d.caldate >= CURDATE()";
         $order = "";
     } else {
         $where = "";
@@ -148,25 +148,23 @@ function queryAllHymns($dbh, $dbp="", $limit=0, $future=false) {
     }
     if ($limit > 0) $limitstr = " LIMIT {$limit}";
     else $limitstr = "";
-    $q = $dbh->prepare("SELECT DATE_FORMAT(days.caldate, '%c/%e/%Y') as date,
-    hymns.book, hymns.number, hymns.note,
-    hymns.location, days.name as dayname, days.rite,
-    days.pkey as id, days.servicenotes, names.title,
-    b.label, b.notes,
-    GET_LESSON(days.name, 'lesson1', b.l1lect, b.l1series) AS lesson1,
-    GET_LESSON(days.name, 'lesson1', b.l2lect, b.l2series) AS lesson2,
-    GET_LESSON(days.name, 'gospel', b.golect, b.goseries) AS gospel,
+    $q = $dbh->prepare("SELECT DATE_FORMAT(d.caldate, '%c/%e/%Y') as date,
+    h.book, h.number, h.note, h.location, d.name as dayname, d.rite,
+    d.pkey as id, d.servicenotes, n.title, b.label, b.notes,
+    `{$dbp}get_lesson`(d.name, 'lesson1', b.l1lect, b.l1series) AS lesson1,
+    `{$dbp}get_lesson`(d.name, 'lesson1', b.l2lect, b.l2series) AS lesson2,
+    `{$dbp}get_lesson`(d.name, 'gospel', b.golect, b.goseries) AS gospel,
     (SELECT psalm FROM `{$dbp}churchyear_lessons` AS l
-        WHERE l.dayname=days.name AND l.lectionary=b.pslect) AS psalm
-    FROM {$dbp}hymns AS hymns
-    RIGHT OUTER JOIN `{$dbp}days` AS days ON (hymns.service = days.pkey)
-    LEFT OUTER JOIN `{$dbp}names` AS names ON (hymns.number = names.number)
-        AND (hymns.book = names.book)
-    LEFT OUTER JOIN `{$dbp}blocks` AS blocks ON (blocks.id = days.block)
-    LEFT JOIN `{$dbp}churchyear_propers` AS cyp ON (cyp.dayname = days.name)
+        WHERE l.dayname=d.name AND l.lectionary=b.pslect) AS psalm
+    FROM {$dbp}hymns AS h
+    RIGHT OUTER JOIN `{$dbp}days` AS d ON (h.service = d.pkey)
+    LEFT OUTER JOIN `{$dbp}names` AS n ON (h.number = n.number)
+        AND (h.book = n.book)
+    LEFT OUTER JOIN `{$dbp}blocks` AS b ON (b.id = d.block)
+    LEFT JOIN `{$dbp}churchyear_propers` AS cyp ON (cyp.dayname = d.name)
     {$where}
-    ORDER BY days.caldate {$order}, hymns.service {$order},
-        hymns.location, hymns.sequence {$limitstr}");
+    ORDER BY d.caldate {$order}, h.service {$order},
+        h.location, h.sequence {$limitstr}");
     if (! $q->execute()) {
         die("<p>".array_pop($q->errorInfo()).'</p><p style="white-space: pre;">'.$q->queryString."</p>");
     }

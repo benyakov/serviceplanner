@@ -36,12 +36,9 @@ $dumplines = file($dumpfile, FILE_IGNORE_NEW_LINES);
 $query = array();
 $tables = array();
 $queries = array();
-foreach ($dumplines as $line)
-{
-    if (preg_match('/^CREATE/', $line)) // A new query
-    {
-        if (count($query) > 0)
-        {
+foreach ($dumplines as $line) {
+    if (preg_match('/^CREATE/', $line)) { // A new query
+        if (count($query) > 0) {
             $queries[] = implode("\n", $query);
         }
         $query = array();
