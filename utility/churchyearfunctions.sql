@@ -189,9 +189,9 @@ BEGIN
     OR `{{DBP}}observed_date_in_year`(YEAR(p_date), dayname) = p_date;
 END;
 
-DROP PROCEDURE IF EXISTS `dbpget_lesson`;
-CREATE PROCEDURE `dbpget_lesson`(dayname VARCHAR(255), lesson VARCHAR(16),
-    lect VARCHAR(56), series VARCHAR(16))
+DROP PROCEDURE IF EXISTS `{{DBP}}get_lesson`;
+CREATE PROCEDURE `{{DBP}}get_lesson`(dayname VARCHAR(255), lesson VARCHAR(16),
+    lect VARCHAR(56), series VARCHAR(16), OUT lesson_ref VARCHAR(64))
 DETERMINISTIC
 BEGIN
     IF lect = 'historic' THEN
@@ -212,6 +212,16 @@ BEGIN
     END IF;
     PREPARE stmt FROM @sql_text;
     EXECUTE stmt;
+END;
+
+DROP FUNCTION IF EXISTS `{{DBP}}get_lesson`;
+CREATE FUNCTION `{{DBP}}get_lesson`(dayname VARCHAR(255), lesson VARCHAR(16),
+    lect VARCHAR(56), series VARCHAR(16)) RETURNS VARCHAR(64);
+DETERMINISTIC
+BEGIN
+    DECLARE rv VARCHAR(64);
+    CALL `{{DBP}}get_lesson`(dayname, lesson, lect, series, rv);
+    RETURN rv;
 END;
 
 #DELIMITER ;
