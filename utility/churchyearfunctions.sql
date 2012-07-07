@@ -189,8 +189,8 @@ BEGIN
     OR `{{DBP}}observed_date_in_year`(YEAR(p_date), dayname) = p_date;
 END;
 
-DROP FUNCTION IF EXISTS `{{DBP}}GET_LESSON`;
-CREATE FUNCTION `{{DBP}}GET_LESSON`(dayname VARCHAR(255), lesson VARCHAR(16),
+DROP FUNCTION IF EXISTS `{{DBP}}get_lesson`;
+CREATE FUNCTION `{{DBP}}get_lesson`(dayname VARCHAR(255), lesson VARCHAR(16),
     lect VARCHAR(56), series VARCHAR(16)) RETURNS VARCHAR(64)
 DETERMINISTIC
 BEGIN

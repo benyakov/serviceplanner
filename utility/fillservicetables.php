@@ -38,7 +38,7 @@ while (($record = fgetcsv($fh)) != FALSE) {
         $r[] = $f;
     }
     $daynames[] = $r[1];
-    $q->execute($r) or dieWithRollback($q, "\n".__FILE__.":".__LINE__);
+    $q->execute($r) or die(array_pop($q->errorInfo()));
 }
 
 // Make sure it's empty.

@@ -31,10 +31,29 @@ if (! $auth) {
 $dumpfile = "restore-{$dbconnection['dbname']}.txt";
 if (move_uploaded_file($_FILES['backup_file']['tmp_name'], $dumpfile))
 {
+    // Insert $dbp into dumpfile.
+    $dumplines = file($dumpfile, FILE_IGNORE_NEW_LINES);
+    $newdumplines = array();
+    foreach ($dumplines as $line) {
+        array_push($newdumplines,
+            preg_replace(
+                array(
+                    '/^(DROP TABLE [^`]*`)([^`]+)/',
+                    '/^(LOCK TABLES `)([^`]+)/',
+                    '/^(INSERT INTO `)([^`]+)/',
+                    '/^(CREATE TABLE `)([^`]+)/',
+                    '/(ALTER TABLE `)([^`]+)/',
+                    '/(REFERENCES `)([^`]+)/',
+                    '/(CONSTRAINT `)([^`]+)/'
+                ), "\\1${dbp}\\2", $line));
+    }
+    $dumpfh = fopen($dumpfile, 'wb');
+    fwrite($dumpfh, implode("\n", $newdumplines));
+    fclose($dumpfh);
     $cmdline = "mysql -u {$dbconnection['dbuser']} -p{$dbconnection['dbpassword']} -h {$dbconnection['dbhost']} {$dbconnection['dbname']} ".
         "-e 'source ${dumpfile}';";
     $result = system($cmdline, $return);
-    unlink($dumpfile);
+    //unlink($dumpfile);
     if (0 == $return)
     {
         setMessage("Restore succeeded.");
