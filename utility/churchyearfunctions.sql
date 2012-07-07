@@ -189,39 +189,26 @@ BEGIN
     OR `{{DBP}}observed_date_in_year`(YEAR(p_date), dayname) = p_date;
 END;
 
-DROP PROCEDURE IF EXISTS `{{DBP}}get_lesson`;
-CREATE PROCEDURE `{{DBP}}get_lesson`(dayname VARCHAR(255), lesson VARCHAR(16),
-    lect VARCHAR(56), series VARCHAR(16), OUT lesson_ref VARCHAR(64))
+DROP PROCEDURE IF EXISTS `{{DBP}}get_lesson_field`;
+CREATE PROCEDURE `{{DBP}}get_lesson`(lesson VARCHAR(16),
+    lect VARCHAR(56), series VARCHAR(16)) RETURNS VARCHAR(64);
 DETERMINISTIC
 BEGIN
     IF lect = 'historic' THEN
         IF lesson = 'lesson1' OR lesson = 'lesson2' THEN
-            IF series = 'first' THEN SET @field = lesson;
-            ELSEIF series = 'second' THEN SET @field = 's2lesson';
-            ELSEIF series = 'third' THEN SET @field = 's3lesson';
+            IF series = 'first' THEN RETURN lesson;
+            ELSEIF series = 'second' THEN RETURN 's2lesson';
+            ELSEIF series = 'third' THEN RETURN 's3lesson';
             END IF;
         ELSEIF lesson = 'gospel' THEN
-            IF series = 'first' THEN SET @field = 'gospel';
-            ELSEIF series = 'second' THEN SET @field = 's2gospel';
-            ELSEIF series = 'third' THEN SET @field = 's3gospel';
+            IF series = 'first' THEN RETURN 'gospel';
+            ELSEIF series = 'second' THEN RETURN 's2gospel';
+            ELSEIF series = 'third' THEN RETURN 's3gospel';
             END IF;
         END IF;
-        SET @sql_text = concat('SELECT ', @field, ' FROM `dbpchurchyear_lessons` WHERE dayname=''', dayname, ''' AND lectionary=''', lect, '''');
     ELSE
-        SET @sql_text = concat('SELECT ', lesson, ' FROM `dbpchurchyear_lessons` WHERE dayname = ''', dayname, ''' AND lectionary=''', lect, '''');
+        RETURN lesson;
     END IF;
-    PREPARE stmt FROM @sql_text;
-    EXECUTE stmt;
-END;
-
-DROP FUNCTION IF EXISTS `{{DBP}}get_lesson`;
-CREATE FUNCTION `{{DBP}}get_lesson`(dayname VARCHAR(255), lesson VARCHAR(16),
-    lect VARCHAR(56), series VARCHAR(16)) RETURNS VARCHAR(64);
-DETERMINISTIC
-BEGIN
-    DECLARE rv VARCHAR(64);
-    CALL `{{DBP}}get_lesson`(dayname, lesson, lect, series, rv);
-    RETURN rv;
 END;
 
 #DELIMITER ;
