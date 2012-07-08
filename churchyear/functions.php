@@ -24,17 +24,6 @@
     USA
    */
 
-/* Replace occurrences of {{DBP}} with $prefix or $dbp in text.
- */
-function replaceDBP($text, $prefix=false) {
-    global $dbp;
-    if ($prefix !== false) {
-        return str_replace('{{DBP}}', $prefix, $text);
-    } else {
-        return str_replace('{{DBP}}', $dbp, $text);
-    }
-}
-
 function query_churchyear($json=false) {
     /* Return an executed query for all rows of the churchyear db
      */

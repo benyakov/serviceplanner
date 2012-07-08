@@ -560,5 +560,16 @@ function getLessonField($lesson, $lect, $series) {
     } else return $lesson;
 }
 
+/* Replace occurrences of {{DBP}} with $prefix or $dbp in text.
+ */
+function replaceDBP($text, $prefix=false) {
+    global $dbp;
+    if ($prefix !== false) {
+        return str_replace('{{DBP}}', $prefix, $text);
+    } else {
+        return str_replace('{{DBP}}', $dbp, $text);
+    }
+}
+
 // vim: set foldmethod=indent :
 ?>
