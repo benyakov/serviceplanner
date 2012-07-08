@@ -150,21 +150,16 @@ function queryAllHymns($dbh, $dbp="", $limit=0, $future=false) {
     else $limitstr = "";
     $q = $dbh->prepare("SELECT DATE_FORMAT(d.caldate, '%c/%e/%Y') as date,
     h.book, h.number, h.note, h.location, d.name as dayname, d.rite,
-    d.pkey as id, d.servicenotes, n.title, b.label, b.notes,
-    (SELECT `{$dbp}get_lesson_field`('lesson1', b.l1lect, b.l1series)
-        FROM `{$dbp}churchyear_lessons` AS cl
-        WHERE cl.dayname = d.name
-        AND cl.lectionary = b.l1lect) AS lesson1,
-    (SELECT `{$dbp}get_lesson_field`('lesson1', b.l2lect, b.l2series)
-        FROM `{$dbp}churchyear_lessons` AS cl
-        WHERE cl.dayname = d.name
-        AND cl.lectionary = b.l2lect) AS lesson2,
-    (SELECT `{$dbp}get_lesson_field`('gospel', b.golect, b.goseries)
-        FROM `{$dbp}churchyear_lessons` AS cl
-        WHERE cl.dayname = d.name
-        AND cl.lectionary = b.golect) AS gospel,
+    d.pkey as id, d.servicenotes, n.title, d.block,
+    b.label as blabel, b.notes as bnotes,
+    (CALL `{$dbp}lesson_ref`('lesson1', b.l1lect, b.l1series, d.name)
+        AS blesson1,
+    (CALL `{$dbp}lesson_ref`('lesson2', b.l2lect, b.l2series, d.name)
+        AS blesson2,
+    (CALL `{$dbp}lesson_ref`('gospel', b.golect, b.goseries, d.name)
+        AS bgospel,
     (SELECT psalm FROM `{$dbp}churchyear_lessons` AS cl
-        WHERE cl.dayname=d.name AND cl.lectionary=b.pslect) AS psalm
+        WHERE cl.dayname=d.name AND cl.lectionary=b.pslect) AS bpsalm
     FROM {$dbp}hymns AS h
     RIGHT OUTER JOIN `{$dbp}days` AS d ON (h.service = d.pkey)
     LEFT OUTER JOIN `{$dbp}names` AS n ON (h.number = n.number)
@@ -205,12 +200,24 @@ function display_records_table($q) {
                 <td colspan=2>{$row['dayname']}: {$row['rite']} ".
                 "[ <a href=\"print.php?id={$row['id']}\" ".
                 "title=\"print\">Print</a> ]</td></tr>\n";
+            if ($row['block'])
+            { ?>
+                <tr><td colspan=3 class="blockdisplay">
+                    <h4>Block: <?=$row['blabel']?></h4>
+                    <div class="blocknotes">
+                        <?=translate_markup($row['bnotes'])?>
+                    </div>
+                    <dl class="blocklessons">
+                        <dt>Lesson 1</dt><dd><?=$row['blesson1']?></dd>
+                        <dt>Lesson 2</dt><dd><?=$row['blesson2']?></dd>
+                        <dt>Gospel</dt><dd><?=$row['bgospel']?></dd>
+                        <dt>Psalm</dt><dd><?=$row['bpsalm']?></dd>
+                    </dl>
+                </tr>
+            <? }
             if ($row['servicenotes']) {
                 echo "<tr><td colspan=3 class=\"servicenote\">".
                      translate_markup($row['servicenotes'])."</td></tr>\n";
-            }
-            if ($row['block']) {
-                // TODO: block data here.
             }
             $date = $row['date'];
             $name = $row['dayname'];
