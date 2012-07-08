@@ -211,6 +211,8 @@ BEGIN
     END IF;
 END;
 
+
+# TODO: Try accomplishing this by creating a view before the main query.
 DROP PROCEDURE IF EXISTS `{{DBP}}lesson_ref`;
 CREATE PROCEDURE `{{DBP}}lesson_ref`
     (lesson VARCHAR(16), lectionary VARCHAR(56), series VARCHAR(16),
