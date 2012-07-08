@@ -505,6 +505,38 @@ form#block-plan-form #label {
     width: 30em;
 }
 
+td.blockdisplay {
+    border: thin solid #888;
+    background-color: #EFE;
+    color: #343;
+}
+
+td.blockdisplay h4 {
+    margin: .125em .5em;
+}
+
+.blocknotes {
+    font-size: small;
+}
+
+dl.blocklessons {
+    margin: .125em .5em;
+}
+
+dl.blocklessons dd {
+    display: inline;
+    margin: 0 .25em 0 0;
+    font-weight: bold;
+    font-family: sans-serif;
+}
+
+dl.blocklessons dt {
+    display: inline;
+    margin: 0 .25em;
+    font-weight: normal;
+    font-size: smaller;
+}
+
 .hiddentemplate {
     display: none;
 }

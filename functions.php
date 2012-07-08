@@ -152,7 +152,8 @@ function queryAllHymns($dbh, $dbp="", $limit=0, $future=false) {
     h.book, h.number, h.note, h.location, d.name as dayname, d.rite,
     d.pkey as id, d.servicenotes, n.title, d.block,
     b.label as blabel, b.notes as bnotes,
-    (IF(b.l1lect = 'historic',
+    (CASE b.l1lect
+        WHEN 'historic' THEN
         (CASE b.l1series
             WHEN 'first' THEN
                 (SELECT lesson1 FROM `{$dbp}churchyear_lessons` AS cl
@@ -163,11 +164,15 @@ function queryAllHymns($dbh, $dbp="", $limit=0, $future=false) {
             WHEN 'third' THEN
                 (SELECT s3lesson FROM `{$dbp}churchyear_lessons` AS cl
                     WHERE cl.dayname=d.name AND cl.lectionary=b.l1lect)
-            END),
+            END)
+        WHEN 'custom' THEN b.l1series
+        ELSE
         (SELECT lesson1 FROM `{$dbp}churchyear_lessons` AS cl
-            WHERE cl.dayname=d.name AND cl.lectionary=b.l1lect)))
+            WHERE cl.dayname=d.name AND cl.lectionary=b.l1lect)
+        END)
         AS blesson1,
-    (IF(b.l2lect = 'historic',
+    (CASE b.l2lect
+        WHEN 'historic' THEN
         (CASE b.l2series
             WHEN 'first' THEN
                 (SELECT lesson2 FROM `{$dbp}churchyear_lessons` AS cl
@@ -178,11 +183,15 @@ function queryAllHymns($dbh, $dbp="", $limit=0, $future=false) {
             WHEN 'third' THEN
                 (SELECT s3lesson FROM `{$dbp}churchyear_lessons` AS cl
                     WHERE cl.dayname=d.name AND cl.lectionary=b.l2lect)
-            END),
+            END)
+        WHEN 'custom' THEN b.l2series
+        ELSE
         (SELECT lesson2 FROM `{$dbp}churchyear_lessons` AS cl
-            WHERE cl.dayname=d.name AND cl.lectionary=b.l2lect)))
+            WHERE cl.dayname=d.name AND cl.lectionary=b.l2lect)
+        END)
         AS blesson2,
-    (IF(b.golect = 'historic',
+    (CASE b.golect
+        WHEN 'historic' THEN
         (CASE b.goseries
             WHEN 'first' THEN
                 (SELECT gospel FROM `{$dbp}churchyear_lessons` AS cl
@@ -193,9 +202,12 @@ function queryAllHymns($dbh, $dbp="", $limit=0, $future=false) {
             WHEN 'third' THEN
                 (SELECT s3gospel FROM `{$dbp}churchyear_lessons` AS cl
                     WHERE cl.dayname=d.name AND cl.lectionary=b.golect)
-            END),
+            END)
+        WHEN 'custom' THEN b.goseries
+        ELSE
         (SELECT gospel FROM `{$dbp}churchyear_lessons` AS cl
-            WHERE cl.dayname=d.name AND cl.lectionary=b.golect)))
+            WHERE cl.dayname=d.name AND cl.lectionary=b.golect)
+        END)
         AS bgospel,
     (SELECT psalm FROM `{$dbp}churchyear_lessons` AS cl
         WHERE cl.dayname=d.name AND cl.lectionary=b.pslect) AS bpsalm
