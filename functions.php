@@ -152,50 +152,50 @@ function queryAllHymns($dbh, $dbp="", $limit=0, $future=false) {
     h.book, h.number, h.note, h.location, d.name as dayname, d.rite,
     d.pkey as id, d.servicenotes, n.title, d.block,
     b.label as blabel, b.notes as bnotes,
-    IF(b.l1lect = 'historic',
-        CASE b.l1series
+    (IF(b.l1lect = 'historic',
+        (CASE b.l1series
             WHEN 'first' THEN
-                SELECT lesson1 FROM '{$dbp}churchyear_lessons' AS cl
-                    WHERE cl.dayname=d.name AND cl.lectionary=b.l1lect
+                (SELECT lesson1 FROM `{$dbp}churchyear_lessons` AS cl
+                    WHERE cl.dayname=d.name AND cl.lectionary=b.l1lect)
             WHEN 'second' THEN
-                SELECT s2lesson FROM '{$dbp}churchyear_lessons' AS cl
-                    WHERE cl.dayname=d.name AND cl.lectionary=b.l1lect
+                (SELECT s2lesson FROM `{$dbp}churchyear_lessons` AS cl
+                    WHERE cl.dayname=d.name AND cl.lectionary=b.l1lect)
             WHEN 'third' THEN
-                SELECT s3lesson FROM '{$dbp}churchyear_lessons' AS cl
-                    WHERE cl.dayname=d.name AND cl.lectionary=b.l1lect
-            END,
-        SELECT lesson1 FROM '{$dbp}churchyear_lessons' AS cl
-            WHERE cl.dayname=d.name AND cl.lectionary=b.l1lect)
+                (SELECT s3lesson FROM `{$dbp}churchyear_lessons` AS cl
+                    WHERE cl.dayname=d.name AND cl.lectionary=b.l1lect)
+            END),
+        (SELECT lesson1 FROM `{$dbp}churchyear_lessons` AS cl
+            WHERE cl.dayname=d.name AND cl.lectionary=b.l1lect)))
         AS blesson1,
-    IF(b.l2lect = 'historic',
-        CASE b.l2series
+    (IF(b.l2lect = 'historic',
+        (CASE b.l2series
             WHEN 'first' THEN
-                SELECT lesson1 FROM '{$dbp}churchyear_lessons' AS cl
-                    WHERE cl.dayname=d.name AND cl.lectionary=b.l2lect
+                (SELECT lesson2 FROM `{$dbp}churchyear_lessons` AS cl
+                    WHERE cl.dayname=d.name AND cl.lectionary=b.l2lect)
             WHEN 'second' THEN
-                SELECT s2lesson FROM '{$dbp}churchyear_lessons' AS cl
-                    WHERE cl.dayname=d.name AND cl.lectionary=b.l2lect
+                (SELECT s2lesson FROM `{$dbp}churchyear_lessons` AS cl
+                    WHERE cl.dayname=d.name AND cl.lectionary=b.l2lect)
             WHEN 'third' THEN
-                SELECT s3lesson FROM '{$dbp}churchyear_lessons' AS cl
-                    WHERE cl.dayname=d.name AND cl.lectionary=b.l2lect
-            END,
-        SELECT lesson1 FROM '{$dbp}churchyear_lessons' AS cl
-            WHERE cl.dayname=d.name AND cl.lectionary=b.l2lect)
+                (SELECT s3lesson FROM `{$dbp}churchyear_lessons` AS cl
+                    WHERE cl.dayname=d.name AND cl.lectionary=b.l2lect)
+            END),
+        (SELECT lesson2 FROM `{$dbp}churchyear_lessons` AS cl
+            WHERE cl.dayname=d.name AND cl.lectionary=b.l2lect)))
         AS blesson2,
-    IF(b.golect = 'historic',
-        CASE b.goseries
+    (IF(b.golect = 'historic',
+        (CASE b.goseries
             WHEN 'first' THEN
-                SELECT lesson1 FROM '{$dbp}churchyear_lessons' AS cl
-                    WHERE cl.dayname=d.name AND cl.lectionary=b.golect
+                (SELECT gospel FROM `{$dbp}churchyear_lessons` AS cl
+                    WHERE cl.dayname=d.name AND cl.lectionary=b.golect)
             WHEN 'second' THEN
-                SELECT s2lesson FROM '{$dbp}churchyear_lessons' AS cl
-                    WHERE cl.dayname=d.name AND cl.lectionary=b.golect
+                (SELECT s2gospel FROM `{$dbp}churchyear_lessons` AS cl
+                    WHERE cl.dayname=d.name AND cl.lectionary=b.golect)
             WHEN 'third' THEN
-                SELECT s3lesson FROM '{$dbp}churchyear_lessons' AS cl
-                    WHERE cl.dayname=d.name AND cl.lectionary=b.golect
-            END,
-        SELECT lesson1 FROM '{$dbp}churchyear_lessons' AS cl
-            WHERE cl.dayname=d.name AND cl.lectionary=b.golect)
+                (SELECT s3gospel FROM `{$dbp}churchyear_lessons` AS cl
+                    WHERE cl.dayname=d.name AND cl.lectionary=b.golect)
+            END),
+        (SELECT gospel FROM `{$dbp}churchyear_lessons` AS cl
+            WHERE cl.dayname=d.name AND cl.lectionary=b.golect)))
         AS bgospel,
     (SELECT psalm FROM `{$dbp}churchyear_lessons` AS cl
         WHERE cl.dayname=d.name AND cl.lectionary=b.pslect) AS bpsalm
