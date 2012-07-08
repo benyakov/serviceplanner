@@ -167,6 +167,7 @@ function queryAllHymns($dbh, $dbp="", $limit=0, $future=false) {
     LEFT OUTER JOIN `{$dbp}blocks` AS b ON (b.id = d.block)
     LEFT JOIN `{$dbp}churchyear_propers` AS cyp ON (cyp.dayname = d.name)
     {$where}
+    LEFT JOIN (SELECT  **** TODO ****)
     ORDER BY d.caldate {$order}, h.service {$order},
         h.location, h.sequence {$limitstr}");
     if (! $q->execute()) {
