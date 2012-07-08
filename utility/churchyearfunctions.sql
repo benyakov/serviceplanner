@@ -211,21 +211,4 @@ BEGIN
     END IF;
 END;
 
-
-# TODO: Try accomplishing this by creating a view before the main query.
-DROP PROCEDURE IF EXISTS `{{DBP}}lesson_ref`;
-CREATE PROCEDURE `{{DBP}}lesson_ref`
-    (lesson VARCHAR(16), lectionary VARCHAR(56), series VARCHAR(16),
-        dayname VARCHAR(255))
-DETERMINISTIC
-BEGIN
-    @q = CONCAT('SELECT `',
-        {{DBP}}get_lesson_field`(lesson, lectionary, series),
-        '` FROM `{{DBP}}churchyear_lessons` AS cl ',
-        ' WHERE cl.dayname = ? AND cl.lectionary = ?');
-    PREPARE @query FROM @q;
-    EXECUTE @query USING dayname, lectionary;
-    DEALLOCATE PREPARE @query;
-END;
-
 #DELIMITER ;

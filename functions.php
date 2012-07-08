@@ -322,9 +322,21 @@ function modify_records_table($q, $action) {
             <td colspan=2><a href=\"#\" class=\"edit-service\" data-id=\"{$row['id']}\">Edit</a> |
             <a href=\"sermon.php?id={$row['id']}\">Sermon</a> |
             {$row['dayname']}: {$row['rite']}</td></tr>\n";
-            $date = $row['date'];
-            $name = $row['dayname'];
-            $location = $row['location'];
+            if ($row['block'])
+            { ?>
+                <tr><td colspan=3 class="blockdisplay">
+                    <h4>Block: <?=$row['blabel']?></h4>
+                    <div class="blocknotes">
+                        <?=translate_markup($row['bnotes'])?>
+                    </div>
+                    <dl class="blocklessons">
+                        <dt>Lesson 1</dt><dd><?=$row['blesson1']?></dd>
+                        <dt>Lesson 2</dt><dd><?=$row['blesson2']?></dd>
+                        <dt>Gospel</dt><dd><?=$row['bgospel']?></dd>
+                        <dt>Psalm</dt><dd><?=$row['bpsalm']?></dd>
+                    </dl>
+                </tr>
+            <? }
             if ($row['servicenotes']) {
                 echo "<tr><td colspan=3 class=\"servicenote\">".
                      translate_markup($row['servicenotes'])."</td></tr>\n";
