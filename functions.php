@@ -152,11 +152,50 @@ function queryAllHymns($dbh, $dbp="", $limit=0, $future=false) {
     h.book, h.number, h.note, h.location, d.name as dayname, d.rite,
     d.pkey as id, d.servicenotes, n.title, d.block,
     b.label as blabel, b.notes as bnotes,
-    (CALL `{$dbp}lesson_ref`('lesson1', b.l1lect, b.l1series, d.name)
+    IF(b.l1lect = 'historic',
+        CASE b.l1series
+            WHEN 'first' THEN
+                SELECT lesson1 FROM '{$dbp}churchyear_lessons' AS cl
+                    WHERE cl.dayname=d.name AND cl.lectionary=b.l1lect
+            WHEN 'second' THEN
+                SELECT s2lesson FROM '{$dbp}churchyear_lessons' AS cl
+                    WHERE cl.dayname=d.name AND cl.lectionary=b.l1lect
+            WHEN 'third' THEN
+                SELECT s3lesson FROM '{$dbp}churchyear_lessons' AS cl
+                    WHERE cl.dayname=d.name AND cl.lectionary=b.l1lect
+            END,
+        SELECT lesson1 FROM '{$dbp}churchyear_lessons' AS cl
+            WHERE cl.dayname=d.name AND cl.lectionary=b.l1lect)
         AS blesson1,
-    (CALL `{$dbp}lesson_ref`('lesson2', b.l2lect, b.l2series, d.name)
+    IF(b.l2lect = 'historic',
+        CASE b.l2series
+            WHEN 'first' THEN
+                SELECT lesson1 FROM '{$dbp}churchyear_lessons' AS cl
+                    WHERE cl.dayname=d.name AND cl.lectionary=b.l2lect
+            WHEN 'second' THEN
+                SELECT s2lesson FROM '{$dbp}churchyear_lessons' AS cl
+                    WHERE cl.dayname=d.name AND cl.lectionary=b.l2lect
+            WHEN 'third' THEN
+                SELECT s3lesson FROM '{$dbp}churchyear_lessons' AS cl
+                    WHERE cl.dayname=d.name AND cl.lectionary=b.l2lect
+            END,
+        SELECT lesson1 FROM '{$dbp}churchyear_lessons' AS cl
+            WHERE cl.dayname=d.name AND cl.lectionary=b.l2lect)
         AS blesson2,
-    (CALL `{$dbp}lesson_ref`('gospel', b.golect, b.goseries, d.name)
+    IF(b.golect = 'historic',
+        CASE b.goseries
+            WHEN 'first' THEN
+                SELECT lesson1 FROM '{$dbp}churchyear_lessons' AS cl
+                    WHERE cl.dayname=d.name AND cl.lectionary=b.golect
+            WHEN 'second' THEN
+                SELECT s2lesson FROM '{$dbp}churchyear_lessons' AS cl
+                    WHERE cl.dayname=d.name AND cl.lectionary=b.golect
+            WHEN 'third' THEN
+                SELECT s3lesson FROM '{$dbp}churchyear_lessons' AS cl
+                    WHERE cl.dayname=d.name AND cl.lectionary=b.golect
+            END,
+        SELECT lesson1 FROM '{$dbp}churchyear_lessons' AS cl
+            WHERE cl.dayname=d.name AND cl.lectionary=b.golect)
         AS bgospel,
     (SELECT psalm FROM `{$dbp}churchyear_lessons` AS cl
         WHERE cl.dayname=d.name AND cl.lectionary=b.pslect) AS bpsalm
@@ -167,7 +206,6 @@ function queryAllHymns($dbh, $dbp="", $limit=0, $future=false) {
     LEFT OUTER JOIN `{$dbp}blocks` AS b ON (b.id = d.block)
     LEFT JOIN `{$dbp}churchyear_propers` AS cyp ON (cyp.dayname = d.name)
     {$where}
-    LEFT JOIN (SELECT  **** TODO ****)
     ORDER BY d.caldate {$order}, h.service {$order},
         h.location, h.sequence {$limitstr}");
     if (! $q->execute()) {
