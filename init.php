@@ -66,4 +66,24 @@ require("./db-connection.php");
 if (! $_GET['flag'] == "inituser") {
     $auth = auth();
 }
+/* Populate the church year table if necessary.
+ */
+$tableTest = $dbh->query("SELECT 1 FROM `{$dbp}churchyear`");
+if (! ($tableTest && $tableTest->fetchAll())) {
+    require('./utility/fillservicetables.php');
+}
+/* (Re-)Create church year functions if necessary
+ */
+$result = $dbh->query("SHOW FUNCTION STATUS LIKE '{$dbp}easter_in_year'");
+if (! $result->fetchAll(PDO::FETCH_NUM)) {
+    // Define helper functions on the db for getting the dates of days
+    $functionsfile = "./utility/churchyearfunctions.sql";
+    $functionsfh = fopen($functionsfile, "rb");
+    $functionstext = fread($functionsfh, filesize($functionsfile));
+    fclose($functionsfh);
+    $q = $dbh->prepare(replaceDBP($functionstext));
+    $q->execute() or die("Problem creating functions<br>".
+        array_pop($q->errorInfo()));
+    $q->closeCursor();
+}
 ?>
