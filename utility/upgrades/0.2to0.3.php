@@ -36,6 +36,8 @@ if (file_exists("./dbversion.txt")) {
     if ("0.2." != substr($version, 0, 4)) {
         die("Can't upgrade from 0.1.x, since the current db version is {$version}.");
     }
+} else {
+    die("No dbversion.txt file showing old db version.");
 }
 // Update the database
 require('./db-connection.php');
@@ -155,7 +157,7 @@ $q->execute() or die(array_pop($q->errorInfo()));
 $rv[] = "Populating church year tables with default values.";
 require("./utility/fillservicetables.php");
 // Wrap up.
-$rv[] = "Done.  Writing new dbversion.txt.";
+$rv[] = "Done.  Writing new dbversion to dbstate file.";
 // Store the new dbversion.
 require('./version.php');
 require("./utility/configfile.php");

@@ -84,10 +84,12 @@ foreach ($queries as $query) {
     }
 }
 $dbh->commit();
-// Write database version to dbversion.txt
-$fh = fopen("../dbversion.txt", "w");
-fwrite($fh, "{$version['major']}.{$version['minor']}.{$version['tick']}");
-fclose($fh);
+// Write database version to dbstate file.
+require("configfile.php");
+$configfile = new Configfile("../dbstate.ini", false);
+$configfile->store('dbversion',
+    "{$version['major']}.{$version['minor']}.{$version['tick']}");
+$configfile->save();
 // Create the initial user
 require("inituser.php");
 ?>

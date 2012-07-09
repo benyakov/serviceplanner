@@ -7,12 +7,15 @@ class Configfile{
 
     public function __construct($FileName, $HasSections=false) {
         $this->IniFile = $FileName;
-        $this->HasSecitons = $HasSections;
+        $this->HasSectons = $HasSections;
+        if (! file_exists($FileName)) {
+            touch($FileName);
+        }
         $this->IniData = parse_ini_file($FileName, $HasSections);
     }
 
     public function get($Key) {
-        if (array_key_exists($Key), $this->IniData) {
+        if (array_key_exists($Key, $this->IniData)) {
             return $this->IniData[$Key];
         } else {
             return false;
@@ -24,7 +27,7 @@ class Configfile{
     }
 
     private function writeVal($Val) {
-        if (is_numeric($Val) {
+        if (is_numeric($Val)) {
             return $Val;
         } elseif (false === strpos($Val, '"')) {
             return "\"{$Val}\"";
@@ -80,9 +83,7 @@ class Configfile{
                 $this->stringifySection[$val];
             }
         }
-        return rewriteWithLock(implode("\r\n", $out));
+        return $this->rewriteWithLock(implode("\r\n", $out));
     }
-
-
-
+}
 ?>
