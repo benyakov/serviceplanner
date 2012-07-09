@@ -56,16 +56,16 @@ class Configfile{
         if ($fh = fopen($this->IniFile, 'wb')) {
             $starttime = microtime();
             do {
-                $writeable = flock($fp, LOCK_EX);
+                $writeable = flock($fh, LOCK_EX);
                 if (!$writeable) usleep(round(rand(0, 100) * 1000));
             } while ((!$writeable) && ((microtime()-$starttime) < 1000));
             if ($writeable) {
                 fwrite($fh, $Contents);
                 flock($fh, LOCK_UN);
-                fclose($fp);
+                fclose($fh);
                 return true;
             } else {
-                fclose($fp);
+                fclose($fh);
                 return false;
             }
         } else {
