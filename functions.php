@@ -288,7 +288,6 @@ function display_records_table($q) {
     echo "</table>\n";
 }
 
-
 function modify_records_table($q, $action) {
     // Show a table of the data in the query $q
   // with links to edit each record, and checkboxes to delete records.
