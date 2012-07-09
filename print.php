@@ -35,14 +35,81 @@ $backlink = "index.php";
 <p><a href="<?=$backlink?>">All Upcoming Services</a><p>
 <?
     $q = $dbh->prepare("SELECT
-        DATE_FORMAT(days.caldate, '%c/%e/%Y') as date,
-        hymns.book, hymns.number, hymns.note, hymns.location,
-        days.name as dayname, days.rite, days.servicenotes
-        FROM ${dbp}hymns AS hymns
-        RIGHT OUTER JOIN {$dbp}days AS days ON (hymns.service=days.pkey)
-        WHERE days.pkey = '{$_GET['id']}'
-        ORDER BY days.caldate DESC, hymns.location, hymns.sequence");
-    $q->execute() or die(array_pop($q->errorInfo()));
+        DATE_FORMAT(d.caldate, '%c/%e/%Y') as date,
+        h.book, h.number, h.note, h.location,
+        d.name as dayname, d.rite, d.servicenotes, d.block,
+        b.label as blabel, b.notes as bnotes,
+        (CASE b.l1lect
+            WHEN 'historic' THEN
+            (CASE b.l1series
+                WHEN 'first' THEN
+                    (SELECT lesson1 FROM `{$dbp}churchyear_lessons` AS cl
+                        WHERE cl.dayname=d.name AND cl.lectionary=b.l1lect)
+                WHEN 'second' THEN
+                    (SELECT s2lesson FROM `{$dbp}churchyear_lessons` AS cl
+                        WHERE cl.dayname=d.name AND cl.lectionary=b.l1lect)
+                WHEN 'third' THEN
+                    (SELECT s3lesson FROM `{$dbp}churchyear_lessons` AS cl
+                        WHERE cl.dayname=d.name AND cl.lectionary=b.l1lect)
+                END)
+            WHEN 'custom' THEN b.l1series
+            ELSE
+            (SELECT lesson1 FROM `{$dbp}churchyear_lessons` AS cl
+                WHERE cl.dayname=d.name AND cl.lectionary=b.l1lect)
+            END)
+            AS blesson1,
+        (CASE b.l2lect
+            WHEN 'historic' THEN
+            (CASE b.l2series
+                WHEN 'first' THEN
+                    (SELECT lesson2 FROM `{$dbp}churchyear_lessons` AS cl
+                        WHERE cl.dayname=d.name AND cl.lectionary=b.l2lect)
+                WHEN 'second' THEN
+                    (SELECT s2lesson FROM `{$dbp}churchyear_lessons` AS cl
+                        WHERE cl.dayname=d.name AND cl.lectionary=b.l2lect)
+                WHEN 'third' THEN
+                    (SELECT s3lesson FROM `{$dbp}churchyear_lessons` AS cl
+                        WHERE cl.dayname=d.name AND cl.lectionary=b.l2lect)
+                END)
+            WHEN 'custom' THEN b.l2series
+            ELSE
+            (SELECT lesson2 FROM `{$dbp}churchyear_lessons` AS cl
+                WHERE cl.dayname=d.name AND cl.lectionary=b.l2lect)
+            END)
+            AS blesson2,
+        (CASE b.golect
+            WHEN 'historic' THEN
+            (CASE b.goseries
+                WHEN 'first' THEN
+                    (SELECT gospel FROM `{$dbp}churchyear_lessons` AS cl
+                        WHERE cl.dayname=d.name AND cl.lectionary=b.golect)
+                WHEN 'second' THEN
+                    (SELECT s2gospel FROM `{$dbp}churchyear_lessons` AS cl
+                        WHERE cl.dayname=d.name AND cl.lectionary=b.golect)
+                WHEN 'third' THEN
+                    (SELECT s3gospel FROM `{$dbp}churchyear_lessons` AS cl
+                        WHERE cl.dayname=d.name AND cl.lectionary=b.golect)
+                END)
+            WHEN 'custom' THEN b.goseries
+            ELSE
+            (SELECT gospel FROM `{$dbp}churchyear_lessons` AS cl
+                WHERE cl.dayname=d.name AND cl.lectionary=b.golect)
+            END)
+            AS bgospel,
+        (SELECT psalm FROM `{$dbp}churchyear_lessons` AS cl
+        WHERE cl.dayname=d.name AND cl.lectionary=b.pslect) AS bpsalm,
+        c.collect AS bcollect,
+        b.coclass AS bcollectclass
+        FROM `${dbp}hymns` AS h
+        RIGHT OUTER JOIN `{$dbp}days` AS d ON (h.service=d.pkey)
+        LEFT OUTER JOIN `{$dbp}blocks` AS b ON (b.id = d.block)
+        LEFT OUTER JOIN `{$dbp}churchyear_collect_index` AS ci
+            ON (ci.dayname = d.name AND ci.lectionary = b.colect)
+        LEFT OUTER JOIN `{$dbp}churchyear_collects` AS c
+            ON (c.id = ci.id AND c.class = b.coclass)
+        WHERE d.pkey = ?
+        ORDER BY d.caldate DESC, h.location, h.sequence");
+    $q->execute(array($_GET['id'])) or die(array_pop($q->errorInfo()));
     $row = $q->fetch(PDO::FETCH_ASSOC);
     ?>
     <dl>
@@ -51,6 +118,22 @@ $backlink = "index.php";
         <dt>Order/Rite</dt> <dd><?=$row['rite']?> </dd>
         <dt>Service Notes</dt> <dd> <?=trim($row['servicenotes'])?> </dd>
     </dl>
+    <? if ($row['block']) { ?>
+    <div class="blockdisplay">
+    <h4>Block: <?=$row['blabel']?></h4>
+        <div class="blocknotes">
+            <?=translate_markup($row['bnotes'])?>
+        </div>
+        <dl class="blocklessons">
+            <dt>Lesson 1</dt><dd><?=$row['blesson1']?></dd>
+            <dt>Lesson 2</dt><dd><?=$row['blesson2']?></dd>
+            <dt>Gospel</dt><dd><?=$row['bgospel']?></dd>
+            <dt>Psalm</dt><dd><?=$row['bpsalm']?></dd>
+        </dl>
+        <h5>Collect: <?=$row['bcollectclass']?></h5>
+        <p><?=$row['bcollect']?></p>
+    </div>
+    <? } ?>
     <table><tbody>
     <tr class="heading"><th>Book</th><th>#</th><th>Note</th>
         <th>Location</th><th>Title</th></tr>
@@ -68,7 +151,7 @@ $backlink = "index.php";
             <td><?=$row['location']?></td>
             <td><?=$row['title']?></td>
         </tr>
-        <?
+        <? # TODO: query for 'title', discover why book and note are omitted.
         $row = $q->fetch(PDO::FETCH_ASSOC);
     }
     ?>

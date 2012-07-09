@@ -505,7 +505,7 @@ form#block-plan-form #label {
     width: 30em;
 }
 
-td.blockdisplay {
+.blockdisplay {
     border: thin solid #ABA;
     background-color: #EFE;
     color: #343;
