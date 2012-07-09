@@ -156,11 +156,13 @@ $rv[] = "Populating church year tables with default values.";
 require("./utility/fillservicetables.php");
 // Wrap up.
 $rv[] = "Done.  Writing new dbversion.txt.";
-// write a new dbversion.txt
+// Store the new dbversion.
 require('./version.php');
-$fh = fopen("./dbversion.txt", "wb");
-fwrite($fh, "{$version['major']}.{$version['minor']}.{$version['tick']}");
-fclose($fh);
+require("./utility/configfile.php");
+$configfile = new Configfile("./dbstate.ini", false);
+$configfile->store('dbversion',
+    "{$version['major']}.{$version['minor']}.{$version['tick']}");
+$configfile->save() or die("Problem saving dbstate file.";
 // redirect with a message.
 setMessage(implode("<br />\n", $rv));
 $serverdir = dirname(dirname(dirname($_SERVER['PHP_SELF'])));

@@ -12,7 +12,11 @@ class Configfile{
     }
 
     public function get($Key) {
-        return $this->IniData[$Key];
+        if (array_key_exists($Key), $this->IniData) {
+            return $this->IniData[$Key];
+        } else {
+            return false;
+        }
     }
 
     public function store($Key, $Value) {

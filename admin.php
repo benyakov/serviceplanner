@@ -164,7 +164,9 @@ $(document).ready(function(){var a="http://www.bethanythedalles.org/services-dev
     <h2>The Broom Closet</h2>
 
     <ul>
-    <li><a href="dump.php">Save a Backup of the Database</a></li>
+    <li><a href="dump.php">Save a Backup of the Database</a>
+        When restoring, be sure to restore into a Services installation
+        with the same version listed below.</li>
     <li><form id="restore-backup" action="restore.php" method="post"
         enctype="multipart/form-data">
         <label for="backup_file">Upload a backup (dump) file to restore.</label>
@@ -184,6 +186,11 @@ $(document).ready(function(){var a="http://www.bethanythedalles.org/services-dev
         title="Purge Church Year Tables">Days in Church Year</a> or
     <a href="churchyear.php?request=dropfunctions"
         title="Drop Church Year Functions">Church Year Functions</a></li>
+    <li>Manually repopulate empty
+        <a href="admin.php?flag=fill-churchyear">church year data</a> or missing
+        <a href="admin.php?flag=create-churchyear-functions">church year functions</a>.
+        This should happen automatically most of the time, and should not be
+        tried unless needed.</li>
     <li>You are using Services version <?
         echo "{$version['major']}.{$version['minor']}.{$version['tick']}";
 ?>.  Refer to this version number, and include the address

@@ -39,14 +39,14 @@ if ((! file_exists("db-connection.php") and
         header("Location: {$serverdir}/utility/setup-dbconfig.php");
         exit(0);
 }
+require("./utility/configfile.php");
+$configfile = new Configfile("./dbstate.ini", false);
 $upgradedb = false;
-if (! file_exists("dbversion.txt")) {
+if (false === $configfile->get('dbversion')) {
     $upgradedb = true;
     $oldversion = "";
 } else {
-    $fh = fopen("dbversion.txt", "rb");
-    $dbcurrent = explode('.', trim(fread($fh, 64)));
-    fclose($fh);
+    $dbcurrent = explode('.', trim($configfile->get('dbversion')));
     if (! ($version['major'] == $dbcurrent[0]
         && $version['minor'] == $dbcurrent[1])) {
         $upgradedb = true;
@@ -58,7 +58,7 @@ if ($upgradedb) {
     header("Location: {$serverdir}/utility/upgrades/{$oldversion}to{$newversion}.php");
     exit(0);
 }
-if (! (file_exists("has-user.txt") || $_GET['flag'] == 'inituser')) {
+if (! $configfile->get("has-user") || $_GET['flag'] == 'inituser')) {
     header("Location: {$serverdir}/utility/inituser.php");
     exit(0);
 }
@@ -66,17 +66,16 @@ require("./db-connection.php");
 if (! $_GET['flag'] == "inituser") {
     $auth = auth();
 }
-/* Populate the church year table if necessary.
- */
-$tableTest = $dbh->query("SELECT 1 FROM `{$dbp}churchyear`");
-if (! ($tableTest && $tableTest->fetchAll())) {
+if ((! $configfile->get("churchyear-filled")) or
+    ($_GET['flag'] == 'fill-churchyear' && $auth))
+{
     require('./utility/fillservicetables.php');
+    $configfile->store("churchyear-filled", 1);
+    $configfile->save() or die("Problem saving dbstate file.");
 }
-/* (Re-)Create church year functions if necessary
- */
-$result = $dbh->query("SHOW FUNCTION STATUS LIKE '{$dbp}easter_in_year'");
-if (! $result->fetchAll(PDO::FETCH_NUM)) {
-    // Define helper functions on the db for getting the dates of days
+if ((! $configfile->get("has-churchyear-functions")) or
+    ($_GET['flag'] == 'create-churchyear-functions' && $auth))
+{
     $functionsfile = "./utility/churchyearfunctions.sql";
     $functionsfh = fopen($functionsfile, "rb");
     $functionstext = fread($functionsfh, filesize($functionsfile));
@@ -85,5 +84,7 @@ if (! $result->fetchAll(PDO::FETCH_NUM)) {
     $q->execute() or die("Problem creating functions<br>".
         array_pop($q->errorInfo()));
     $q->closeCursor();
+    $configfile->store('has-churchyear-functions', 1);
+    $configfile->save() or die("Problem saving dbstate file.");
 }
 ?>
