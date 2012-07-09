@@ -151,7 +151,7 @@ $backlink = "index.php";
             <td><?=$row['location']?></td>
             <td><?=$row['title']?></td>
         </tr>
-        <?
+        <? # TODO: query for 'title', discover why book and note are omitted.
         $row = $q->fetch(PDO::FETCH_ASSOC);
     }
     ?>
