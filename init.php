@@ -53,7 +53,7 @@ if (null == $configfile->get('dbversion')) {
         $oldversion = "{$dbcurrent[0]}.{$dbcurrent[1]}";
     }
 }
-print_r(array('upgradedb'=>$upgradedb, 'oldversion'=>$oldversion,
+var_dump(array('upgradedb'=>$upgradedb, 'oldversion'=>$oldversion,
     'dbversion'=>$configfile->get('dbversion')));
 exit(0);
 if ($upgradedb) {
