@@ -42,7 +42,7 @@ if ((! file_exists("db-connection.php") and
 require("./utility/configfile.php");
 $configfile = new Configfile("./dbstate.ini", false);
 $upgradedb = false;
-if (false === $configfile->get('dbversion')) {
+if (null == $configfile->get('dbversion')) {
     $upgradedb = true;
     $oldversion = "";
 } else {
@@ -53,6 +53,9 @@ if (false === $configfile->get('dbversion')) {
         $oldversion = "{$dbcurrent[0]}.{$dbcurrent[1]}";
     }
 }
+print_r(array('upgradedb'=>$upgradedb, 'oldversion'=>$oldversion,
+    'dbversion'=>$configfile->get('dbversion')));
+exit(0);
 if ($upgradedb) {
     $newversion = "{$version['major']}.{$version['minor']}";
     header("Location: {$serverdir}/utility/upgrades/{$oldversion}to{$newversion}.php");

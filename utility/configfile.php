@@ -18,7 +18,7 @@ class Configfile{
         if (array_key_exists($Key, $this->IniData)) {
             return $this->IniData[$Key];
         } else {
-            return false;
+            return null;
         }
     }
 
