@@ -40,13 +40,13 @@ if ((! file_exists("db-connection.php") and
         exit(0);
 }
 require("./utility/configfile.php");
-$configfile = new Configfile("./dbstate.ini", false);
+$dbstate = new Configfile("./dbstate.ini", false);
 $upgradedb = false;
-if (null == $configfile->get('dbversion')) {
+if (null == $dbstate->get('dbversion')) {
     $upgradedb = true;
     $oldversion = "";
 } else {
-    $dbcurrent = explode('.', trim($configfile->get('dbversion')));
+    $dbcurrent = explode('.', trim($dbstate->get('dbversion')));
     if (! ($version['major'] == $dbcurrent[0]
         && $version['minor'] == $dbcurrent[1])) {
         $upgradedb = true;
@@ -58,7 +58,7 @@ if ($upgradedb) {
     header("Location: {$serverdir}/utility/upgrades/{$oldversion}to{$newversion}.php");
     exit(0);
 }
-if (! ($configfile->get("has-user") || $_GET['flag'] == 'inituser')) {
+if (! ($dbstate->get("has-user") || $_GET['flag'] == 'inituser')) {
     header("Location: {$serverdir}/utility/inituser.php");
     exit(0);
 }
@@ -66,14 +66,14 @@ require("./db-connection.php");
 if (! $_GET['flag'] == "inituser") {
     $auth = auth();
 }
-if ((! $configfile->get("churchyear-filled")) or
+if ((! $dbstate->get("churchyear-filled")) or
     ($_GET['flag'] == 'fill-churchyear' && $auth))
 {
     require('./utility/fillservicetables.php');
-    $configfile->store("churchyear-filled", 1);
-    $configfile->save() or die("Problem saving dbstate file.");
+    $dbstate->store("churchyear-filled", 1);
+    $dbstate->save() or die("Problem saving dbstate file.");
 }
-if ((! $configfile->get("has-churchyear-functions")) or
+if ((! $dbstate->get("has-churchyear-functions")) or
     ($_GET['flag'] == 'create-churchyear-functions' && $auth))
 {
     $functionsfile = "./utility/churchyearfunctions.sql";
@@ -84,7 +84,7 @@ if ((! $configfile->get("has-churchyear-functions")) or
     $q->execute() or die("Problem creating functions<br>".
         array_pop($q->errorInfo()));
     $q->closeCursor();
-    $configfile->store('has-churchyear-functions', 1);
-    $configfile->save() or die("Problem saving dbstate file.");
+    $dbstate->store('has-churchyear-functions', 1);
+    $dbstate->save() or die("Problem saving dbstate file.");
 }
 ?>

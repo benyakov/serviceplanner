@@ -206,10 +206,8 @@ if ( $flag=="edit" ) {
         session_destroy();
         require("./setup-session.php");
         auth($_POST['username'], $_POST['pw']);
-        require("./utility/configfile.php");
-        $configfile = new Configfile("./dbstate.ini", false);
-        $configfile->store('has-user', 1);
-        $configfile->save() or die("Problem saving dbstate file.");
+        $dbstate->store('has-user', 1);
+        $dbstate->save() or die("Problem saving dbstate file.");
         setMessage("Initial user has been set up.");
         header("Location: index.php");
 } elseif ($authdata['userlevel'] == 3) {

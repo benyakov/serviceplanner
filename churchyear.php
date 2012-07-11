@@ -46,10 +46,8 @@ if ($_GET['request'] == 'dropfunctions') {
     setMessage("Church year functions dropped.  To re-create them, visit"
         ." the Church Year tab.  They will be created automatically.");
     $dbh->commit();
-    require("./utility/configfile.php");
-    $configfile = new Configfile("./dbstate.ini", false);
-    $configfile->store("has-churchyear-functions", 0);
-    $configfile->save() or die("Problem saving dbstate file.");
+    $dbstate->store("has-churchyear-functions", 0);
+    $dbstate->save() or die("Problem saving dbstate file.");
     header("location: index.php");
     exit(0);
 }
@@ -67,10 +65,8 @@ if ($_GET['request'] == 'purgetables') {
     $dbh->exec("DELETE FROM `{$dbp}churchyear_propers`");
     $dbh->exec("DELETE FROM `{$dbp}churchyear_order`");
     $dbh->exec("DELETE FROM `{$dbp}churchyear`");
-
-    $configfile = new Configfile("./dbstate.ini", false);
-    $configfile->store("has-churchyear-functions", 0);
-    if ($configfile->save()) {
+    $dbstate->store("has-churchyear-functions", 0);
+    if ($dbstate->save()) {
         setMessage("Church year tables purged.  They should be re-populated "
             ."by the time you see this message.");
         $dbh->commit();
