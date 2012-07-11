@@ -58,7 +58,7 @@ if ($upgradedb) {
     header("Location: {$serverdir}/utility/upgrades/{$oldversion}to{$newversion}.php");
     exit(0);
 }
-if (! $configfile->get("has-user") || $_GET['flag'] == 'inituser') {
+if (! ($configfile->get("has-user") || $_GET['flag'] == 'inituser')) {
     header("Location: {$serverdir}/utility/inituser.php");
     exit(0);
 }
