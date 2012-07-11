@@ -7,7 +7,7 @@ class Configfile{
 
     public function __construct($FileName, $HasSections=false) {
         $this->IniFile = $FileName;
-        $this->HasSectons = $HasSections;
+        $this->HasSections = $HasSections;
         if (! file_exists($FileName)) {
             touch($FileName);
         }
@@ -38,18 +38,18 @@ class Configfile{
         }
     }
 
-    private function stringifySection($Ary) {
+    private function serializeSection($Ary) {
         $out = array();
         foreach ($Ary as $key => $val) {
             if (is_array($val)) {
                 foreach ($val as $k => $v) {
-                    $out[] = "{$key}[{$k}] = ".writeVal($v);
+                    $out[] = "{$key}[{$k}] = ".$this->writeVal($v);
                 }
             } else {
-                $out[] = "{$key} = ".writeVal($val);
+                $out[] = "{$key} = ".$this->writeVal($val);
             }
         }
-        return implode("\r\n", $out);
+        return implode("\n", $out);
     }
 
     private function rewriteWithLock($Contents) {
@@ -75,15 +75,15 @@ class Configfile{
 
     public function save() {
         $out = array();
-        foreach ($this->IniData as $key => $val) {
-            if ($this->HasSections) {
-                $out[] = "[{$key}]";
-                $out[] = $this->stringifySection[$val];
-            } else {
-                $this->stringifySection[$val];
+        if ($this->HasSections) {
+            foreach ($this->IniData as $key => $val) {
+                    $out[] = "[{$key}]";
+                    $out[] = $this->serializeSection($val);
             }
+        } else {
+            $out[] = $this->serializeSection($this->IniData);
         }
-        return $this->rewriteWithLock(implode("\r\n", $out));
+        return $this->rewriteWithLock(implode("\n", $out)."\n");
     }
 }
 ?>
