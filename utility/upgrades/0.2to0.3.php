@@ -93,7 +93,7 @@ $rv[] = "Creating synonyms table.";
 $q = $dbh->prepare("CREATE TABLE `{$dbp}churchyear_synonyms` (
     `canonical` varchar(255),
     `synonym`   varchar(255),
-    FOREIGN KEY (`canonical`) REFERENCES `churchyear` (`dayname`)
+    FOREIGN KEY (`canonical`) REFERENCES `{$dbp}churchyear` (`dayname`)
         ON UPDATE CASCADE ON DELETE CASCADE,
     INDEX (`synonym`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8");
