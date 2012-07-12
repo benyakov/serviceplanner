@@ -15,6 +15,11 @@ class Configfile{
     }
 
     public function get($Key) {
+        if (! (is_string($Key) or is_int($Key))) {
+            echo var_dump($Key)."is an invalid configfile key. "
+                ."Use a string or integer.";
+            exit(1);
+        }
         if (array_key_exists($Key, $this->IniData)) {
             return $this->IniData[$Key];
         } else {
