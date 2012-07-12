@@ -44,7 +44,11 @@ $dbstate = new Configfile("./dbstate.ini", false);
 $upgradedb = false;
 if (null == $dbstate->get('dbversion')) {
     $upgradedb = true;
-    $oldversion = "";
+    if (file_exists("./dbversion.txt")) {
+        $dp = fopen("./dbversion.txt", "rb");
+        $oldversion = explode('.', fread($dp, 64));
+        $oldversion = "{$oldversion[0]}.{$oldversion[1]}";
+    } else $oldversion = "";
 } else {
     $dbcurrent = explode('.', trim($dbstate->get('dbversion')));
     if (! ($version['major'] == $dbcurrent[0]

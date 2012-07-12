@@ -153,9 +153,6 @@ $q = $dbh->prepare("CREATE TABLE `{$dbp}churchyear_collect_index` (
         ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8");
 $q->execute() or die(array_pop($q->errorInfo()));
-// Populate church year tables with default values
-$rv[] = "Populating church year tables with default values.";
-require("./utility/fillservicetables.php");
 // Wrap up.
 $rv[] = "Done.  Writing new dbversion to dbstate file.";
 // Store the new dbversion.
@@ -164,7 +161,15 @@ require("./utility/configfile.php");
 $configfile = new Configfile("./dbstate.ini", false);
 $configfile->store('dbversion',
     "{$version['major']}.{$version['minor']}.{$version['tick']}");
-$configfile->save() or die("Problem saving dbstate file.";
+// Store has-user to state file.
+if (file_exists("./has-user.txt")) {
+    $configfile->store('has-user', 1);
+}
+$configfile->save() or die("Problem saving dbstate file.");
+if (file_exists("./has-user.txt")) {
+    unlink("./has-user.txt");
+}
+unlink("./dbversion.txt");
 // redirect with a message.
 setMessage(implode("<br />\n", $rv));
 $serverdir = dirname(dirname(dirname($_SERVER['PHP_SELF'])));

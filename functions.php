@@ -241,8 +241,7 @@ function display_records_table($q) {
                 $row['dayname'] == $name &&
                 $row['location'] == $location))
         {// Display the heading line
-            if (is_within_week($row['date']))
-            {
+            if (is_within_week($row['date'])) {
                 $datetext = "<a name=\"now\">{$row['date']}</a>";
             } else {
                 $datetext = $row['date'];
@@ -308,8 +307,7 @@ function modify_records_table($q, $action) {
                 $row['dayname'] == $name &&
                 $row['location'] == $location)) {
             // Display the heading line
-            if (is_within_week($row['date']))
-            {
+            if (is_within_week($row['date'])) {
                 $datetext = "<a name=\"now\">{$row['date']}</a>";
             } else {
                 $datetext = $row['date'];
@@ -340,6 +338,9 @@ function modify_records_table($q, $action) {
                 echo "<tr><td colspan=3 class=\"servicenote\">".
                      translate_markup($row['servicenotes'])."</td></tr>\n";
             }
+            $date = $row['date'];
+            $name = $row['dayname'];
+            $location = $row['location'];
         }
         // Display this hymn
         if (0 == $rowcount % 2) {
