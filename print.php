@@ -36,9 +36,9 @@ $backlink = "index.php";
 <?
     $q = $dbh->prepare("SELECT
         DATE_FORMAT(d.caldate, '%c/%e/%Y') as date,
-        h.book, h.number, h.note, h.location,
+        h.book AS book, h.number, h.note AS note, h.location,
         d.name as dayname, d.rite, d.servicenotes, d.block,
-        b.label as blabel, b.notes as bnotes,
+        b.label as blabel, b.notes as bnotes, n.title,
         (CASE b.l1lect
             WHEN 'historic' THEN
             (CASE b.l1series
@@ -101,11 +101,13 @@ $backlink = "index.php";
         c.collect AS bcollect,
         b.coclass AS bcollectclass
         FROM `${dbp}hymns` AS h
-        RIGHT OUTER JOIN `{$dbp}days` AS d ON (h.service=d.pkey)
-        LEFT OUTER JOIN `{$dbp}blocks` AS b ON (b.id = d.block)
-        LEFT OUTER JOIN `{$dbp}churchyear_collect_index` AS ci
+        LEFT JOIN `{$dbp}names` AS n ON (h.number = n.number)
+            AND (h.book = n.book)
+        LEFT JOIN `{$dbp}days` AS d ON (h.service=d.pkey)
+        LEFT JOIN `{$dbp}blocks` AS b ON (b.id = d.block)
+        LEFT JOIN `{$dbp}churchyear_collect_index` AS ci
             ON (ci.dayname = d.name AND ci.lectionary = b.colect)
-        LEFT OUTER JOIN `{$dbp}churchyear_collects` AS c
+        LEFT JOIN `{$dbp}churchyear_collects` AS c
             ON (c.id = ci.id AND c.class = b.coclass)
         WHERE d.pkey = ?
         ORDER BY d.caldate DESC, h.location, h.sequence");
@@ -145,7 +147,7 @@ $backlink = "index.php";
         }
         ?>
         <tr>
-            <td><?=$hymnbook == $row['book']?></td>
+            <td><?=$row['book']?></td>
             <td><?=$row['number']?></td>
             <td><?=$row['note']?></td>
             <td><?=$row['location']?></td>
