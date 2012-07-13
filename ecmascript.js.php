@@ -131,13 +131,15 @@ function updateExisting(dateitem) {
                         $("#liturgicalname").prop('disabled', true);
                         $("#rite").prop('disabled', true);
                         $("#servicenotes").prop('disabled', true);
-                        $("#block").prop('disabled', true);
+                        $("#block").val($(this).attr('data-block'))
+                            .prop('disabled', true);
                     } else {
                         $('.existingservice').prop('disabled', false);
                         $("#liturgicalname").prop('disabled', false);
                         $("#rite").prop('disabled', false);
                         $("#servicenotes").prop('disabled', false);
-                        $("#block").prop('disabled', false);
+                        $("#block").val('None')
+                            .prop('disabled', false);
                     }
                 })
             })
