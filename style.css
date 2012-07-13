@@ -192,6 +192,14 @@ table#churchyear-listing td.dayname {
     width: 20em;
 }
 
+table#print-hymns-table td {
+    padding: .5ex;
+}
+table#print-hymns-table th {
+    font-weight: bold;
+    font-family: sans-serif;
+    padding: 1ex 0;
+}
 
 #listinglimit {
     width:4em;
@@ -509,6 +517,7 @@ form#block-plan-form #label {
     border: thin solid #ABA;
     background-color: #EFE;
     color: #343;
+    padding: 1ex;
 }
 
 td.blockdisplay h4 {

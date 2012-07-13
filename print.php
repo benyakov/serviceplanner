@@ -31,8 +31,6 @@ $backlink = "index.php";
 ?>
 <body>
 <div id="content-container">
-<h1>Print a Single Service</h1>
-<p><a href="<?=$backlink?>">All Upcoming Services</a><p>
 <?
     $q = $dbh->prepare("SELECT
         DATE_FORMAT(d.caldate, '%c/%e/%Y') as date,
@@ -100,23 +98,24 @@ $backlink = "index.php";
         WHERE cl.dayname=d.name AND cl.lectionary=b.pslect) AS bpsalm,
         c.collect AS bcollect,
         b.coclass AS bcollectclass
-        FROM `${dbp}hymns` AS h
-        LEFT JOIN `{$dbp}names` AS n ON (h.number = n.number)
+        FROM `{$dbp}days` AS d
+        JOIN `${dbp}hymns` AS h ON (h.service=d.pkey)
+        JOIN `{$dbp}names` AS n ON (h.number = n.number)
             AND (h.book = n.book)
-        LEFT JOIN `{$dbp}days` AS d ON (h.service=d.pkey)
-        LEFT JOIN `{$dbp}blocks` AS b ON (b.id = d.block)
-        LEFT JOIN `{$dbp}churchyear_collect_index` AS ci
+        JOIN `{$dbp}blocks` AS b ON (b.id = d.block)
+        JOIN `{$dbp}churchyear_collect_index` AS ci
             ON (ci.dayname = d.name AND ci.lectionary = b.colect)
-        LEFT JOIN `{$dbp}churchyear_collects` AS c
+        JOIN `{$dbp}churchyear_collects` AS c
             ON (c.id = ci.id AND c.class = b.coclass)
         WHERE d.pkey = ?
         ORDER BY d.caldate DESC, h.location, h.sequence");
     $q->execute(array($_GET['id'])) or die(array_pop($q->errorInfo()));
     $row = $q->fetch(PDO::FETCH_ASSOC);
     ?>
+    <h1>Service on <?=$row['date']?></h1>
+    <h2><?=$row['dayname']?></h2>
+    <p class="nonprinting"><a href="<?=$backlink?>">All Upcoming Services</a><p>
     <dl>
-        <dt>Date</dt> <dd><?=$row['date']?></dd>
-        <dt>Day Name</dt> <dd><?=$row['dayname']?> </dd>
         <dt>Order/Rite</dt> <dd><?=$row['rite']?> </dd>
         <dt>Service Notes</dt> <dd> <?=trim($row['servicenotes'])?> </dd>
     </dl>
@@ -136,7 +135,7 @@ $backlink = "index.php";
         <p><?=$row['bcollect']?></p>
     </div>
     <? } ?>
-    <table><tbody>
+    <table id="print-hymns-table"><tbody>
     <tr class="heading"><th>Book</th><th>#</th><th>Note</th>
         <th>Location</th><th>Title</th></tr>
     <?

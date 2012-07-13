@@ -42,3 +42,8 @@ div#content-container {
     border: none;
 }
 
+.blockdisplay {
+    border-color: black;
+    background-color: white;
+    color: black;
+}
