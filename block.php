@@ -316,7 +316,7 @@ if (! $auth) {
                 $('#'+abbr+'series').attr('disabled', false)
                     .show();
                 if ($('#'+abbr+'lect').val() == 'custom') {
-                    $('#'+abbr+'lect').val('');
+                    $('#'+abbr+'lect').val('historic');
                 }
             }
         }
@@ -333,7 +333,6 @@ if (! $auth) {
             }
         }
     }
-
     var checkCustomL1 = gencheckCustom("l1");
     var checkHistoricL1 = gencheckHistoric("l1");
     var checkCustomL2 = gencheckCustom("l2");
@@ -342,6 +341,13 @@ if (! $auth) {
     var checkHistoricGo = gencheckHistoric("go");
     var checkCustomPs = gencheckCustom("ps");
     var checkHistoricPs = gencheckHistoric("ps");
+    var checkCustomCo = function() {
+        if ($('#colect').val() == 'custom') {
+            $('#coclass').hide();
+        } else {
+            $('#coclass').show();
+        }
+    };
     function checkOverlap() {
         var olstart = dateValToSQL($("#startdate").val());
         var olend = dateValToSQL($("#enddate").val());
@@ -379,18 +385,18 @@ if (! $auth) {
             .datepicker({showOn:"button", numberOfMonths:[2,2],
                 stepMonths: 4});
         checkCustomPs();
+        checkCustomL1();
+        checkCustomL2();
+        checkCustomGo();
         $('#pscustom').change(function() {
             checkCustomPs();
         });
-        checkCustomL1();
         $('#l1custom').change(function() {
             checkCustomL1();
         });
-        checkCustomL2();
         $('#l2custom').change(function() {
             checkCustomL2();
         });
-        checkCustomGo();
         $('#gocustom').change(function() {
             checkCustomGo();
         });
@@ -407,9 +413,9 @@ if (! $auth) {
         $('#golect').change(function() {
             checkHistoricGo();
         });
-        $('#pslect').change(function() {
-            checkHistoricPs();
-        });
+        $('#pslect').change(checkHistoricPs);
+        checkCustomCo();
+        $('#colect').change(checkCustomCo);
     }
     $(document).ready(function() {
         $("#new-block").click(function(evt) {
@@ -465,8 +471,8 @@ applicable block plan when they are created or edited.</p>
 $q = $dbh->prepare("SELECT DATE_FORMAT(blockstart, '%c/%e/%Y') AS blockstart,
     DATE_FORMAT(blockend, '%c/%e/%Y') AS blockend, label, notes, l1lect,
     l1series, l2lect, l2series, golect, goseries, pslect, psseries,
-    colect, coclass, id FROM {$dbp}blocks
-    ORDER BY blockstart, blockend");
+    colect, coclass, id FROM `{$dbp}blocks` AS b
+    ORDER BY b.blockstart, b.blockend");
 if ($q->execute()) {
     while ($row = $q->fetch(PDO::FETCH_ASSOC)) { ?>
     <tr class="heading">
