@@ -25,12 +25,32 @@
  */
 require("./init.php");
 if (! $auth) {
+    setMessage("Access denied.");
     header("location: index.php");
     exit(0);
 }
-$dumpfile = "restore-{$dbconnection['dbname']}.txt";
-if (move_uploaded_file($_FILES['backup_file']['tmp_name'], $dumpfile))
-{
+$dumpfile = "./restore-{$dbconnection['dbname']}.txt";
+if ($_FILES['file']['type'] != "text/plain") {
+    setMessage("Please choose a backup dump file.");
+    header("location: admin.php");
+    exit(0);
+} else {
+    $dbversion = $dbstate->get('dbversion');
+    $timestampsplit = explode('_', $_FILES['file']['name']);
+    $versionsplit = explode('-', $timestampsplit[0]);
+    $dbrequired = implode('.', array_splice(explode('.', $dbversion), 0, -1));
+    $dboffered=implode('.',array_splice(explode('.', $versionsplit[1], 0, -1));
+    if ($dbrequired != $dboffered) {
+        setMessage("The chosen dumpfile was from a different version of the ".
+            "Service Planner.  This installation is version {$dbversion}, ".
+            "but the dumpfile is from version {$versionsplit[1]}. ".
+            "To restore this dumpfile, use an installation of any "
+            "Services version beginning with '{$dbrequired}'.");
+        header("location: admin.php");
+        exit(0);
+    }
+}
+if (move_uploaded_file($_FILES['file']['tmp_name'], $dumpfile)) {
     // Insert $dbp into dumpfile.
     $dumplines = file($dumpfile, FILE_IGNORE_NEW_LINES);
     $newdumplines = array();
@@ -50,25 +70,32 @@ if (move_uploaded_file($_FILES['backup_file']['tmp_name'], $dumpfile))
     $dumpfh = fopen($dumpfile, 'wb');
     fwrite($dumpfh, implode("\n", $newdumplines));
     fclose($dumpfh);
-    $cmdline = "mysql -u {$dbconnection['dbuser']} -p{$dbconnection['dbpassword']} -h {$dbconnection['dbhost']} {$dbconnection['dbname']} ".
-        "-e 'source ${dumpfile}';";
-    $result = system($cmdline, $return);
-    //unlink($dumpfile);
-    if (0 == $return)
-    {
-        setMessage("Restore succeeded.");
-        header("Location: records.php");
-    } else {
-        ?>
-        <!DOCTYPE html>
-        <html lang="en"><head><title>Problem Executing Restore</title></head>
-        <body><h1>Problem Executing Restore</h1>
-        <p>Command: <pre><?=$cmdline?></p>
-        <p>Exit code: <?=$return?></p>
-        <p>Output: <pre><?=$result?></pre></p>
-        </body></html>
-        <?
+    if (touch("./.my.cnf") && chmod(".my.cnf", 0600)) {
+        $fp = fopen(".my.cnf", "w");
+        fwrite($fp, "[client]
+        user=\"{$dbconnection['dbuser']}\"
+        password=\"{$dbconnection['dbpassword']}\"\n") ;
+        fclose($fp);
+        $cmdline = "mysql --defaults-file=.my.cnf -h {$dbconnection['dbhost']} {$dbconnection['dbname']} ".
+            "-e 'source ${dumpfile}';";
+        $result = system($cmdline, $return);
+        unlink($dumpfile);
+        unlink("./.my.cnf");
+        if (0 == $return) {
+            setMessage("Restore succeeded of data dumped at {$timestampsplit[1]}.");
+            header("Location: records.php");
+            exit(0);
+        }
     }
+    ?>
+    <!DOCTYPE html>
+    <html lang="en"><head><title>Problem Executing Restore</title></head>
+    <body><h1>Problem Executing Restore</h1>
+    <p>Command: <pre><?=$cmdline?></p>
+    <p>Exit code: <?=$return?></p>
+    <p>Output: <pre><?=$result?></pre></p>
+    </body></html>
+    <?
 } else {
     setMessage("Problem uploading backup file.");
     header("Location: records.php");

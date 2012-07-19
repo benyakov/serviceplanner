@@ -26,6 +26,7 @@
 
 require("./init.php");
 if (! $auth) {
+    setMessage("Access denied.");
     header("Location: index.php");
     exit(0);
 }
@@ -57,15 +58,16 @@ $tablenamestring = implode(" ", $finaltablenames);
 if (touch(".my.cnf") && chmod(".my.cnf", 0600)) {
     header("Content-type: text/plain");
     $timestamp = date("dMY-Hi");
-    header("Content-disposition: attachment; filename=services-{$timestamp}.dump");
-    $fp = fopen(".my.cnf", "w");
+    $dbversion = $dbstate->get('dbversion');
+    header("Content-disposition: attachment; filename=services-{$dbversion}_{$timestamp}.dump");
+    $fp = fopen("./.my.cnf", "w");
     fwrite($fp, "[client]
     user=\"{$dbconnection['dbuser']}\"
     password=\"{$dbconnection['dbpassword']}\"\n") ;
     fclose($fp);
     $rv = 0;
     passthru("mysqldump --defaults-file=.my.cnf -h {$dbconnection['dbhost']} {$dbconnection['dbname']} {$tablenamestring}", $rv);
-    unlink(".my.cnf");
+    unlink("./.my.cnf");
     if ($rv != 0) {
         echo "mysqldump returned {$rv}";
     }

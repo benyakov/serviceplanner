@@ -117,7 +117,7 @@ $backlink = "index.php";
     <p class="nonprinting"><a href="<?=$backlink?>">All Upcoming Services</a><p>
     <dl>
         <dt>Order/Rite</dt> <dd><?=$row['rite']?> </dd>
-        <dt>Service Notes</dt> <dd> <?=trim($row['servicenotes'])?> </dd>
+        <dt>Service Notes</dt> <dd> <?=translate_markup(trim($row['servicenotes']))?> </dd>
     </dl>
     <? if ($row['block']) { ?>
     <div class="blockdisplay">
