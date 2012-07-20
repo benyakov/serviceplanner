@@ -30,27 +30,30 @@ if (! $auth) {
     exit(0);
 }
 $dumpfile = "./restore-{$dbconnection['dbname']}.txt";
-if ($_FILES['file']['type'] != "text/plain") {
-    setMessage("Please choose a backup dump file.");
+$fnmatches = array();
+if (! preg_match('/^services-(\d+\.\d+\.\d+)_(\d+[[:alpha:]]{3}\d{4}-\d{4}).dump$/',
+    $_FILES['backup_file']['name'], $fnmatches))
+    {
+    setMessage("Please choose a backup dump file with its original name. (Uploaded {$_FILES['backup_file']['name']})");
     header("location: admin.php");
     exit(0);
 } else {
     $dbversion = $dbstate->get('dbversion');
-    $timestampsplit = explode('_', $_FILES['file']['name']);
-    $versionsplit = explode('-', $timestampsplit[0]);
+    $timestamp = $fnmatches[2];
+    $version = $fnmatches[1];
     $dbrequired = implode('.', array_splice(explode('.', $dbversion), 0, -1));
-    $dboffered=implode('.',array_splice(explode('.', $versionsplit[1], 0, -1));
+    $dboffered=implode('.',array_splice(explode('.', $version), 0, -1));
     if ($dbrequired != $dboffered) {
         setMessage("The chosen dumpfile was from a different version of the ".
             "Service Planner.  This installation is version {$dbversion}, ".
-            "but the dumpfile is from version {$versionsplit[1]}. ".
-            "To restore this dumpfile, use an installation of any "
+            "but the dumpfile is from version {$version}. ".
+            "To restore this dumpfile, use an installation of any ".
             "Services version beginning with '{$dbrequired}'.");
         header("location: admin.php");
         exit(0);
     }
 }
-if (move_uploaded_file($_FILES['file']['tmp_name'], $dumpfile)) {
+if (move_uploaded_file($_FILES['backup_file']['tmp_name'], $dumpfile)) {
     // Insert $dbp into dumpfile.
     $dumplines = file($dumpfile, FILE_IGNORE_NEW_LINES);
     $newdumplines = array();
@@ -82,8 +85,8 @@ if (move_uploaded_file($_FILES['file']['tmp_name'], $dumpfile)) {
         unlink($dumpfile);
         unlink("./.my.cnf");
         if (0 == $return) {
-            setMessage("Restore succeeded of data dumped at {$timestampsplit[1]}.");
-            header("Location: records.php");
+            setMessage("Restore succeeded of data dumped at {$timestamp}.");
+            header("Location: index.php");
             exit(0);
         }
     }
