@@ -307,14 +307,11 @@ function getDayFor(datestr, target) {
     $.get("churchyear.php", {daysfordate: sdate},
         function(rv) {
             rv = eval(rv);
-            if (rv[0]) {
-                if (rv[1] != null) {
-                    var names = eval(rv[1]);
-                    if (target.is("input")) {
-                        target.val(names.join(", "));
-                    } else {
-                        target.html(names.join(", "));
-                    }
+            if (rv.length) {
+                if (target.is("input")) {
+                    target.val(rv.join(", "));
+                } else {
+                    target.html(rv.join(", "));
                 }
             }
         });

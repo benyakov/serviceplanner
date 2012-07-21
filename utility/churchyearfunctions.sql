@@ -116,7 +116,7 @@ END;
 
 DROP FUNCTION IF EXISTS `{{DBP}}date_in_year`;
 CREATE FUNCTION `{{DBP}}date_in_year`(p_year INTEGER, p_dayname VARCHAR(255))
-RETURNS TEXT
+RETURNS DATE
 READS SQL DATA
 BEGIN
     DECLARE v_base VARCHAR(255);
@@ -177,8 +177,20 @@ BEGIN
         FROM `{{DBP}}churchyear`
         WHERE dayname=p_dayname
         INTO v_base, v_observed_month, v_observed_sunday;
-RETURN `{{DBP}}calc_observed_date_in_year`(p_year, p_dayname, v_base, v_observed_month,
-    v_observed_sunday);
+    RETURN `{{DBP}}calc_observed_date_in_year`(p_year, p_dayname, v_base,
+        v_observed_month, v_observed_sunday);
+END;
+
+DROP FUNCTION IF EXISTS `{{DBP}}calendar_date_in_year`;
+CREATE FUNCTION `{{DBP}}calendar_date_in_year` (p_year INTEGER,
+    p_dayname VARCHAR(255)) RETURNS DATE READS SQL DATA
+BEGIN
+    DECLARE v_result DATE;
+    SELECT CONCAT_WS('-', p_year, cy.month, cy.day)
+        FROM `{{DBP}}churchyear` AS cy
+        WHERE cy.dayname = p_dayname
+        INTO v_result;
+    RETURN v_result;
 END;
 
 DROP PROCEDURE IF EXISTS `{{DBP}}get_days_for_date`;
@@ -186,7 +198,8 @@ CREATE PROCEDURE `{{DBP}}get_days_for_date` (p_date DATE)
 BEGIN
     SELECT dayname FROM `{{DBP}}churchyear`
     WHERE `{{DBP}}date_in_year`(YEAR(p_date), dayname) = p_date
-    OR `{{DBP}}observed_date_in_year`(YEAR(p_date), dayname) = p_date;
+    OR `{{DBP}}observed_date_in_year`(YEAR(p_date), dayname) = p_date
+    OR `{{DBP}}calendar_date_in_year`(YEAR(p_date), dayname) = p_date;
 END;
 
 DROP FUNCTION IF EXISTS `{{DBP}}get_lesson_field`;

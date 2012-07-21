@@ -46,9 +46,11 @@ if (array_key_exists("date", $_POST)) {
     <script type="text/javascript">
     function updateFromDate(dateitem) {
         var dateval = $(dateitem).val();
-        getDayFor(dateval, $("#liturgicalname"));
-        updateExisting(dateval);
-        updateBlocksAvailable(dateval);
+        if (dateval) {
+            getDayFor(dateval, $("#liturgicalname"));
+            updateExisting(dateval);
+            updateBlocksAvailable(dateval);
+        }
     }
     $(document).ready(function() {
         $("#existing-services").hide();
