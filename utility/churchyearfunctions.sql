@@ -136,7 +136,7 @@ RETURNS DATE
 DETERMINISTIC
 BEGIN
     DECLARE actual, firstofmonth, lastofmonth DATE;
-    IF base IS NULL THEN
+    IF base IS NULL OR base = "" THEN
         IF observed_month = 0 THEN
             SET actual = `{{DBP}}date_in_year`(p_year, p_dayname);
             IF DAYOFWEEK(actual) > 1 THEN
@@ -150,15 +150,13 @@ BEGIN
                 SET firstofmonth = firstofmonth
                     + INTERVAL 8-DAYOFWEEK(firstofmonth) DAY;
             END IF;
-            RETURN firstofmonth + INTERVAL (observed_sunday-1)*7 DAY;
+            RETURN firstofmonth + INTERVAL (observed_sunday-1) WEEK;
         ELSE
             SET lastofmonth = (CONCAT_WS('-', p_year, observed_month, 1)
                 + INTERVAL 1 MONTH) - INTERVAL 1 DAY;
-            IF DAYOFWEEK(lastofmonth) > 1 THEN
-                SET lastofmonth = lastofmonth
-                    - INTERVAL DAYOFWEEK(lastofmonth)-1 DAY;
-            END IF;
-            RETURN lastofmonth + INTERVAL (observed_sunday+1)*7 DAY;
+            SET lastofmonth = lastofmonth
+                - INTERVAL DAYOFWEEK(lastofmonth)-1 DAY;
+            RETURN lastofmonth + INTERVAL (observed_sunday+1) WEEK;
         END IF;
     ELSE
         RETURN 0;
