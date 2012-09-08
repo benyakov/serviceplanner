@@ -51,7 +51,7 @@ while ($row = $q->fetch(PDO::FETCH_ASSOC)) {
         'location' => $row['location']
     );
 }
-if ($title) {
+if ($title || $_GET['xref']=="off") {
     echo json_encode(array($title, $lastusedary));
     exit(0);
 }
