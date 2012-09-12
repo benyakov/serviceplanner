@@ -57,6 +57,11 @@ if ($_GET['request'] == 'dropfunctions') {
  * them again.
  */
 if ($_GET['request'] == 'purgetables') {
+    if (! $auth) {
+        setMessage("Access denied.  Please log in.");
+        header("location: index.php");
+        exit(0);
+    }
     $dbh->beginTransaction();
     $dbh->exec("DELETE FROM `{$dbp}churchyear_collects_index`");
     $dbh->exec("DELETE FROM `{$dbp}churchyear_collects`");
@@ -65,7 +70,7 @@ if ($_GET['request'] == 'purgetables') {
     $dbh->exec("DELETE FROM `{$dbp}churchyear_propers`");
     $dbh->exec("DELETE FROM `{$dbp}churchyear_order`");
     $dbh->exec("DELETE FROM `{$dbp}churchyear`");
-    $dbstate->store("has-churchyear-functions", 0);
+    $dbstate->store("churchyear-filled", 0);
     if ($dbstate->save()) {
         setMessage("Church year tables purged.  They should be re-populated "
             ."by the time you see this message.");
