@@ -146,9 +146,10 @@ function updateExisting(dateitem) {
 }
 
 function fetchHymnTitle() {
-    var hymnNumber = $(this).val();
     var id = $(this).attr("id").split("_");
     var entryNumber = id[1];
+    if ($("#title_"+entryNumber).val()) return;
+    var hymnNumber = $(this).val();
     var use_xref = $("#xref-names:checked").val() || "off";
     if (! hymnNumber) {
         $("#title_"+entryNumber).val("").hide();
