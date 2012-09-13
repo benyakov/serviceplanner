@@ -148,9 +148,9 @@ cross-reference table.</label>
             <option><?=$hymnbook?></option>
         <? } ?>
         </select>
-        <input tabindex="<?=$tabindex+1?>" type="number" min="1" id="number_<?=$i?>" name="number_<?=$i?>" value="" class="edit-number">
-        <input tabindex="<?=$tabindex+2?>" type="text" id="note_<?=$i?>" name="note_<?=$i?>" class="edit-note" maxlength="100" value="">
-        <input tabindex="<?=$tabindex+3?>" type="text" id="title_<?=$i?>" name="title_<?=$i?>" class="edit-title hidden">
+        <input tabindex="<?=$tabindex+1?>" type="number" min="1" id="number_<?=$i?>" name="number_<?=$i?>" value="" class="edit-number" placeholder="<#>">
+        <input tabindex="<?=$tabindex+2?>" type="text" id="note_<?=$i?>" name="note_<?=$i?>" class="edit-note" maxlength="100" value="" placeholder="<note>">
+        <input tabindex="<?=$tabindex+3?>" type="text" id="title_<?=$i?>" name="title_<?=$i?>" class="edit-title hidden" placeholder="<Please enter a title.>">
         <div id="past_<?=$i?>" class="hymn-past"></div>
     </li>
     <? } ?>

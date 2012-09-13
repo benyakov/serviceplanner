@@ -64,7 +64,9 @@ function addHymnToTable() {
         .attr("id", "number_new-"+indexStart)
         .attr("name", "number_new-"+indexStart)
         .val("")
-        .keyup(function() {
+        .keyup(function(evt) {
+            if (evt.which == 9 ||
+                evt.which == 17) return;
             $(this).doTimeout('fetch-hymn-title', 250, fetchHymnTitle)
         })
         .change(fetchHymnTitle);
@@ -95,7 +97,9 @@ function addHymnToList() {
         .attr("id", "number_"+hymnIndex)
         .attr("name", "number_"+hymnIndex)
         .attr("tabindex", tabindexStart+5)
-        .keyup(function() {
+        .keyup(function(evt) {
+            if (evt.which == 9 ||
+                evt.which == 17) return;
             $(this).doTimeout('fetch-hymn-title', 250, fetchHymnTitle)
         })
         .change(fetchHymnTitle);
@@ -148,7 +152,6 @@ function updateExisting(dateitem) {
 function fetchHymnTitle() {
     var id = $(this).attr("id").split("_");
     var entryNumber = id[1];
-    if ($("#title_"+entryNumber).val()) return;
     var hymnNumber = $(this).val();
     var use_xref = $("#xref-names:checked").val() || "off";
     if (! hymnNumber) {
@@ -166,7 +169,7 @@ function fetchHymnTitle() {
                     $("#title_"+entryNumber).val(hymnTitle).show();
                 } else {
                     $("#title_"+entryNumber).val("")
-                        .attr("placeholder", "Please enter a title.")
+                        .attr("placeholder", "<Please enter a title.>")
                         .show();
                 }
                 var past = new Array;
