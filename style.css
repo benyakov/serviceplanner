@@ -136,6 +136,15 @@ input.edit-location {
 input.hidden {
     display: none;
 }
+::-webkit-input-placeholder {
+    color: #999;
+}
+:-moz-placeholder {
+    color: #999;
+}
+:-ms-input-placeholder {
+    color: #999;
+}
 div.hymn-past {
     width: 50em;
     display: none;
