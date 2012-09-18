@@ -114,6 +114,10 @@ input {
     background-color: black;
     color: #EFF;
 }
+input:focus {
+    background-color: #DDD;
+    color: black;
+}
 input.entryline {
     margin: 1ex;
 }
