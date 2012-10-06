@@ -26,7 +26,7 @@
 function propersForm($dayname) {
     global $dbp, $dbh;
     $q = $dbh->prepare("SELECT pr.color, pr.theme, pr.introit, pr.note,
-        l.lesson1, l.lesson2, l.gospel, l.psalm, l.s2lesson, l.s3gospel,
+        l.lesson1, l.lesson2, l.gospel, l.psalm, l.s2lesson, l.s2gospel,
         l.s3lesson, l.s3gospel, l.id, l.lectionary, l.hymnabc, l.hymn
         FROM `{$dbp}churchyear_propers` AS pr
         LEFT OUTER JOIN `{$dbp}churchyear_lessons` AS l
