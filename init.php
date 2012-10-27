@@ -91,4 +91,11 @@ if ((! $dbstate->get("has-churchyear-functions")) or
     $dbstate->store('has-churchyear-functions', 1);
     $dbstate->save() or die("Problem saving dbstate file.");
 }
+if ((! $dbstate->get("has-views")) or
+        ($_GET['flag'] == 'create-views' && $auth))
+{
+        require('./utility/createviews.php');
+            $dbstate->store('has-views', 1);
+            $dbstate->save() or die("Problem saving dbstate file.");
+}
 ?>

@@ -152,22 +152,24 @@ function queryAllHymns($dbh, $dbp="", $limit=0, $future=false) {
     h.book, h.number, h.note, h.location, d.name as dayname, d.rite,
     d.pkey as id, d.servicenotes, n.title, d.block,
     b.label as blabel, b.notes as bnotes,
+    cyp.color as color, cyp.theme as theme, cyp.introit as introit,
+    cyp.note as propersnote,
     (CASE b.l1lect
         WHEN 'historic' THEN
         (CASE b.l1series
             WHEN 'first' THEN
-                (SELECT lesson1 FROM `{$dbp}churchyear_lessons` AS cl
+                (SELECT lesson1 FROM `{$dbp}synlessons` AS cl
                     WHERE cl.dayname=d.name AND cl.lectionary=b.l1lect)
             WHEN 'second' THEN
-                (SELECT s2lesson FROM `{$dbp}churchyear_lessons` AS cl
+                (SELECT s2lesson FROM `{$dbp}synlessons` AS cl
                     WHERE cl.dayname=d.name AND cl.lectionary=b.l1lect)
             WHEN 'third' THEN
-                (SELECT s3lesson FROM `{$dbp}churchyear_lessons` AS cl
+                (SELECT s3lesson FROM `{$dbp}synlessons` AS cl
                     WHERE cl.dayname=d.name AND cl.lectionary=b.l1lect)
             END)
         WHEN 'custom' THEN b.l1series
         ELSE
-        (SELECT lesson1 FROM `{$dbp}churchyear_lessons` AS cl
+        (SELECT lesson1 FROM `{$dbp}synlessons` AS cl
             WHERE cl.dayname=d.name AND cl.lectionary=b.l1lect)
         END)
         AS blesson1,
@@ -175,18 +177,18 @@ function queryAllHymns($dbh, $dbp="", $limit=0, $future=false) {
         WHEN 'historic' THEN
         (CASE b.l2series
             WHEN 'first' THEN
-                (SELECT lesson2 FROM `{$dbp}churchyear_lessons` AS cl
+                (SELECT lesson2 FROM `{$dbp}synlessons` AS cl
                     WHERE cl.dayname=d.name AND cl.lectionary=b.l2lect)
             WHEN 'second' THEN
-                (SELECT s2lesson FROM `{$dbp}churchyear_lessons` AS cl
+                (SELECT s2lesson FROM `{$dbp}synlessons` AS cl
                     WHERE cl.dayname=d.name AND cl.lectionary=b.l2lect)
             WHEN 'third' THEN
-                (SELECT s3lesson FROM `{$dbp}churchyear_lessons` AS cl
+                (SELECT s3lesson FROM `{$dbp}synlessons` AS cl
                     WHERE cl.dayname=d.name AND cl.lectionary=b.l2lect)
             END)
         WHEN 'custom' THEN b.l2series
         ELSE
-        (SELECT lesson2 FROM `{$dbp}churchyear_lessons` AS cl
+        (SELECT lesson2 FROM `{$dbp}synlessons` AS cl
             WHERE cl.dayname=d.name AND cl.lectionary=b.l2lect)
         END)
         AS blesson2,
@@ -194,29 +196,29 @@ function queryAllHymns($dbh, $dbp="", $limit=0, $future=false) {
         WHEN 'historic' THEN
         (CASE b.goseries
             WHEN 'first' THEN
-                (SELECT gospel FROM `{$dbp}churchyear_lessons` AS cl
+                (SELECT gospel FROM `{$dbp}synlessons` AS cl
                     WHERE cl.dayname=d.name AND cl.lectionary=b.golect)
             WHEN 'second' THEN
-                (SELECT s2gospel FROM `{$dbp}churchyear_lessons` AS cl
+                (SELECT s2gospel FROM `{$dbp}synlessons` AS cl
                     WHERE cl.dayname=d.name AND cl.lectionary=b.golect)
             WHEN 'third' THEN
-                (SELECT s3gospel FROM `{$dbp}churchyear_lessons` AS cl
+                (SELECT s3gospel FROM `{$dbp}synlessons` AS cl
                     WHERE cl.dayname=d.name AND cl.lectionary=b.golect)
             END)
         WHEN 'custom' THEN b.goseries
         ELSE
-        (SELECT gospel FROM `{$dbp}churchyear_lessons` AS cl
+        (SELECT gospel FROM `{$dbp}synlessons` AS cl
             WHERE cl.dayname=d.name AND cl.lectionary=b.golect)
         END)
         AS bgospel,
-    (SELECT psalm FROM `{$dbp}churchyear_lessons` AS cl
+    (SELECT psalm FROM `{$dbp}synlessons` AS cl
         WHERE cl.dayname=d.name AND cl.lectionary=b.pslect) AS bpsalm
     FROM {$dbp}hymns AS h
     RIGHT OUTER JOIN `{$dbp}days` AS d ON (h.service = d.pkey)
     LEFT OUTER JOIN `{$dbp}names` AS n ON (h.number = n.number)
         AND (h.book = n.book)
     LEFT OUTER JOIN `{$dbp}blocks` AS b ON (b.id = d.block)
-    LEFT JOIN `{$dbp}churchyear_propers` AS cyp ON (cyp.dayname = d.name)
+    LEFT OUTER JOIN `{$dbp}churchyear_propers` AS cyp ON (cyp.dayname = d.name)
     {$where}
     ORDER BY d.caldate {$order}, h.service {$order},
         h.location, h.sequence {$limitstr}");
