@@ -547,7 +547,7 @@ dl.blocklessons {
 
 dl.blocklessons dd {
     display: inline;
-    margin: 0 .25em 0 0;
+    margin: 0 .25em 0 .25em;
     font-weight: bold;
     font-family: sans-serif;
 }
@@ -557,6 +557,24 @@ dl.blocklessons dt {
     margin: 0 .25em;
     font-weight: normal;
     font-size: smaller;
+}
+
+.heavy {
+    font-weight: bold;
+}
+
+.smaller {
+    font-size: smaller;
+}
+
+.maxcolumn {
+    width: 42em;
+}
+
+.menulink {
+    font-size: 95%;
+    font-weight: bold;
+    font-family: monospace;
 }
 
 .hiddentemplate {

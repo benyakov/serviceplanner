@@ -218,7 +218,7 @@ function queryAllHymns($dbh, $dbp="", $limit=0, $future=false) {
     LEFT OUTER JOIN `{$dbp}names` AS n ON (h.number = n.number)
         AND (h.book = n.book)
     LEFT OUTER JOIN `{$dbp}blocks` AS b ON (b.id = d.block)
-    LEFT OUTER JOIN `{$dbp}churchyear_propers` AS cyp ON (cyp.dayname = d.name)
+    LEFT OUTER JOIN `{$dbp}synpropers` AS cyp ON (cyp.dayname = d.name)
     {$where}
     ORDER BY d.caldate {$order}, h.service {$order},
         h.location, h.sequence {$limitstr}");
@@ -248,15 +248,26 @@ function display_records_table($q) {
             } else {
                 $datetext = $row['date'];
             }
-            echo "<tr class=\"heading\"><td>{$datetext} {$row['location']}</td>
+            echo "<tr class=\"heading\"><td class=\"heavy\">{$datetext} {$row['location']}</td>
                 <td colspan=2>{$row['dayname']}: {$row['rite']} ".
                 "[ <a href=\"print.php?id={$row['id']}\" ".
                 "title=\"print\">Print</a> ]</td></tr>\n";
+            echo "<tr class=\"heading\"><td class=\"heavy smaller\">{$row['theme']}</td>";
+            echo "<td colspan=2>{$row['color']}</td></tr>";
+            if ($row['introit']) {
+                echo "<tr class=\"heading\"><td colspan=3>
+                    <p class=\"maxcolumn smaller\">{$row['introit']}</p></td></tr>";
+            }
+            if ($row['propersnote']) {
+                echo "<tr class=\"heading\"><td colspan=3>
+                    <p class=\"maxcolumn\">".
+                    translate_markup($row['propersnote'])."</p></td></tr>";
+            }
             if ($row['block'])
             { ?>
                 <tr><td colspan=3 class="blockdisplay">
                     <h4>Block: <?=$row['blabel']?></h4>
-                    <div class="blocknotes">
+                    <div class="blocknotes maxcolumn">
                         <?=translate_markup($row['bnotes'])?>
                     </div>
                     <dl class="blocklessons">
@@ -317,10 +328,23 @@ function modify_records_table($q, $action) {
             $urldate=urlencode($row['date']);
             echo "<tr class=\"heading\"><td>
             <input form=\"delete-service\" type=\"checkbox\" name=\"{$row['id']}_{$row['location']}\" id=\"check_{$row['id']}_{$row['location']}\">
-            {$datetext} <a href=\"enter.php?date={$urldate}\" title=\"Add another service or hymns on {$row['date']}.\">[add]</a> {$row['location']}</td>
-            <td colspan=2><a href=\"#\" class=\"edit-service\" data-id=\"{$row['id']}\">Edit</a> |
-            <a href=\"sermon.php?id={$row['id']}\">Sermon</a> |
+            <span class=\"heavy\">{$datetext}</span>
+            [ <a class=\"menulink\" href=\"enter.php?date={$urldate}\" title=\"Add another service or hymns on {$row['date']}.\">Add</a> ]
+            <span class=\"heavy\">{$row['location']}</span></td>
+            <td colspan=2>[ <a href=\"#\" class=\"edit-service menulink\" data-id=\"{$row['id']}\">Edit</a> |
+            <a class=\"menulink\" href=\"sermon.php?id={$row['id']}\">Sermon</a> ]
             {$row['dayname']}: {$row['rite']}</td></tr>\n";
+            echo "<tr class=\"heading\"><td class=\"heavy smaller\">{$row['theme']}</td>";
+            echo "<td colspan=2>{$row['color']}</td></tr>";
+            if ($row['introit']) {
+                echo "<tr class=\"heading\"><td colspan=3>
+                    <p class=\"maxcolumn smaller\">{$row['introit']}</p></td></tr>";
+            }
+            if ($row['propersnote']) {
+                echo "<tr class=\"heading\"><td colspan=3>
+                    <p class=\"maxcolumn\">".
+                    translate_markup($row['propersnote'])."</p></td></tr>";
+            }
             if ($row['block'])
             { ?>
                 <tr><td colspan=3 class="blockdisplay">
