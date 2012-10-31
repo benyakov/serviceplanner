@@ -110,7 +110,8 @@ div.servicenote {
 
 
 select,
-input {
+input,
+select option {
     background-color: black;
     color: #EFF;
 }
@@ -587,4 +588,8 @@ textarea.datalist {
 
 #new-propers-collect {
     display: none;
+}
+
+td > label {
+    white-space: nowrap;
 }
