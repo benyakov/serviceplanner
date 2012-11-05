@@ -68,11 +68,15 @@ if (! array_key_exists('stage', $_GET)) {
             });
         });
     </script>
-        <? showMessage(); ?>
+    <header>
+    <?=getLoginForm()?>
+    <?=getUserActions()?>
+    <?showMessage();?>
+    </header>
+    <?=sitetabs($sitetabs, "sermons")?>
         <div id="content-container">
         <p><a href="sermonreport.php?id=<?=${id}?>">Printable Sermon Report</a>
-        | <a href="sermons.php">Browse All Sermon Plans</a>
-        | <a href="modify.php">Back to Service Listing</a></p>
+        | <a href="sermons.php">Browse All Sermon Plans</a></p>
         <h1>Edit a Sermon Plan</h1>
         <p class="explanation">You can delete the whole service, hymns, sermon
         plan, and all, from here.  To edit this service or modify the chosen

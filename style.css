@@ -33,6 +33,11 @@ body {
 body>header {
     font-family: sans-serif;
     font-size: small;
+    position: fixed;
+    top: 0px; left: 0px; width: 100%;
+    padding: 2px;
+    z-index: 4;
+    background-color: black;
 }
 
 body>header a,
@@ -40,6 +45,12 @@ body>header a:link,
 body>header a:visited {
     color: #88F;
     background-color: transparent;
+}
+
+body>nav {
+    position: fixed;
+    top: 35px; left: 0px; width: 100%;
+    z-index: 4;
 }
 
 #login {
@@ -162,9 +173,9 @@ div#content-container {
     -moz-border-radius: 5px;
     border-radius: 5px;
     border-radius: 5px;
-    margin-top: 0;
+    margin-top: 60px;
     padding-top: 0;
-    padding: 1ex;
+    padding: 10px;
     background-color: white;
     color: black;
 }
@@ -311,6 +322,7 @@ div.propersbox {
 }
 
 table#userlist {
+    margin-top: 90px;
     background-color: #444;
     font-family: sans-serif;
 }
@@ -346,17 +358,16 @@ dt {
 ul#sitetabs {
     font-size: 10pt; font-family: sans-serif;
     font-weight: bold;
-    display: table;
-    margin: 0pt; padding: 0pt;
+    margin: 0 9px; padding: 0;
     background-color: black;
-    width: 100%;
+    border-bottom: 2px solid #888;
 }
 ul#sitetabs a {
     text-decoration: none; color: black;
-    display: block;
-    width: 90%; text-align: center;
+    text-align: center;
     margin-left: auto; margin-right: auto;
     margin-bottom: -2px;
+    padding: 0 1ex;
     border: 2px solid #888;
     -moz-border-radius-topleft: 6px;
     -moz-border-radius-topright: 6px;
@@ -366,10 +377,7 @@ ul#sitetabs a {
     background-color: #BBB;
 }
 ul#sitetabs > li {
-    display: table-cell;
-    margin: 0;
-    text-align: center;
-    vertical-align: bottom;
+    display: inline;
 }
 ul#sitetabs > li.activated A  {
     color: black;
