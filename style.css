@@ -38,6 +38,7 @@ body>header {
     padding: 2px;
     z-index: 4;
     background-color: black;
+    height: 35px;
 }
 
 body>header a,
@@ -49,7 +50,7 @@ body>header a:visited {
 
 body>nav {
     position: fixed;
-    top: 35px; left: 0px; width: 100%;
+    top: 35px; left: 0px; width: 100%; height: 25px;
     z-index: 4;
 }
 
@@ -173,7 +174,8 @@ div#content-container {
     -moz-border-radius: 5px;
     border-radius: 5px;
     border-radius: 5px;
-    margin-top: 60px;
+    position: relative;
+    top: 55px;
     padding-top: 0;
     padding: 10px;
     background-color: white;
@@ -358,7 +360,7 @@ dt {
 ul#sitetabs {
     font-size: 10pt; font-family: sans-serif;
     font-weight: bold;
-    margin: 0 9px; padding: 0;
+    margin: 0 15px; padding: 0;
     background-color: black;
     border-bottom: 2px solid #888;
 }
