@@ -30,7 +30,7 @@ body {
     color: white;
 }
 
-body>header {
+#pageheader {
     font-family: sans-serif;
     font-size: small;
     position: fixed;
@@ -38,20 +38,14 @@ body>header {
     padding: 2px;
     z-index: 4;
     background-color: black;
-    height: 35px;
+    height: 24pt;
 }
 
-body>header a,
-body>header a:link,
-body>header a:visited {
+#pageheader a,
+#pageheader a:link,
+#pageheader a:visited {
     color: #88F;
     background-color: transparent;
-}
-
-body>nav {
-    position: fixed;
-    top: 35px; left: 0px; width: 100%; height: 25px;
-    z-index: 4;
 }
 
 #login {
@@ -175,7 +169,7 @@ div#content-container {
     border-radius: 5px;
     border-radius: 5px;
     position: relative;
-    top: 55px;
+    top: 38pt;
     padding-top: 0;
     padding: 10px;
     background-color: white;
@@ -360,15 +354,13 @@ dt {
 ul#sitetabs {
     font-size: 10pt; font-family: sans-serif;
     font-weight: bold;
-    margin: 0 15px; padding: 0;
+    margin: 0 7pt; padding: 0;
     background-color: black;
     border-bottom: 2px solid #888;
 }
 ul#sitetabs a {
     text-decoration: none; color: black;
     text-align: center;
-    margin-left: auto; margin-right: auto;
-    margin-bottom: -2px;
     padding: 0 1ex;
     border: 2px solid #888;
     -moz-border-radius-topleft: 6px;
@@ -380,8 +372,9 @@ ul#sitetabs a {
 }
 ul#sitetabs > li {
     display: inline;
+    margin: 0 2pt;
 }
-ul#sitetabs > li.activated A  {
+ul#sitetabs > li.activated a  {
     color: black;
     background-color: white;
     border-bottom: 2px solid white;
@@ -392,6 +385,9 @@ div#sitetabs-background {
     padding-bottom: 0;
     border: none;
     margin: 0;
+    position: fixed;
+    top: 24pt; left: 0; width: 100%; height: 12pt;
+    z-index: 4;
 }
 .quicklinks {
     float: right;

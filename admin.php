@@ -59,12 +59,8 @@ if (! $auth) {
         });
     });
 </script>
-    <header>
-    <?=getLoginForm()?>
-    <?=getUserActions()?>
-    <?showMessage();?>
-    </header>
-    <?=sitetabs($sitetabs, $script_basename)?>
+    <?pageHeader();
+    siteTabs($auth); ?>
     <div id="content-container">
     <h1>Housekeeping</h1>
     <p>This page contains the links for backing up the database and restoring

@@ -95,16 +95,8 @@ $q = $dbh->query("SELECT * FROM {$dbp}xref{$sort_by}") ;
 <html lang="en">
 <?=html_head("Hymn Cross Reference")?>
 <body>
-    <header>
-    <?=getLoginForm()?>
-    <?=getUserActions()?>
-    <?showMessage();?>
-    </header>
-<? if ($auth) {
-    echo sitetabs($sitetabs, $script_basename);
-} else {
-    echo sitetabs($sitetabs_anonymous, $script_basename);
-} ?>
+    <?  pageHeader();
+    siteTabs($auth); ?>
 <div id="content-container">
 <?  if ($sorted_on) { ?>
 <div id="quicklinks"><a href="#sortstart">Jump to Beginning of Sorted</a></div>

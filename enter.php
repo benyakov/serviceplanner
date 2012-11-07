@@ -83,12 +83,8 @@ if (array_key_exists("date", $_POST)) {
     });
     auth = "<?=authId()?>";
     </script>
-    <header>
-    <?=getLoginForm()?>
-    <?=getUserActions()?>
-    <?showMessage();?>
-    </header>
-    <?=sitetabs($sitetabs, "modify")?>
+    <? pageHeader();
+    siteTabs($auth); ?>
     <div id="content-container">
     <header>
     <h1>Service Entry Form</h1>

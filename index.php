@@ -40,21 +40,9 @@ if ($jsonp = checkJsonpReq()) {
 <html lang="en">
 <?=html_head("Upcoming Hymns")?>
 <body>
-    <header>
-    <? if (!$displayonly) {
-        echo getLoginForm();
-        echo getUserActions();
-    } ?>
-    <?showMessage();?>
-    </header>
 <?
-if (! $displayonly) {
-    if ($auth) {
-        echo sitetabs($sitetabs, $script_basename);
-    } else {
-        echo sitetabs($sitetabs_anonymous, $script_basename);
-    }
-}
+pageHeader($displayonly);
+siteTabs($auth, $displayonly);
 if ($jsonp) {
     ob_clean();
 } ?>

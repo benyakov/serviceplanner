@@ -418,7 +418,7 @@ function quote_array($ary) {
     return str_replace("'", "''", $ary);
 }
 
-function sitetabs($sitetabs, $action, $bare=false) {
+function gensitetabs($sitetabs, $action, $bare=false) {
     $tabs = array_fill_keys(array_keys($sitetabs), 0);
     $tabs[$action] = 1;
     $rv = "";
@@ -594,6 +594,29 @@ function replaceDBP($text, $prefix=false) {
         return str_replace('{{DBP}}', $prefix, $text);
     } else {
         return str_replace('{{DBP}}', $dbp, $text);
+    }
+}
+
+function pageHeader($displayonly=false) { ?>
+    <header>
+    <div id="pageheader">
+    <? if (!$displayonly) {
+        echo getLoginForm();
+        echo getUserActions();
+    } ?>
+    <?showMessage();?>
+    </div>
+    </header> <?
+}
+function siteTabs($auth, $displayonly=false, $basename=false) {
+    global $sitetabs, $sitetabs_anonymous, $script_basename;
+    if (! $basename) $basename=$script_basename;
+    if (! $displayonly) {
+        if ($auth) {
+            echo gensitetabs($sitetabs, $script_basename);
+        } else {
+            echo gensitetabs($sitetabs_anonymous, $script_basename);
+        }
     }
 }
 

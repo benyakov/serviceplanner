@@ -68,12 +68,8 @@ if (! array_key_exists('stage', $_GET)) {
             });
         });
     </script>
-    <header>
-    <?=getLoginForm()?>
-    <?=getUserActions()?>
-    <?showMessage();?>
-    </header>
-    <?=sitetabs($sitetabs, "sermons")?>
+    <? pageHeader();
+    siteTabs($auth, $basename="sermons"); ?>
         <div id="content-container">
         <p><a href="sermonreport.php?id=<?=${id}?>">Printable Sermon Report</a>
         | <a href="sermons.php">Browse All Sermon Plans</a></p>

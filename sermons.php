@@ -44,12 +44,8 @@ $q = $dbh->query("SELECT sermons.bibletext, sermons.outline,
     ORDER BY days.caldate DESC");
 $q->execute() or die(array_pop($q->errorInfo));
 ?>
-    <header>
-    <?=getLoginForm()?>
-    <?=getUserActions()?>
-    <?showMessage();?>
-    </header>
-    <?=sitetabs($sitetabs, $script_basename)?>
+    <? pageHeader();
+    siteTabs($auth); ?>
     <div id="content-container">
     <h1>Sermon Plans</h1>
     <p class="explanation">This is a listing of sermon plans you have created.

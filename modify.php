@@ -99,12 +99,8 @@ if (array_key_exists('listinglimit', $_GET) &&
             });
         });
     </script>
-    <header>
-    <?=getLoginForm()?>
-    <?=getUserActions()?>
-    <? showMessage(); ?>
-    </header>
-    <?=sitetabs($sitetabs, $script_basename)?>
+    <? pageHeader();
+    siteTabs($auth); ?>
     <div id="content-container">
     <div class="quicklinks"><a href="enter.php" title="New Service">New Service</a>
     | <a href="#now">Jump to This Week</a></div>

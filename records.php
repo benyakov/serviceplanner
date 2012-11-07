@@ -30,16 +30,8 @@ $this_script = $_SERVER['HTTP_HOST'].$_SERVER['SCRIPT_NAME'] ;
 <html lang="en">
 <?=html_head("Service Planning Records")?>
 <body>
-    <header>
-    <?=getLoginForm()?>
-    <?=getUserActions()?>
-    <?showMessage();?>
-    </header>
-    <? if ($auth) {
-        echo sitetabs($sitetabs, $script_basename);
-    } else {
-        echo sitetabs($sitetabs_anonymous, $script_basename);
-    } ?>
+<?  pageHeader();
+    siteTabs($auth);?>
     <div id="content-container">
     <div class="quicklinks"><a href="#now">Jump to This Week</a></div>
     <?

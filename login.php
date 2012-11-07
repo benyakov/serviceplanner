@@ -51,7 +51,7 @@ if (array_key_exists('ajax', $_POST) || array_key_exists('ajax', $_GET)) {
     $stkeys = array_keys($st);
     $rv['actions'] = getUserActions($bare=true);
     $rv['loginform'] = getLoginForm($bare=true);
-    $rv['sitetabs'] = sitetabs($st, $stkeys[0], $bare=true);
+    $rv['sitetabs'] = gensitetabs($st, $stkeys[0], $bare=true);
     echo json_encode($rv);
 } else {
     $redirect = $_SESSION['HTTP_REFERER']?

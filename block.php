@@ -452,12 +452,8 @@ if (! $auth) {
         });
     });
     </script>
-    <header>
-    <?=getLoginForm()?>
-    <?=getUserActions()?>
-    <? showMessage(); ?>
-    </header>
-    <?=sitetabs($sitetabs, $script_basename)?>
+    <?pageHeader();
+    siteTabs($auth); ?>
     <div id="content-container">
     <div class="quicklinks"><a href="block.php?action=new" title="New Block" id="new-block">New Block</a></div>
     <h1>Block Plans</h1>

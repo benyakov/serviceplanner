@@ -596,12 +596,9 @@ if (! $auth) {
 <script type="text/javascript">
     <? require("./churchyear/ecmascript.js"); ?>
 </script>
-<header>
-<?=getLoginForm()?>
-<?=getUserActions()?>
-<? showMessage(); ?>
-</header>
-<?=sitetabs($sitetabs, $script_basename)?>
+<?
+pageHeader();
+siteTabs($auth);?>
 <div id="content-container">
 <h1>Church Year Configuration</h1>
 <?=churchyear_listing(query_churchyear())?>
