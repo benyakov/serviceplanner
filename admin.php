@@ -187,6 +187,7 @@ $(document).ready(function(){var a="http://www.bethanythedalles.org/services-dev
         <a href="admin.php?flag=create-churchyear-functions">church year functions</a>.
         This should happen automatically most of the time, and should not be
         tried unless needed.</li>
+    <li>Manually re-create <a href="admin.php?flag=create-views">synonym coordination views</a> in the database.  This should also happen automatically when needed.</li>
     <li>You are using Services version <?
         echo "{$version['major']}.{$version['minor']}.{$version['tick']}";
 ?>.  Refer to this version number, and include the address

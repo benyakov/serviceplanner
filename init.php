@@ -67,9 +67,7 @@ if (! ($dbstate->get("has-user") || $_GET['flag'] == 'inituser')) {
     exit(0);
 }
 require("./db-connection.php");
-if (! $_GET['flag'] == "inituser") {
-    $auth = auth();
-}
+if (! ($_GET['flag'] == "inituser")) $auth = auth();
 if ((! $dbstate->get("churchyear-filled")) or
     ($_GET['flag'] == 'fill-churchyear' && $auth))
 {
@@ -94,8 +92,9 @@ if ((! $dbstate->get("has-churchyear-functions")) or
 if ((! $dbstate->get("has-views")) or
         ($_GET['flag'] == 'create-views' && $auth))
 {
-        require('./utility/createviews.php');
-            $dbstate->store('has-views', 1);
-            $dbstate->save() or die("Problem saving dbstate file.");
+    require('./utility/createviews.php');
+        $dbstate->store('has-views', 1);
+        $dbstate->save() or die("Problem saving dbstate file.");
 }
+
 ?>
