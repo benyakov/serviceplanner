@@ -84,7 +84,7 @@ if (array_key_exists("date", $_POST)) {
     auth = "<?=authId()?>";
     </script>
     <? pageHeader();
-    siteTabs($auth); ?>
+    siteTabs($auth, "modify"); ?>
     <div id="content-container">
     <header>
     <h1>Service Entry Form</h1>

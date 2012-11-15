@@ -159,18 +159,22 @@ function queryAllHymns($dbh, $dbp="", $limit=0, $future=false) {
         (CASE b.l1series
             WHEN 'first' THEN
                 (SELECT lesson1 FROM `{$dbp}synlessons` AS cl
-                    WHERE cl.dayname=d.name AND cl.lectionary=b.l1lect)
+                WHERE cl.dayname=d.name AND cl.lectionary=b.l1lect
+                LIMIT 1)
             WHEN 'second' THEN
                 (SELECT s2lesson FROM `{$dbp}synlessons` AS cl
-                    WHERE cl.dayname=d.name AND cl.lectionary=b.l1lect)
+                WHERE cl.dayname=d.name AND cl.lectionary=b.l1lect
+                LIMIT 1)
             WHEN 'third' THEN
                 (SELECT s3lesson FROM `{$dbp}synlessons` AS cl
-                    WHERE cl.dayname=d.name AND cl.lectionary=b.l1lect)
+                WHERE cl.dayname=d.name AND cl.lectionary=b.l1lect
+                LIMIT 1)
             END)
         WHEN 'custom' THEN b.l1series
         ELSE
-        (SELECT lesson1 FROM `{$dbp}synlessons` AS cl
-            WHERE cl.dayname=d.name AND cl.lectionary=b.l1lect)
+            (SELECT lesson1 FROM `{$dbp}synlessons` AS cl
+            WHERE cl.dayname=d.name AND cl.lectionary=b.l1lect
+            LIMIT 1)
         END)
         AS blesson1,
     (CASE b.l2lect
@@ -178,18 +182,22 @@ function queryAllHymns($dbh, $dbp="", $limit=0, $future=false) {
         (CASE b.l2series
             WHEN 'first' THEN
                 (SELECT lesson2 FROM `{$dbp}synlessons` AS cl
-                    WHERE cl.dayname=d.name AND cl.lectionary=b.l2lect)
+                WHERE cl.dayname=d.name AND cl.lectionary=b.l2lect
+                LIMIT 1)
             WHEN 'second' THEN
                 (SELECT s2lesson FROM `{$dbp}synlessons` AS cl
-                    WHERE cl.dayname=d.name AND cl.lectionary=b.l2lect)
+                WHERE cl.dayname=d.name AND cl.lectionary=b.l2lect
+                LIMIT 1)
             WHEN 'third' THEN
                 (SELECT s3lesson FROM `{$dbp}synlessons` AS cl
-                    WHERE cl.dayname=d.name AND cl.lectionary=b.l2lect)
+                WHERE cl.dayname=d.name AND cl.lectionary=b.l2lect
+                LIMIT 1)
             END)
         WHEN 'custom' THEN b.l2series
         ELSE
-        (SELECT lesson2 FROM `{$dbp}synlessons` AS cl
-            WHERE cl.dayname=d.name AND cl.lectionary=b.l2lect)
+            (SELECT lesson2 FROM `{$dbp}synlessons` AS cl
+            WHERE cl.dayname=d.name AND cl.lectionary=b.l2lect
+            LIMIT 1)
         END)
         AS blesson2,
     (CASE b.golect
@@ -197,22 +205,27 @@ function queryAllHymns($dbh, $dbp="", $limit=0, $future=false) {
         (CASE b.goseries
             WHEN 'first' THEN
                 (SELECT gospel FROM `{$dbp}synlessons` AS cl
-                    WHERE cl.dayname=d.name AND cl.lectionary=b.golect)
+                WHERE cl.dayname=d.name AND cl.lectionary=b.golect
+                LIMIT 1)
             WHEN 'second' THEN
                 (SELECT s2gospel FROM `{$dbp}synlessons` AS cl
-                    WHERE cl.dayname=d.name AND cl.lectionary=b.golect)
+                WHERE cl.dayname=d.name AND cl.lectionary=b.golect
+                LIMIT 1)
             WHEN 'third' THEN
                 (SELECT s3gospel FROM `{$dbp}synlessons` AS cl
-                    WHERE cl.dayname=d.name AND cl.lectionary=b.golect)
+                WHERE cl.dayname=d.name AND cl.lectionary=b.golect
+                LIMIT 1)
             END)
         WHEN 'custom' THEN b.goseries
         ELSE
-        (SELECT gospel FROM `{$dbp}synlessons` AS cl
-            WHERE cl.dayname=d.name AND cl.lectionary=b.golect)
+            (SELECT gospel FROM `{$dbp}synlessons` AS cl
+            WHERE cl.dayname=d.name AND cl.lectionary=b.golect
+            LIMIT 1)
         END)
         AS bgospel,
     (SELECT psalm FROM `{$dbp}synlessons` AS cl
-        WHERE cl.dayname=d.name AND cl.lectionary=b.pslect) AS bpsalm
+    WHERE cl.dayname=d.name AND cl.lectionary=b.pslect
+    LIMIT 1) AS bpsalm
     FROM {$dbp}hymns AS h
     RIGHT OUTER JOIN `{$dbp}days` AS d ON (h.service = d.pkey)
     LEFT OUTER JOIN `{$dbp}names` AS n ON (h.number = n.number)
@@ -608,14 +621,14 @@ function pageHeader($displayonly=false) { ?>
     </div>
     </header> <?
 }
-function siteTabs($auth, $displayonly=false, $basename=false) {
+function siteTabs($auth, $basename=false, $displayonly=false) {
     global $sitetabs, $sitetabs_anonymous, $script_basename;
     if (! $basename) $basename=$script_basename;
     if (! $displayonly) {
         if ($auth) {
-            echo gensitetabs($sitetabs, $script_basename);
+            echo gensitetabs($sitetabs, $basename);
         } else {
-            echo gensitetabs($sitetabs_anonymous, $script_basename);
+            echo gensitetabs($sitetabs_anonymous, $basename);
         }
     }
 }

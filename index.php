@@ -42,7 +42,7 @@ if ($jsonp = checkJsonpReq()) {
 <body>
 <?
 pageHeader($displayonly);
-siteTabs($auth, $displayonly);
+siteTabs($auth, False, $displayonly);
 if ($jsonp) {
     ob_clean();
 } ?>
