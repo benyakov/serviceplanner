@@ -31,7 +31,7 @@ function query_churchyear($json=false) {
     $q = $dbh->prepare("SELECT cy.`dayname`, cy.`season`, cy.`base`,
         cy.`offset`, cy.`month`, cy.`day`,
         cy.`observed_month`, cy.`observed_sunday`,
-        1 AS next
+        `{$dbp}next_in_year`(cy.`dayname`) AS next
         FROM `{$dbp}churchyear` AS cy
         LEFT OUTER JOIN `{$dbp}churchyear_order` AS cyo
             ON (cy.season = cyo.name)

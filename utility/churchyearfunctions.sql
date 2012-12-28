@@ -200,6 +200,24 @@ BEGIN
     OR `{{DBP}}calendar_date_in_year`(YEAR(p_date), dayname) = p_date;
 END;
 
+DROP FUNCTION IF EXISTS `{{DBP}}next_in_year`;
+CREATE FUNCTION `{{DBP}}next_in_year` (p_dayname VARCHAR(255))
+RETURNS DATE READS SQL DATA
+BEGIN
+    DECLARE v_result DATE;
+    SET v_result = `{{DBP}}date_in_year`(YEAR(CURDATE()), p_dayname);
+    IF NOT v_result THEN
+        SET v_result = `{{DBP}}observed_date_in_year`(YEAR(CURDATE()), p_dayname);
+    END IF;
+    IF v_result < CURDATE() THEN
+        SET v_result = `{{DBP}}date_in_year`(YEAR(CURDATE())+1, p_dayname);
+        IF NOT v_result THEN
+            SET v_result = `{{DBP}}observed_date_in_year`(YEAR(CURDATE())+1, p_dayname);
+        END IF;
+    END IF;
+    RETURN v_result;
+END;
+
 DROP FUNCTION IF EXISTS `{{DBP}}get_lesson_field`;
 CREATE FUNCTION `{{DBP}}get_lesson_field`(lesson VARCHAR(16),
     lect VARCHAR(56), series VARCHAR(16)) RETURNS VARCHAR(64)
