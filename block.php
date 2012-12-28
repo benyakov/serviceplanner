@@ -468,7 +468,7 @@ $q = $dbh->prepare("SELECT DATE_FORMAT(blockstart, '%c/%e/%Y') AS blockstart,
     DATE_FORMAT(blockend, '%c/%e/%Y') AS blockend, label, notes, l1lect,
     l1series, l2lect, l2series, golect, goseries, pslect, psseries,
     colect, coclass, id FROM `{$dbp}blocks` AS b
-    ORDER BY b.blockstart, b.blockend");
+    ORDER BY b.blockstart DESC, b.blockend DESC");
 if ($q->execute()) {
     while ($row = $q->fetch(PDO::FETCH_ASSOC)) { ?>
     <tr class="heading">

@@ -30,7 +30,8 @@ function query_churchyear($json=false) {
     global $dbh, $dbp;
     $q = $dbh->prepare("SELECT cy.`dayname`, cy.`season`, cy.`base`,
         cy.`offset`, cy.`month`, cy.`day`,
-        cy.`observed_month`, cy.`observed_sunday`
+        cy.`observed_month`, cy.`observed_sunday`,
+        1 AS next
         FROM `{$dbp}churchyear` AS cy
         LEFT OUTER JOIN `{$dbp}churchyear_order` AS cyo
             ON (cy.season = cyo.name)
@@ -54,7 +55,8 @@ function churchyear_listing($rows) {
     ob_start();
 ?>
 <table id="churchyear-listing">
-<tr><td></td><th>Name</th><th>Season</th><th>Base Day</th><th>Days Offset</th><th>Month</th>
+<tr><td></td><th>Name</th><th>Next</th><th>Season</th><th>Base Day</th>
+    <th>Days Offset</th><th>Month</th>
     <th>Day</th><th>Observed Month</th><th>Observed Sunday</th></tr>
 <? $even = "";
     foreach ($rows as $row) {
@@ -72,6 +74,7 @@ function churchyear_listing($rows) {
             data-day="<?=$row['dayname']?>">=</a>
         <a href="" data-day="<?=$row['dayname']?>"
             class="propers"><?=$row['dayname']?></a></td>
+    <td class="next"><?=$row['next']?></td>
     <td class="season"><?=$row['season']?></td>
     <td class="base"><?=$row['base']?></td>
     <td class="offset"><?=$row['offset']?></td>
