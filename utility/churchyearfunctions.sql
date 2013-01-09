@@ -54,11 +54,11 @@ DETERMINISTIC
 BEGIN
     DECLARE wdchristmas INTEGER;
     SET wdchristmas = DAYOFWEEK(CONCAT_WS('-', p_year, 12, 25));
-    IF wdchristmas = 1 THEN
-        RETURN CONCAT_WS('-', p_year, 12, 25);
-    ELSE
-        RETURN CONCAT_WS('-', p_year, 12, 25) + INTERVAL (8-wdchristmas) DAY;
-    END IF;
+#     IF wdchristmas = 1 THEN
+#         RETURN CONCAT_WS('-', p_year, 12, 25);
+#     ELSE
+    RETURN CONCAT_WS('-', p_year, 12, 25) + INTERVAL (8-wdchristmas) DAY;
+#    END IF;
 END;
 
 DROP FUNCTION IF EXISTS `{{DBP}}michaelmas1_in_year`;
@@ -85,11 +85,11 @@ DETERMINISTIC
 BEGIN
     DECLARE wdepiphany INTEGER;
     SET wdepiphany = DAYOFWEEK(CONCAT_WS('-', p_year, 1, 6));
-    IF wdepiphany = 1 THEN
-        RETURN CONCAT_WS('-', p_year, 1, 6);
-    ELSE
-        RETURN CONCAT_WS('-', p_year, 1, 6) + INTERVAL (8-wdepiphany) DAY;
-    END IF;
+#     IF wdepiphany = 1 THEN
+#         RETURN CONCAT_WS('-', p_year, 1, 6);
+#     ELSE
+    RETURN CONCAT_WS('-', p_year, 1, 6) + INTERVAL (8-wdepiphany) DAY;
+#     END IF;
 END;
 
 DROP FUNCTION IF EXISTS `{{DBP}}calc_date_in_year`;
