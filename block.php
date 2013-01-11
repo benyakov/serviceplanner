@@ -485,7 +485,9 @@ if ($q->execute()) {
         <td class="pscell"><b>Psalm:</b>
         <?=showLesson($row['pslect'], $row['psseries'])?></td>
         <td class="cocell"><b>Collect:</b>
-        <?=$row['colect']?> (<?=$row['coclass']?>)</td></tr>
+        <?=$row['colect']?>
+        <? if ($row['colect'] != "custom") {?> (<?=$row['coclass']?>)<?};?>
+        </td></tr>
     <tr><td colspan="5"><?=translate_markup($row['notes'])?></td></tr>
 <? }
 } else echo "Problem getting blocks: " . array_pop($q->errorInfo()); ?>
