@@ -138,8 +138,13 @@ function checkJsonpReq() {
     return $_GET['jsonpreq'];
 }
 
-function queryAllHymns($dbh, $dbp="", $limit=0, $future=false) {
-    if ($future) {
+function queryService($dbh, $id) {
+    return queryAllHymns($dbh, "", 0, false, $id);
+}
+
+function queryAllHymns($dbh, $dbp="", $limit=0, $future=false, $id="") {
+    if ($id) $where = "WHERE d.pkey = ?";
+    elseif ($future) {
         $where = "WHERE d.caldate >= CURDATE()";
         $order = "";
     } else {
@@ -235,6 +240,9 @@ function queryAllHymns($dbh, $dbp="", $limit=0, $future=false) {
     {$where}
     ORDER BY d.caldate {$order}, h.service {$order},
         h.location, h.sequence {$limitstr}");
+    if ($id) {
+        $q->bindParam(1, $id);
+    }
     if (! $q->execute()) {
         die("<p>".array_pop($q->errorInfo()).'</p><p style="white-space: pre;">'.$q->queryString."</p>");
     }
