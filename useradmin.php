@@ -327,8 +327,8 @@ function editUserForm($elementValues="", $mode="Add",
         method="post" autocomplete="off">
     <tr>
         <td align="right"><label for="username">User name</label></td>
-        <td><input type="text" name="username" value="<?=$username?>"
-                required></td>
+        <td><input type="text" maxlength="15" name="username"
+            value="<?=$username?>" required></td>
     </tr>
     <tr>
         <td align="right"><label for="pw">Password</label></td>
@@ -351,15 +351,15 @@ function editUserForm($elementValues="", $mode="Add",
     <? } ?>
     <tr>
         <td align="right"><label for="fname">First name</label></td>
-        <td><input type="text" name="fname" value="<?=$fname?>" required></td>
+        <td><input type="text" name="fname" maxlength="20" value="<?=$fname?>" required></td>
     </tr>
     <tr>
         <td align="right"><label for="lname">Last name</label></td>
-        <td><input type="text" name="lname" value="<?=$lname?>"></td>
+        <td><input type="text" name="lname" maxlength="30" value="<?=$lname?>"></td>
     </tr>
     <tr>
         <td align="right"><label for="email">Email</label></td>
-        <td><input type="email" name="email" value="<?=$email?>" required></td>
+        <td><input type="email" name="email" maxlength="40" value="<?=$email?>" required></td>
     </tr>
 
     <tr>

@@ -61,22 +61,22 @@ $(document).ready(function() {
         <tr>
             <td nowrap valign="top" align="right" nowrap>
             <label for="fname">First Name</label></td>
-            <td><input type="text" name="fname"></td>
+            <td><input type="text" maxlength="20" name="fname"></td>
         </tr>
         <tr>
             <td nowrap valign="top" align="right" nowrap>
             <label for="lname">Last Name</label></td>
-            <td><input type="text" name="lname" ></td>
+            <td><input type="text" maxlength="30" name="lname" ></td>
         </tr>
         <tr>
             <td nowrap valign="top" align="right" nowrap>
             <label for="email">Email</label></td>
-            <td><input type="email" name="email" required></td>
+            <td><input type="email" maxlength="40" name="email" required></td>
         </tr>
         <tr>
             <td nowrap valign="top" align="right" nowrap>
             <label for="username">User Name</label></td>
-            <td><input type="text" name="username" required></td>
+            <td><input type="text" maxlength="15" name="username" required></td>
         </tr>
         <tr>
             <td nowrap valign="top" align="right" nowrap>
