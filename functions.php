@@ -566,8 +566,52 @@ function getUserActions($bare=false) {
 }
 
 function getCSSAdjuster() {
-
-
+?>
+    <form name="cssadjuster" onsubmit="savecss()">
+    <div id="cssadjuster">
+        <label for="basefont">Base font size</label>
+        <input name="basefont" id="basefont" type="number" min="6" max="50" step="1"><br />
+        <label for="hymnfont">Hymn font size</label>
+        <input name="hymnfont" id="hymnfont" type="number" min="6" max="50" step="5"><br />
+        <label for="notefont">Note font size</label>
+        <input name="notefont" id="notefont" type="number" min="6" max="50" step="5"><br />
+        <label for="blockdisplay">Show block info?</label>
+        <input name="blockdisplay" id="blockdisplay" type="checkbox"><br />
+        <label for="propers">Show propers?</label>
+        <input name="propers" id="propers" type="checkbox"><br />
+        <button type="submit" value="Submit">
+        <button type="submit" value="Reset to Default">
+    </div>
+    </form>
+    <script type="text/javascript">
+        // Initialize vars
+        var basefont = 0;
+        var hymnfont = 0;
+        var notefont = 0;
+        var blockdisplay = 0;
+        var propers = 0;
+        // Get from storage
+        if (typeof(Storage) !== "undefined") {
+            basefont = localStorage.basefont;
+            hymnfont = localStorage.hymnfont;
+            notefont = localStorage.notefont;
+            blockdisplay = localStorage.blockdisplay;
+            propers = localStorage.propers;
+        }
+        // Set defaults
+        if (! basefont) basefont = $("body").css("font-size");
+        if (! hymnfont) hymnfont = $(".hymn-number").css("font-size");
+        if (! notefont) notefont = $(".servicenote").css("font-size");
+        if (blockdisplay == 0) blockdisplay = true;
+        if (propers == 0) propers = true;
+        // Populate form
+        $("#basefont").val(basefont);
+        $("#hymnfont").val(hymnfont);
+        $("#notefont").val(notefont);
+        $("#blockdisplay").attr('checked', blockdisplay);
+        $("#propers").attr('checked', propers);
+    </script>
+<?
 }
 
 function jsString($s, $q="'") {
