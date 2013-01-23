@@ -424,10 +424,10 @@ function html_head($title) {
         $here = dirname($_SERVER['SCRIPT_NAME']);
         $rv[] = "<link type=\"text/css\" rel=\"stylesheet\" href=\"{$here}/style.css\">";
         $rv[] = "<link type=\"text/css\" rel=\"stylesheet\" media=\"print\" href=\"{$here}/print.css\">";
-        $rv[] = "<script type=\"text/javascript\" src=\"http://ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery.min.js\"></script>";
-        $rv[] = "<link href=\"http://ajax.googleapis.com/ajax/libs/jqueryui/1.8/themes/base/jquery-ui.css\" rel=\"stylesheet\" type=\"text/css\"/>
-        <script type=\"text/javascript\" src=\"http://ajax.googleapis.com/ajax/libs/jqueryui/1.8/jquery-ui.min.js\"></script>
-        <script type=\"text/javascript\" src=\"jquery.ba-dotimeout.min.js\"></script>";
+        $rv[] = "<script type=\"text/javascript\" src=\"jquery/jquery.js\"></script>";
+        $rv[] = "<link href=\"jquery/jquery-ui.css\" rel=\"stylesheet\" type=\"text/css\"/>
+        <script type=\"text/javascript\" src=\"jquery/jquery-ui.js\"></script>
+        <script type=\"text/javascript\" src=\"jquery/jquery.ba-dotimeout.min.js\"></script>";
         $rv[] = "<script type=\"text/javascript\" src=\"{$here}/ecmascript.js.php\"></script>";
     }
     $rv[] = "</head>";
@@ -565,6 +565,11 @@ function getUserActions($bare=false) {
     }
 }
 
+function getCSSAdjuster() {
+
+
+}
+
 function jsString($s, $q="'") {
     return str_replace( array($q, "\n"), array("\\$q", "\\n"), $s);
 }
@@ -624,6 +629,7 @@ function pageHeader($displayonly=false) { ?>
     <? if (!$displayonly) {
         echo getLoginForm();
         echo getUserActions();
+        echo getCSSAdjuster();
     } ?>
     <?showMessage();?>
     </div>
