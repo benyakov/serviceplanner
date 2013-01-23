@@ -673,7 +673,7 @@ function pageHeader($displayonly=false) { ?>
     <? if (!$displayonly) {
         echo getLoginForm();
         echo getUserActions();
-        echo getCSSAdjuster();
+        //echo getCSSAdjuster();
     } ?>
     <?showMessage();?>
     </div>
