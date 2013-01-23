@@ -344,11 +344,21 @@ function dateValToSQL(dateval) {
     return dateobj.toISOString().split("T")[0];
 }
 
+function openStyler() {
+    // FIXME: Put #stylerdialog into each page, hidden by default
+    $("#stylerdialog").dialog({title: "Style Adjuster",
+        width: $(window).width()*0.4,
+        maxHeight: $(window).height()*0.7,
+        position: "right"
+    });
+}
+
 $(document).ready(function() {
     $("#loginform").submit(function(evt) {
         evt.preventDefault();
         submitLogin();
     });
+    $("#openstyler").click(openStyler());
     $("#message").delay(5000).slideUp();
 });
 
