@@ -59,7 +59,16 @@ if (array_key_exists("date", $_POST)) {
                 updateFromDate(this);
             })})
             .change(function() {
-                updateFromDate(this);
+                if (! isNaN(Date.parse($(this).val()))) {
+                    var input = new Date($(this).val());
+                    $(this).val((input.getMonth()+1)+'/'+
+                                input.getDate()+'/'+
+                                input.getFullYear());
+                    updateFromDate(this);
+                } else {
+                    setMessage("Date not recognized.");
+                    $(this).focus();
+                }
             })
             .datepicker({showOn:"button", numberOfMonths: [2,2],
                 stepMonths: 4, onClose: function() {

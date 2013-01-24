@@ -308,7 +308,11 @@ function calcMichaelmas1(year) {
     }
 }
 function getDayFor(datestr, target) {
-    var sdate = dateValToSQL(datestr);
+    try {
+        var sdate = dateValToSQL(datestr);
+    } catch(err) {
+        return;
+    }
     $.get("churchyear.php", {daysfordate: sdate},
         function(rv) {
             rv = eval(rv);
@@ -323,7 +327,11 @@ function getDayFor(datestr, target) {
 }
 
 function updateBlocksAvailable(datestr) {
-    var dateval = dateValToSQL(datestr);
+    try {
+        var dateval = dateValToSQL(datestr);
+    } catch(err) {
+        return;
+    }
     $.get("block.php", {available: dateval}, function(rv) {
         rv = eval(rv);
         $("#block").empty();
