@@ -23,7 +23,8 @@
     The Dalles, OR 97058
     USA
     */
-require('functions.php'); ?>
+require('functions.php');
+header('Content-type: application/javascript'); ?>
 
 function addHymn() {
     if ($("#hymnentries").is("table")) {
@@ -345,7 +346,6 @@ function dateValToSQL(dateval) {
 }
 
 function openStyler() {
-    // FIXME: Put #stylerdialog into each page, hidden by default
     $("#stylerdialog").dialog({title: "Style Adjuster",
         width: $(window).width()*0.4,
         maxHeight: $(window).height()*0.7,
@@ -353,13 +353,38 @@ function openStyler() {
     });
 }
 
+function updateCSS() {
+    localStorage.setItem("basefont", $("#basefont").val());
+    localStorage.setItem("hymnfont", $("#hymnfont").val());
+    localStorage.setItem("notefont", $("#notefont").val());
+    localStorage.setItem("blockdisplay", $("#cssblockdisplay").val());
+    localStorage.setItem("propers", $("#csspropers").val());
+    setCSSTweaks();
+}
+
+function setCSSTweaks() {
+    if (localStorage.getItem("basefont"))
+        $("body").css("font-size", localStorage.getItem("basefont")+"px");
+    if (localStorage.getItem("hymnfont"))
+        $(".hymn-number,.note,.title").css("font-size", localStorage.getItem("hymnfont")+"%");
+    if (localStorage.getItem("notefont"))
+        $(".servicenote").css("font-size", localStorage.getItem("notefont")+"%");
+    if (localStorage.getItem("blockdisplay") !== null &&
+        localStorage.getItem("blockdisplay") == "false")
+        $(".blockdisplay").attr("display", "none");
+    if (localStorage.getItem("propers") !== null &&
+        localStorage.getItem("propers") == "false")
+        $(".propers").attr("display", "none");
+}
+
 $(document).ready(function() {
     $("#loginform").submit(function(evt) {
         evt.preventDefault();
         submitLogin();
     });
-    $("#openstyler").click(openStyler());
+    $("#openstyler").click(openStyler);
     $("#message").delay(5000).slideUp();
+    setCSSTweaks();
 });
 
 

@@ -54,6 +54,12 @@ body {
     margin: 0 1em 1ex 0;
     float: left;
 }
+#styler {
+    font-weight: bold;
+    height:2.5em;
+    margin: 0 0 1ex 1em;
+    float: right;
+}
 
 #useractions a:link,
 #useractions a:visited {
@@ -274,6 +280,9 @@ td.controls {
 }
 #dialog {
     font-size: 85%;
+}
+#stylerdialog {
+    display: none;
 }
 td.controls a:link,
 a.synonym:link,

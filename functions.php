@@ -567,20 +567,20 @@ function getUserActions($bare=false) {
 
 function getCSSAdjuster() {
 ?>
-    <form name="cssadjuster" onsubmit="savecss()">
+    <form name="cssadjuster" id="cssadjuster">
     <div id="cssadjuster">
-        <label for="basefont">Base font size</label>
+        <label for="basefont">Base font size (pixels)</label>
         <input name="basefont" id="basefont" type="number" min="6" max="50" step="1"><br />
-        <label for="hymnfont">Hymn font size</label>
-        <input name="hymnfont" id="hymnfont" type="number" min="6" max="50" step="5"><br />
-        <label for="notefont">Note font size</label>
-        <input name="notefont" id="notefont" type="number" min="6" max="50" step="5"><br />
-        <label for="blockdisplay">Show block info?</label>
-        <input name="blockdisplay" id="blockdisplay" type="checkbox"><br />
-        <label for="propers">Show propers?</label>
-        <input name="propers" id="propers" type="checkbox"><br />
-        <button type="submit" value="Submit">
-        <button type="submit" value="Reset to Default">
+        <label for="hymnfont">Hymn font size (%)</label>
+        <input name="hymnfont" id="hymnfont" type="number" min="25" max="200" step="5"><br />
+        <label for="notefont">Note font size (%)</label>
+        <input name="notefont" id="notefont" type="number" min="25" max="200" step="5"><br />
+        <label for="cssblockdisplay">Show block info?</label>
+        <input name="cssblockdisplay" id="cssblockdisplay" type="checkbox"><br />
+        <label for="csspropers">Show propers?</label>
+        <input name="csspropers" id="csspropers" type="checkbox"><br />
+        <button type="submit" value="submit">Submit</button>
+        <button type="submit" value="reset">Reset to Default</button>
     </div>
     </form>
     <script type="text/javascript">
@@ -592,24 +592,29 @@ function getCSSAdjuster() {
         var propers = 0;
         // Get from storage
         if (typeof(Storage) !== "undefined") {
-            basefont = localStorage.basefont;
-            hymnfont = localStorage.hymnfont;
-            notefont = localStorage.notefont;
-            blockdisplay = localStorage.blockdisplay;
-            propers = localStorage.propers;
+            basefont = localStorage.getItem("basefont");
+            hymnfont = localStorage.getItem("hymnfont");
+            notefont = localStorage.getItem("notefont");
+            blockdisplay = localStorage.getItem("blockdisplay");
+            propers = localStorage.getItem("propers");
         }
         // Set defaults
-        if (! basefont) basefont = $("body").css("font-size");
-        if (! hymnfont) hymnfont = $(".hymn-number").css("font-size");
-        if (! notefont) notefont = $(".servicenote").css("font-size");
+        if (! basefont) basefont = Number($("body").css("font-size"));
+        if (! hymnfont) hymnfont = 100;
+        if (! notefont) notefont = 100;
         if (blockdisplay == 0) blockdisplay = true;
         if (propers == 0) propers = true;
         // Populate form
         $("#basefont").val(basefont);
         $("#hymnfont").val(hymnfont);
         $("#notefont").val(notefont);
-        $("#blockdisplay").attr('checked', blockdisplay);
-        $("#propers").attr('checked', propers);
+        $("#cssblockdisplay").attr('checked', blockdisplay);
+        $("#csspropers").attr('checked', propers);
+        $("#cssadjuster").submit(function(evt) {
+            evt.preventDefault();
+            $("this").dialog("close");
+            updateCSS();
+        });
     </script>
 <?
 }
@@ -672,8 +677,11 @@ function pageHeader($displayonly=false) { ?>
     <div id="pageheader">
     <? if (!$displayonly) {
         echo getLoginForm();
+        echo "<div id=\"styler\"><a href=\"#\" title=\"Adjust Styles\" id=\"openstyler\">Adjust Styles</a></div>\n";
         echo getUserActions();
-        echo "<div id=\"styler\"><a href=\"#\" title=\"Adjust Styles\" id=\"openstyler\"></div>";
+        echo "<div id=\"stylerdialog\">";
+        getCSSAdjuster();
+        echo "</div>\n";
     } ?>
     <?showMessage();?>
     </div>
