@@ -146,7 +146,7 @@ input.edit-title {
 input.edit-location {
     width: 10em;
 }
-input.hidden {
+.hidden {
     display: none;
 }
 ::-webkit-input-placeholder {
@@ -283,6 +283,9 @@ td.controls {
 }
 #stylerdialog {
     display: none;
+}
+#stylerdialog input {
+    width: 3em;
 }
 td.controls a:link,
 a.synonym:link,

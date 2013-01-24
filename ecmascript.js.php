@@ -357,8 +357,8 @@ function updateCSS() {
     localStorage.setItem("basefont", $("#basefont").val());
     localStorage.setItem("hymnfont", $("#hymnfont").val());
     localStorage.setItem("notefont", $("#notefont").val());
-    localStorage.setItem("blockdisplay", $("#cssblockdisplay").val());
-    localStorage.setItem("propers", $("#csspropers").val());
+    localStorage.setItem("blockdisplay", $("#cssblockdisplay").is(':checked'));
+    localStorage.setItem("propers", $("#csspropers").is(':checked'));
     setCSSTweaks();
 }
 
@@ -371,10 +371,12 @@ function setCSSTweaks() {
         $(".servicenote").css("font-size", localStorage.getItem("notefont")+"%");
     if (localStorage.getItem("blockdisplay") !== null &&
         localStorage.getItem("blockdisplay") == "false")
-        $(".blockdisplay").attr("display", "none");
+        $(".blockdisplay").addClass("hidden");
+    else $(".blockdisplay").removeClass("hidden");
     if (localStorage.getItem("propers") !== null &&
         localStorage.getItem("propers") == "false")
-        $(".propers").attr("display", "none");
+        $(".propers").addClass("hidden");
+    else $(".propers").removeClass("hidden");
 }
 
 $(document).ready(function() {

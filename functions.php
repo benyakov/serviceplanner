@@ -273,14 +273,14 @@ function display_records_table($q) {
                 <td colspan=2>{$row['dayname']}: {$row['rite']} ".
                 "[ <a href=\"print.php?id={$row['id']}\" ".
                 "title=\"print\">Print</a> ]</td></tr>\n";
-            echo "<tr class=\"heading\"><td class=\"heavy smaller\">{$row['theme']}</td>";
+            echo "<tr class=\"heading propers\"><td class=\"heavy smaller\">{$row['theme']}</td>";
             echo "<td colspan=2>{$row['color']}</td></tr>";
             if ($row['introit']) {
-                echo "<tr class=\"heading\"><td colspan=3>
+                echo "<tr class=\"heading propers\"><td colspan=3>
                     <p class=\"maxcolumn smaller\">{$row['introit']}</p></td></tr>";
             }
             if ($row['propersnote']) {
-                echo "<tr class=\"heading\"><td colspan=3>
+                echo "<tr class=\"heading propers\"><td colspan=3>
                     <p class=\"maxcolumn\">".
                     translate_markup($row['propersnote'])."</p></td></tr>";
             }
@@ -355,14 +355,14 @@ function modify_records_table($q, $action) {
             <td colspan=2>[ <a href=\"#\" class=\"edit-service menulink\" data-id=\"{$row['id']}\">Edit</a> |
             <a class=\"menulink\" href=\"sermon.php?id={$row['id']}\">Sermon</a> ]
             {$row['dayname']}: {$row['rite']}</td></tr>\n";
-            echo "<tr class=\"heading\"><td class=\"heavy smaller\">{$row['theme']}</td>";
+            echo "<tr class=\"heading propers\"><td class=\"heavy smaller\">{$row['theme']}</td>";
             echo "<td colspan=2>{$row['color']}</td></tr>";
             if ($row['introit']) {
-                echo "<tr class=\"heading\"><td colspan=3>
+                echo "<tr class=\"heading propers\"><td colspan=3>
                     <p class=\"maxcolumn smaller\">{$row['introit']}</p></td></tr>";
             }
             if ($row['propersnote']) {
-                echo "<tr class=\"heading\"><td colspan=3>
+                echo "<tr class=\"heading propers\"><td colspan=3>
                     <p class=\"maxcolumn\">".
                     translate_markup($row['propersnote'])."</p></td></tr>";
             }
@@ -569,18 +569,20 @@ function getCSSAdjuster() {
 ?>
     <form name="cssadjuster" id="cssadjuster">
     <div id="cssadjuster">
-        <label for="basefont">Base font size (pixels)</label>
-        <input name="basefont" id="basefont" type="number" min="6" max="50" step="1"><br />
-        <label for="hymnfont">Hymn font size (%)</label>
-        <input name="hymnfont" id="hymnfont" type="number" min="25" max="200" step="5"><br />
-        <label for="notefont">Note font size (%)</label>
-        <input name="notefont" id="notefont" type="number" min="25" max="200" step="5"><br />
-        <label for="cssblockdisplay">Show block info?</label>
-        <input name="cssblockdisplay" id="cssblockdisplay" type="checkbox"><br />
-        <label for="csspropers">Show propers?</label>
-        <input name="csspropers" id="csspropers" type="checkbox"><br />
-        <button type="submit" value="submit">Submit</button>
-        <button type="submit" value="reset">Reset to Default</button>
+        <table>
+        <tr><td><label for="basefont">Base font size (pixels)</label></td>
+        <td><input name="basefont" id="basefont" type="number" min="6" max="50" step="1"></td></tr>
+        <tr><td><label for="hymnfont">Hymn font size (%)</label></td>
+        <td><input name="hymnfont" id="hymnfont" type="number" min="25" max="200" step="5"></td></tr>
+        <tr><td><label for="notefont">Note font size (%)</label></td>
+        <td><input name="notefont" id="notefont" type="number" min="25" max="200" step="5"></td></tr>
+        <tr><td><label for="cssblockdisplay">Show block info?</label></td>
+        <td><input name="cssblockdisplay" id="cssblockdisplay" type="checkbox"></td></tr>
+        <tr><td><label for="csspropers">Show propers?</label></td>
+        <td><input name="csspropers" id="csspropers" type="checkbox"></td></tr>
+        <tr><td><button type="button" id="cssapply">Apply</button></td>
+        <td><button type="button" id="cssreset">Reset to Default</button></td>
+        </table>
     </div>
     </form>
     <script type="text/javascript">
@@ -599,21 +601,25 @@ function getCSSAdjuster() {
             propers = localStorage.getItem("propers");
         }
         // Set defaults
-        if (! basefont) basefont = Number($("body").css("font-size"));
+        if (! basefont) basefont = $("body").css("font-size").replace(/[^0-9]/g, "");
         if (! hymnfont) hymnfont = 100;
         if (! notefont) notefont = 100;
-        if (blockdisplay == 0) blockdisplay = true;
-        if (propers == 0) propers = true;
+        if ((blockdisplay == 0) || (blockdisplay == null)) blockdisplay = true;
+        if ((propers == 0) || (propers == null)) propers = true;
         // Populate form
         $("#basefont").val(basefont);
         $("#hymnfont").val(hymnfont);
         $("#notefont").val(notefont);
-        $("#cssblockdisplay").attr('checked', blockdisplay);
-        $("#csspropers").attr('checked', propers);
-        $("#cssadjuster").submit(function(evt) {
-            evt.preventDefault();
-            $("this").dialog("close");
-            updateCSS();
+        $("#cssblockdisplay").prop('checked', blockdisplay);
+        $("#csspropers").prop('checked', propers);
+        $("#cssapply").click(updateCSS);
+        $("#cssreset").click(function() {
+            localStorage.removeItem("basefont");
+            localStorage.removeItem("hymnfont");
+            localStorage.removeItem("notefont");
+            localStorage.removeItem("blockdisplay");
+            localStorage.removeItem("propers");
+            location.reload();
         });
     </script>
 <?
