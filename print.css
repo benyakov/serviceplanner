@@ -33,6 +33,10 @@ body {
     display: none;
 }
 
+#pageheader {
+    display: none;
+}
+
 ul#sitetabs,
 div#sitetabs-background {
     display: none;
