@@ -387,6 +387,12 @@ function setCSSTweaks() {
     else $(".propers").removeClass("hidden");
 }
 
+var zeropadding = "000000000000";
+function zeroPad(number, width) {
+    var input = number + "";
+    return zeropadding.slice(0, width-input.length) + input;
+}
+
 $(document).ready(function() {
     $("#loginform").submit(function(evt) {
         evt.preventDefault();

@@ -371,8 +371,10 @@ if (! $auth) {
                     checkOverlap();
                 }
             })
-            .datepicker({showOn:"button", numberOfMonths:[2,2],
+        if (! Modernizr.inputtypes.date) {
+            $('#startdate').datepicker({showOn:"button", numberOfMonths:[2,2],
                 stepMonths: 4});
+        }
         $('#enddate').unbind('change')
             .bind('change', function() {
                 getDayFor($(this).val(), $("#endday"));
@@ -382,8 +384,10 @@ if (! $auth) {
                     checkOverlap();
                 }
             })
-            .datepicker({showOn:"button", numberOfMonths:[2,2],
+        if (! Modernizr.inputtypes.date) {
+            $('#enddate').datepicker({showOn:"button", numberOfMonths:[2,2],
                 stepMonths: 4});
+        }
         checkCustomPs();
         checkCustomL1();
         checkCustomL2();

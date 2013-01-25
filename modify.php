@@ -44,10 +44,12 @@ if (array_key_exists('listinglimit', $_GET) &&
     <script type="text/javascript">
         function setupEditDialog() {
             showJsOnly();
-            $("#date").datepicker({showOn:"both"})
-                .change(function() {
-                    updateBlocksAvailable($(this).val());
-                });
+            if (! Modernizr.inputtypes.date) {
+                $("#date").datepicker({showOn:"both"})
+            }
+            $("#date").change(function() {
+                updateBlocksAvailable($(this).val());
+            });
             $(".edit-number").keyup(function(evt) {
                 if (evt.which != 9 &&
                     evt.which != 17) {

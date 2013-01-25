@@ -61,21 +61,25 @@ if (array_key_exists("date", $_POST)) {
             .change(function() {
                 if (! isNaN(Date.parse($(this).val()))) {
                     var input = new Date($(this).val());
-                    $(this).val((input.getMonth()+1)+'/'+
-                                input.getDate()+'/'+
-                                input.getFullYear());
+                    if (! Modernizr.inputtypes.date) {
+                        $(this).val(zeroPad(input.getMonth()+1, 2)+'/'+
+                                    zeroPad(input.getDate(), 2)+'/'+
+                                    input.getFullYear());
+                    }
                     updateFromDate(this);
                 } else {
                     setMessage("Date not recognized.");
                     $(this).focus();
                 }
             })
-            .datepicker({showOn:"button", numberOfMonths: [2,2],
+            .focus();
+        if (! Modernizr.inputtypes.date) {
+            $("#date").datepicker({showOn:"button", numberOfMonths: [2,2],
                 stepMonths: 4, onClose: function() {
                     $("#location").focus();
                     $("#date").change();
                 }})
-            .focus();
+        }
         updateFromDate($("#date"));
         $(".edit-number").keyup(function(evt){
             if (evt.which != 9 &&

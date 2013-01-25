@@ -426,6 +426,7 @@ function html_head($title) {
         $rv[] = "<link type=\"text/css\" rel=\"stylesheet\" media=\"print\" href=\"{$here}/print.css\">";
         $rv[] = "<script type=\"text/javascript\" src=\"jquery/jquery.js\"></script>";
         $rv[] = "<link href=\"jquery/jquery-ui.css\" rel=\"stylesheet\" type=\"text/css\"/>
+        <script type=\"text/javascript\" src=\"modernizr/modernizr.js\"></script>
         <script type=\"text/javascript\" src=\"jquery/jquery-ui.js\"></script>
         <script type=\"text/javascript\" src=\"jquery/jquery.ba-dotimeout.min.js\"></script>";
         $rv[] = "<script type=\"text/javascript\" src=\"{$here}/ecmascript.js.php\"></script>";
