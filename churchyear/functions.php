@@ -73,7 +73,7 @@ function churchyear_listing($rows) {
     <td class="dayname"><a href="" class="synonym"
             data-day="<?=$row['dayname']?>">=</a>
         <a href="" data-day="<?=$row['dayname']?>"
-            class="propers"><?=$row['dayname']?></a></td>
+            class="propersname"><?=$row['dayname']?></a></td>
     <td class="next"><?=$row['next']?></td>
     <td class="season"><?=$row['season']?></td>
     <td class="base"><?=$row['base']?></td>

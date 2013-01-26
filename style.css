@@ -289,21 +289,21 @@ td.controls {
 }
 td.controls a:link,
 a.synonym:link,
-a.propers:link {
+a.propersname:link {
     color: blue;
     background-color: transparent;
     text-decoration: none;
 }
 td.controls a:visited,
 a.synonym:visited,
-a.propers:visited {
+a.propersname:visited {
     color: blue;
     background-color: transparent;
     text-decoration: none;
 }
 td.controls a:active,
 a.synonym:active,
-a.propers:active {
+a.propersname:active {
     color: white;
     background-color: blue;
     text-decoration: none;
