@@ -41,6 +41,9 @@ $backlink = "index.php";
     <dl>
         <dt>Order/Rite</dt> <dd><?=$row['rite']?> </dd>
         <dt>Service Notes</dt> <dd> <?=translate_markup(trim($row['servicenotes']))?> </dd>
+        <? if ($row['introit']) { ?>
+        <dt>Introit</dt> <dd class="maxcolumn smaller"><?=$row['introit']?></dd>
+        <? } ?>
     </dl>
     <? if ($row['block']) { ?>
     <div class="blockdisplay">

@@ -139,7 +139,8 @@ function checkJsonpReq() {
 }
 
 function queryService($dbh, $id) {
-    return queryAllHymns($dbh, "", 0, false, $id);
+    global $dbp;
+    return queryAllHymns($dbh, $dbp, 0, false, $id);
 }
 
 function queryAllHymns($dbh, $dbp="", $limit=0, $future=false, $id="") {
