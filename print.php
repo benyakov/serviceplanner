@@ -43,7 +43,16 @@ $backlink = "index.php";
         <dt>Service Notes</dt> <dd> <?=translate_markup(trim($row['servicenotes']))?> </dd>
         <? if ($row['introit']) { ?>
         <dt>Introit</dt> <dd class="maxcolumn smaller"><?=$row['introit']?></dd>
-        <? } ?>
+        <? }
+        if ($row['propersnote']) { ?>
+        <dt>Propers Note</dt> <dd> <?=translate_markup(trim($row['propersnote']))?></dd>
+        <?}
+        if ($row['color']) { ?>
+        <dt>Color</dt> <dd><?=$row['color']?></dd>
+        <?}
+        if ($row['theme']) { ?>
+        <dt>Theme</dt> <dd><?=$row['theme']?></dd>
+        <?}?>
     </dl>
     <? if ($row['block']) { ?>
     <div class="blockdisplay">
