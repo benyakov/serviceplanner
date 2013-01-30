@@ -604,6 +604,14 @@ textarea.datalist {
     display: none;
 }
 
+.collecttext {
+    font-size: smaller;
+}
+
+.introittext {
+    font-size: smaller;
+}
+
 #new-propers-collect {
     display: none;
 }

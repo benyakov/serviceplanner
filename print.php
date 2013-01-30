@@ -42,7 +42,7 @@ $backlink = "index.php";
         <dt>Order/Rite</dt> <dd><?=$row['rite']?> </dd>
         <dt>Service Notes</dt> <dd> <?=translate_markup(trim($row['servicenotes']))?> </dd>
         <? if ($row['introit']) { ?>
-        <dt>Introit</dt> <dd class="maxcolumn smaller"><?=$row['introit']?></dd>
+        <dt>Introit</dt> <dd class="introittext maxcolumn"><?=$row['introit']?></dd>
         <? }
         if ($row['propersnote']) { ?>
         <dt>Propers Note</dt> <dd> <?=translate_markup(trim($row['propersnote']))?></dd>
@@ -67,7 +67,7 @@ $backlink = "index.php";
             <dt>Psalm</dt><dd><?=$row['bpsalm']?></dd>
         </dl>
         <h5>Collect: <?=$row['bcollectclass']?></h5>
-        <p><?=$row['bcollect']?></p>
+        <p class="collecttext maxcolumn"><?=$row['bcollect']?></p>
     </div>
     <? } ?>
     <table id="print-hymns-table"><tbody>

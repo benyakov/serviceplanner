@@ -231,7 +231,13 @@ function queryAllHymns($dbh, $dbp="", $limit=0, $future=false, $id="") {
         AS bgospel,
     (SELECT psalm FROM `{$dbp}synlessons` AS cl
     WHERE cl.dayname=d.name AND cl.lectionary=b.pslect
-    LIMIT 1) AS bpsalm
+    LIMIT 1) AS bpsalm,
+    b.coclass AS bcollectclass,
+    (SELECT collect FROM `{$dbp}churchyear_collects` AS cyc
+    JOIN `{$dbp}churchyear_collect_index` AS cci
+    WHERE cci.dayname=d.name AND cci.lectionary=b.colect
+    AND cyc.class=b.coclass
+    LIMIT 1) AS bcollect
     FROM {$dbp}hymns AS h
     RIGHT OUTER JOIN `{$dbp}days` AS d ON (h.service = d.pkey)
     LEFT OUTER JOIN `{$dbp}names` AS n ON (h.number = n.number)
@@ -298,6 +304,10 @@ function display_records_table($q) {
                         <dt>Gospel</dt><dd><?=$row['bgospel']?></dd>
                         <dt>Psalm</dt><dd><?=$row['bpsalm']?></dd>
                     </dl>
+                    <h5>Collect (<?=$row['bcollectclass']?>)</h5>
+                    <div class="collecttext maxcolumn">
+                        <?=$row['bcollect']?>
+                    </div>
                 </tr>
             <? }
             if ($row['servicenotes']) {
@@ -380,6 +390,10 @@ function modify_records_table($q, $action) {
                         <dt>Gospel</dt><dd><?=$row['bgospel']?></dd>
                         <dt>Psalm</dt><dd><?=$row['bpsalm']?></dd>
                     </dl>
+                    <h5>Collect (<?=$row['bcollectclass']?>)</h5>
+                    <div class="collecttext maxcolumn">
+                        <?=$row['bcollect']?>
+                    </div>
                 </tr>
             <? }
             if ($row['servicenotes']) {
