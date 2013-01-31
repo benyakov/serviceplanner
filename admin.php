@@ -195,6 +195,16 @@ $(document).ready(function(){var a="http://www.bethanythedalles.org/services-dev
     email to <a href="mailto: jmatjac@gmail.com">the author</a>.
     </li>
     </ul>
+
+    <h2>Config Settings</h2>
+    <form id="configsettings" action="utility/savesettings.php" method="post">
+    <dl>
+    <dt>Preferred Bible Abbreviation from <a href="http://biblegateway.com" title="BibleGateway.com">Bible Gateway</a></dt>
+    <dd><input type="text" id="biblegwversion" name="biblegwversion"
+        value="<?=$config->get('biblegwversion')?>" placeholder="Unset">
+    </dl>
+    <button type="submit">Submit</button><button type="reset">Reset</button>
+    </form>
     </div>
 </body>
 </html>

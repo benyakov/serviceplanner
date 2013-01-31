@@ -292,10 +292,10 @@ function display_records_table($q) {
                         <?=translate_markup($row['bnotes'])?>
                     </div>
                     <dl class="blocklessons">
-                        <dt>Lesson 1</dt><dd><?=$row['blesson1']?></dd>
-                        <dt>Lesson 2</dt><dd><?=$row['blesson2']?></dd>
-                        <dt>Gospel</dt><dd><?=$row['bgospel']?></dd>
-                        <dt>Psalm</dt><dd><?=$row['bpsalm']?></dd>
+                    <dt>Lesson 1</dt><dd><?=linkbgw($row['blesson1'])?></dd>
+                        <dt>Lesson 2</dt><dd><?=linkbgw($row['blesson2'])?></dd>
+                        <dt>Gospel</dt><dd><?=linkbgw($row['bgospel'])?></dd>
+                        <dt>Psalm</dt><dd><?=linkbgw("Ps {$row['bpsalm']}")?></dd>
                     </dl>
                 </tr>
             <? }
@@ -374,10 +374,10 @@ function modify_records_table($q, $action) {
                         <?=translate_markup($row['bnotes'])?>
                     </div>
                     <dl class="blocklessons">
-                        <dt>Lesson 1</dt><dd><?=$row['blesson1']?></dd>
-                        <dt>Lesson 2</dt><dd><?=$row['blesson2']?></dd>
-                        <dt>Gospel</dt><dd><?=$row['bgospel']?></dd>
-                        <dt>Psalm</dt><dd><?=$row['bpsalm']?></dd>
+                        <dt>Lesson 1</dt><dd><?=linkbgw($row['blesson1'])?></dd>
+                        <dt>Lesson 2</dt><dd><?=linkbgw($row['blesson2'])?></dd>
+                        <dt>Gospel</dt><dd><?=linkbgw($row['bgospel'])?></dd>
+                        <dt>Psalm</dt><dd><?=linkbgw("Ps {$row['bpsalm']}")?></dd>
                     </dl>
                 </tr>
             <? }
@@ -433,6 +433,20 @@ function html_head($title) {
     }
     $rv[] = "</head>";
     return implode("\n", $rv);
+}
+
+function linkbgw($ref) {
+    // Return a link to BibleGateway for the given reference,
+    // or if the version is not set, just the ref.
+    global $config;
+    $bgwversion = $config->get("biblegwversion");
+    if ($bgwversion) {
+        return "<a href=\"http://biblegateway.com/passage?search=".
+            rawurlencode($ref).
+            "&version={$bgwversion}&interface=print\">{$ref}</a>";
+    } else {
+        return $ref;
+    }
 }
 
 function quote_array($ary) {

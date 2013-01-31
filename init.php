@@ -41,6 +41,7 @@ if ((! file_exists("db-connection.php") and
 }
 require("./utility/configfile.php");
 $dbstate = new Configfile("./dbstate.ini", false);
+$config = new Configfile("./config.ini", false);
 $upgradedb = false;
 if (null == $dbstate->get('dbversion')) {
     $upgradedb = true;
