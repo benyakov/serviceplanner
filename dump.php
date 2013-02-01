@@ -32,7 +32,6 @@ if (! $auth) {
 }
 $tabledescfiles = array(
     "./utility/createtables.sql",
-    "./utility/dynamictables.sql"
 );
 function gettablename ($line) {
     if (preg_match('/TABLE `(\w+)/', $line, $matches)) {
