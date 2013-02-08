@@ -36,10 +36,10 @@ if (! $auth) {
 <body>
 <?
 $q = $dbh->query("SELECT sermons.bibletext, sermons.outline,
-    sermons.notes, sermons.service,
+    sermons.notes, sermons.service, sermons.mstype,
     DATE_FORMAT(days.caldate, '%e %b %Y') as date,
     days.name, days.rite
-    FROM {$dbp}sermons AS sermons JOIN {$dbp}days AS days
+    FROM `{$dbp}sermons` AS sermons JOIN `{$dbp}days` AS days
         ON (sermons.service=days.pkey)
     ORDER BY days.caldate DESC");
 $q->execute() or die(array_pop($q->errorInfo));
@@ -59,9 +59,13 @@ $q->execute() or die(array_pop($q->errorInfo));
 while ($row = $q->fetch(PDO::FETCH_ASSOC))
 {
 ?>
-    <tr class="table-topline">
+    <tr class="table-topline smaller">
         <td><?=$row['date']?></td><td><?=$row['name']?></td>
-        <td><?=$row['bibletext']?></td><td><?=$row['rite']?></td></tr>
+        <td><?=$row['bibletext']?>
+    <? if ($row['mstype']) { ?>
+        <a href="sermon.php?manuscript=1&id=<?=$row['service']?>">mss</a>
+    <? } ?>
+        </td><td><?=$row['rite']?></td></tr>
     <tr><td colspan="3" class="table-preformat">
             <pre><?=$row['outline']?></pre><br />
             <a href="sermon.php?id=<?=$row['service']?>">Edit</a>
