@@ -27,7 +27,7 @@ require("./init.php");
 $this_script = $_SERVER['HTTP_HOST'].$_SERVER['SCRIPT_NAME'] ;
 if (array_key_exists('manuscript', $_GET)) {
     // Send the sermon manuscript, or a message saying it ain't there
-    $q = $dbh->prepare("SELECT manuscript, mstype FROM {$dbp}sermons
+    $q = $dbh->prepare("SELECT manuscript, mstype FROM `{$dbp}sermons`
         WHERE service=:id");
     $q->bindParam(":id", $_GET['id']);
     $q->execute();
@@ -41,7 +41,9 @@ if (array_key_exists('manuscript', $_GET)) {
     }
     header("Content-type: {$mstype}");
     header("Content-disposition: attachment; filename=sermonmanuscript");
-    fpassthru($mss);
+    if (is_string($mss))
+        echo $mss;
+    else fpassthru($mss);
     exit(0);
 }
 if (! array_key_exists('stage', $_GET)) {
@@ -84,9 +86,9 @@ if (! array_key_exists('stage', $_GET)) {
             hymns.book, hymns.number, hymns.note,
             hymns.location, days.name as dayname, days.rite,
             days.pkey as id, days.servicenotes, names.title
-            FROM {$dbp}hymns AS hymns
-            LEFT OUTER JOIN {$dbp}days AS days ON (hymns.service = days.pkey)
-            LEFT OUTER JOIN {$dbp}names AS names ON
+            FROM `{$dbp}hymns` AS hymns
+            LEFT OUTER JOIN `{$dbp}days` AS days ON (hymns.service = days.pkey)
+            LEFT OUTER JOIN `{$dbp}names` AS names ON
                 (hymns.number = names.number)
                 AND (hymns.book = names.book)
             WHERE days.pkey = :id
@@ -97,7 +99,7 @@ if (! array_key_exists('stage', $_GET)) {
     modify_records_table($q, "delete.php");
 
     $q = $dbh->prepare("SELECT bibletext, outline, notes, mstype
-        FROM {$dbp}sermons WHERE service=:id");
+        FROM `{$dbp}sermons` WHERE service=:id");
     $q->bindParam(":id", $id);
     $q->execute();
     $row = $q->fetch(PDO::FETCH_ASSOC);
@@ -137,7 +139,7 @@ if (! array_key_exists('stage', $_GET)) {
 {
     $dbh->beginTransaction();
     $msfile = "manuscript-{$dbconnection['dbname']}.txt";
-    if (! move_uploaded_file($_FILES['manuscript_file']['tmp_name'], $msfile)
+    if ((! move_uploaded_file($_FILES['manuscript_file']['tmp_name'], $msfile))
             || $_POST['deletems']) {
         $fp = tmpfile();
         $ft = "";
@@ -148,24 +150,27 @@ if (! array_key_exists('stage', $_GET)) {
     if ($ft || $_POST['deletems']) {
         // Update the saved file blob and type field
         // This is handled separately from the other data updates
-        $q = $dbh->prepare("INSERT INTO {$dbp}sermons
-            (manuscript, mstype, service)
-            VALUES (?, ?, ?");
+        $q = $dbh->prepare("SELECT 1 from `{$dbp}sermons`
+            WHERE service=?");
+        $q->execute(array($_POST['service']))
+            or die(array_pop($q->errorInfo()));
+        $exists = $q->fetchColumn();
+        if ($exists) {
+            $q = $dbh->prepare("UPDATE `{$dbp}sermons`
+                SET manuscript=?, mstype=?
+                WHERE service=?");
+        } else {
+            $q = $dbh->prepare("INSERT INTO `{$dbp}sermons`
+                (manuscript, mstype, service)
+                VALUES (?, ?, ?");
+        }
         $q->bindParam(1, $fp, PDO::PARAM_LOB);
         $q->bindParam(2, $ft);
         $q->bindParam(3, $_POST['service']);
-        if (! $q->execute()) {
-            $q = $dbh->prepare("UPDATE {$dbp}sermons
-                SET manuscript=?, mstype=?
-                WHERE service=?");
-            $q->bindParam(1, $fp, PDO::PARAM_LOB);
-            $q->bindParam(2, $ft);
-            $q->bindParam(3, $_POST['service']);
-            $q->execute() or die(array_pop($q->errorInfo()));
-        }
+        $q->execute() or die(array_pop($q->errorInfo()));
     }
     // Insert or update the sermon plans.
-    $q = $dbh->prepare("INSERT INTO {$dbp}sermons
+    $q = $dbh->prepare("INSERT INTO `{$dbp}sermons`
         (bibletext, outline, notes, service)
         VALUES (:bibletext, :outline, :notes, :id)");
     $q->bindParam(':bibletext', $_POST['bibletext']);
@@ -173,7 +178,7 @@ if (! array_key_exists('stage', $_GET)) {
     $q->bindParam(':notes', $_POST['notes']);
     $q->bindParam(':id', $_POST['service']);
     if (! $q->execute()) {
-        $q = $dbh->prepare("UPDATE {$dbp}sermons
+        $q = $dbh->prepare("UPDATE `{$dbp}sermons`
             SET bibletext = :bibletext,
             outline = :outline, notes = :notes
             WHERE service = :id");
