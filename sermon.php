@@ -162,7 +162,7 @@ if (! array_key_exists('stage', $_GET)) {
         } else {
             $q = $dbh->prepare("INSERT INTO `{$dbp}sermons`
                 (manuscript, mstype, service)
-                VALUES (?, ?, ?");
+                VALUES (?, ?, ?)");
         }
         $q->bindParam(1, $fp, PDO::PARAM_LOB);
         $q->bindParam(2, $ft);
