@@ -35,7 +35,7 @@ if (! array_key_exists("stage", $_GET))
     <h1>Edit a Service</h1>
     <?
         $q = $dbh->prepare("SELECT
-            DATE_FORMAT(days.caldate, '%c/%e/%Y') as date,
+            DATE_FORMAT(days.caldate, '%Y-%m-%d') as date,
             hymns.book, hymns.number, hymns.note,
             hymns.pkey as hymnid, hymns.location,
             hymns.sequence, days.name as dayname, days.rite, days.block,
@@ -54,7 +54,7 @@ if (! array_key_exists("stage", $_GET))
         <dl>
             <dt>Date</dt>
             <dd>
-                <input type="text" id="date" name="date"
+                <input type="date" id="date" name="date"
                  value="<?=$row['date']?>" required>
             </dd>
             <dt>Day Name</dt>

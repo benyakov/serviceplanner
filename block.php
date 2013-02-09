@@ -224,8 +224,8 @@ if ($_GET['action'] == "edit" && $_GET['id']) {
         exit(0);
     }
     $q = $dbh->prepare("SELECT
-        DATE_FORMAT(blockstart, '%c/%e/%Y') AS blockstart,
-        DATE_FORMAT(blockend, '%c/%e/%Y') AS blockend, label, notes, l1lect,
+        DATE_FORMAT(blockstart, '%Y-%m-%d') AS blockstart,
+        DATE_FORMAT(blockend, '%Y-%m-%d') AS blockend, label, notes, l1lect,
         l1series, l2lect, l2series, golect, goseries, pslect, psseries,
         colect, coclass, id FROM `{$dbp}blocks`
         WHERE id = ?");
@@ -373,7 +373,7 @@ if (! $auth) {
             })
         if (! Modernizr.inputtypes.date) {
             $('#startdate').datepicker({showOn:"button", numberOfMonths:[2,2],
-                stepMonths: 4});
+                stepMonths: 4, dateFormat: "yyyy-mm-dd"});
         }
         $('#enddate').unbind('change')
             .bind('change', function() {
@@ -386,7 +386,7 @@ if (! $auth) {
             })
         if (! Modernizr.inputtypes.date) {
             $('#enddate').datepicker({showOn:"button", numberOfMonths:[2,2],
-                stepMonths: 4});
+                stepMonths: 4, dateFormat: "yyyy-mm-dd"});
         }
         checkCustomPs();
         checkCustomL1();

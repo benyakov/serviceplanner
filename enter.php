@@ -78,7 +78,8 @@ if (array_key_exists("date", $_POST)) {
                 stepMonths: 4, onClose: function() {
                     $("#location").focus();
                     $("#date").change();
-                }})
+                },
+                dateFormat: "yyyy-mm-dd"})
         }
         updateFromDate($("#date"));
         $(".edit-number").keyup(function(evt){
