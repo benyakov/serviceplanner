@@ -229,9 +229,18 @@ function queryAllHymns($dbh, $dbp="", $limit=0, $future=false, $id="") {
             LIMIT 1)
         END)
         AS bgospel,
-    (SELECT psalm FROM `{$dbp}synlessons` AS cl
-    WHERE cl.dayname=d.name AND cl.lectionary=b.pslect
-    LIMIT 1) AS bpsalm,
+    (CASE b.pslect
+        WHEN 'custom' THEN b.psseries
+        ELSE
+            (SELECT psalm FROM `{$dbp}synlessons` AS cl
+            WHERE cl.dayname=d.name AND cl.lectionary=b.pslect
+            LIMIT 1)
+        END)
+        AS bpsalm,
+    b.l1lect != \"custom\" AS l1link,
+    b.l2lect != \"custom\" AS l2link,
+    b.golect != \"custom\" AS golink,
+    b.pslect != \"custom\" AS pslink,
     b.coclass AS bcollectclass,
     (SELECT collect FROM `{$dbp}churchyear_collects` AS cyc
     JOIN `{$dbp}churchyear_collect_index` AS cci
@@ -299,10 +308,10 @@ function display_records_table($q) {
                         <?=translate_markup($row['bnotes'])?>
                     </div>
                     <dl class="blocklessons">
-                    <dt>Lesson 1</dt><dd><?=linkbgw($row['blesson1'])?></dd>
-                        <dt>Lesson 2</dt><dd><?=linkbgw($row['blesson2'])?></dd>
-                        <dt>Gospel</dt><dd><?=linkbgw($row['bgospel'])?></dd>
-                        <dt>Psalm</dt><dd><?=linkbgw("Ps {$row['bpsalm']}")?></dd>
+                    <dt>Lesson 1</dt><dd><?=linkbgw($row['blesson1'], $row['l1link'])?></dd>
+                        <dt>Lesson 2</dt><dd><?=linkbgw($row['blesson2'], $row['l2link'])?></dd>
+                        <dt>Gospel</dt><dd><?=linkbgw($row['bgospel'], $row['golink'])?></dd>
+                        <dt>Psalm</dt><dd><?=linkbgw($row['bpsalm'], $row['pslink'], "Ps ")?></dd>
                     </dl>
                     <h5>Collect (<?=$row['bcollectclass']?>)</h5>
                     <div class="collecttext maxcolumn">
@@ -385,10 +394,10 @@ function modify_records_table($q, $action) {
                         <?=translate_markup($row['bnotes'])?>
                     </div>
                     <dl class="blocklessons">
-                        <dt>Lesson 1</dt><dd><?=linkbgw($row['blesson1'])?></dd>
-                        <dt>Lesson 2</dt><dd><?=linkbgw($row['blesson2'])?></dd>
-                        <dt>Gospel</dt><dd><?=linkbgw($row['bgospel'])?></dd>
-                        <dt>Psalm</dt><dd><?=linkbgw("Ps {$row['bpsalm']}")?></dd>
+                        <dt>Lesson 1</dt><dd><?=linkbgw($row['blesson1'], $row['l1link'])?></dd>
+                        <dt>Lesson 2</dt><dd><?=linkbgw($row['blesson2'], $row['l2link'])?></dd>
+                        <dt>Gospel</dt><dd><?=linkbgw($row['bgospel'], $row['golink'])?></dd>
+                        <dt>Psalm</dt><dd><?=linkbgw($row['bpsalm'], $row['pslink'], "Ps ")?></dd>
                     </dl>
                     <h5>Collect (<?=$row['bcollectclass']?>)</h5>
                     <div class="collecttext maxcolumn">
@@ -450,9 +459,14 @@ function html_head($title) {
     return implode("\n", $rv);
 }
 
-function linkbgw($ref) {
+function linkbgw($ref, $linked, $prefix="") {
     // Return a link to BibleGateway for the given reference,
     // or if the version is not set, just the ref.
+    if (! $linked) {
+        return $ref;
+    } else {
+        $ref = "{$prefix} {$ref}";
+    }
     global $config;
     $bgwversion = $config->get("biblegwversion");
     if ($bgwversion) {

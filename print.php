@@ -66,8 +66,10 @@ $backlink = "index.php";
             <dt>Gospel</dt><dd><?=$row['bgospel']?></dd>
             <dt>Psalm</dt><dd><?=$row['bpsalm']?></dd>
         </dl>
-        <h5>Collect: <?=$row['bcollectclass']?></h5>
-        <p class="collecttext maxcolumn"><?=$row['bcollect']?></p>
+        <h5>Collect: (<?=$row['bcollectclass']?>)</h5>
+        <div class="collecttext maxcolumn">
+            <?=$row['bcollect']?>
+        </div>
     </div>
     <? } ?>
     <table id="print-hymns-table"><tbody>
