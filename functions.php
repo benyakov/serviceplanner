@@ -154,12 +154,13 @@ function queryAllHymns($dbh, $dbp="", $limit=0, $future=false, $id="") {
     }
     if ($limit > 0) $limitstr = " LIMIT {$limit}";
     else $limitstr = "";
-    $q = $dbh->prepare("SELECT DATE_FORMAT(d.caldate, '%c/%e/%Y') as date,
-    h.book, h.number, h.note, h.location, d.name as dayname, d.rite,
-    d.pkey as id, d.servicenotes, n.title, d.block,
-    b.label as blabel, b.notes as bnotes,
-    cyp.color as color, cyp.theme as theme, cyp.introit as introit,
-    cyp.note as propersnote,
+    $q = $dbh->prepare("SELECT d.pkey AS serviceid,
+    DATE_FORMAT(d.caldate, '%c/%e/%Y') AS date,
+    h.book, h.number, h.note, h.location, d.name AS dayname, d.rite,
+    d.pkey AS id, d.servicenotes, n.title, d.block,
+    b.label AS blabel, b.notes AS bnotes,
+    cyp.color AS color, cyp.theme AS theme, cyp.introit AS introit,
+    cyp.note AS propersnote,
     (CASE b.l1lect
         WHEN 'historic' THEN
         (CASE b.l1series
@@ -286,7 +287,7 @@ function display_records_table($q) {
                 $datetext = $row['date'];
             }
             echo "<tr class=\"heading\"><td class=\"heavy\">{$datetext} {$row['location']}</td>
-                <td colspan=2>{$row['dayname']}: {$row['rite']} ".
+                <td colspan=2><a name=\"service_{$row['serviceid']}\">{$row['dayname']}</a>: {$row['rite']} ".
                 "[ <a href=\"print.php?id={$row['id']}\" ".
                 "title=\"print\">Print</a> ]</td></tr>\n";
             echo "<tr class=\"heading propers\"><td class=\"heavy smaller\">{$row['theme']}</td>";
@@ -373,8 +374,10 @@ function modify_records_table($q, $action) {
             [ <a class=\"menulink\" href=\"enter.php?date={$urldate}\" title=\"Add another service or hymns on {$row['date']}.\">Add</a> ]
             <span class=\"heavy\">{$row['location']}</span></td>
             <td colspan=2>[ <a href=\"#\" class=\"edit-service menulink\" data-id=\"{$row['id']}\">Edit</a> |
-            <a class=\"menulink\" href=\"sermon.php?id={$row['id']}\">Sermon</a> ]
-            {$row['dayname']}: {$row['rite']}</td></tr>\n";
+            <a class=\"menulink\" href=\"sermon.php?id={$row['id']}\">Sermon</a> |
+            <a class=\"menulink\" href=\"print.php?id={$row['id']}\" title=\"print\">Print</a>
+            ]
+            <a name=\"service_{$row['serviceid']}\">{$row['dayname']}</a>: {$row['rite']}</td></tr>\n";
             echo "<tr class=\"heading propers\"><td class=\"heavy smaller\">{$row['theme']}</td>";
             echo "<td colspan=2>{$row['color']}</td></tr>";
             if ($row['introit']) {
