@@ -393,6 +393,12 @@ function zeroPad(number, width) {
     return zeropadding.slice(0, width-input.length) + input;
 }
 
+function scrollTarget(place) {
+    window.location.hash = place;
+    window.scrollTo(0, $(window).scrollTop()-60);
+    $('a[name="'+place+'"]').addClass('highlight');
+}
+
 $(document).ready(function() {
     $("#loginform").submit(function(evt) {
         evt.preventDefault();

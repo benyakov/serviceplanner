@@ -30,10 +30,18 @@ $this_script = $_SERVER['HTTP_HOST'].$_SERVER['SCRIPT_NAME'] ;
 <html lang="en">
 <?=html_head("Service Planning Records")?>
 <body>
+    <script type="text/javascript">
+        $(document).ready(function() {
+            $('#thisweek').click(function(evt) {
+                evt.preventDefault();
+                scrollTarget("now");
+            });
+        });
+    </script>
 <?  pageHeader();
     siteTabs($auth);?>
     <div id="content-container">
-    <div class="quicklinks"><a href="#now">Jump to This Week</a></div>
+    <div class="quicklinks"><a id="thisweek" href="#now">Jump to This Week</a></div>
     <?
     include("records-table.php");
     ?>

@@ -71,6 +71,10 @@ $sitetabs_anonymous = array(
 // of hymns included in the list.
 $listinglimit = 200;
 
+// Default order for the presentation of hymns and services on the Modify tab.
+// May be "Future" or "All".
+$modifyorder = "All";
+
 // Location of a PHP "library" directory on the web server where you might
 // have e.g. markup-processing packages installed.
 // For example, If you download Markdown

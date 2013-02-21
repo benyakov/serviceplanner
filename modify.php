@@ -30,9 +30,15 @@ if (! $auth) {
     exit(0);
 }
 $this_script = $_SERVER['HTTP_HOST'].$_SERVER['SCRIPT_NAME'] ;
+if (! array_key_exists('modifyorder', $_SESSION[$sprefix])) {
+    $_SESSION[$sprefix]['modifyorder'] = $modifyorder;
+}
 if (array_key_exists('listinglimit', $_GET) &&
     is_numeric($_GET['listinglimit'])) {
     $_SESSION[$sprefix]["listinglimit"] = $_GET['listinglimit'];
+    if ("Apply" != $_GET['submit']) {
+        $_SESSION[$sprefix]["modifyorder"] = $_GET['submit'];
+    }
 } elseif (! array_key_exists('listinglimit', $_SESSION[$sprefix])) {
     $_SESSION[$sprefix]['listinglimit'] = $listinglimit;
 }
@@ -100,13 +106,17 @@ if (array_key_exists('listinglimit', $_GET) &&
 
 
             });
+            $('#thisweek').click(function(evt) {
+                evt.preventDefault();
+                scrollTarget("now");
+            });
         });
     </script>
     <? pageHeader();
     siteTabs($auth); ?>
     <div id="content-container">
     <div class="quicklinks"><a href="enter.php" title="New Service">New Service</a>
-    | <a href="#now">Jump to This Week</a></div>
+    | <a id="thisweek" href="#now">Jump to This Week</a></div>
 <h1>Modify Service Planning Records</h1>
 <p class="explanation">This listing of hymns allows you to delete whole
 services, with all associated hymns at that location. To delete only certain
@@ -116,10 +126,22 @@ for that service, use the "Sermon" link.</p>
 <label for="listinglimit">Listing Limit (0 for None):</label>
 <input type="text" id="listinglimit" name="listinglimit"
     value="<?=$_SESSION[$sprefix]["listinglimit"]?>">
-<button type="submit" value="Apply">Apply</button>
+<button type="submit" name="submit" value="Apply">Apply</button>
+<?
+    $disabled = "";
+    if ("Future" == $_SESSION[$sprefix]['modifyorder']) $disabled = "disabled";
+?>
+<button id="futurebutton" type="submit" name="submit" value="Future" <?=$disabled?>>Show Future Only (Chron.)</button>
+<?
+    $disabled = "";
+    if ("All" == $_SESSION[$sprefix]['modifyorder']) $disabled = "disabled";
+?>
+<button id="allbutton" type="submit" name="submit" value="All" <?=$disabled?>>Show All (Rev. Chron.)</button>
 </form>
 <?
-$q = queryAllHymns($dbh, $dbp, $_SESSION[$sprefix]['listinglimit']);
+if ("Future" == $_SESSION[$sprefix]['modifyorder']) $future = true;
+else $future = false;
+$q = queryAllHymns($dbh, $dbp, $_SESSION[$sprefix]['listinglimit'], $future);
 modify_records_table($q, "delete.php");
 ?>
 </div>
