@@ -74,12 +74,10 @@ if (array_key_exists("date", $_POST)) {
             })
             .focus();
         if (! Modernizr.inputtypes.date) {
-            $("#date").datepicker({showOn:"button", numberOfMonths: [2,2],
+            $("#date").datepicker({showOn:"button", numberOfMonths: [2,3],
                 stepMonths: 4, onClose: function() {
                     $("#location").focus();
-                    $("#date").change();
-                },
-                dateFormat: "yyyy-mm-dd"})
+                }})
         }
         updateFromDate($("#date"));
         $(".edit-number").keyup(function(evt){

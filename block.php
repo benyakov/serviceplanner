@@ -372,8 +372,8 @@ if (! $auth) {
                 }
             })
         if (! Modernizr.inputtypes.date) {
-            $('#startdate').datepicker({showOn:"button", numberOfMonths:[2,2],
-                stepMonths: 4, dateFormat: "yyyy-mm-dd"});
+            $('#startdate').datepicker({showOn:"button", numberOfMonths:[2,3],
+                stepMonths: 4});
         }
         $('#enddate').unbind('change')
             .bind('change', function() {
@@ -385,8 +385,8 @@ if (! $auth) {
                 }
             })
         if (! Modernizr.inputtypes.date) {
-            $('#enddate').datepicker({showOn:"button", numberOfMonths:[2,2],
-                stepMonths: 4, dateFormat: "yyyy-mm-dd"});
+            $('#enddate').datepicker({showOn:"button", numberOfMonths:[2,3],
+                stepMonths: 4});
         }
         checkCustomPs();
         checkCustomL1();

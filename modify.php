@@ -51,8 +51,7 @@ if (array_key_exists('listinglimit', $_GET) &&
         function setupEditDialog() {
             showJsOnly();
             if (! Modernizr.inputtypes.date) {
-                $("#date").datepicker({showOn:"both",
-                    dateFormat: "yyyy-mm-dd"});
+                $("#date").datepicker({showOn:"both"});
             }
             $("#date").change(function() {
                 updateBlocksAvailable($(this).val());
