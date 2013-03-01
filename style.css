@@ -401,8 +401,36 @@ div#sitetabs-background {
     top: 24pt; left: 0; width: 100%; height: 12pt;
     z-index: 4;
 }
-.quicklinks {
+div.quicklinks {
     float: right;
+}
+div.quicklinks a,
+a.menulink {
+    font-family: sans-serif;
+    font-weight: bold;
+    font-size: 90%;
+    color: inherit;
+    background-color: #DDD;
+    padding: 3px 6px;
+    border: 2px solid #811;
+    border-top-color: #D66;
+    border-left-color: #D66;
+    margin-left: 2px;
+    margin-right: 2px;
+}
+
+div.quicklinks a:active,
+a.menulink:active {
+    color: inherit;
+    background-color: #999;
+}
+
+div.quicklinks a:link,
+div.quicklinks a:visited,
+a.menulink:link,
+a.menulink:visited {
+    color: #008;
+    text-decoration: none;
 }
 
 a.sortlink {
@@ -588,12 +616,6 @@ dl.blocklessons dt {
 
 .maxcolumn {
     width: 42em;
-}
-
-.menulink {
-    font-size: 95%;
-    font-weight: bold;
-    font-family: monospace;
 }
 
 .hiddentemplate {

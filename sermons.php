@@ -68,7 +68,7 @@ while ($row = $q->fetch(PDO::FETCH_ASSOC))
         </td><td><?=$row['rite']?></td></tr>
     <tr><td colspan="3" class="table-preformat">
             <pre><?=$row['outline']?></pre><br />
-            <a href="sermon.php?id=<?=$row['service']?>">Edit</a>
+            <a class="menulink" href="sermon.php?id=<?=$row['service']?>">Edit</a>
         </td>
         <td class="table-leftborder table-preformat">
             <?=translate_markup($row['notes'])?>

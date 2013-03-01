@@ -73,13 +73,13 @@ if (! array_key_exists('stage', $_GET)) {
     <? pageHeader();
     siteTabs($auth, "sermons"); ?>
         <div id="content-container">
-        <p><a href="sermonreport.php?id=<?=${id}?>">Printable Sermon Report</a>
-        | <a href="sermons.php">Browse All Sermon Plans</a></p>
+        <div class="quicklinks"><a href="sermonreport.php?id=<?=${id}?>">Printable Sermon Report</a>
+        <a href="sermons.php">Browse All Sermon Plans</a></div>
         <h1>Edit a Sermon Plan</h1>
         <p class="explanation">You can delete the whole service, hymns, sermon
         plan, and all, from here.  To edit this service or modify the chosen
         hymns individually, use the link below.</p>
-        <a href="edit.php?id=<?=urlencode($id)?>">Edit the Service</a>.</p>
+        <p><a class="menulink" href="edit.php?id=<?=urlencode($id)?>">Edit the Service</a></p>
     <?
     $q = $dbh->prepare("SELECT
             DATE_FORMAT(days.caldate, '%e %b %Y') as date,

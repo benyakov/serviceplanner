@@ -289,8 +289,8 @@ function display_records_table($q) {
             }
             echo "<tr class=\"heading\"><td class=\"heavy\">{$datetext} {$row['location']}</td>
                 <td colspan=2><a name=\"service_{$row['serviceid']}\">{$row['dayname']}</a>: {$row['rite']} ".
-                "[ <a href=\"print.php?id={$row['id']}\" ".
-                "title=\"print\">Print</a> ]</td></tr>\n";
+                "<a class=\"menulink\" href=\"print.php?id={$row['id']}\" ".
+                "title=\"print\">Print</a></td></tr>\n";
             echo "<tr class=\"heading propers\"><td class=\"heavy smaller\">{$row['theme']}</td>";
             echo "<td colspan=2>{$row['color']}</td></tr>";
             if ($row['introit']) {
@@ -372,12 +372,11 @@ function modify_records_table($q, $action) {
             echo "<tr class=\"heading\"><td>
             <input form=\"delete-service\" type=\"checkbox\" name=\"{$row['id']}_{$row['location']}\" id=\"check_{$row['id']}_{$row['location']}\">
             <span class=\"heavy\">{$datetext}</span>
-            [ <a class=\"menulink\" href=\"enter.php?date={$urldate}\" title=\"Add another service or hymns on {$row['date']}.\">Add</a> ]
+            <a class=\"menulink\" href=\"enter.php?date={$urldate}\" title=\"Add another service or hymns on {$row['date']}.\">Add</a>
             <span class=\"heavy\">{$row['location']}</span></td>
-            <td colspan=2>[ <a href=\"#\" class=\"edit-service menulink\" data-id=\"{$row['id']}\">Edit</a> |
-            <a class=\"menulink\" href=\"sermon.php?id={$row['id']}\">Sermon</a> |
+            <td colspan=2><a href=\"#\" class=\"edit-service menulink\" data-id=\"{$row['id']}\">Edit</a>
+            <a class=\"menulink\" href=\"sermon.php?id={$row['id']}\">Sermon</a>
             <a class=\"menulink\" href=\"print.php?id={$row['id']}\" title=\"print\">Print</a>
-            ]
             <a name=\"service_{$row['serviceid']}\">{$row['dayname']}</a>: {$row['rite']}</td></tr>\n";
             echo "<tr class=\"heading propers\"><td class=\"heavy smaller\">{$row['theme']}</td>";
             echo "<td colspan=2>{$row['color']}</td></tr>";

@@ -478,8 +478,8 @@ if ($q->execute()) {
     <tr class="heading">
         <td colspan="2"><?=$row['blockstart']?> to <?=$row['blockend']?></td>
         <td colspan="3"><?=$row['label']?>
-        <div class="quicklinks">[ <a title="edit" href="" data-id="<?=$row['id']?>" class="edit">Edit</a>
-        | <a title="delete" href="" data-label="<?=$row['label']?>" data-id="<?=$row['id']?>" class="delete">Delete</a> ]</div></td></tr>
+        <div class="quicklinks"><a title="edit" href="" data-id="<?=$row['id']?>" class="edit">Edit</a>
+        <a title="delete" href="" data-label="<?=$row['label']?>" data-id="<?=$row['id']?>" class="delete">Delete</a></div></td></tr>
     <tr><td class="otcell"><b>Lesson 1:</b>
         <?=showLesson($row['l1lect'], $row['l1series'])?></td>
         <td class="epcell"><b>Lesson 2:</b>

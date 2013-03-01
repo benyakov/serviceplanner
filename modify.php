@@ -115,7 +115,7 @@ if (array_key_exists('listinglimit', $_GET) &&
     siteTabs($auth); ?>
     <div id="content-container">
     <div class="quicklinks"><a href="enter.php" title="New Service">New Service</a>
-    | <a id="thisweek" href="#now">Jump to This Week</a></div>
+    <a id="thisweek" href="#now">Jump to This Week</a></div>
 <h1>Modify Service Planning Records</h1>
 <p class="explanation">This listing of hymns allows you to delete whole
 services, with all associated hymns at that location. To delete only certain
