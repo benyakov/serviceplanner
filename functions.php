@@ -245,6 +245,7 @@ function queryAllHymns($dbh, $dbp="", $limit=0, $future=false, $id="") {
     b.coclass AS bcollectclass,
     (SELECT collect FROM `{$dbp}churchyear_collects` AS cyc
     JOIN `{$dbp}churchyear_collect_index` AS cci
+    ON (cyc.id = cci.id)
     WHERE cci.dayname=d.name AND cci.lectionary=b.colect
     AND cyc.class=b.coclass
     LIMIT 1) AS bcollect
