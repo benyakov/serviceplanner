@@ -77,7 +77,7 @@ function getDateFor(year) {
 }
 
 function setupPropers() {
-    $(".propers").click(function(evt) {
+    $(".propersname").click(function(evt) {
         evt.preventDefault();
         var loc = $(this).offset();
         var orig = $(this).attr("data-day");
@@ -91,7 +91,8 @@ function setupPropers() {
                     .dialog({modal: true,
                         title: "Propers for "+orig,
                         width: $(window).width()*0.7,
-                        maxHeight: $(window).height()*0.7,
+                        height: "auto",
+                        maxHeight: $(window).height()*0.9,
                         position: "center"
                     });
             });
@@ -134,7 +135,8 @@ function setupSynonym() {
                 $("#dialog").dialog({modal: true,
                     title: "Synonyms for "+orig,
                     width: $(window).width()*0.4,
-                    maxHeight: $(window).height()*0.4,
+                    height: "auto",
+                    maxHeight: $(window).height()*0.7,
                     position: [30, loc.top],
                 });
             });
@@ -153,7 +155,8 @@ function setupEdit() {
                         position: "center",
                         title: dtitle,
                         width: $(window).width()*0.7,
-                        maxHeight: $(window).height()*0.7,
+                        height: "auto",
+                        maxHeight: $(window).height()*0.9,
                         open: function() {
                             setupEditDialog();
                         }});
@@ -314,6 +317,7 @@ function setupPropersDialog() {
                     position: "center",
                     title: "New Collect",
                     width: $(window).width()*0.65,
+                    height: "auto",
                     maxHeight: $(window).height()*0.7,
                     open: function() {
                         setupCollectDialog(this);
@@ -335,6 +339,7 @@ function setupPropersDialog() {
                     position: "center",
                     title: "Confirm Delete Collect?",
                     width: $(window).width()*0.65,
+                    height: "auto",
                     maxHeight: $(window).height()*0.7,
                     open: function() {
                         setupCollectDeleteDialog();
