@@ -29,16 +29,12 @@ body {
     background-color: white;
 }
 
-.nonprinting {
-    display: none;
-}
-
-#pageheader {
-    display: none;
-}
-
 ul#sitetabs,
-div#sitetabs-background {
+div#sitetabs-background,
+#pageheader,
+a.menulink,
+div.quicklinks,
+.nonprinting {
     display: none;
 }
 
@@ -51,3 +47,4 @@ div#content-container {
     background-color: white;
     color: black;
 }
+
