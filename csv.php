@@ -27,8 +27,9 @@ require("./init.php");
 $this_script = $_SERVER['HTTP_HOST'].$_SERVER['SCRIPT_NAME'] ;
 $q = queryService($dbh, $_GET['id']);
 $row = $q->fetch(PDO::FETCH_ASSOC);
+$filebase = urlencode($row['dayname']);
 header('Content-Type: text/csv; charset=utf-8');
-header("Content-Disposition: attachment; filename={$row['dayname']}.csv");
+header("Content-Disposition: attachment; filename={$filebase}.csv");
 $output = fopen('php://output', 'w');
 fputcsv($output, array("Date", "Day", "Order", "Service Notes", "Introit", "Propers Note", "Color", "Theme", "Block", "Block Notes", "Lesson 1", "Lesson 2", "Gospel", "Psalm", "Collect", "Hymnbook", "Hymnnumber", "Hymnnote", "Hymnlocation", "Hymntitle"));
 while ($row) {

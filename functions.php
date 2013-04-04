@@ -268,6 +268,7 @@ function queryAllHymns($dbh, $dbp="", $limit=0, $future=false, $id="") {
 }
 
 function display_records_table($q) {
+    global $auth;
     // Show a table of the data in the query $result
     ?><table id="records-listing">
         <tr><th>Date &amp; Location</th><th colspan=2>Liturgical Day Name: Service/Rite</th></tr>
@@ -288,8 +289,13 @@ function display_records_table($q) {
                 $datetext = $row['date'];
             }
             echo "<tr class=\"heading\"><td class=\"heavy\">{$datetext} {$row['location']}</td>
-                <td colspan=2><a name=\"service_{$row['serviceid']}\">{$row['dayname']}</a>: {$row['rite']} ".
-                "<a class=\"menulink\" href=\"print.php?id={$row['id']}\" ".
+                <td colspan=2><a name=\"service_{$row['serviceid']}\">{$row['dayname']}</a>: {$row['rite']}".
+            ($auth?
+            "<a class=\"menulink\" href=\"sermon.php?id={$row['id']}\">Sermon</a>
+            <a class=\"menulink\" href=\"csv.php?id={$row['id']}\">CSV Data</a>"
+
+            :"").
+                " <a class=\"menulink\" href=\"print.php?id={$row['id']}\" ".
                 "title=\"print\">Print</a></td></tr>\n";
             echo "<tr class=\"heading propers\"><td class=\"heavy smaller\">{$row['theme']}</td>";
             echo "<td colspan=2>{$row['color']}</td></tr>";
