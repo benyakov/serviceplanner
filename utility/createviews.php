@@ -30,7 +30,7 @@ $q = $dbh->prepare("CREATE VIEW `{$dbp}synlessons` AS
     l.hymnabc, l.hymn
     FROM `{$dbp}churchyear_lessons` AS l
     RIGHT JOIN `{$dbp}churchyear_synonyms` AS s ON (l.dayname = s.canonical)");
-$q->execute();
+$q->execute() or die(array_pop($q->errorInfo()));
 $q = $dbh->exec("DROP VIEW IF EXISTS `{$dbp}synpropers`");
 $q = $dbh->prepare("CREATE VIEW `{$dbp}synpropers` AS
     SELECT s.synonym AS dayname, p.color, p.theme, p.introit, p.note,
@@ -39,5 +39,5 @@ $q = $dbh->prepare("CREATE VIEW `{$dbp}synpropers` AS
     RIGHT JOIN `{$dbp}churchyear_synonyms` AS s ON (p.dayname = s.canonical)
     LEFT JOIN `{$dbp}churchyear` AS cy ON (p.dayname = cy.dayname)
     LEFT JOIN `{$dbp}churchyear_graduals` AS g ON (g.season = cy.season)");
-$q->execute();
+$q->execute() or die(array_pop($q->errorInfo()));;
 ?>

@@ -63,6 +63,7 @@ if ($_GET['request'] == 'purgetables') {
         exit(0);
     }
     $dbh->beginTransaction();
+    $dbh->exec("DELETE FROM `{$dbp}churchyear_graduals`");
     $dbh->exec("DELETE FROM `{$dbp}churchyear_collects_index`");
     $dbh->exec("DELETE FROM `{$dbp}churchyear_collects`");
     $dbh->exec("DELETE FROM `{$dbp}churchyear_synonyms`");
@@ -70,11 +71,11 @@ if ($_GET['request'] == 'purgetables') {
     $dbh->exec("DELETE FROM `{$dbp}churchyear_propers`");
     $dbh->exec("DELETE FROM `{$dbp}churchyear_order`");
     $dbh->exec("DELETE FROM `{$dbp}churchyear`");
-    $dbstate->store("churchyear-filled", 0);
     if ($dbstate->save()) {
         setMessage("Church year tables purged.  They should be re-populated "
             ."by the time you see this message.");
         $dbh->commit();
+        $dbstate->store("churchyear-filled", 0);
     } else {
         setMessage("Problem saving dbstate config file.  Tables not purged.");
         $dbh->rollback();
