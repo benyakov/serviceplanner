@@ -143,6 +143,11 @@ CREATE TABLE `churchyear_collect_index` (
     FOREIGN KEY (`dayname`) REFERENCES `churchyear_synonyms` (`synonym`)
         ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+CREATE TABLE `churchyear_graduals` (
+    `season`    varchar(64),
+    `gradual`   text,
+    FOREIGN KEY (`season`) REFERENCES `churchyear` (`season`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 CREATE TABLE `blocks` (
   `blockstart` date,
   `blockend` date,
