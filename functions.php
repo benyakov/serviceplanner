@@ -160,7 +160,7 @@ function queryAllHymns($dbh, $dbp="", $limit=0, $future=false, $id="") {
     d.pkey AS id, d.servicenotes, n.title, d.block,
     b.label AS blabel, b.notes AS bnotes,
     cyp.color AS color, cyp.theme AS theme, cyp.introit AS introit,
-    cyp.note AS propersnote,
+    cyp.gradual AS gradual, cyp.note AS propersnote,
     (CASE b.l1lect
         WHEN 'historic' THEN
         (CASE b.l1series
@@ -299,9 +299,13 @@ function display_records_table($q) {
                 "title=\"print\">Print</a></td></tr>\n";
             echo "<tr class=\"heading propers\"><td class=\"heavy smaller\">{$row['theme']}</td>";
             echo "<td colspan=2>{$row['color']}</td></tr>";
-            if ($row['introit']) {
-                echo "<tr class=\"heading propers\"><td colspan=3>
-                    <p class=\"maxcolumn smaller\">{$row['introit']}</p></td></tr>";
+            if ($row['introit'] || $row['gradual']) {
+                echo "<tr class=\"heading propers\"><td colspan=3>";
+                if ($row['introit'])
+                    echo "<p class=\"sbspar maxcolumn smaller\">{$row['introit']}</p>";
+                if ($row['gradual'])
+                    echo "<p class=\"sbspar halfcolumn smaller\">{$row['gradual']}</p>";
+                echo "</td></tr>";
             }
             if ($row['propersnote']) {
                 echo "<tr class=\"heading propers\"><td colspan=3>
@@ -386,9 +390,13 @@ function modify_records_table($q, $action) {
             <a name=\"service_{$row['serviceid']}\">{$row['dayname']}</a>: {$row['rite']}</td></tr>\n";
             echo "<tr class=\"heading propers\"><td class=\"heavy smaller\">{$row['theme']}</td>";
             echo "<td colspan=2>{$row['color']}</td></tr>";
-            if ($row['introit']) {
-                echo "<tr class=\"heading propers\"><td colspan=3>
-                    <p class=\"maxcolumn smaller\">{$row['introit']}</p></td></tr>";
+            if ($row['introit'] || $row['gradual']) {
+                echo "<tr class=\"heading propers\"><td colspan=3>";
+                if ($row['introit'])
+                    echo "<p class=\"sbspar maxcolumn smaller\">{$row['introit']}</p>";
+                if ($row['gradual'])
+                    echo "<p class=\"sbspar halfcolumn smaller\">{$row['gradual']}</p>";
+                echo "</td></tr>";
             }
             if ($row['propersnote']) {
                 echo "<tr class=\"heading propers\"><td colspan=3>

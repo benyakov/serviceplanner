@@ -145,8 +145,7 @@ CREATE TABLE `churchyear_collect_index` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 CREATE TABLE `churchyear_graduals` (
     `season`    varchar(64),
-    `gradual`   text,
-    FOREIGN KEY (`season`) REFERENCES `churchyear` (`season`)
+    `gradual`   text
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 CREATE TABLE `blocks` (
   `blockstart` date,

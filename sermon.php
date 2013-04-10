@@ -76,27 +76,12 @@ if (! array_key_exists('stage', $_GET)) {
         <div class="quicklinks"><a href="sermonreport.php?id=<?=${id}?>">Printable Sermon Report</a>
         <a href="sermons.php">Browse All Sermon Plans</a></div>
         <h1>Edit a Sermon Plan</h1>
-        <p class="explanation">You can delete the whole service, hymns, sermon
-        plan, and all, from here.  To edit this service or modify the chosen
-        hymns individually, use the link below.</p>
-        <p><a class="menulink" href="edit.php?id=<?=urlencode($id)?>">Edit the Service</a></p>
+        <p class="explanation">This page is for planning a sermon for a
+    particular service.  The service is displayed below.  You can also store
+    your sermon manuscript file in the system, from this page.</p>
     <?
-    $q = $dbh->prepare("SELECT
-            DATE_FORMAT(days.caldate, '%e %b %Y') as date,
-            hymns.book, hymns.number, hymns.note,
-            hymns.location, days.name as dayname, days.rite,
-            days.pkey as id, days.servicenotes, names.title
-            FROM `{$dbp}hymns` AS hymns
-            LEFT OUTER JOIN `{$dbp}days` AS days ON (hymns.service = days.pkey)
-            LEFT OUTER JOIN `{$dbp}names` AS names ON
-                (hymns.number = names.number)
-                AND (hymns.book = names.book)
-            WHERE days.pkey = :id
-            ORDER BY days.caldate DESC, hymns.location,
-                hymns.sequence");
-    $q->bindParam(":id", $id);
-    $q->execute() or die(array_pop($q->errorInfo()));
-    modify_records_table($q, "delete.php");
+    $q = queryService($dbh, $id);
+    display_records_table($q, "delete.php");
 
     $q = $dbh->prepare("SELECT bibletext, outline, notes, mstype
         FROM `{$dbp}sermons` WHERE service=:id");

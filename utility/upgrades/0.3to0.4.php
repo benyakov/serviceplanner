@@ -37,16 +37,21 @@ if ("0.3." != substr($version, 0, 4)) {
 }
 // Update the database
 require('./db-connection.php');
-$rv = array();
-$rv[] = "Adding churchyear-graduals table.";
+$rm = array();
+$rm[] = "Adding churchyear-graduals table.";
 $q = $dbh->prepare("CREATE TABLE `churchyear_graduals` (
     `season`    varchar(64),
-    `gradual`   text,
-    FOREIGN KEY (`season`) REFERENCES `churchyear` (`season`)
+    `gradual`   text
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8");
-$q->execute() or die(array_pop($q->errorInfo()));
+if (! $q->execute()) {
+    $rm[] = "Error: ".array_pop($q->errorInfo()));
+    exit(0);
+}
+// Re-create views
+$rm[] = "Re-creating database views.";
+require("./utility/createviews.php");
 // Wrap up.
-$rv[] = "Done.  Writing new dbversion to dbstate file.";
+$rm[] = "Done.  Writing new dbversion to dbstate file.";
 // Store the new dbversion.
 require('./version.php');
 $configfile->store('dbversion',

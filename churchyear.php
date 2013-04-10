@@ -76,6 +76,7 @@ if ($_GET['request'] == 'purgetables') {
             ."by the time you see this message.");
         $dbh->commit();
         $dbstate->store("churchyear-filled", 0);
+        $dbstate->save();
     } else {
         setMessage("Problem saving dbstate config file.  Tables not purged.");
         $dbh->rollback();

@@ -131,6 +131,19 @@ while (($record = fgetcsv($fh)) != FALSE) {
         or die(__FILE__.":".__LINE__.$dict['dayname']);
 }
 
+// Fill graduals
+$fh = fopen("./utility/churchyear/graduals.csv", "r");
+$headings = fgetcsv($fh);
+$ql = $dbh->prepare("INSERT INTO `{$dbp}churchyear_graduals`
+    (season, gradual)
+    VALUES (?, ?)");
+while (($record = fgetcsv($fh)) != FALSE) {
+    $r = blanksToNull($record);
+    $dict = array_combine($headings, $r);
+    $ql->execute(array($dict['season'], $dict['gradual']))
+        or die(__FILE__.":".__LINE__.$dict['season']);
+}
+
 function blanksToNull($arrayin) {
     $r = array();
     foreach ($arrayin as $field) {

@@ -618,6 +618,15 @@ dl.blocklessons dt {
     width: 42em;
 }
 
+.halfcolumn {
+    width: 30em;
+}
+
+p.sbspar {
+    display: inline-block;
+    padding: .5em;
+}
+
 .hiddentemplate {
     display: none;
 }
