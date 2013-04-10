@@ -44,6 +44,9 @@ $backlink = "index.php";
         <? if ($row['introit']) { ?>
         <dt>Introit</dt> <dd class="introittext maxcolumn"><?=$row['introit']?></dd>
         <? }
+        if ($row['gradual']) { ?>
+        <dt>Gradual</dt> <dd class="smaller maxcolumn"><?=$row['gradual']?></dd>
+        <? }
         if ($row['propersnote']) { ?>
         <dt>Propers Note</dt> <dd> <?=translate_markup(trim($row['propersnote']))?></dd>
         <?}
