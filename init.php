@@ -60,8 +60,7 @@ if (null == $dbstate->get('dbversion')) {
 }
 if ($upgradedb) {
     $newversion = "{$version['major']}.{$version['minor']}";
-    header("Location: {$serverdir}/utility/upgrades/{$oldversion}to{$newversion}.php");
-    exit(0);
+    require("./utility/upgrades/{$oldversion}to{$newversion}.php");
 }
 if (! ($dbstate->get("has-user") || $_GET['flag'] == 'inituser')) {
     header("Location: {$serverdir}/utility/inituser.php");

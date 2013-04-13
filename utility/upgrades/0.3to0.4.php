@@ -23,23 +23,17 @@
     The Dalles, OR 97058
     USA
  */
-// Check the userlevel.
-chdir('../..');
-require('./setup-session.php');
-require('./functions.php');
-validateAuth($require=true);
-// Check dbversion.txt
-require("./utility/configfile.php");
-$configfile = new Configfile("./dbstate.ini", false);
-$version = $configfile->get('dbversion');
-if ("0.3." != substr($version, 0, 4)) {
-    die("Can't upgrade from 0.3.x, since the current db version is {$version}.");
+if (! (isset($newversion) && isset($oldversion))) {
+    echo "Error: This upgrade must be run automatically.";
+}
+if ("0.3." != substr($oldversion, 0, 4).'.') {
+    die("Can't upgrade from 0.3.x, since the current db version is {$oldversion}.");
 }
 // Update the database
 require('./db-connection.php');
 $rm = array();
 $rm[] = "Adding churchyear-graduals table.";
-$q = $dbh->prepare("CREATE TABLE `churchyear_graduals` (
+$q = $dbh->prepare("CREATE TABLE `{$dbp}churchyear_graduals` (
     `season`    varchar(64),
     `gradual`   text
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8");
@@ -53,14 +47,10 @@ require("./utility/createviews.php");
 // Wrap up.
 $rm[] = "Done.  Writing new dbversion to dbstate file.";
 // Store the new dbversion.
-require('./version.php');
-$configfile->store('dbversion',
-    "{$version['major']}.{$version['minor']}.{$version['tick']}");
-$configfile->save() or die("Problem saving dbstate file.");
-// redirect with a message.
-setMessage(implode("<br />\n", $rv));
-$serverdir = dirname(dirname(dirname($_SERVER['PHP_SELF'])));
-header("Location: {$serverdir}");
-
+$newversion = "{$version['major']}.{$version['minor']}.{$version['tick']}";
+$dbstate->store('dbversion', $newversion);
+$dbstate->save() or die("Problem saving dbstate file.");
+$rm[] = "Upgraded to {$newversion}";
+setMessage(implode("<br />\n", $rm));
 ?>
 
