@@ -31,7 +31,7 @@ $filebase = urlencode($row['dayname']);
 header('Content-Type: text/csv; charset=utf-8');
 header("Content-Disposition: attachment; filename={$filebase}.csv");
 $output = fopen('php://output', 'w');
-fputcsv($output, array("Date", "Day", "Order", "Service Notes", "Introit", "Propers Note", "Color", "Theme", "Block", "Block Notes", "Lesson 1", "Lesson 2", "Gospel", "Psalm", "Collect", "Hymnbook", "Hymnnumber", "Hymnnote", "Hymnlocation", "Hymntitle"));
+fputcsv($output, array("Date", "Day", "Order", "Service Notes", "Introit", "Gradual", "Propers Note", "Color", "Theme", "Block", "Block Notes", "Lesson 1", "Lesson 2", "Gospel", "Psalm", "Collect", "Hymnbook", "Hymnnumber", "Hymnnote", "Hymnlocation", "Hymntitle"));
 while ($row) {
     if ('' == $row['number']) {
         $row = $q->fetch(PDO::FETCH_ASSOC);
@@ -39,9 +39,9 @@ while ($row) {
     }
     fputcsv($output, array(
         $row['date'], $row['dayname'], $row['rite'], $row['servicenotes'],
-        $row['introit'], $row['propersnote'], $row['color'], $row['theme'],
-        $row['blabel'], $row['bnotes'], $row['blesson1'], $row['blesson2'],
-        $row['bgospel'], $row['bpsalm'], $row['bcollect'],
+        $row['introit'], $row['gradual'], $row['propersnote'], $row['color'],
+        $row['theme'], $row['blabel'], $row['bnotes'], $row['blesson1'],
+        $row['blesson2'], $row['bgospel'], $row['bpsalm'], $row['bcollect'],
         $row['book'], $row['number'], $row['note'], $row['location'],
         $row['title']));
     $row = $q->fetch(PDO::FETCH_ASSOC);
