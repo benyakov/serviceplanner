@@ -44,7 +44,7 @@ $q = $dbh->prepare("CREATE TABLE `churchyear_graduals` (
     `gradual`   text
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8");
 if (! $q->execute()) {
-    $rm[] = "Error: ".array_pop($q->errorInfo()));
+    $rm[] = "Error: ".array_pop($q->errorInfo());
     exit(0);
 }
 // Re-create views
