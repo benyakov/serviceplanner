@@ -67,7 +67,14 @@ and location of the service and liturgical day name.  Below that line appear
 the <em>Evangelical Lutheran Hymnary (ELH)</em>'s topical description for
 hymns on that day, as well as the liturgical color for paraments.</p>
 
-    <p>
+    <p>The actual hymns are listed line-by-line, with the abbreviation for the
+hymnbook, the number, any notes for that hymn (verse/stanza numbers, etc.), and
+the title.</p>
+
+    <p>Between the heading line and the list of hymns, there is service
+information, including any special notes about that service, the Introit, and the gradual.  Some services may be assigned to named blocks (introduced soon) for planning purposes.  Those that are will also contain a rectangle with a heading inside that says "Block: " and some name for the block to which the service belongs.  The block specifies which propers will be used for that service, and they are automatically looked up and displayed in the block rectangle.</p>
+
+
 
 </body>
 </html>
