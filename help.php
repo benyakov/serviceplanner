@@ -8,6 +8,21 @@ html_head("Help");
     <h1>Contents</h1>
     <ul>
     <li><a href="#tour">Introductory Tour</a></li>
+    <li><a href="#anonymous_tabs">Anonymous Access Tabs</a> (Upcoming Hymns, Service Records, and Cross Ref)</li>
+    <li><a href="#modify_services">Modify Services</a></li>
+    <li><a href="#block_plans">Block Plans</a></li>
+    <li><a href="#sermon_plans">Sermon Plans</a></li>
+    <li><a href="#church_year">Church Year</a></li>
+    <li><a href="#housekeeping">Housekeeping</a></li>
+    <li><a href="#workflow_example">Workflow</a></li>
+    <li><a href="#adding_hymns">Adding Hymns to a Service</a></li>
+    <li><a href="#changing_service">Changing a Service</a></li>
+    <li><a href="#last_use">When did I last use that hymn?</a></li>
+    <li><a href="#backups">Data Storage and Backups</a></li>
+    <li><a href="#coinstallation">Populating Hymn Titles from a Co-installation</a></li>
+    <li><a href="#mashups">Inserting a Service Listing into Another Web Page</a></li>
+    <li><a href="#restoring_defaults">Restoring Defaults</a></li>
+    <li><a href="#bug_reporting">Bug Reporting</a></li>
     </ul>
 
 
@@ -168,7 +183,7 @@ an abbreviation here, then the lection references will not be links.<p>
 
     <h2>Usage Tips</h2>
 
-    <h3>Workflow</h3>
+    <h3><a name="workflow_example">Workflow</a></h3>
 
     <p>Here's an outline of how the author uses the service planner.  You may
 prefer another workflow, but if you want somewhere to start, look through the
@@ -202,7 +217,8 @@ liturgical rite, or plan for extra things like choir pieces.</li>
     <li>After you have set up a block plan that spans the date of this service,
 that block plan will be available as a choice in the Block Plan drop-down
 control.  Choosing one is optional.  If you </li>
-    <li>If you haven't saved many verified hymn titles, you may want to check
+    <li><a name="unknownhymns">If</a> you haven't saved many verified hymn
+titles, you may want to check
 the "Attempt to provide unknown titles..." box.  The cross-reference tab
 contains a table of hymns, including titles, which come from another source.
 When you enter a hymn number, if this checkbox is activated, the Service
@@ -228,12 +244,24 @@ you click "Reset" instead, then the information in the form will return to its
 original state.</li>
     </ol>
 
+    <h3><a name="adding_hymns">Adding Hymns to a Service</a></h3>
+
     <p>Sometimes you want to add hymns, or create an additional service on the
 same day as one already in the system.  If you click the Add button in the
 heading line of a service on the Modify Services page, or if you create a new
 service using the same date as a service already in the system, the resulting
 form will automatically include a list of existing services on the right side,
-with some abbreviated information about each one.  If you want to add another, separate service on the same day, you can safely ignore that list of existing services.  However, if you want to add hymns to one of the existing services, then you can activate its checkbox.  The form will allow you to specify a location (in case your new hymns are for the same service somewhere else), but you won't be able to change the Liturgical Name, the Rite or Order, Service Notes, or Block Plan.  That's because those things are already saved in the service.  (If you want to change them, you can edit the service instead of entering new hymns.  See below.)</p>
+with some abbreviated information about each one.  If you want to add another,
+separate service on the same day, you can safely ignore that list of existing
+services.  However, if you want to add hymns to one of the existing services,
+then you can activate its checkbox.  The form will allow you to specify a
+location (in case your new hymns are for the same service somewhere else), but
+you won't be able to change the Liturgical Name, the Rite or Order, Service
+Notes, or Block Plan.  That's because those things are already saved in the
+service.  (If you want to change them, you can edit the service instead of
+entering new hymns.  See below.)</p>
+
+    <h3><a name="changing_service">Changing a Service</a></h3>
 
     <p>To edit an existing service, click the Edit button in the heading line
 fo the service you want to edit.  The resulting form will allow you to change
@@ -246,6 +274,125 @@ doesn't really matter what numbers you use, where the range begins or ends, or
 whether there are gaps in the range.  Finally, you can also delete hymns from
 the service by activating their checkbox in the Del column.  Click the Commit
 button to enact all of the changes you wish to make.</p>
+
+    <h3><a name="last_use">When and where did I last use that hymn?</a></h3>
+
+    <p>While you can add hymns to an existing service through the Edit button
+<em>or</em> through the Add button, the "Add" page gives you an advantage you
+may consider important.  When when you enter a hymn number to add, the system
+will not only look up the title automatically, but it will also list the last
+few dates when you have used that particular hymn, along with the location
+where you used it each time.  This should help you to see when you are
+choosing the same hymn more often than you would like, before you actually
+save the new hymns into that service.</p>
+
+    <h3><a name="backups">Data Storage and Backups</a></h3>
+
+    <p>If you have misgivings about the reliablity of the system to store all
+the work you have done, then now is the time to consider backing up your
+service planner, and maybe even performing a restore to make sure it works.
+The author trusts the database system, but backs up his own service planner
+after every planning session.</p>
+
+    <p>On the <a href="#housekeeping">Housekeeping</a> tab, scroll to the Broom
+Closet heading, and click the first link, "Save a Backup of the Database."  The
+system will dump out the database to a file and send it to your browser.  Save
+it somewhere for safekeeping, using the suggested filename.<p>
+
+    <p>To restore from a backup file, use the very next item in the Broom
+Closet.  Click the Browse button and select your backup file.  Then, click the
+"Send" button.  When the file is uploaded, it will be used to restore the
+entire database.  Just be aware that any changes you have made since the backup
+will be lost.</p>
+
+    <p>The backup file contains the date of the backup, but also the version of
+the service planner.  While it's under development, the database schema is
+subject to change.  The version contains three number separated by two periods.
+Whenever the second number changes, the database schema has changed.  If you
+try to use a backup file from a Service Planner version older than the one you
+have installed, you're asking for trouble.  In fact, the system won't let you.
+That's another reason to keep frequent backups.  While it's possible to revert
+the installed Service Planner to an older version (and I can do that for you)
+in order to restore an outdated backup file, nobody likes extra work.</p>
+
+    <h1>Advanced Features</h1>
+
+    <h2><a name="coinstallation">Populating Hymn Titles from a Co-installation</a></h2>
+
+    <p>The service planner automatically fills in hymn titles for you as you
+enter the hymns for a service.  The reliable titles are the ones for hymns you
+have already entered, because you have to verify the title yourself when you
+enter them.  <a href="#unknownhymns">As mentioned above</a>, the system can
+also provide titles from the Cross Ref table, but these are not guaranteed to
+be correct.</p>
+
+    <p>If your Service Planner uses a shared database with other service
+planners (like the ones hosted at Ma-amad.com), then you can take advantage of
+the work others have done in their service planners by merging their verified
+hymn titles into your own Service Planner database.  The advantage is that you
+can probably trust that they're correct, and it will save you from typing in
+all those hymn titles.</p>
+
+    <p>To do this, you will use the third item in the Broom Closet on the
+Housekeeping page.  Each shared installation uses a prefix to distinguish it
+from the other service planners.  You probably chose your prefix when you first
+signed up and had your Service Planner installed.  If you know the prefix of
+another installation with which you share the database, then you can enter that
+prefix in the entry box and click the "Import Titles" button.  It should be as
+easy as that.</p>
+
+    <h2><a name="mashups">Inserting a Service Listing into Another Web Page</a></h2>
+
+    <p>This is called a "mashup," and there are instructions on the
+Housekeeping tab.  While it's a little complicated, the author has done all the
+hard work for you.  All you have to do is copy some bits of provided JavaScript
+code into the web page where you want the service listing to appear.  The code
+is provided on the Housekeeping tab.</p>
+
+    <p>If your web page is on a different server (for example, if your Service
+Planner is hosted at Ma-amad.com), then you will have to authorize the Service
+Planner to accept requests from another site's web page.  To do that, simply
+type the full address of your web page's server into the text box provided on
+the Housekeeping tab and click the Save button.  You can do this for as many
+servers as you want by including their addresses in the same box, one per line.
+To revoke the authorization, simply remove the address from this box and click
+"Save."</p>
+
+    <h2><a name="restoring_defaults">Restoring Sanity to the Church Year (and other things)</a></h2>
+
+    <p>If you have been experimenting with the data saved on the Church Year
+tab, and you have broken something, it's possible to restore all of those
+values to their defaults by clicking the first link on the fourth item in the
+Broom Closet, the link that says "Days in Church Year."  <b>Please note that this will lose any custom lectionaries or other changes you have made.</b></p>
+
+    <p>The other link, which says "Church Year Functions," is probably
+something you won't ever need, but I'll explain it anyway.  The Service Planner
+does some of its computing on the web server, some in your browser, and some in
+the database itself.  Clicking this link will remove the Service Planner's
+computing instructions from the database and restore them to their default.
+It's probably only needed by developers when they are working on the
+database.</p>
+
+    <p>For the curious, the next two items in the Broom Closet are for
+situations when something has gotten out of whack.  This doesn't usually
+happen, and never in normal usage.  But sometimes it can get tricky to work out
+bugs in the database upgrade process, and these links allow a graceful recovery
+from some of the problems that may arise.</p>
+
+    <h2><a name="bug_reporting">Bug Reporting</a></h2>
+
+    <p>When something doesn't work right, that's a bug.  Bug reports are
+welcome and appreciated.  You can submit bugs in <a
+href="http://code.google.com/p/service-planner/issues/list">the issue tracker
+at Google Code</a>, or by emailing me using the link provided at the bottom of
+the Housekeeping tab.  Please be as descriptive as possible, saying what you
+expected and how that's different from what actually happened.  Also, please
+include the version number of your Service Planner, which can be found at the
+bottom of the Housekeeping tab.</p>
+
+    <p>Some "bugs" are not really problems, but feature requests.  Those are
+welcome too.  With those too, please be as descriptive as possible and include
+the version number of your Service Planner.</p>
 
 </body>
 </html>
