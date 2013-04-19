@@ -166,9 +166,86 @@ include the lection references in their block plan rectangles, but those
 references will be links to the texts via BibleGateway.com.  If you don't save
 an abbreviation here, then the lection references will not be links.<p>
 
-    <h2>Tips</h2>
+    <h2>Usage Tips</h2>
 
+    <h3>Workflow</h3>
 
+    <p>Here's an outline of how the author uses the service planner.  You may
+prefer another workflow, but if you want somewhere to start, look through the
+following.  If you want to use a block plan, which automatically displays the
+block's set of propers for each service, then you may want to set that up first
+on the Block Plans tab.</p>
+
+    <ol>
+    <li>Log in and go to the Modify Services tab.</li>
+    <li>Click the New Service button at the top.</li>
+    <li>Fill out the form, beginning with the date of the service.  When you
+choose the date, the Service Planner will automatically check to see if it
+matches with one of the days in the Church Year.  If it does, then all matches
+will be placed automatically into the Liturgical Name field.</li> <li>Since the
+author plans the same service for two different locations,
+the location field is used.  If you have only one location, you can ignore
+it.  The location really applies to the hymns that are chosen.  Hymns from
+multiple locations may be associated with the same service, since one service
+may be repeated at multiple places.</li>
+    <li>If no matches were found for the date, perhaps because it's an
+occasional service, I will put the occasion into the Liturgical Name field.  If
+multiple matches were found, I choose only one and delete the rest.  Anything
+could be written in this field, but the Service Planner uses it to find propers
+automatically for this service.  If the field does not contain a recognized
+liturgical name, then no propers will be found. (You can add new liturgical
+days or adjust their names on the <a href="#church_year">Church Year</a>
+tab.)</li>
+    <li>Each service can have its own notes, which may contain anything you
+like.  This would be a good place to note deviations from the printed
+liturgical rite, or plan for extra things like choir pieces.</li>
+    <li>After you have set up a block plan that spans the date of this service,
+that block plan will be available as a choice in the Block Plan drop-down
+control.  Choosing one is optional.  If you </li>
+    <li>If you haven't saved many verified hymn titles, you may want to check
+the "Attempt to provide unknown titles..." box.  The cross-reference tab
+contains a table of hymns, including titles, which come from another source.
+When you enter a hymn number, if this checkbox is activated, the Service
+Planner will automatically pick one of the titles listed on that table for the
+chosen hymn number, and include it in this form.  There is no way to guarantee
+that the title will be accurate, but they often are.  You can fix it, if
+necessary.  On the other hand, the titles chosen when you submit this form are
+considered to be reliable.  If one of those has already been entered into the
+system, it will be preferred over the cross-reference table's title for the
+purpose of automatically filling out this form.  If no title is found, then a
+blank field will appear for you to enter the hymn title by hand.</li>
+    <li>Each hymn you enter can have a note associated with it.  This is where
+you record which verses/stanzas you want to sing.  You could also include other
+information, like whether it's a communion distribution hymn.  (I may add a
+separate field for the use/role of each hymn, if it doesn't complicate the
+whole thing too much.)</li>
+    <li>If you're planning an extra long service with more than 8 hymns, then
+you can click the "Add another hymn" link as many times as necessary to get all
+of your hymns entered. (You can also add hymns later, once the service has been
+saved.)</li>
+    <li>When satisfied, click the "Send" button at the bottom of the form.  If
+you click "Reset" instead, then the information in the form will return to its
+original state.</li>
+    </ol>
+
+    <p>Sometimes you want to add hymns, or create an additional service on the
+same day as one already in the system.  If you click the Add button in the
+heading line of a service on the Modify Services page, or if you create a new
+service using the same date as a service already in the system, the resulting
+form will automatically include a list of existing services on the right side,
+with some abbreviated information about each one.  If you want to add another, separate service on the same day, you can safely ignore that list of existing services.  However, if you want to add hymns to one of the existing services, then you can activate its checkbox.  The form will allow you to specify a location (in case your new hymns are for the same service somewhere else), but you won't be able to change the Liturgical Name, the Rite or Order, Service Notes, or Block Plan.  That's because those things are already saved in the service.  (If you want to change them, you can edit the service instead of entering new hymns.  See below.)</p>
+
+    <p>To edit an existing service, click the Edit button in the heading line
+fo the service you want to edit.  The resulting form will allow you to change
+any of the service information, including hymns.  It will include <em>all</em>
+hymns for that service, no matter what location is associated with them.  The
+form will also allow you to change the sequence of the hymns by changing the
+numbers in the Seq column.  The only significance of the numbers is that the
+hymns will be listed sequentially, from the lowest to highest numbers.  It
+doesn't really matter what numbers you use, where the range begins or ends, or
+whether there are gaps in the range.  Finally, you can also delete hymns from
+the service by activating their checkbox in the Del column.  Click the Commit
+button to enact all of the changes you wish to make.</p>
 
 </body>
 </html>
