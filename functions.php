@@ -602,27 +602,25 @@ function getLoginForm($bare=false) {
 
 function getUserActions($bare=false) {
     $authlevel = authLevel();
-    if ($bare) {
-        $rv = "";
-    } else {
-        $rv = '<div id="useractions">';
-    }
+    $actions = array();
     if ($authlevel) {
         if ($authlevel<3) {
-            $rv .= '<a href="useradmin.php?flag=changepw"
+            $actions[] = '<a href="useradmin.php?flag=changepw"
                 title="Update Password">Update Password</a>';
         } else {
-            $rv .= '<a href="useradmin.php"
+            $actions[] = '<a href="useradmin.php"
                 title="User Administration">User Administration</a>';
         }
+        $actions[] = '<a href="help.php" title="Help">Help</a>';
     } else {
-        $rv .= '<a href="resetpw.php"
+        $actions[] = '<a href="resetpw.php"
         title="Reset Password">Reset Password</a>';
     }
+    $stactions = implode(' | ', $actions);
     if ($bare) {
-        return $rv;
+        return $stactions;
     } else {
-        return $rv .= '</div>';
+        return '<div id="useractions">'.$stactions.'</div>';
     }
 }
 

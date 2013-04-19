@@ -1,13 +1,46 @@
+<? /* Interface for modifying services from the listing
+    Copyright (C) 2012 Jesse Jacobsen
+
+    This program is free software; you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation; either version 2 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program; if not, write to the Free Software
+    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+
+    Send feedback or donations to: Jesse Jacobsen <jmatjac@gmail.com>
+
+    Mailed donation may be sent to:
+    Bethany Lutheran Church
+    2323 E. 12th St.
+    The Dalles, OR 97058
+    USA
+ */
+require("./init.php");
+if (! $auth) {
+    setMessage("Access denied.  Please log in.");
+    header("location: index.php");
+    exit(0);
+} ?>
 <!DOCTYPE html>
 <html lang="en">
-<?
-require(".functions.php");
-html_head("Help");
-?>
+<?=html_head("Help")?>
 <body>
-    <h1>Contents</h1>
+<?pageHeader();
+  siteTabs($auth, "admin");?>
+    <div id="content-container">
+    <div class="maxcolumn">
+    <h1>Help Contents</h1>
+
+    <p>To return to the regular Housekeeping tab, just click on it.</p>
     <ul>
-    <li><a href="#tour">Introductory Tour</a></li>
     <li><a href="#anonymous_tabs">Anonymous Access Tabs</a> (Upcoming Hymns, Service Records, and Cross Ref)</li>
     <li><a href="#modify_services">Modify Services</a></li>
     <li><a href="#block_plans">Block Plans</a></li>
@@ -55,7 +88,7 @@ listing at some point, just ignore that link.</p>
     <h3><a name="anonymous_tabs">Anonymous Access Tabs</a></h3>
 
     <p>There are three tabs available to anonymous (not logged-in) users:
-"Upcoming Hymns," "Service Records," and "Cross Ref."  The first simply
+Upcoming Hymns, Service Records, and Cross Ref.  The first simply
 lists all hymns in their services from this day forward, in chronological
 order.  The very next service is at the top of the list.  "Service Records"
 is similar, but it shows <em>all</em> services that have been planned, with
@@ -394,6 +427,8 @@ bottom of the Housekeeping tab.</p>
 welcome too.  With those too, please be as descriptive as possible and include
 the version number of your Service Planner.</p>
 
+    </div>
+    </div>
 </body>
 </html>
 
