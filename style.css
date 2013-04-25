@@ -330,8 +330,8 @@ div.propersbox {
 }
 
 table#userlist {
-    margin-top: 90px;
-    background-color: #444;
+    margin: 1em;
+    background-color: #999;
     font-family: sans-serif;
 }
 
@@ -343,7 +343,7 @@ table#userlist td {
 table#userlist a,
 table#userlist a:visited,
 table#userlist a:link {
-    color: #88F;
+    color: #338;
     background-color: transparent;
 }
 

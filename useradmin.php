@@ -400,9 +400,11 @@ function userList() {
     <h1>User List</h1>
 
     <nav>
-        [ <a href="useradmin.php?flag=add">Add User</a> | <a href="index.php">Return to Services</a> ]
+        <a class="menulink" href="useradmin.php?flag=add">Add User</a> <a  class="menulink" href="index.php">Return to Services</a>
     </nav>
     </header>
+
+    <div id="content-container">
 
     <table id="userlist">
     <tr class="headings">
@@ -429,7 +431,10 @@ function userList() {
         </tr>
 <?
     }
-    ?> </table> <?
+    ?> </table>
+    </div>
+    </body>
+    </html><?
 }
 
 function passwordFormManagement($mode="") {

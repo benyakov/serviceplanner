@@ -199,7 +199,7 @@ $(document).ready(function(){var a="http://www.bethanythedalles.org/services-dev
     <h2>Config Settings</h2>
     <form id="configsettings" action="utility/savesettings.php" method="post">
     <dl>
-    <dt>Preferred Bible Abbreviation from <a href="http://biblegateway.com" title="BibleGateway.com">Bible Gateway</a></dt>
+    <dt>Preferred Bible Abbreviation from <a href="http://www.biblegateway.com/versions/" title="BibleGateway.com">Bible Gateway</a></dt>
     <dd><input type="text" id="biblegwversion" name="biblegwversion"
         value="<?=$config->get('biblegwversion')?>" placeholder="Unset">
     </dl>

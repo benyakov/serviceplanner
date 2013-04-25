@@ -67,7 +67,7 @@ try to keep it brief, at the risk of leaving out some important or
 advanced things.</p>
 
     <p>It will help to have a web browser window open to the service
-planner beside this introduction, so you can try things yourself as your
+planner beside this introduction, so you can try things yourself as you
 read.</p>
 
     <p>The pages of the service planner are arranged in a series of tabs
@@ -146,7 +146,7 @@ hymns (handy for organists!).</p>
     <p>The Block Plans tab allows you to create a block of services planned
 together, falling within a particular span of time.  The timespan of multiple
 blocks may overlap, so that you might have one block for Lent Sundays and
-another for Lend midweek services, and perhaps another for nonspecific services
+another for Lent midweek services, and perhaps another for nonspecific services
 throughout the year.  Each service can be associated with one block, or with no
 block at all.</p>
 
@@ -163,10 +163,10 @@ can always add blocks later.</p>
     <h4><a name="sermon_plans">Sermon Plans</a></h4>
 
     <p>The Sermon Plans tab is where you will find plans for sermons
-(shocking!), once you have created them.  The Service Planner is centered on
-the whole service, so in order to create a sermon plan, you will have to have a
-service already in the system for that particular day.  It need not have any
-hymns, but it must exist.  Then, on the <a href="#modify_services">Modify
+(shocking!), once you have created them.  The Service Planner is organized
+around the whole service, so in order to create a sermon plan, you will have to
+have a service already in the system for that particular day.  It need not have
+any hymns, but it must exist.  Then, on the <a href="#modify_services">Modify
 Services</a> page, where the service is listed, you can add a sermon by
 clicking the (... wait for it ...) Sermon link in the heading for that
 service.</p>
@@ -249,7 +249,8 @@ like.  This would be a good place to note deviations from the printed
 liturgical rite, or plan for extra things like choir pieces.</li>
     <li>After you have set up a block plan that spans the date of this service,
 that block plan will be available as a choice in the Block Plan drop-down
-control.  Choosing one is optional.  If you </li>
+control.  Choosing one is optional, but they are useful for displaying propers
+in the hymn listing that are associated with the block of services.</li>
     <li><a name="unknownhymns">If</a> you haven't saved many verified hymn
 titles, you may want to check
 the "Attempt to provide unknown titles..." box.  The cross-reference tab
@@ -340,7 +341,7 @@ will be lost.</p>
 
     <p>The backup file contains the date of the backup, but also the version of
 the service planner.  While it's under development, the database schema is
-subject to change.  The version contains three number separated by two periods.
+subject to change.  The version contains three numbers separated by two periods.
 Whenever the second number changes, the database schema has changed.  If you
 try to use a backup file from a Service Planner version older than the one you
 have installed, you're asking for trouble.  In fact, the system won't let you.
