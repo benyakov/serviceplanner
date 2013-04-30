@@ -91,7 +91,7 @@ if (array_key_exists('sort', $_GET)) {
     $sorted_on = "";
 }
 $q = $dbh->query("SELECT * FROM {$dbp}xref{$sort_by}") ;
-?>
+?><!DOCTYPE html>
 <html lang="en">
 <?=html_head("Hymn Cross Reference")?>
 <body>
