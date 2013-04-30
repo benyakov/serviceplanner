@@ -654,3 +654,10 @@ td > label {
 .highlight {
     border: thin solid yellow;
 }
+
+/* Jquery tweaks */
+
+.ui-widget {
+    font-size: inherit;
+}
+
