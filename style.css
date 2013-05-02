@@ -259,20 +259,25 @@ tr.table-topline td {
     display: none;
 }
 
+table.hymn-listing {
+    font-family: sans-serif;
+}
+
 th.hymn-number,
 td.hymn-number {
-    padding: 0 1em 0 1em;
-    text-align: right;
+    padding: 0 1em 0 .5em;
+    text-align: left;
 }
 
 th.note,
 td.note {
-    width: 8em;
     text-align: left;
+    padding: 0 .5em 0 .5em
 }
 
 td.title {
     font-style: italic;
+    padding-left: .5em;
 }
 
 td.controls {

@@ -40,18 +40,25 @@ if (! $auth) {
     <h1>Help Contents</h1>
 
     <p>To return to the regular Housekeeping tab, just click on it.</p>
-    <ul>
+    <h2>Introductory Tour</h2>
+    <ol>
     <li><a href="#anonymous_tabs">Anonymous Access Tabs</a> (Upcoming Hymns, Service Records, and Cross Ref)</li>
     <li><a href="#modify_services">Modify Services</a></li>
     <li><a href="#block_plans">Block Plans</a></li>
     <li><a href="#sermon_plans">Sermon Plans</a></li>
     <li><a href="#church_year">Church Year</a></li>
     <li><a href="#housekeeping">Housekeeping</a></li>
+    </ol>
+    <h2>Guides and Tips</h2>
+    <ul>
     <li><a href="#workflow_example">Workflow</a></li>
     <li><a href="#adding_hymns">Adding Hymns to a Service</a></li>
     <li><a href="#changing_service">Changing a Service</a></li>
     <li><a href="#last_use">When did I last use that hymn?</a></li>
     <li><a href="#backups">Data Storage and Backups</a></li>
+    </ul>
+    <h2>Advanced Features</h2>
+    <ul>
     <li><a href="#coinstallation">Populating Hymn Titles from a Co-installation</a></li>
     <li><a href="#mashups">Inserting a Service Listing into Another Web Page</a></li>
     <li><a href="#restoring_defaults">Restoring Defaults</a></li>
@@ -246,7 +253,9 @@ days or adjust their names on the <a href="#church_year">Church Year</a>
 tab.)</li>
     <li>Each service can have its own notes, which may contain anything you
 like.  This would be a good place to note deviations from the printed
-liturgical rite, or plan for extra things like choir pieces.</li>
+liturgical rite, plan for extra things like choir pieces, or include the name
+of the organist for that service.  If there are different organists for each
+location, they should all be specified here.</li>
     <li>After you have set up a block plan that spans the date of this service,
 that block plan will be available as a choice in the Block Plan drop-down
 control.  Choosing one is optional, but they are useful for displaying propers
@@ -269,6 +278,14 @@ you record which verses/stanzas you want to sing.  You could also include other
 information, like whether it's a communion distribution hymn.  (I may add a
 separate field for the use/role of each hymn, if it doesn't complicate the
 whole thing too much.)</li>
+    <li>If you wish to avoid confusing your organists and others by including
+an entry for <em>every</em> possible hymn location in your service, even when
+you don't wish to sing a hymn at that point, then a good practice is to use
+hymn number zero (0) for the liturgical hymn-points that you don't want to
+use.  You can make the hymn title something like "(Info)" and include as a note
+something like "Omit."  This is a suggested convention, so if you want to
+do something else, go right ahead.  For your convenience, hymns numbered zero
+will be listed without the hymn book and hymn number.</li>
     <li>If you're planning an extra long service with more than 8 hymns, then
 you can click the "Add another hymn" link as many times as necessary to get all
 of your hymns entered. (You can also add hymns later, once the service has been

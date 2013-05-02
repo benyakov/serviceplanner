@@ -156,7 +156,7 @@ cross-reference table.</label>
             <option><?=$hymnbook?></option>
         <? } ?>
         </select>
-        <input tabindex="<?=$tabindex+1?>" type="number" min="1" id="number_<?=$i?>" name="number_<?=$i?>" value="" class="edit-number" placeholder="<#>">
+        <input tabindex="<?=$tabindex+1?>" type="number" min="0" id="number_<?=$i?>" name="number_<?=$i?>" value="" class="edit-number" placeholder="<#>">
         <input tabindex="<?=$tabindex+2?>" type="text" id="note_<?=$i?>" name="note_<?=$i?>" class="edit-note" maxlength="100" value="" placeholder="<note>">
         <input tabindex="<?=$tabindex+3?>" type="text" id="title_<?=$i?>" name="title_<?=$i?>" class="edit-title hidden">
         <div id="past_<?=$i?>" class="hymn-past"></div>
@@ -226,7 +226,7 @@ function processFormData() {
         }
     }
     // Remove blank hymn entries
-    $hymns = array_filter($hymns, create_function('$s','return $s["number"];'));
+    $hymns = array_filter($hymns, create_function('$s','return ($s["number"] or $s["number"]==0);'));
     // Insert each hymn title
     foreach ($hymns as $h) {
         if (! $h['title']) { continue; }
@@ -263,21 +263,21 @@ function processFormData() {
         $q->bindParam(':serviceid', $serviceid);
         $q->execute() or dieWithRollback($q, ".");
         $sequenceMax = array_pop($q->fetch());
-        foreach ($hymns as $sequence => $ahymn)
-        {
-            if (! intval($ahymn['number'])) continue;
-            $realsequence = $sequence + $sequenceMax;
-            $sqlhymns[] = "({$dbh->quote($serviceid)},
-                {$dbh->quote($_POST['location'])},
-                {$dbh->quote($ahymn['book'])},
-                {$dbh->quote($ahymn['number'])},
-                {$dbh->quote($ahymn['note'])}, {$realsequence})";
-            $saved[] = "{$ahymn['book']} {$ahymn['number']}";
-        }
         $q = $dbh->prepare("INSERT INTO `{$dbp}hymns`
             (service, location, book, number, note, sequence)
-            VALUES ".implode(", ", $sqlhymns));
-        $q->execute() or dieWithRollback($q, $q->queryString);
+            VALUES (:service, :location, :book, :number, :note, :sequence)");
+        foreach ($hymns as $sequence => $ahymn) {
+            if (! is_numeric($ahymn['number'])) continue;
+            $realsequence = $sequence + $sequenceMax;
+            $q->bindValue(":service", $serviceid);
+            $q->bindValue(":location", $_POST['location']);
+            $q->bindValue(":book", $ahymn['book']);
+            $q->bindValue(":number", $ahymn['number']);
+            $q->bindValue(":note", $ahymn['note']);
+            $q->bindValue(":sequence", $realsequence);
+            $q->execute() or dieWithRollback($q, $q->queryString);
+            $saved[] = "{$ahymn['book']} {$ahymn['number']}";
+        }
         if ($q->rowCount()) {
             $feedback .="<li>Saved hymns: <ol><li>" . implode("</li><li>", $saved) . "</li></ol></li></ol>\n";
         }

@@ -108,7 +108,7 @@ if (! array_key_exists("stage", $_GET))
                     <? } ?>
                     </select>
                 </td>
-                <td><input class="edit-number" type="number"
+                <td><input class="edit-number" type="number" min="0"
                     id="number_<?=$row['hymnid']?>" size="5"
                     name="number_<?=$row['hymnid']?>" value="<?=$row['number']?>">
                 </td>

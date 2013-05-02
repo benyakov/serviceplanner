@@ -267,22 +267,49 @@ function queryAllHymns($dbh, $dbp="", $limit=0, $future=false, $id="") {
     return $q;
 }
 
+function listthesehymns(&$thesehymns, $rowcount) {
+    // Display the hymns in $thesehymns, if any.
+    $rows = 0;
+    if (! $thesehymns) return;
+    echo "<tr><td colspan=3>\n";
+    echo "<table class=\"hymn-listing\">";
+    foreach ($thesehymns as $ahymn) {
+        // Display this hymn
+        if (0 == ($rowcount+$rows) % 2) {
+            $oddness = " class=\"even\"";
+        } else {
+            $oddness = "";
+        }
+        echo "<tr{$oddness}>";
+        if (intval($ahymn['number'])) {
+            echo "<td class=\"hymn-number\">{$ahymn['book']} {$ahymn['number']}</td>";
+        } else echo "<td></td>";
+        echo "<td class=\"note\">{$ahymn['note']}</td><td class=\"title\">{$ahymn['title']}</td>";
+        $rows += 1;
+    }
+    echo "</table></td></tr>\n";
+    $thesehymns=array();
+    return $rows;
+}
+
 function display_records_table($q) {
     global $auth;
     // Show a table of the data in the query $result
     ?><table id="records-listing">
         <tr><th>Date &amp; Location</th><th colspan=2>Liturgical Day Name: Service/Rite</th></tr>
-        <tr><th class="hymn-number">Book &amp; #</th><th class="note">Note</th><th>Title</th></tr>
     <?
     $date = "";
     $name = "";
     $location = "";
     $rowcount = 1;
+    $thesehymns = array();
     while ($row = $q->fetch(PDO::FETCH_ASSOC)) {
         if (!  ($row['date'] == $date &&
                 $row['dayname'] == $name &&
                 $row['location'] == $location))
-        {// Display the heading line
+        {
+            $rowcount += listthesehymns($thesehymns, $rowcount);
+            // Display the heading line
             if (is_within_week($row['date'])) {
                 $datetext = "<a name=\"now\">{$row['date']}</a>";
             } else {
@@ -339,15 +366,8 @@ function display_records_table($q) {
             $name = $row['dayname'];
             $location = $row['location'];
         }
-        // Display this hymn
-        if (0 == $rowcount % 2) {
-            $oddness = " class=\"even\"";
-        } else {
-            $oddness = "";
-        }
-        echo "<tr{$oddness}><td class=\"hymn-number\">{$row['book']} {$row['number']}</td>
-            <td class=\"note\">{$row['note']}</td><td class=\"title\">{$row['title']}</td>";
-        $rowcount += 1;
+        // Collect hymns
+        $thesehymns[] = $row;
     }
     echo "</article>\n";
     echo "</table>\n";
@@ -362,16 +382,17 @@ function modify_records_table($q, $action) {
       </form>
       <table id="modify-listing">
         <tr><th>Date &amp; Location</th><th colspan=2>Liturgical Day Name: Service/Rite</th></tr>
-        <tr><th class="hymn-number">Book &amp; #</th><th class="note">Note</th><th>Title</th></tr>
     <?
     $date = "";
     $name = "";
     $location = "";
     $rowcount = 1;
+    $thesehymns = array();
     while ($row = $q->fetch(PDO::FETCH_ASSOC)) {
         if (!  ($row['date'] == $date &&
                 $row['dayname'] == $name &&
                 $row['location'] == $location)) {
+            $rowcount += listthesehymns($thesehymns, $rowcount);
             // Display the heading line
             if (is_within_week($row['date'])) {
                 $datetext = "<a name=\"now\">{$row['date']}</a>";
@@ -430,15 +451,8 @@ function modify_records_table($q, $action) {
             $name = $row['dayname'];
             $location = $row['location'];
         }
-        // Display this hymn
-        if (0 == $rowcount % 2) {
-            $oddness = " class=\"even\"";
-        } else {
-            $oddness = "";
-        }
-        echo "<tr{$oddness}><td class=\"hymn-number\">{$row['book']} {$row['number']}</td>
-            <td class=\"note\">{$row['note']}</td><td class=\"title\">{$row['title']}</td></tr>\n";
-        $rowcount += 1;
+        // Collect hymns
+        $thesehymns[] = $row;
     }
     echo "</article>\n";
     ?>
