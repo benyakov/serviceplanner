@@ -35,20 +35,22 @@ if ( $flag=="edit" ) {
     $q = $dbh->prepare("SELECT * FROM `{$dbp}users` WHERE `uid`=:id");
     $q->bindParam(":id", $id);
     $q->execute();
-    $row = $q->fetch();
+    $row = $q->fetch(PDO::FETCH_ASSOC);
     editUserForm($row, "Edit");
 } elseif ( $flag=="update" ) {
     adminOnly($authdata['userlevel']);
     $uname = $_POST['username'];
-    if ($_POST['pw'] == "No change") {
-        $pwstr = '';
-    } else {
+    $updatesession = false;
+    $pwstr = "";
+    if (array_key_exists("pw", $_POST) && $_POST['pw']) {
         $pwstr = "`password`=:pw,";
+        $newpw = $_POST['pw'];
     }
     $ulevel = $_POST['userlevel'];
-    $fname = $_POST['fname'];
-    $lname = $_POST['lname'];
+    $fname = htmlentities($_POST['fname']);
+    $lname = htmlentities($_POST['lname']);
     $email = $_POST['email'];
+    $uid = intval($_POST['uid']);
     $q = $dbh->prepare("UPDATE `{$dbp}users` SET {$pwstr}
         `fname`=:fname, `lname`=:lname, `userlevel`=:ulevel,
         `email`=:email WHERE `username`=:uname");
@@ -60,7 +62,23 @@ if ( $flag=="edit" ) {
     if ($pwstr) $q->bindParam(':pw', hashPassword($_POST['pw']));
     $q->execute();
     if ( $uname==$authdata['login'] ) {
-        $_SESSION[$sprefix]['authdata']['password'] = $pw;
+        if ($newpw) auth($uname, $newpw);
+        else {
+            $q = $dbh->prepare("SELECT password FROM `{$dbp}users`
+                WHERE `uid` = :uid");
+            $q->bindParam(':uid', $uid);
+            $q->execute();
+            if ($pwhash = $q->fetchColumn(0)) {
+                $_SESSION[$sprefix]["authdata"] = array_merge(
+                    $_SESSION[$sprefix]["authdata"],
+                    array(
+                        "fullname"=>"$fname $lname",
+                        "login"=>$uname,
+                        "password"=>$pwhash,
+                        "userlevel"=>$ulevel));
+                $auth = auth();
+            }
+        }
     }
     header("location:useradmin.php");
 } elseif ( $flag=="delete" ) {
@@ -84,8 +102,8 @@ if ( $flag=="edit" ) {
         exit(0);
     }
     $uname = $_POST['username'];
-    $fname = $_POST['fname'];
-    $lname = $_POST['lname'];
+    $fname = htmlentities($_POST['fname']);
+    $lname = htmlentities($_POST['lname']);
     $email = $_POST['email'];
     $dbh->beginTransaction();
     // Check for existing user name
@@ -259,7 +277,7 @@ function changePW($flag) {
     <table>
     <tr>
         <td></td>
-        <td><?=$username?></td>
+        <td><?=htmlentities($username)?></td>
     </tr>
     <? if ($flag=="changepw") { ?>
     <tr>
@@ -293,12 +311,13 @@ function editUserForm($elementValues="", $mode="Add",
     $unameerror = "", $emailerror = "") {
     global $authdata;
     if ($mode=="Edit") {
-        $username = $elementValues[1];
-        $password = ""; // $elementValues[2];
-        $fname = $elementValues[3];
-        $lname = $elementValues[4];
-        $userlevel = $elementValues[5];
-        $email = $elementValues[6];
+        $uid = $elementValues['uid'];
+        $username = $elementValues['username'];
+        $password = ""; // $elementValues['password'];
+        $fname = $elementValues['fname'];
+        $lname = $elementValues['lname'];
+        $userlevel = $elementValues['userlevel'];
+        $email = $elementValues['email'];
         $title = "Edit User";
 
         $userlevel_selected = array(
@@ -325,6 +344,7 @@ function editUserForm($elementValues="", $mode="Add",
     <table>
     <form id="userform" action="useradmin.php?flag=<?=$flag?>"
         method="post" autocomplete="off">
+    <input type="hidden" name="uid" value="<?=$uid?>">
     <tr>
         <td align="right"><label for="username">User name</label></td>
         <td><input type="text" maxlength="15" name="username"
@@ -422,9 +442,9 @@ function userList() {
         $userlevel = $row[5];
 ?>
         <tr>
-            <td><?=$row[1]?></td>
+            <td><?=htmlentities($row[1])?></td>
             <td><?=$row[3]?> <?=$row[4]?></td>
-            <td><?=$row[6]?></td>
+            <td><?=htmlentities($row[6])?></td>
             <td><?=$userlevel?></td>
             <td><a href="useradmin.php?flag=edit&id=<?=$row[0]?>">Edit</a></td>
             <td><a href="#" onClick="deleteConfirm('<?=$row[1]?>', '<?=$row[0]?>');">Delete</a></td>

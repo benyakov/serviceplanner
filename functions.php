@@ -46,7 +46,8 @@ function auth($login = '', $passwd = '') {
         }
 	} elseif (!empty($login)) {
 		$check = $login;
-        $q = $dbh->prepare("SELECT * FROM `{$dbp}users`
+        $q = $dbh->prepare("SELECT password, fname, lname,
+           login, uid, userlevel FROM `{$dbp}users`
             WHERE `username` = :check");
         $q->bindParam(':check', $check);
         $q->execute();
@@ -60,9 +61,8 @@ function auth($login = '', $passwd = '') {
                     "userlevel"=>$row["userlevel"]);
             return true;
         } else {
-            echo $row["password"]." != ".crypt($passwd, $row["password"]);
-            exit(0);
             unset( $_SESSION[$sprefix]['authdata'] );
+            setMessage("Passwords don't match.");
             return false;
         }
 	} else {
