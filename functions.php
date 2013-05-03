@@ -369,6 +369,7 @@ function display_records_table($q) {
         // Collect hymns
         $thesehymns[] = $row;
     }
+    if ($thesehymns) listthesehymns($thesehymns, $rowcount);
     echo "</article>\n";
     echo "</table>\n";
 }
@@ -454,8 +455,9 @@ function modify_records_table($q, $action) {
         // Collect hymns
         $thesehymns[] = $row;
     }
-    echo "</article>\n";
+    if ($thesehymns) listthesehymns($thesehymns, $rowcount);
     ?>
+    </article>
     </table>
     <button class="deletesubmit" form="delete-service" type="submit" value="Delete">Delete</button>
     <button form="delete-service" type="reset" value="Clear">Clear</button>
