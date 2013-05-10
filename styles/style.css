@@ -1,0 +1,6 @@
+@import 'default.css';
+@import 'print.css' print;
+@import 'smallscreen.css' handheld;
+@import 'smallscreen.css' screen and (max-width: 480px);
+
+

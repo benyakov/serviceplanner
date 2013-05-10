@@ -660,6 +660,10 @@ td > label {
     border: thin solid yellow;
 }
 
+tr.propers {
+    page-break-before: avoid;
+    page-break-inside: avoid;
+}
 /* Jquery tweaks */
 
 .ui-widget {
