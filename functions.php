@@ -484,9 +484,7 @@ function html_head($title) {
         $rv[] = "</style>";
     } else {
         $here = dirname($_SERVER['SCRIPT_NAME']);
-        $rv[] = "<link type=\"text/css\" rel=\"stylesheet\" href=\"{$here}/style.css\">";
-        $rv[] = "<link type=\"text/css\" rel=\"stylesheet\" media=\"print\" href=\"{$here}/print.css\">";
-        $rv[] = "<link type=\"text/css\" rel=\"stylesheet\" media=\"print\" href=\"{$here}/smallscreen.css\">";
+        $rv[] = "<link type=\"text/css\" rel=\"stylesheet\" href=\"{$here}/styles/style.css\">";
         $rv[] = "<script type=\"text/javascript\" src=\"jquery/jquery.js\"></script>";
         $rv[] = "<link href=\"jquery/jquery-ui.css\" rel=\"stylesheet\" type=\"text/css\"/>
         <script type=\"text/javascript\" src=\"modernizr/modernizr.js\"></script>
