@@ -367,6 +367,11 @@ function updateCSS() {
     localStorage.setItem("notefont", $("#notefont").val());
     localStorage.setItem("blockdisplay", $("#cssblockdisplay").is(':checked'));
     localStorage.setItem("propers", $("#csspropers").is(':checked'));
+    var locations = Array();
+    $(".cssadjusterloc").each(function() {
+        locations[$(this).attr('name')] = $(this).is(':checked');
+    });
+    localStorage.setItem("locations", locations);
     setCSSTweaks();
 }
 
@@ -385,6 +390,16 @@ function setCSSTweaks() {
         localStorage.getItem("propers") == "false")
         $(".propers").addClass("hidden");
     else $(".propers").removeClass("hidden");
+    if (localStorage.getItem("locations")) {
+        var locations = localStorage.getItem("locations");
+        for (var loc in locations) {
+            if (locations[loc]) {
+                $('tr[data-loc="'+loc+'"]').addClass("hidden");
+            } else {
+                $('tr[data-loc="'+loc+'"]').removeClass("hidden");
+            }
+        }
+    }
 }
 
 var zeropadding = "000000000000";

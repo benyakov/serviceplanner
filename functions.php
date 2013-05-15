@@ -267,11 +267,16 @@ function queryAllHymns($dbh, $dbp="", $limit=0, $future=false, $id="") {
     return $q;
 }
 
-function listthesehymns(&$thesehymns, $rowcount) {
+function listthesehymns(&$thesehymns, $rowcount, $location=false) {
     // Display the hymns in $thesehymns, if any.
     $rows = 0;
     if (! $thesehymns) return;
-    echo "<tr><td colspan=3>\n";
+    if ($location) {
+        $location = " data-loc=\"{$location}\"";
+    } else {
+        $location = "";
+    }
+    echo "<tr{$location}><td colspan=3>\n";
     echo "<table class=\"hymn-listing\">";
     foreach ($thesehymns as $ahymn) {
         // Display this hymn
@@ -308,14 +313,14 @@ function display_records_table($q) {
                 $row['dayname'] == $name &&
                 $row['location'] == $location))
         {
-            $rowcount += listthesehymns($thesehymns, $rowcount);
+            $rowcount += listthesehymns($thesehymns, $rowcount, $row['location']);
             // Display the heading line
             if (is_within_week($row['date'])) {
                 $datetext = "<a name=\"now\">{$row['date']}</a>";
             } else {
                 $datetext = $row['date'];
             }
-            echo "<tr class=\"heading\"><td class=\"heavy\">{$datetext} {$row['location']}</td>
+            echo "<tr data-loc=\"{$row['location']}\" class=\"heading\"><td class=\"heavy\">{$datetext} {$row['location']}</td>
                 <td colspan=2><a name=\"service_{$row['serviceid']}\">{$row['dayname']}</a>: {$row['rite']}".
             ($auth?
             "<a class=\"menulink\" href=\"sermon.php?id={$row['id']}\">Sermon</a>
@@ -324,10 +329,10 @@ function display_records_table($q) {
             :"").
                 " <a class=\"menulink\" href=\"print.php?id={$row['id']}\" ".
                 "title=\"print\">Print</a></td></tr>\n";
-            echo "<tr class=\"heading propers\"><td class=\"heavy smaller\">{$row['theme']}</td>";
+            echo "<tr data-loc=\"{$row['location']}\" class=\"heading propers\"><td class=\"heavy smaller\">{$row['theme']}</td>";
             echo "<td colspan=2>{$row['color']}</td></tr>";
             if ($row['introit'] || $row['gradual']) {
-                echo "<tr class=\"heading propers\"><td colspan=3>";
+                echo "<tr data-loc=\"{$row['location']}\" class=\"heading propers\"><td colspan=3>";
                 if ($row['introit'])
                     echo "<p class=\"sbspar maxcolumn smaller\">{$row['introit']}</p>";
                 if ($row['gradual'])
@@ -335,13 +340,13 @@ function display_records_table($q) {
                 echo "</td></tr>";
             }
             if ($row['propersnote']) {
-                echo "<tr class=\"heading propers\"><td colspan=3>
+                echo "<tr data-loc=\"{$row['location']}\" class=\"heading propers\"><td colspan=3>
                     <p class=\"maxcolumn\">".
                     translate_markup($row['propersnote'])."</p></td></tr>";
             }
             if ($row['block'])
             { ?>
-                <tr><td colspan=3 class="blockdisplay">
+                <tr data-loc="<?=$row['location']?>"><td colspan=3 class="blockdisplay">
                     <h4>Block: <?=$row['blabel']?></h4>
                     <div class="blocknotes maxcolumn">
                         <?=translate_markup($row['bnotes'])?>
@@ -359,7 +364,7 @@ function display_records_table($q) {
                 </tr>
             <? }
             if ($row['servicenotes']) {
-                echo "<tr><td colspan=3 class=\"servicenote\">".
+                echo "<tr data-loc=\"{$row['location']}\"><td colspan=3 class=\"servicenote\">".
                      translate_markup($row['servicenotes'])."</td></tr>\n";
             }
             $date = $row['date'];
@@ -369,7 +374,7 @@ function display_records_table($q) {
         // Collect hymns
         $thesehymns[] = $row;
     }
-    if ($thesehymns) listthesehymns($thesehymns, $rowcount);
+    if ($thesehymns) listthesehymns($thesehymns, $rowcount, $row['location']);
     echo "</article>\n";
     echo "</table>\n";
 }
@@ -656,12 +661,29 @@ function getCSSAdjuster() {
         <td><input name="cssblockdisplay" id="cssblockdisplay" type="checkbox"></td></tr>
         <tr><td><label for="csspropers">Show propers?</label></td>
         <td><input name="csspropers" id="csspropers" type="checkbox"></td></tr>
+        <tr id="adjusterlocationchooser" style="display: none;">
+        <td><label for="locations">Show locations:</label></td>
+        <td><ul id="adjusterlocations"></ul></td></tr>
         <tr><td><button type="button" id="cssapply">Apply</button></td>
         <td><button type="button" id="cssreset">Reset to Default</button></td>
         </table>
     </div>
     </form>
     <script type="text/javascript">
+        $(document).ready(function() {
+            var loc = {};
+            $("tr[data-loc]").each(function() {
+                loc[$(this).attr("data-loc")] = 1;
+            });
+            locations = Object.keys(loc);
+            for (index in locations) {
+                var loc = locations[index];
+                $("#adjusterlocations").append('<li>'+
+                    '<input name="'+loc+'" class="cssadjusterloc" type="checkbox" value="checked"></li>'+
+                    ' <label for="'+loc+'">'+loc+'</label>');
+            }
+            $("#adjusterlocationchooser").show();
+        });
         // Initialize vars
         var basefont = 0;
         var hymnfont = 0;
