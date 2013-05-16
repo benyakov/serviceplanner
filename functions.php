@@ -673,7 +673,10 @@ function getCSSAdjuster() {
             var locations = $("tr[data-loc]").map(function() {
                 return $(this).attr("data-loc");
             });
-            // *** Fixme: Remove duplicates from locations ***
+            var locobj = {};
+            for (i=1;i<locations.length;i++) locobj[l=locations[i]] = 1;
+            locations = Array();
+            for (l in locobj) locations.push(l);
             var stored = false;
             if (typeof(Storage) !== "undefined")
                 stored = localStorage.getItem("locations");
