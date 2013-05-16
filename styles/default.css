@@ -670,3 +670,8 @@ tr.propers {
     font-size: inherit;
 }
 
+ul#adjusterlocations {
+    list-style-type: none;
+    padding: 0px;
+    margin: 0px;
+}

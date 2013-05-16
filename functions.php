@@ -313,6 +313,7 @@ function display_records_table($q) {
                 $row['dayname'] == $name &&
                 $row['location'] == $location))
         {
+            // Fixme: Don't use new location with old hymns!!
             $rowcount += listthesehymns($thesehymns, $rowcount, $row['location']);
             // Display the heading line
             if (is_within_week($row['date'])) {
@@ -669,16 +670,22 @@ function getCSSAdjuster() {
     </form>
     <script type="text/javascript">
         $(document).ready(function() {
-            var loc = {};
-            $("tr[data-loc]").each(function() {
-                loc[$(this).attr("data-loc")] = 1;
+            var locations = $("tr[data-loc]").map(function() {
+                return $(this).attr("data-loc");
             });
-            locations = Object.keys(loc);
+            // *** Fixme: Remove duplicates from locations ***
+            var stored = false;
+            if (typeof(Storage) !== "undefined")
+                stored = localStorage.getItem("locations");
             for (index in locations) {
                 var loc = locations[index];
+                var init = " checked";
+                if (stored && (! stored[loc])) {
+                    init = '';
+                }
                 $("#adjusterlocations").append('<li>'+
-                    '<input name="'+loc+'" class="cssadjusterloc" type="checkbox" value="checked"></li>'+
-                    ' <label for="'+loc+'">'+loc+'</label>');
+                    '<input name="'+loc+'" class="cssadjusterloc" type="checkbox" '+init+'>'+
+                    ' <label for="'+loc+'">'+loc+'</label></li>');
             }
             $("#adjusterlocationchooser").show();
         });

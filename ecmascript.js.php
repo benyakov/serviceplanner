@@ -367,11 +367,14 @@ function updateCSS() {
     localStorage.setItem("notefont", $("#notefont").val());
     localStorage.setItem("blockdisplay", $("#cssblockdisplay").is(':checked'));
     localStorage.setItem("propers", $("#csspropers").is(':checked'));
-    var locations = Array();
-    $(".cssadjusterloc").each(function() {
-        locations[$(this).attr('name')] = $(this).is(':checked');
-    });
-    localStorage.setItem("locations", locations);
+    var locboxes = $(".cssadjusterloc").get();
+    var locarray = new Object();
+    for (domitem in locboxes) {
+        var name = $(locboxes[domitem]).attr('name');
+        var checked = $(locboxes[domitem]).is(':checked');
+        locarray[name] = checked;
+    }
+    localStorage.setItem("locations", JSON.stringify(locarray));
     setCSSTweaks();
 }
 
@@ -391,12 +394,12 @@ function setCSSTweaks() {
         $(".propers").addClass("hidden");
     else $(".propers").removeClass("hidden");
     if (localStorage.getItem("locations")) {
-        var locations = localStorage.getItem("locations");
-        for (var loc in locations) {
+        var locations = $.parseJSON(localStorage.getItem("locations"));
+        for (loc in locations) {
             if (locations[loc]) {
-                $('tr[data-loc="'+loc+'"]').addClass("hidden");
-            } else {
                 $('tr[data-loc="'+loc+'"]').removeClass("hidden");
+            } else {
+                $('tr[data-loc="'+loc+'"]').addClass("hidden");
             }
         }
     }
