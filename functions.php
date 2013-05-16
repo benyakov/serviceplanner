@@ -308,13 +308,13 @@ function display_records_table($q) {
     $location = "";
     $rowcount = 1;
     $thesehymns = array();
+    $hymnlocation = "";
     while ($row = $q->fetch(PDO::FETCH_ASSOC)) {
         if (!  ($row['date'] == $date &&
                 $row['dayname'] == $name &&
                 $row['location'] == $location))
         {
-            // Fixme: Don't use new location with old hymns!!
-            $rowcount += listthesehymns($thesehymns, $rowcount, $row['location']);
+            $rowcount += listthesehymns($thesehymns, $rowcount, $hymnlocation);
             // Display the heading line
             if (is_within_week($row['date'])) {
                 $datetext = "<a name=\"now\">{$row['date']}</a>";
@@ -374,8 +374,9 @@ function display_records_table($q) {
         }
         // Collect hymns
         $thesehymns[] = $row;
+        $hymnlocation = $row['location'];
     }
-    if ($thesehymns) listthesehymns($thesehymns, $rowcount, $row['location']);
+    if ($thesehymns) listthesehymns($thesehymns, $rowcount, $hymnlocation);
     echo "</article>\n";
     echo "</table>\n";
 }
