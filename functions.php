@@ -564,9 +564,9 @@ function translate_markup($text) {
 function is_within_week($dbdate) {
     // True if the given date is within a week *after* today.
     $db = strtotime($dbdate);
-    $now = getdate(time());
+    $now = getdate();
     $weekahead = mktime(0,0,0,$now['mon'],$now['mday']+8,$now['year']);
-    if ($db <= $weekahead) return True; else return False;
+    if ($db <= $weekahead && $db >= time()) return True; else return False;
 }
 
 function get_style($filename) {
