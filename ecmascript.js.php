@@ -354,11 +354,17 @@ function dateValToSQL(dateval) {
 }
 
 function openStyler() {
-    $("#stylerdialog").dialog({title: "Style Adjuster",
-        width: $(window).width()*0.4,
-        maxHeight: $(window).height()*0.7,
-        position: "right"
-    });
+    if ($(this).attr('data-state') == "open") {
+        $("#stylerdialog").dialog("close");
+        $(this).attr('data-state', "closed");
+    } else {
+        $(this).attr('data-state', "open");
+        $("#stylerdialog").dialog({title: "Style Adjuster",
+            width: $(window).width()*0.4,
+            maxHeight: $(window).height()*0.9,
+            position: "right"
+        });
+    }
 }
 
 function updateCSS() {
@@ -368,7 +374,9 @@ function updateCSS() {
     localStorage.setItem("blockdisplay", $("#cssblockdisplay").is(':checked'));
     localStorage.setItem("propers", $("#csspropers").is(':checked'));
     var locboxes = $(".cssadjusterloc").get();
-    var locarray = new Object();
+    if (localStorage.getItem('locations'))
+        var locarray = $.parseJSON(localStorage.getItem('locations'));
+    else var locarray = new Object();
     for (domitem in locboxes) {
         var name = $(locboxes[domitem]).attr('name');
         var checked = $(locboxes[domitem]).is(':checked');
@@ -397,9 +405,9 @@ function setCSSTweaks() {
         var locations = $.parseJSON(localStorage.getItem("locations"));
         for (loc in locations) {
             if (locations[loc]) {
-                $('tr[data-loc="'+loc+'"]').removeClass("hidden");
+                $('tr[data-loc="'+loc+'"]').show();
             } else {
-                $('tr[data-loc="'+loc+'"]').addClass("hidden");
+                $('tr[data-loc="'+loc+'"]').hide();
             }
         }
     }
