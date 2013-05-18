@@ -33,11 +33,11 @@ function auth($login = '', $passwd = '') {
             WHERE `username` = :login AND `password` = :password
             AND `uid` = :uid AND `userlevel` = :userlevel
             AND CONCAT_WS(' ', `fname`, `lname`) = :fullname");
-        $q->bindParam(':login', $authdata["login"]);
-        $q->bindParam(':password', $authdata["password"]);
-        $q->bindParam(':uid', $authdata["uid"]);
-        $q->bindParam(':userlevel', $authdata["userlevel"]);
-        $q->bindParam(':fullname', $authdata["fullname"]);
+        $q->bindValue(':login', $authdata["login"]);
+        $q->bindValue(':password', $authdata["password"]);
+        $q->bindValue(':uid', $authdata["uid"]);
+        $q->bindValue(':userlevel', $authdata["userlevel"]);
+        $q->bindValue(':fullname', $authdata["fullname"]);
         $q->execute();
         if ($q->fetch()) {
             return true;
@@ -47,10 +47,10 @@ function auth($login = '', $passwd = '') {
 	} elseif (!empty($login)) {
 		$check = $login;
         $q = $dbh->prepare("SELECT password, fname, lname,
-           login, uid, userlevel FROM `{$dbp}users`
+           username, uid, userlevel FROM `{$dbp}users`
             WHERE `username` = :check");
-        $q->bindParam(':check', $check);
-        $q->execute();
+        $q->bindValue(':check', $check);
+        if (! $q->execute()) die(array_pop($q->errorInfo()));
         $row = $q->fetch(PDO::FETCH_ASSOC);
         if ( $row["password"] == crypt($passwd, $row["password"]) ) {
                 $_SESSION[$sprefix]["authdata"] = array(

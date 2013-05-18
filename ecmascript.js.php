@@ -211,7 +211,7 @@ function setupLogin(authactions) {
     // Set up the login form or logout link
     $("#useractions").html(authactions['actions']);
     $("#login").html(authactions['loginform']);
-    $("#loginform").submit(function(evt) {
+    $("#loginform").off('click').submit(function(evt) {
         evt.preventDefault();
         submitLogin();
     });
