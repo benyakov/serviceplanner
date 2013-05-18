@@ -327,11 +327,13 @@ function editUserForm($elementValues="", $mode="Add",
             3 => ($userlevel == 3) ? "selected" : "");
         if ($username == $authdata['login']) { $editorstr=$userstr = ""; }
         $flag = "update";
+        $rdonly = " readonly ";
     } else {
         $username=$password=$fname=$lname=$userlevel=$email="";
         $userlevel_selected = array(0 => "", 1 => "", 2 => "", 3 => "");
         $title = "Register User";
         $flag = "insert";
+        $rdonly = "";
     }
 ?>
     <!DOCTYPE html>
@@ -348,7 +350,7 @@ function editUserForm($elementValues="", $mode="Add",
     <tr>
         <td align="right"><label for="username">User name</label></td>
         <td><input type="text" maxlength="15" name="username"
-            value="<?=$username?>" required></td>
+            value="<?=$username?>" required <?=$rdonly?>></td>
     </tr>
     <tr>
         <td align="right"><label for="pw">Password</label></td>
