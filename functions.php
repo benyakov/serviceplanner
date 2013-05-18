@@ -267,11 +267,16 @@ function queryAllHymns($dbh, $dbp="", $limit=0, $future=false, $id="") {
     return $q;
 }
 
-function listthesehymns(&$thesehymns, $rowcount) {
+function listthesehymns(&$thesehymns, $rowcount, $location=false) {
     // Display the hymns in $thesehymns, if any.
     $rows = 0;
     if (! $thesehymns) return;
-    echo "<tr><td colspan=3>\n";
+    if ($location) {
+        $location = " data-loc=\"{$location}\"";
+    } else {
+        $location = "";
+    }
+    echo "<tr{$location}><td colspan=3>\n";
     echo "<table class=\"hymn-listing\">";
     foreach ($thesehymns as $ahymn) {
         // Display this hymn
@@ -303,19 +308,20 @@ function display_records_table($q) {
     $location = "";
     $rowcount = 1;
     $thesehymns = array();
+    $hymnlocation = "";
     while ($row = $q->fetch(PDO::FETCH_ASSOC)) {
         if (!  ($row['date'] == $date &&
                 $row['dayname'] == $name &&
                 $row['location'] == $location))
         {
-            $rowcount += listthesehymns($thesehymns, $rowcount);
+            $rowcount += listthesehymns($thesehymns, $rowcount, $hymnlocation);
             // Display the heading line
             if (is_within_week($row['date'])) {
                 $datetext = "<a name=\"now\">{$row['date']}</a>";
             } else {
                 $datetext = $row['date'];
             }
-            echo "<tr class=\"heading\"><td class=\"heavy\">{$datetext} {$row['location']}</td>
+            echo "<tr data-loc=\"{$row['location']}\" class=\"heading\"><td class=\"heavy\">{$datetext} {$row['location']}</td>
                 <td colspan=2><a name=\"service_{$row['serviceid']}\">{$row['dayname']}</a>: {$row['rite']}".
             ($auth?
             "<a class=\"menulink\" href=\"sermon.php?id={$row['id']}\">Sermon</a>
@@ -324,7 +330,8 @@ function display_records_table($q) {
             :"").
                 " <a class=\"menulink\" href=\"print.php?id={$row['id']}\" ".
                 "title=\"print\">Print</a></td></tr>\n";
-            echo "<tr class=\"heading propers\"><td class=\"heavy smaller\">{$row['theme']}</td>";
+            echo "<tr data-loc=\"{$row['location']}\" class=\"heading\"><td class=\"propers\" colspan=3>\n";
+            echo "<table><tr><td class=\"heavy smaller\">{$row['theme']}</td>";
             echo "<td colspan=2>{$row['color']}</td></tr>";
             if ($row['introit'] || $row['gradual']) {
                 echo "<tr class=\"heading propers\"><td colspan=3>";
@@ -339,9 +346,10 @@ function display_records_table($q) {
                     <p class=\"maxcolumn\">".
                     translate_markup($row['propersnote'])."</p></td></tr>";
             }
+            echo "\n</table></td></tr>\n";
             if ($row['block'])
             { ?>
-                <tr><td colspan=3 class="blockdisplay">
+                <tr data-loc="<?=$row['location']?>"><td colspan=3 class="blockdisplay">
                     <h4>Block: <?=$row['blabel']?></h4>
                     <div class="blocknotes maxcolumn">
                         <?=translate_markup($row['bnotes'])?>
@@ -359,7 +367,7 @@ function display_records_table($q) {
                 </tr>
             <? }
             if ($row['servicenotes']) {
-                echo "<tr><td colspan=3 class=\"servicenote\">".
+                echo "<tr data-loc=\"{$row['location']}\"><td colspan=3 class=\"servicenote\">".
                      translate_markup($row['servicenotes'])."</td></tr>\n";
             }
             $date = $row['date'];
@@ -368,7 +376,9 @@ function display_records_table($q) {
         }
         // Collect hymns
         $thesehymns[] = $row;
+        $hymnlocation = $row['location'];
     }
+    if ($thesehymns) listthesehymns($thesehymns, $rowcount, $hymnlocation);
     echo "</article>\n";
     echo "</table>\n";
 }
@@ -388,11 +398,12 @@ function modify_records_table($q, $action) {
     $location = "";
     $rowcount = 1;
     $thesehymns = array();
+    $hymnlocation = "";
     while ($row = $q->fetch(PDO::FETCH_ASSOC)) {
         if (!  ($row['date'] == $date &&
                 $row['dayname'] == $name &&
                 $row['location'] == $location)) {
-            $rowcount += listthesehymns($thesehymns, $rowcount);
+            $rowcount += listthesehymns($thesehymns, $rowcount, $hymnlocation);
             // Display the heading line
             if (is_within_week($row['date'])) {
                 $datetext = "<a name=\"now\">{$row['date']}</a>";
@@ -400,7 +411,7 @@ function modify_records_table($q, $action) {
                 $datetext = $row['date'];
             }
             $urldate=urlencode($row['date']);
-            echo "<tr class=\"heading\"><td>
+            echo "<tr data-loc=\"{$row['location']}\" class=\"heading\"><td>
             <input form=\"delete-service\" type=\"checkbox\" name=\"{$row['id']}_{$row['location']}\" id=\"check_{$row['id']}_{$row['location']}\">
             <span class=\"heavy\">{$datetext}</span>
             <a class=\"menulink\" href=\"enter.php?date={$urldate}\" title=\"Add another service or hymns on {$row['date']}.\">Add</a>
@@ -409,10 +420,11 @@ function modify_records_table($q, $action) {
             <a class=\"menulink\" href=\"sermon.php?id={$row['id']}\">Sermon</a>
             <a class=\"menulink\" href=\"print.php?id={$row['id']}\" title=\"print\">Print</a>
             <a name=\"service_{$row['serviceid']}\">{$row['dayname']}</a>: {$row['rite']}</td></tr>\n";
-            echo "<tr class=\"heading propers\"><td class=\"heavy smaller\">{$row['theme']}</td>";
+            echo "<tr data-loc=\"{$row['location']}\" class=\"heading\"><td colspan=3 class=\"propers\">\n";
+            echo "<table><tr><td class=\"heavy smaller\">{$row['theme']}</td>";
             echo "<td colspan=2>{$row['color']}</td></tr>";
             if ($row['introit'] || $row['gradual']) {
-                echo "<tr class=\"heading propers\"><td colspan=3>";
+                echo "<tr><td colspan=3>";
                 if ($row['introit'])
                     echo "<p class=\"sbspar maxcolumn smaller\">{$row['introit']}</p>";
                 if ($row['gradual'])
@@ -420,13 +432,14 @@ function modify_records_table($q, $action) {
                 echo "</td></tr>";
             }
             if ($row['propersnote']) {
-                echo "<tr class=\"heading propers\"><td colspan=3>
+                echo "<tr><td colspan=3>
                     <p class=\"maxcolumn\">".
                     translate_markup($row['propersnote'])."</p></td></tr>";
             }
+            echo "\n</tr></table></td>\n";
             if ($row['block'])
             { ?>
-                <tr><td colspan=3 class="blockdisplay">
+                <tr data-loc="<?=$row['location']?>"><td colspan=3 class="blockdisplay">
                     <h4>Block: <?=$row['blabel']?></h4>
                     <div class="blocknotes">
                         <?=translate_markup($row['bnotes'])?>
@@ -444,7 +457,7 @@ function modify_records_table($q, $action) {
                 </tr>
             <? }
             if ($row['servicenotes']) {
-                echo "<tr><td colspan=3 class=\"servicenote\">".
+                echo "<tr data-loc=\"{$row['location']}\"><td colspan=3 class=\"servicenote\">".
                      translate_markup($row['servicenotes'])."</td></tr>\n";
             }
             $date = $row['date'];
@@ -453,9 +466,11 @@ function modify_records_table($q, $action) {
         }
         // Collect hymns
         $thesehymns[] = $row;
+        $hymnlocation = $row['location'];
     }
-    echo "</article>\n";
+    if ($thesehymns) listthesehymns($thesehymns, $rowcount, $hymnlocation);
     ?>
+    </article>
     </table>
     <button class="deletesubmit" form="delete-service" type="submit" value="Delete">Delete</button>
     <button form="delete-service" type="reset" value="Clear">Clear</button>
@@ -477,8 +492,7 @@ function html_head($title) {
         $rv[] = "</style>";
     } else {
         $here = dirname($_SERVER['SCRIPT_NAME']);
-        $rv[] = "<link type=\"text/css\" rel=\"stylesheet\" href=\"{$here}/style.css\">";
-        $rv[] = "<link type=\"text/css\" rel=\"stylesheet\" media=\"print\" href=\"{$here}/print.css\">";
+        $rv[] = "<link type=\"text/css\" rel=\"stylesheet\" href=\"{$here}/styles/style.css\">";
         $rv[] = "<script type=\"text/javascript\" src=\"jquery/jquery.js\"></script>";
         $rv[] = "<link href=\"jquery/jquery-ui.css\" rel=\"stylesheet\" type=\"text/css\"/>
         <script type=\"text/javascript\" src=\"modernizr/modernizr.js\"></script>
@@ -550,9 +564,9 @@ function translate_markup($text) {
 function is_within_week($dbdate) {
     // True if the given date is within a week *after* today.
     $db = strtotime($dbdate);
-    $now = getdate(time());
+    $now = getdate();
     $weekahead = mktime(0,0,0,$now['mon'],$now['mday']+8,$now['year']);
-    if ($db <= $weekahead) return True; else return False;
+    if ($db <= $weekahead && $db >= time()) return True; else return False;
 }
 
 function get_style($filename) {
@@ -653,12 +667,39 @@ function getCSSAdjuster() {
         <td><input name="cssblockdisplay" id="cssblockdisplay" type="checkbox"></td></tr>
         <tr><td><label for="csspropers">Show propers?</label></td>
         <td><input name="csspropers" id="csspropers" type="checkbox"></td></tr>
-        <tr><td><button type="button" id="cssapply">Apply</button></td>
+        <tr id="adjusterlocationchooser" style="display: none;">
+        <td><label for="locations">Show locations:</label></td>
+        <td><ul id="adjusterlocations"></ul></td></tr>
+        <tr><td></td>
         <td><button type="button" id="cssreset">Reset to Default</button></td>
         </table>
     </div>
     </form>
     <script type="text/javascript">
+        $(document).ready(function() {
+            var locations = $("tr[data-loc]").map(function() {
+                return $(this).attr("data-loc");
+            });
+            var locobj = {};
+            for (i=1;i<locations.length;i++) locobj[l=locations[i]] = 1;
+            locations = Array();
+            for (l in locobj) locations.push(l);
+            var stored = false;
+            if (typeof(Storage) !== "undefined")
+                stored = $.parseJSON(localStorage.getItem("locations"));
+            for (index in locations) {
+                var loc = locations[index];
+                var init = " checked";
+                if (stored && (! stored[loc])) {
+                    init = '';
+                }
+                $("#adjusterlocations").append('<li>'+
+                    '<input name="'+loc+'" class="cssadjusterloc" type="checkbox" '+init+'>'+
+                    ' <label for="'+loc+'">'+loc+'</label></li>');
+            }
+            $("#adjusterlocationchooser").show();
+            $(".cssadjusterloc").change(updateCSS);
+        });
         // Initialize vars
         var basefont = 0;
         var hymnfont = 0;
@@ -680,18 +721,18 @@ function getCSSAdjuster() {
         if ((blockdisplay == 0) || (blockdisplay == null)) blockdisplay = true;
         if ((propers == 0) || (propers == null)) propers = true;
         // Populate form
-        $("#basefont").val(basefont);
-        $("#hymnfont").val(hymnfont);
-        $("#notefont").val(notefont);
-        $("#cssblockdisplay").prop('checked', blockdisplay);
-        $("#csspropers").prop('checked', propers);
-        $("#cssapply").click(updateCSS);
+        $("#basefont").val(basefont).change(updateCSS);
+        $("#hymnfont").val(hymnfont).change(updateCSS);
+        $("#notefont").val(notefont).change(updateCSS);
+        $("#cssblockdisplay").prop('checked', blockdisplay).change(updateCSS);
+        $("#csspropers").prop('checked', propers).change(updateCSS);
         $("#cssreset").click(function() {
             localStorage.removeItem("basefont");
             localStorage.removeItem("hymnfont");
             localStorage.removeItem("notefont");
             localStorage.removeItem("blockdisplay");
             localStorage.removeItem("propers");
+            localStorage.removeItem("locations");
             location.reload();
         });
     </script>

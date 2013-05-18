@@ -1,0 +1,205 @@
+/* Small screen styles
+    Copyright (C) 2012 Jesse Jacobsen
+
+    This program is free software; you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation; either version 2 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program; if not, write to the Free Software
+    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+
+    Send feedback or donations to: Jesse Jacobsen <jmatjac@gmail.com>
+
+    Mailed donation may be sent to:
+    Bethany Lutheran Church
+    2323 E. 12th St.
+    The Dalles, OR 97058
+    USA
+*/
+
+body {
+    padding-top: 0;
+    background-color: black;
+    color: white;
+    font-size: 25px;
+}
+
+#pageheader {
+    font-size: 90%;
+}
+
+p.hymnlist {
+    font-size: 100%;
+}
+#message {
+    right: 2px;
+    top: .25in;
+    width: 15em;
+    padding: 1ex;
+    margin-top: 1ex;
+}
+.explanation {
+    width: 15em;
+    font-size: 75%;
+    padding: 1ex;
+}
+
+textarea#outline,
+textarea#notes,
+textarea#servicenotes{
+    height: 8em;
+    width: 90%;
+    margin: 1ex;
+}
+textarea#synonyms{
+    width: 90%;
+}
+div.servicenote {
+    font-size: 80%;
+}
+
+input.edit-note {
+    width: 10em;
+}
+input.edit-title {
+    width: 15em;
+}
+input.edit-location {
+    width: 10em;
+}
+div.hymn-past {
+    width: 100%;
+    font-size: 75%;
+}
+
+div#content-container {
+    top: 37pt;
+    padding: 3px;
+}
+
+table#churchyear-listing th {
+    font-size: 80%;
+}
+
+table#churchyear-listing td {
+    text-align: center;
+}
+table#churchyear-listing td.dayname {
+    padding: 0 .25em 0 .25em;
+    text-align: left;
+    font-weight: bold;
+    width: 15em;
+}
+
+#listinglimit {
+    width:4em;
+}
+
+#prefix,
+#backup_file {
+    width: 15em;
+}
+
+.table-leftborder {
+    border-left: 1px solid #88B;
+}
+.table-preformat {
+    padding: 1ex;
+}
+
+td.controls {
+    font: bold 50% sans-serif;
+}
+#dialog {
+    font-size: 85%;
+}
+#stylerdialog input {
+    width: 3em;
+}
+
+/**** site tabs ****/
+
+ul#sitetabs {
+    font-size: 80%;
+    margin: 0 2pt;
+    border-bottom: 1px solid #888;
+}
+ul#sitetabs a {
+    border: 1px solid #888;
+}
+ul#sitetabs > li {
+    display: inline;
+    margin: 0 2pt;
+}
+ul#sitetabs > li.activated a  {
+    border-bottom: 1px solid white;
+}
+div#sitetabs-background {
+    padding-top: 1ex;
+    top: 24pt;
+    height: 12pt;
+}
+div.quicklinks a,
+a.menulink {
+    font-size: 75%;
+    padding: .5ex .5em;
+    border: 1px solid #811;
+}
+
+form#corsform #contents {
+    width: 25em;
+    height: 5em;
+}
+
+section#existing-services {
+    width: 25%;
+}
+input#location,
+input#liturgicalname,
+input#rite {
+    width: 15em;
+}
+
+
+form#block-plan-form #label {
+    width: 25em;
+}
+
+.blocknotes {
+    font-size: 70%;
+}
+
+
+.smaller {
+    font-size: 70%;
+}
+
+.maxcolumn {
+    width: 15em;
+}
+
+.halfcolumn {
+    width: 15em;
+}
+
+.collecttext {
+    font-size: 70%;
+}
+
+.introittext {
+    font-size: 70%;
+}
+
+/* Jquery tweaks */
+
+.ui-widget {
+    font-size: inherit;
+}
+

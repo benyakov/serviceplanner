@@ -354,11 +354,17 @@ function dateValToSQL(dateval) {
 }
 
 function openStyler() {
-    $("#stylerdialog").dialog({title: "Style Adjuster",
-        width: $(window).width()*0.4,
-        maxHeight: $(window).height()*0.7,
-        position: "right"
-    });
+    if ($(this).attr('data-state') == "open") {
+        $("#stylerdialog").dialog("close");
+        $(this).attr('data-state', "closed");
+    } else {
+        $(this).attr('data-state', "open");
+        $("#stylerdialog").dialog({title: "Style Adjuster",
+            width: $(window).width()*0.4,
+            maxHeight: $(window).height()*0.9,
+            position: "right"
+        });
+    }
 }
 
 function updateCSS() {
@@ -367,6 +373,16 @@ function updateCSS() {
     localStorage.setItem("notefont", $("#notefont").val());
     localStorage.setItem("blockdisplay", $("#cssblockdisplay").is(':checked'));
     localStorage.setItem("propers", $("#csspropers").is(':checked'));
+    var locboxes = $(".cssadjusterloc").get();
+    if (localStorage.getItem('locations'))
+        var locarray = $.parseJSON(localStorage.getItem('locations'));
+    else var locarray = new Object();
+    for (domitem in locboxes) {
+        var name = $(locboxes[domitem]).attr('name');
+        var checked = $(locboxes[domitem]).is(':checked');
+        locarray[name] = checked;
+    }
+    localStorage.setItem("locations", JSON.stringify(locarray));
     setCSSTweaks();
 }
 
@@ -385,6 +401,16 @@ function setCSSTweaks() {
         localStorage.getItem("propers") == "false")
         $(".propers").addClass("hidden");
     else $(".propers").removeClass("hidden");
+    if (localStorage.getItem("locations")) {
+        var locations = $.parseJSON(localStorage.getItem("locations"));
+        for (loc in locations) {
+            if (locations[loc]) {
+                $('tr[data-loc="'+loc+'"]').show();
+            } else {
+                $('tr[data-loc="'+loc+'"]').hide();
+            }
+        }
+    }
 }
 
 var zeropadding = "000000000000";
