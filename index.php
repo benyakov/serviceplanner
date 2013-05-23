@@ -31,6 +31,20 @@ if (is_link($_SERVER['SCRIPT_FILENAME']) || $cors ) {
 } else {
     $displayonly = false;
 }
+// Get the main content
+ob_start();
+?>
+<h1>Upcoming Hymns</h1>
+<?php
+$q = queryAllHymns($dbh, $dbp, $limit=0, $future=true);
+display_records_table($q);
+$rawcontent = ob_get_clean();
+// Check for a content-only request.
+if ($contentonly = checkContentReq()) {
+    echo json_encode($rawcontent);
+    exit(0);
+}
+// Check for a cross-site jsonp request.
 if ($jsonp = checkJsonpReq()) {
     $displayonly = true;
     ob_start();
@@ -40,6 +54,19 @@ if ($jsonp = checkJsonpReq()) {
 <html lang="en">
 <?=html_head("Upcoming Hymns")?>
 <body>
+<script type="text/javascript">
+    function refreshContent() {
+        var xhr = $.getJSON("index.php", {contentonly: "t"},
+            function(rv) {
+                $("#content-container").html(rv);
+                setCSSTweaks();
+            });
+    }
+    $(document).ready(function() {
+        refreshContent();
+        svch.addHandler('login', refreshContent);
+    });
+</script>
 <?
 pageHeader($displayonly);
 siteTabs($auth, False, $displayonly);
@@ -47,11 +74,7 @@ if ($jsonp) {
     ob_clean();
 } ?>
 <div id="content-container">
-<h1>Upcoming Hymns</h1>
-<?php
-$q = queryAllHymns($dbh, $dbp, $limit=0, $future=true);
-display_records_table($q);
-?>
+<? if ($jsonp) echo $rawcontent; ?>
 </div>
 <?  if ($jsonp) {
         $output = json_encode(addcslashes(ob_get_clean(), "'"));

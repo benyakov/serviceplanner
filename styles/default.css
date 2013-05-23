@@ -389,7 +389,7 @@ ul#sitetabs a {
 }
 ul#sitetabs > li {
     display: inline;
-    margin: 0 2pt;
+    margin: 0;
 }
 ul#sitetabs > li.activated a  {
     color: black;

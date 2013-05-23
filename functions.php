@@ -138,6 +138,10 @@ function checkJsonpReq() {
     return $_GET['jsonpreq'];
 }
 
+function checkContentReq() {
+    return $_GET['contentonly'];
+}
+
 function queryService($dbh, $id) {
     global $dbp;
     return queryAllHymns($dbh, $dbp, 0, false, $id);

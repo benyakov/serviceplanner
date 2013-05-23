@@ -200,6 +200,7 @@ function submitLogin() {
             setupLogin(result);
             if (result['userlevel']) {
                 setMessage("Logged in.");
+                svch.execHandlers('login');
             } else {
                 setMessage("Login failed.");
             }
@@ -424,6 +425,30 @@ function scrollTarget(place) {
     window.scrollTo(0, $(window).scrollTop()-60);
     $('a[name="'+place+'"]').addClass('highlight');
 }
+
+function ServiceHandlers() {
+    this.handlers = {};
+    this.addHandler = addHandler;
+    function addHandler(eventname, handler) {
+        if (! this.handlers[eventname]) {
+            this.handlers[eventname] = Array();
+        }
+        this.handlers[eventname].push(handler);
+    }
+    this.execHandlers = execHandlers;
+    function execHandlers(eventname) {
+        if (eventname in this.handlers)
+            for (i in this.handlers[eventname])
+                this.handlers[eventname][i]();
+    }
+    return this;
+    function clearHandlers(eventname) {
+        if (eventname in this.handlers)
+            delete this.handlers[eventname];
+    }
+}
+
+var svch = new ServiceHandlers();
 
 $(document).ready(function() {
     $("#loginform").submit(function(evt) {
