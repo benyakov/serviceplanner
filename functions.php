@@ -28,8 +28,9 @@
 function auth($login = '', $passwd = '') {
     global $dbp, $sprefix, $dbh;
 	$authdata = $_SESSION[$sprefix]['authdata'];
+    if (authcookie()) return true;
 	if (is_array($authdata) && (empty($login))) {
-        $q = $dbh->prepare("SELECT * FROM `{$dbp}users`
+        $q = $dbh->prepare("SELECT 1 FROM `{$dbp}users`
             WHERE `username` = :login AND `password` = :password
             AND `uid` = :uid AND `userlevel` = :userlevel
             AND CONCAT_WS(' ', `fname`, `lname`) = :fullname");
@@ -40,6 +41,7 @@ function auth($login = '', $passwd = '') {
         $q->bindValue(':fullname', $authdata["fullname"]);
         $q->execute();
         if ($q->fetch()) {
+            authcookie(true);
             return true;
         } else {
             return false;
@@ -58,7 +60,9 @@ function auth($login = '', $passwd = '') {
                     "login"=>$row["username"],
                     "password"=>$row["password"],
                     "uid"=>$row["uid"],
-                    "userlevel"=>$row["userlevel"]);
+                    "userlevel"=>$row["userlevel"],
+                    "authtype"=>"password");
+            authcookie(true);
             return true;
         } else {
             unset( $_SESSION[$sprefix]['authdata'] );
@@ -81,6 +85,67 @@ function authId($authdata=false) {
     } else {
         return false;
     }
+}
+
+function authcookie($authorized=null) {
+    // Set the authorization cookies, if $authorized or not.
+    // Return whether valid auth cookie exists.
+    global $dbp, $sprefix, $dbh;
+    if (! file_exists("authcookies")) mkdir("authcookies");
+    if (is_null($authorized)) {
+        // Check cookie
+        if (array_key_exists('auth', $_COOKIE) &&
+            file_exists("authcookies/{$_COOKIE['auth']['user']}")
+        {
+            if (! file_exists("authcookies/{$_COOKIE['auth']['user']}/".
+                "{$_COOKIE['auth']['series']}"))
+                return false;
+            $token = file_get_contents("authcookies/{$_COOKIE['auth']['user']}/".
+                "{$_COOKIE['auth']['series']}");
+            if (! $_COOKIE['auth']['token'] == $token) {
+                setMessage("Someone has stolen your session. Check your security! Forgetting all of your remembered sessions.");
+                return false;
+            $newtoken = genCookieAuthString();
+            file_put_contents("authcookies/{$_COOKIE['auth']['user']}/".
+                "{$_COOKIE['auth']['series']}", $newtoken);
+            $q = $dbh->prepare("SELECT fname, lname, username, uid,
+                userlevel, password FROM `{$dbp}users`
+                WHERE `username` = :check");
+            $q->bindValue(':check', $_COOKIE['user']);
+            if (! $q->execute()) die(array_pop($q->errorInfo()));
+            $row = $q->fetch(PDO::FETCH_ASSOC);
+            $_SESSION[$sprefix]["authdata"] = array(
+                "fullname"=>"{$row['fname']} {$row['lname']}",
+                "login"=>$row["username"],
+                "password"=>$row["password"],
+                "uid"=>$row["uid"],
+                "userlevel"=>$row["userlevel"],
+                "authtype"=>"cookie");
+            setcookie('auth',
+                Array('user'=>$_SESSION[$sprefix]["authdata"]["login"],
+                      'series'=>$_COOKIE['auth']['series'],
+                      'token'=>$newtoken),
+                time()+60*60*24*7);
+            return true;
+        }
+    }
+    if ($authorized) {
+        // Set cookie
+        setcookie('auth',
+            Array('user'=>$_SESSION[$sprefix]["authdata"]["login"],
+                  'series'=>genCookieAuthString(),
+                  'token'=>genCookieAuthString())
+            time()+60*60*24*7);
+        return true;
+    } else {
+        // Remove cookie
+        setcookie('auth', "", time()-3600);
+        return false;
+    }
+}
+
+function genCookieAuthString() {
+    return openssl_random_pseudo_bytes(28);
 }
 
 function authLevel($authdata=false) {

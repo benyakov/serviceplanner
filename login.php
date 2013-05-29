@@ -27,6 +27,7 @@ require("./init.php");
 
 if (array_key_exists('action', $_GET) && $_GET['action'] == 'logout') {
     session_destroy();
+    authcookie(False);
     require("./setup-session.php");
     $auth = false;
 } else {
