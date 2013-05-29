@@ -75,7 +75,7 @@ body {
 }
 
 .odd { background-color: #FFF; }
-.even { background-color: #EEE; }
+.even { background-color: #CCC; }
 p.hymnlist {
     font-size: smaller;
     margin: 0.2em 0 0.2em 2em;
@@ -98,9 +98,6 @@ p.hymnlist {
     border: medium solid #AE791D;
     width: 45em;
     padding: 1ex;
-}
-tr.even {
-    background-color: #F5F5F5;
 }
 
 textarea#outline,

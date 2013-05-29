@@ -188,6 +188,7 @@ $(document).ready(function(){var a="http://www.bethanythedalles.org/services-dev
         This should happen automatically most of the time, and should not be
         tried unless needed.</li>
     <li>Manually re-create <a href="admin.php?flag=create-views">synonym coordination views</a> in the database.  This should also happen automatically when needed.</li>
+    <li><a href="hymnindex.php?drop=yes">Drop and re-create hymn cross-reference table</a>.  This is needed when the table has been changed in a new version.</li>
     <li>You are using Services version <?
         echo "{$version['major']}.{$version['minor']}.{$version['tick']}";
 ?>.  Refer to this version number, and include the address

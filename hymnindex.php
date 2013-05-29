@@ -41,6 +41,11 @@ function togglebg($current) {
     }
 }
 
+if ($_GET['drop'] == 'yes' && $auth) {
+    $dbh->query("DROP TABLE `{$dbp}xref`");
+    setMessage("Cross-reference table repopulated.");
+}
+
 if (! $dbh->query("SELECT 1 FROM {$dbp}xref")) {
     /**** To create the cross reference table ****/
 
@@ -83,14 +88,18 @@ if (! $dbh->query("SELECT 1 FROM {$dbp}xref")) {
 }
 /* To Display the cross-reference table */
 
-if (array_key_exists('sort', $_GET)) {
-    $sort_by = " ORDER BY {$_GET['sort']}";
+
+if (array_key_exists('sort', $_GET) && strpos($_GET['sort'], ';') == False) {
+    $sanitized_sort_field = "`{$_GET['sort']}`";
+    $sort_by = " ORDER BY ({$sanitized_sort_field} = \"\") DESC, ".
+        " {$sanitized_sort_field}";
     $sorted_on = $_GET['sort'];
 } else {
     $sort_by = "";
     $sorted_on = "";
 }
-$q = $dbh->query("SELECT * FROM {$dbp}xref{$sort_by}") ;
+$q = $dbh->prepare("SELECT * FROM {$dbp}xref{$sort_by}") ;
+if (!$q->execute()) die(array_pop($q->errorInfo()));
 ?><!DOCTYPE html>
 <html lang="en">
 <?=html_head("Hymn Cross Reference")?>
@@ -98,9 +107,6 @@ $q = $dbh->query("SELECT * FROM {$dbp}xref{$sort_by}") ;
     <?  pageHeader();
     siteTabs($auth); ?>
 <div id="content-container">
-<?  if ($sorted_on) { ?>
-<div id="quicklinks"><a href="#sortstart">Jump to Beginning of Sorted</a></div>
-<?  } ?>
 <h1>Cross Reference Table</h1>
 <table id="xref-listing" cols="8">
 <thead>
@@ -122,27 +128,17 @@ $q = $dbh->query("SELECT * FROM {$dbp}xref{$sort_by}") ;
 $marked_sortstart = FALSE;
 $sortmarker = "";
 $cursortvalue = "";
-$sortrowbg = "";
+$rownum = 0;
 while ($row = $q->fetch(PDO::FETCH_ASSOC)) {
     $r = array();
     foreach ($row as $k => $v) {
         if (is_null($v)) { $v = ''; }
         $r[$k] = $v;
     }
-    if (array_key_exists($sorted_on, $r)) {
-        if ($cursortvalue != $r[$sorted_on]) {
-            $sortrowbg = togglebg($sortrowbg);
-            $cursortvalue = $r[$sorted_on];
-        }
-        if ((! $marked_sortstart) && $r[$sorted_on]) {
-            $sortmarker = "<a name=\"sortstart\" />";
-            $marked_sortstart = TRUE;
-        } else {
-            $sortmarker = "";
-        }
-    }
+    if ($rownum++ % 2 == 0) $sortrowbg = ' class="even"';
+    else $sortrowbg = ' class="odd"';
     echo "<tr${sortrowbg}>
-        <td class=\"title\">{$sortmarker}${r['title']}</td>
+        <td class=\"title\">${r['title']}</td>
         <td class=\"text\">{$r['text']}</td>
         <td class=\"elh\">{$r['elh']}</td>
         <td class=\"tlh\">{$r['tlh']}</td>
