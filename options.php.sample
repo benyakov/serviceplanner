@@ -90,4 +90,9 @@ if (strpos($phplibrary, '/') != 0) {
     $phplibrary = dirname(__FILE__) . DIRECTORY_SEPARATOR . $phplibrary;
 }
 
+// Default shelf-life of auth cookies, which allow the Service Planner to
+// remember the logins of users past the expiration of the current session.
+// This can be customized on the Admin page.
+$authcookie_shelf_life = 60*60*24*7;  // 1 week (in seconds)
+
 ?>

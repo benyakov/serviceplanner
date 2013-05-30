@@ -189,6 +189,14 @@ $(document).ready(function(){var a="http://www.bethanythedalles.org/services-dev
         tried unless needed.</li>
     <li>Manually re-create <a href="admin.php?flag=create-views">synonym coordination views</a> in the database.  This should also happen automatically when needed.</li>
     <li><a href="hymnindex.php?drop=yes">Drop and re-create hymn cross-reference table</a>.  This is needed when the table has been changed in a new version.</li>
+    <li><form id="authcookie-age" action="utility/authcookieage.php" method="post">
+    <label for="cookie-age">The maximum number of days you
+      wish the Service Planner to remember your login session.</label>
+    <input type="number" name="cookie-age" value="<?=getAuthCookieMaxAge()/(60*60*24)?>" size="4">
+    <button type="submit" id="submit">Set login limit</button>
+    This extends your normal login session, which expires after a few hours,
+    usually just before you submit a meticulously-prepared service.
+    </form></li>
     <li>You are using Services version <?
         echo "{$version['major']}.{$version['minor']}.{$version['tick']}";
 ?>.  Refer to this version number, and include the address
