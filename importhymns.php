@@ -29,20 +29,21 @@ if (! $auth) {
     exit(0);
 }
 if ($_POST['prefix'] && strpos($_POST['prefix'], ' ') === false) {
-    $q = $dbh->query("SHOW TABLES LIKE '{$_POST['prefix']}names'");
+    $namestable = $dbh->quote("{$_POST['prefix']}names");
+    $q = $dbh->query("SHOW TABLES LIKE '{$namestable}'");
     if (! count($q->fetchAll())) {
-        setMessage("No names table exists with prefix `{$_POST['prefix']}'");
+        setMessage("No names table exists with prefix `".htmlentities($_POST['prefix'])."'");
         header('Location: admin.php');
         exit(0);
     }
     $rowcount = $dbh->exec("INSERT IGNORE INTO `{$dbp}names`
         (book, number, title)
         SELECT n2.book, n2.number, n2.title
-            FROM `{$_POST['prefix']}names` AS n2");
+            FROM `{$namestable}` AS n2");
     setMessage($rowcount . " hymn names imported.");
     header('Location: admin.php');
 } else {
-    setMessage("Bad prefix: `{$_POST['prefix']}'");
+    setMessage("Bad prefix: `".htmlentities({$_POST['prefix']})."'");
     header('Location: admin.php');
 }
 

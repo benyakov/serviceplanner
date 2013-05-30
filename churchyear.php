@@ -61,6 +61,13 @@ if ($_GET['request'] == 'purgetables') {
         setMessage("Access denied.  Please log in.");
         header("location: index.php");
         exit(0);
+    } elseif (! 'password' == $_SESSION[$sprefix]['authdata']['authtype']) {
+        authcookie(False);
+        session_destroy();
+        require("./setup-session.php");
+        setMessage("Data loss possible.  Please authenticate your identity and try again.");
+        header("location: index.php");
+        exit(0);
     }
     $dbh->beginTransaction();
     $dbh->exec("DELETE FROM `{$dbp}churchyear_graduals`");

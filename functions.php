@@ -95,7 +95,7 @@ function authcookie($authorized=null) {
     if (is_null($authorized)) {
         // Check cookie
         if (array_key_exists('auth', $_COOKIE) &&
-            file_exists("authcookies/{$_COOKIE['auth']['user']}")
+            file_exists("authcookies/{$_COOKIE['auth']['user']}"))
         {
             if (! file_exists("authcookies/{$_COOKIE['auth']['user']}/".
                 "{$_COOKIE['auth']['series']}"))
@@ -105,9 +105,7 @@ function authcookie($authorized=null) {
             if (! $_COOKIE['auth']['token'] == $token) {
                 setMessage("Someone has stolen your session. Check your security! Forgetting all of your remembered sessions.");
                 return false;
-            $newtoken = genCookieAuthString();
-            file_put_contents("authcookies/{$_COOKIE['auth']['user']}/".
-                "{$_COOKIE['auth']['series']}", $newtoken);
+            }
             $q = $dbh->prepare("SELECT fname, lname, username, uid,
                 userlevel, password FROM `{$dbp}users`
                 WHERE `username` = :check");
@@ -121,31 +119,44 @@ function authcookie($authorized=null) {
                 "uid"=>$row["uid"],
                 "userlevel"=>$row["userlevel"],
                 "authtype"=>"cookie");
-            setcookie('auth',
-                Array('user'=>$_SESSION[$sprefix]["authdata"]["login"],
-                      'series'=>$_COOKIE['auth']['series'],
-                      'token'=>$newtoken),
-                time()+60*60*24*7);
+            setAuthCookie($_SESSION[$sprefix]["authdata"]["login"],
+                $_COOKIE['auth']['series']);
             return true;
         }
     }
     if ($authorized) {
         // Set cookie
-        setcookie('auth',
-            Array('user'=>$_SESSION[$sprefix]["authdata"]["login"],
-                  'series'=>genCookieAuthString(),
-                  'token'=>genCookieAuthString())
-            time()+60*60*24*7);
+        setAuthCookie($_SESSION[$sprefix]["authdata"]["login"],
+            genCookieAuthString());
         return true;
     } else {
-        // Remove cookie
-        setcookie('auth', "", time()-3600);
+        delAuthCookie();
         return false;
     }
 }
 
+function setAuthCookie($user, $series) {
+    if (! file_exists("authcookies/{$user}"))
+        mkdir("authcookies/{$user}");
+    if (file_exists("authcookies/{$user}/{$_COOKIE['auth']['series']}"))
+        $token = $_COOKIE['auth']['series'];
+    else $token = genCookieAuthString();
+    $timestamp = time()+60*60*24*7;
+    setcookie('auth[user]', $user, $timestamp);
+    setcookie('auth[series]', $series, $timestamp);
+    setcookie('auth[token]', $token, $timestamp);
+    file_put_contents("authcookies/{$user}/{$series}", $token);
+}
+
+function delAuthCookie() {
+    $timestamp = time()-3600;
+    setcookie('auth[user]', '', $timestamp);
+    setcookie('auth[series]', '', $timestamp);
+    setcookie('auth[token]', '', $timestamp);
+}
+
 function genCookieAuthString() {
-    return openssl_random_pseudo_bytes(28);
+    return substr(str_shuffle('01234567890ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz_.~'), 0, 28);
 }
 
 function authLevel($authdata=false) {

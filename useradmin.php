@@ -501,6 +501,7 @@ function hashPassword($pw) {
 }
 
 function adminOnly($authlevel) {
+    checkPasswordAuth();
     if ($authlevel != 3) {
         setMessage("Access Denied");
         header("Location: index.php");
@@ -509,9 +510,22 @@ function adminOnly($authlevel) {
 }
 
 function authOnly($authlevel) {
+    checkPasswordAuth();
     if (! is_numeric($authlevel)) {
         setMessage("Access Denied");
         header("Location: index.php");
+        exit(0);
+    }
+}
+
+function checkPasswordAuth() {
+    global $sprefix;
+    if ('password' != $_SESSION[$sprefix]['authdata']['authtype']) {
+        authcookie(False);
+        session_destroy();
+        require("./setup-session.php");
+        setMessage("Please authenticate your identity and try again.");
+        header("location: index.php");
         exit(0);
     }
 }
