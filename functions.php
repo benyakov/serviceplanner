@@ -25,190 +25,7 @@
     USA
  */
 
-function auth($login = '', $passwd = '') {
-    global $dbp, $sprefix, $dbh;
-	$authdata = $_SESSION[$sprefix]['authdata'];
-    if (authcookie()) return true;
-	if (is_array($authdata) && (empty($login))) {
-        $q = $dbh->prepare("SELECT 1 FROM `{$dbp}users`
-            WHERE `username` = :login AND `password` = :password
-            AND `uid` = :uid AND `userlevel` = :userlevel
-            AND CONCAT_WS(' ', `fname`, `lname`) = :fullname");
-        $q->bindValue(':login', $authdata["login"]);
-        $q->bindValue(':password', $authdata["password"]);
-        $q->bindValue(':uid', $authdata["uid"]);
-        $q->bindValue(':userlevel', $authdata["userlevel"]);
-        $q->bindValue(':fullname', $authdata["fullname"]);
-        $q->execute();
-        if ($q->fetch()) {
-            authcookie(true);
-            return true;
-        } else {
-            return false;
-        }
-	} elseif (!empty($login)) {
-		$check = $login;
-        $q = $dbh->prepare("SELECT password, fname, lname,
-           username, uid, userlevel FROM `{$dbp}users`
-            WHERE `username` = :check");
-        $q->bindValue(':check', $check);
-        if (! $q->execute()) die(array_pop($q->errorInfo()));
-        $row = $q->fetch(PDO::FETCH_ASSOC);
-        if ( $row["password"] == crypt($passwd, $row["password"]) ) {
-                $_SESSION[$sprefix]["authdata"] = array(
-                    "fullname"=>"{$row['fname']} {$row['lname']}",
-                    "login"=>$row["username"],
-                    "password"=>$row["password"],
-                    "uid"=>$row["uid"],
-                    "userlevel"=>$row["userlevel"],
-                    "authtype"=>"password");
-            authcookie(true);
-            return true;
-        } else {
-            unset( $_SESSION[$sprefix]['authdata'] );
-            setMessage("Passwords don't match.");
-            return false;
-        }
-	} else {
-		return false;
-	}
-}
-
-function authId($authdata=false) {
-    // Return the current username from parameter or session, or false
-    global $sprefix;
-    $authdata = $authdata?$authdata:
-        (array_key_exists('authdata', $_SESSION[$sprefix])?
-            $_SESSION[$sprefix]['authdata']:0);
-	if ( is_array( $authdata ) ) {
-		return $authdata['fullname'];
-    } else {
-        return false;
-    }
-}
-
-function authcookie($authorized=null) {
-    // Set the authorization cookies, if $authorized or not.
-    // Return whether valid auth cookie exists.
-    global $dbp, $sprefix, $dbh;
-    if (! file_exists("authcookies")) mkdir("authcookies");
-    if (is_null($authorized)) {
-        // Check cookie
-        if (array_key_exists('auth', $_COOKIE) &&
-            file_exists("authcookies/{$_COOKIE['auth']['user']}"))
-        {
-            if (! file_exists("authcookies/{$_COOKIE['auth']['user']}/".
-                "{$_COOKIE['auth']['series']}"))
-                return false;
-            $token = file_get_contents("authcookies/{$_COOKIE['auth']['user']}/".
-                "{$_COOKIE['auth']['series']}");
-            if (! $_COOKIE['auth']['token'] == $token) {
-                setMessage("Someone has stolen your session. Check your security! Forgetting all of your remembered sessions.");
-                return false;
-            }
-            $q = $dbh->prepare("SELECT fname, lname, username, uid,
-                userlevel, password FROM `{$dbp}users`
-                WHERE `username` = :check");
-            $q->bindValue(':check', $_COOKIE['user']);
-            if (! $q->execute()) die(array_pop($q->errorInfo()));
-            $row = $q->fetch(PDO::FETCH_ASSOC);
-            $_SESSION[$sprefix]["authdata"] = array(
-                "fullname"=>"{$row['fname']} {$row['lname']}",
-                "login"=>$row["username"],
-                "password"=>$row["password"],
-                "uid"=>$row["uid"],
-                "userlevel"=>$row["userlevel"],
-                "authtype"=>"cookie");
-            setAuthCookie($_SESSION[$sprefix]["authdata"]["login"],
-                $_COOKIE['auth']['series']);
-            return true;
-        }
-    }
-    if ($authorized) {
-        // Set cookie
-        setAuthCookie($_SESSION[$sprefix]["authdata"]["login"],
-            genCookieAuthString());
-        return true;
-    } else {
-        delAuthCookie();
-        return false;
-    }
-}
-
-function setAuthCookie($user, $series) {
-    if (! file_exists("authcookies/{$user}"))
-        mkdir("authcookies/{$user}");
-    if (file_exists("authcookies/{$user}/{$_COOKIE['auth']['series']}"))
-        $token = $_COOKIE['auth']['series'];
-    else $token = genCookieAuthString();
-    $timestamp = time()+60*60*24*7;
-    setcookie('auth[user]', $user, $timestamp);
-    setcookie('auth[series]', $series, $timestamp);
-    setcookie('auth[token]', $token, $timestamp);
-    file_put_contents("authcookies/{$user}/{$series}", $token);
-}
-
-function delAuthCookie() {
-    $timestamp = time()-3600;
-    setcookie('auth[user]', '', $timestamp);
-    setcookie('auth[series]', '', $timestamp);
-    setcookie('auth[token]', '', $timestamp);
-}
-
-function genCookieAuthString() {
-    return substr(str_shuffle('01234567890ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz_.~'), 0, 28);
-}
-
-function authLevel($authdata=false) {
-    // Return the auth level from parameter or session, or 0
-    global $sprefix;
-    $authdata = $authdata?$authdata:
-        (array_key_exists('authdata', $_SESSION[$sprefix])?
-            $_SESSION[$sprefix]['authdata']:0);
-    if ($authdata) {
-        return $authdata['userlevel'];
-    } else {
-        return 0;
-    }
-}
-
-function validateAuth($require) {
-    global $serverdir, $sprefix;
-    if (array_key_exists('authdata', $_SESSION[$sprefix])) {
-        if (authLevel() < 3) {
-            require("../functions.php");
-            setMessage("Access denied");
-            header("Location: {$serverdir}/index.php");
-        }
-    } elseif ($require) {
-        setMessage("Access denied");
-        header("Location: {$serverdir}/index.php");
-    }
-}
-
-function checkCorsAuth() {
-    if ($_SERVER['HTTP_ORIGIN']) {
-        $corsfile = explode("\n", file_get_contents("corsfile.txt"));
-        if ($_SERVER['HTTP_HOST'] == $_SERVER['HTTP_ORIGIN']) {
-            return false;
-        } elseif ($corsfile && in_array($_SERVER['HTTP_ORIGIN'], $corsfile)) {
-            header("Access-Control-Allow-Origin: {$_SERVER['HTTP_ORIGIN']}");
-            return true;
-        } else {
-            ?><!DOCTYPE=html>
-            <html lang="en">
-            <head><title>Access Denied</title></head>
-            <body><p><?=$_SERVER['HTTP_ORIGIN']?> is not set up for a CORS
-            mashup.  If you can log in to
-            <?="{$_SERVER['HTTP_HOST']}/{$serverdir}/admin.php"?>,
-            then you need to save "<?=$_SERVER['HTTP_ORIGIN']?>" in the form box
-            under the heading "Mashing up pages from here into your own web
-            site."</p></body></html>
-            <?
-            exit(0);
-        }
-    } else return false;
-}
+require_once("authfunctions.php");
 
 function checkJsonpReq() {
     return $_GET['jsonpreq'];
@@ -673,17 +490,21 @@ function dieWithRollback($q, $errorstr = "") {
 function showMessage() {
     global $sprefix;
     if (array_key_exists('message', $_SESSION[$sprefix])) { ?>
-        <div id="message"><?=$_SESSION[$sprefix]['message']?></div>
+        <div id="message"><?
+        foreach ($_SESSION[$sprefix]['message'] as $msg)
+            echo "<div>{$msg}</div>\n";
+        ?></div>
         <? unset($_SESSION[$sprefix]['message']);
     }
 }
 
 function setMessage($text) {
     global $sprefix;
-    $_SESSION[$sprefix]['message'] = $text;
+    $_SESSION[$sprefix]['message'][] = $text;
 }
 
 function getLoginForm($bare=false) {
+    global $sprefix;
     $auth = authId();
     if ($bare) {
         $rv = "";
@@ -691,7 +512,11 @@ function getLoginForm($bare=false) {
         $rv = '<div id="login">';
     }
     if ($auth) {
-        $rv .= "{$auth} <a href=\"login.php?action=logout\" name=\"Log out\" title=\"Log out\">Log out</a>";
+        if ("cookie" == $_SESSION[$sprefix]['authdata']['authtype'])
+            $cookie = "*";
+        else
+            $cookie = "";
+        $rv .= "{$_SESSION[$sprefix]['authdata']['login']}{$cookie} <a href=\"login.php?action=logout\" name=\"Log out\" title=\"Log out\">Log out</a>";
     } else {
         $rv .= '<form id="loginform" method="post" action="login.php">
         <label for="username">User Name</label>

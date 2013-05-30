@@ -229,6 +229,7 @@ if ( $flag=="edit" ) {
         setMessage("Initial user has been set up.");
         header("Location: index.php");
 } elseif ($authdata['userlevel'] == 3) {
+    checkPasswordAuth();
     userList();
 } else {
     setMessage("Access denied.");
