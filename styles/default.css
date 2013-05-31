@@ -419,6 +419,7 @@ a.menulink {
     border-left-color: #D66;
     margin-left: 2px;
     margin-right: 2px;
+    display: inline-block;
 }
 
 div.quicklinks a:active,
