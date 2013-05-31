@@ -60,6 +60,7 @@ if ($jsonp = checkJsonpReq()) {
             function(rv) {
                 $("#content-container").html(rv);
                 setCSSTweaks();
+                setupStyleAdjusterLocs();
             });
     }
     $(document).ready(function() {

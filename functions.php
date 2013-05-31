@@ -582,6 +582,9 @@ function getCSSAdjuster() {
     </form>
     <script type="text/javascript">
         $(document).ready(function() {
+            setupStyleAdjusterLocs();
+        });
+        function setupStyleAdjusterLocs() {
             var locations = $("tr[data-loc]").map(function() {
                 return $(this).attr("data-loc");
             });
@@ -604,7 +607,7 @@ function getCSSAdjuster() {
             }
             $("#adjusterlocationchooser").show();
             $(".cssadjusterloc").change(updateCSS);
-        });
+        }
         // Initialize vars
         var basefont = 0;
         var hymnfont = 0;
