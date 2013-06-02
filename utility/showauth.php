@@ -26,10 +26,19 @@
 chdir("..");
 require("./init.php");
 function displayarray($array) {
-    foreach ($k->$v in ) {
+    if (! is_array($array)) {
+        echo "Not an array:";
+        print_r($array);
+    }
+    echo "<dl>\n";
+    foreach ($array as $k=>$v) {
         echo "<dt>{$k}</dt><dd>\n";
         if (is_array($v)) {
-            foreach ($k->$v
+            displayarray($v);
+        } else {
+            echo "<dd>{$v}</dd>";
+        }
+    }
 }
 
 ?><!DOCTYPE html>
@@ -38,8 +47,7 @@ function displayarray($array) {
 <title>Current User's Session Data</title>
 </head>
 <body>
-<h1>Current User's Session data</title>
-<dl>
+<h1>Current User's Session data</h1>
 <?displayarray($_SESSION[$sprefix]);?>
-</dl>
-
+</body>
+</html>

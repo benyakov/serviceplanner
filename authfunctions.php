@@ -71,7 +71,8 @@ function auth($login = '', $passwd = '') {
         }
     } elseif (! authcookie()) {
         unset($_SESSION[$sprefix]['authdata']);
-    };
+        return false;
+    } else return true;
 }
 
 function authId($authdata=false) {
