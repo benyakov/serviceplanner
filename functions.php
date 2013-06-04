@@ -218,7 +218,7 @@ function display_records_table($q) {
             } else {
                 $datetext = $row['date'];
             }
-            echo "<tr data-loc=\"{$row['location']}\" class=\"heading\"><td class=\"heavy\">{$datetext} {$row['location']}</td>
+            echo "<tr data-loc=\"{$row['location']}\" class=\"heading servicehead\"><td class=\"heavy\">{$datetext} {$row['location']}</td>
                 <td colspan=2><a name=\"service_{$row['serviceid']}\">{$row['dayname']}</a>: {$row['rite']}".
             ($auth?
             "<a class=\"menulink\" href=\"sermon.php?id={$row['id']}\">Sermon</a>
@@ -308,7 +308,7 @@ function modify_records_table($q, $action) {
                 $datetext = $row['date'];
             }
             $urldate=urlencode($row['date']);
-            echo "<tr data-loc=\"{$row['location']}\" class=\"heading\"><td>
+            echo "<tr data-loc=\"{$row['location']}\" class=\"heading servicehead\"><td>
             <input form=\"delete-service\" type=\"checkbox\" name=\"{$row['id']}_{$row['location']}\" id=\"check_{$row['id']}_{$row['location']}\">
             <span class=\"heavy\">{$datetext}</span>
             <a class=\"menulink\" href=\"enter.php?date={$urldate}\" title=\"Add another service or hymns on {$row['date']}.\">Add</a>

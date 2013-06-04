@@ -240,6 +240,10 @@ tr.heading {
     color: black;
 }
 
+tr.servicehead {
+    border-top: thick solid #999;
+}
+
 tr.table-topline td {
     border-top: 2px solid #BBB;
     background-color: #E2E2E2;
