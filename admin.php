@@ -200,7 +200,7 @@ $(document).ready(function(){var a="http://www.bethanythedalles.org/services-dev
     <li>You are using Services version <?
         echo "{$version['major']}.{$version['minor']}.{$version['tick']}";
 ?>.  Refer to this version number, and include the address
-    <?=$_SERVER['PHP_SELF']?> when writing bug reports.  You may send them via
+    <?=$_SERVER['SERVER_NAME'].$_SERVER['PHP_SELF']?> when writing bug reports.  You may send them via
     email to <a href="mailto: jmatjac@gmail.com">the author</a>.
     </li>
     </ul>
