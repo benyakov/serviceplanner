@@ -88,7 +88,8 @@ manage other users, if you need any.</p>
     <p>On the right of the very top is an Adjust Styles link, which opens a
 dialog box on the screen allowing you to make some adjustments to the
 layout of the service listing.  Unless you are dissatisfied with the
-listing at some point, just ignore that link.</p>
+listing at some point, just ignore that link.  If you click it anyway,
+clicking it again will make the style adjuster dialog disappear again.</p>
 
     <h2><a name="tabs">Tabs</a></h2>
 

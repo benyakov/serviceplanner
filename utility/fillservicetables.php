@@ -150,7 +150,7 @@ $ql = $dbh->prepare("INSERT INTO `{$dbp}churchyear_graduals`
 while (($record = fgetcsv($fh)) != FALSE) {
     $dict = array_combine($headings, $record);
     $ql->bindValue(1, $dict['season'], paramStrNull($dict['season']));
-    $ql->bindValue(1, $dict['gradual'], paramStrNull($dict['gradual']));
+    $ql->bindValue(2, $dict['gradual'], paramStrNull($dict['gradual']));
     $ql->execute() or die(__FILE__.":".__LINE__.$dict['season']);
 }
 

@@ -169,13 +169,17 @@ if ($_POST['submit_day']==1) {
     }
     // Update/save supplied values for the given day
     unset($_POST['submit_day']);
+    if ("None" == $_POST['base']) {
+        $_POST['base'] = "";
+        $_POST['offset'] = 0;
+    }
     $q = $dbh->prepare("INSERT INTO `{$dbp}churchyear`
         (season, base, offset, month, day,
         observed_month, observed_sunday, dayname)
         VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
     $bound = array($_POST['season'], $_POST['base'],
         $_POST['offset'], $_POST['month'], $_POST['day'],
-        $_POST['observed_month'], $_POST['observed_sunday'],
+        $_POST['observed-month'], $_POST['observed-sunday'],
         $_POST['dayname']);
     if (! $q->execute($bound)) {
         $q = $dbh->prepare("UPDATE `{$dbp}churchyear`
@@ -615,3 +619,6 @@ siteTabs($auth);?>
 <div id="dialog"></div>
 </body>
 </html>
+<?
+// vim: set foldmethod=indent :
+?>
