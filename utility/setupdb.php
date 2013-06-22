@@ -49,7 +49,7 @@ foreach ($dumplines as $line) {
                     '/^(CREATE TABLE `)([^`]+)/',
                     '/(REFERENCES `)([^`]+)/',
                     '/(CONSTRAINT `)([^`]+)/'
-                ), "\\1${dbp}\\2", $line);
+                ), "\${1}{$dbp}\${2}", $line);
     if (strpos($line, 'CREATE TABLE') > -1) {
         $tables[] = preg_replace('/^(CREATE TABLE `)([^`]+).*$/', "{$dbp}\\2",
             $line);
