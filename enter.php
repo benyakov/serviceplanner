@@ -37,6 +37,9 @@ if (array_key_exists("date", $_GET)) {
 if (array_key_exists("date", $_POST)) {
     processFormData();
     exit(0);
+} elseif (array_key_exists("sethymntitle", $_POST)) {
+    setHymnTitle();
+    exit(0);
 }
 ?>
 <!DOCTYPE html>
@@ -90,6 +93,17 @@ if (array_key_exists("date", $_POST)) {
         $("#addHymn").click(function(evt) {
             evt.preventDefault();
             addHymn();
+        });
+        $(".save-title").click(function(evt) {
+            evt.preventDefault();
+            var listingord = $(this).attr("data-hymn");
+            var xhr = $.getJSON("<?$this_script?>",
+                    { sethymntitle: $("#title_"+listingord).val(),
+                    number: $("#number_"+listingord).val()
+                    book: $("#book_"+listingord).val() },
+                    function(result) {
+                        setMessage(result[0]);
+                    });
         });
         showJsOnly();
     });
@@ -158,7 +172,7 @@ cross-reference table.</label>
         </select>
         <input tabindex="<?=$tabindex+1?>" type="number" min="0" id="number_<?=$i?>" name="number_<?=$i?>" value="" class="edit-number" placeholder="<#>">
         <input tabindex="<?=$tabindex+2?>" type="text" id="note_<?=$i?>" name="note_<?=$i?>" class="edit-note" maxlength="100" value="" placeholder="<note>">
-        <input tabindex="<?=$tabindex+3?>" type="text" id="title_<?=$i?>" name="title_<?=$i?>" class="edit-title hidden">
+        <input tabindex="<?=$tabindex+3?>" type="text" id="title_<?=$i?>" name="title_<?=$i?>" class="edit-title hidden"><a href="#" data-hymn="<?=$i?>" class="hidden save-title" id="savetitle_<?=$i?>">Save Title</a>
         <div id="past_<?=$i?>" class="hymn-past"></div>
     </li>
     <? } ?>
@@ -285,5 +299,34 @@ function processFormData() {
     $dbh->commit();
     setMessage($feedback);
     header("Location: modify.php");
+}
+function setHymnTitle() {
+    global $dbh, $dbp;
+    $dbh->beginTransaction();
+    $q = $dbh->prepare("SELECT `title` FROM `{$dbp}names`
+        WHERE `book` = :book AND `number` = :number");
+    $q->bindValue(':book', $POST['book']);
+    $q->bindValue(':number', $POST['number']);
+    $q->execute() or die(array_pop($q->errorInfo()));
+    $oldtitle = "";
+    if ($oldtitle = $q->fetchColumn(0)) {
+        //Update
+        $q = $dbh->prepare("UPDATE `{$dbp}names` SET `title` = :title
+            WHERE `book` = :book AND `number` = :number");
+        $message = "Hymn title for {$_POST['book']} {$_POST['number']} set "
+            . " to {$_POST["sethymntitle"]}.";
+    } else {
+        //Insert
+        $q = $dbh->prepare("INSERT INTO `{$dbp}names`
+            (book, number, title)
+            VALUES (:book, :number, :title");
+        $message = "Hymn title for {$_POST['book']} {$_POST['number']} updated "
+            . " from {$oldtitle} to {$_POST["sethymntitle"]}.";
+    }
+    $q->bindValue(':book', $POST['book']);
+    $q->bindValue(':number', $POST['number']);
+    $q->bindValue(':title', $POST['sethymntitle']);
+    $q->execute() or die(array_pop($q->errorInfo()));
+    return json_encode(array($message));
 }
 ?>
