@@ -122,7 +122,11 @@ if (! array_key_exists("stage", $_GET))
                 </td>
                 <td><input type="text" id="title_<?=$row['hymnid']?>" size="50"
                      maxlength="50" name="title_<?=$row['hymnid']?>"
-                     value="<?=$row['title']?>" class="edit-title">
+                     value="<?=$row['title']?>" class="edit-title"
+                     data-hymn="<?=$row['hymnid']?>">
+                    <a href="#" data-hymn="<?=$row['hymnid']?>"
+                     class="hidden save-title"
+                     id="savetitle_<?=$row['hymnid']?>">Save</a>
                 </td>
             </tr>
             <?
@@ -155,6 +159,8 @@ if (! array_key_exists("stage", $_GET))
             </td>
             <td><input type="text" id="title_new" size="50"
                  maxlength="50" name="title_new" class="edit-title">
+                <a href="#" data-hymn="<?=$i?>" class="hidden save-title"
+                 id="savetitle_new">Save</a>
             </td>
         </tr>
         </tbody></table>

@@ -52,7 +52,7 @@ while ($row = $q->fetch(PDO::FETCH_ASSOC)) {
     );
 }
 if ($title || $_GET['xref']=="off") {
-    echo json_encode(array($title, $lastusedary));
+    echo json_encode(array($title, $lastusedary, false));
     exit(0);
 }
 $bookname = strtolower($_GET['book']);
@@ -64,5 +64,5 @@ if ($q->execute() && ($row = $q->fetch())) {
 } else {
     $title = "";
 }
-echo json_encode(array($title, array()));
+echo json_encode(array($title, $lastusedary, true));
 ?>

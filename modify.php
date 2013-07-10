@@ -67,6 +67,26 @@ if (array_key_exists('listinglimit', $_GET) &&
                 evt.preventDefault();
                 addHymn();
             });
+            $(".edit-title").change(function() {
+                var listingord = $(this).attr("data-hymn");
+                $(this).removeClass("data-saved");
+                $("#savetitle_"+listingord).show();
+            });
+            $(".save-title").click(function(evt) {
+                evt.preventDefault();
+                var listingord = $(this).attr("data-hymn");
+                var xhr = $.getJSON("enter.php",
+                        { sethymntitle: $("#title_"+listingord).val(),
+                        number: $("#number_"+listingord).val(),
+                        book: $("#book_"+listingord).val() },
+                        function(result) {
+                            if (result[0]) {
+                                $("#title_"+listingord).addClass("data-saved");
+                                $("#savetitle_"+listingord).hide();
+                            }
+                            setMessage(result[1]);
+                        });
+            });
             $(".edit-number").each(fetchHymnTitle);
             updateBlocksAvailable($("#date").val());
         }

@@ -37,7 +37,7 @@ if (array_key_exists("date", $_GET)) {
 if (array_key_exists("date", $_POST)) {
     processFormData();
     exit(0);
-} elseif (array_key_exists("sethymntitle", $_POST)) {
+} elseif (array_key_exists("sethymntitle", $_GET)) {
     setHymnTitle();
     exit(0);
 }
@@ -88,21 +88,30 @@ if (array_key_exists("date", $_POST)) {
                 evt.which != 17) {
                 $(this).doTimeout('fetch-hymn-title', 250, fetchHymnTitle);
             }
-        })
-            .focusout(fetchHymnTitle);
+        });
+            //.focusout(fetchHymnTitle);  // Results in second request
         $("#addHymn").click(function(evt) {
             evt.preventDefault();
             addHymn();
+        });
+        $(".edit-title").change(function() {
+            var listingord = $(this).attr("data-hymn");
+            $(this).removeClass("data-saved");
+            $("#savetitle_"+listingord).show();
         });
         $(".save-title").click(function(evt) {
             evt.preventDefault();
             var listingord = $(this).attr("data-hymn");
             var xhr = $.getJSON("<?$this_script?>",
                     { sethymntitle: $("#title_"+listingord).val(),
-                    number: $("#number_"+listingord).val()
+                    number: $("#number_"+listingord).val(),
                     book: $("#book_"+listingord).val() },
                     function(result) {
-                        setMessage(result[0]);
+                        if (result[0]) {
+                            $("#title_"+listingord).addClass("data-saved");
+                            $("#savetitle_"+listingord).hide();
+                        }
+                        setMessage(result[1]);
                     });
         });
         showJsOnly();
@@ -162,8 +171,9 @@ if (array_key_exists("date", $_POST)) {
     <label for="xref-names">Attempt to provide unknown hymn titles using the
 cross-reference table.</label>
     <ol id="hymnentries">
-    <? for ($i=1; $i<=$option_hymncount; $i++) {
-        $tabindex = $i*4 + 51; ?>
+<?  $tabsperhymnline = 6;
+    for ($i=1; $i<=$option_hymncount; $i++) {
+        $tabindex = $i*$tabsperhymnline + 51; ?>
     <li class="<?= $i%2==0?"even":"odd" ?>">
         <select tabindex="<?=$tabindex?>" id="book_<?=$i?>" name="book_<?=$i?>">
         <? foreach ($option_hymnbooks as $hymnbook) { ?>
@@ -172,7 +182,8 @@ cross-reference table.</label>
         </select>
         <input tabindex="<?=$tabindex+1?>" type="number" min="0" id="number_<?=$i?>" name="number_<?=$i?>" value="" class="edit-number" placeholder="<#>">
         <input tabindex="<?=$tabindex+2?>" type="text" id="note_<?=$i?>" name="note_<?=$i?>" class="edit-note" maxlength="100" value="" placeholder="<note>">
-        <input tabindex="<?=$tabindex+3?>" type="text" id="title_<?=$i?>" name="title_<?=$i?>" class="edit-title hidden"><a href="#" data-hymn="<?=$i?>" class="hidden save-title" id="savetitle_<?=$i?>">Save Title</a>
+        <input tabindex="<?=$tabindex+3?>" data-hymn="<?=$i?>" type="text" id="title_<?=$i?>" name="title_<?=$i?>" class="edit-title hidden">
+        <a tabindex="<?=$tabindex+4?>" href="#" data-hymn="<?=$i?>" class="hidden save-title" id="savetitle_<?=$i?>">Save Title</a>
         <div id="past_<?=$i?>" class="hymn-past"></div>
     </li>
     <? } ?>
@@ -303,30 +314,36 @@ function processFormData() {
 function setHymnTitle() {
     global $dbh, $dbp;
     $dbh->beginTransaction();
-    $q = $dbh->prepare("SELECT `title` FROM `{$dbp}names`
+    $q = $dbh->prepare("SELECT `title`, `number` FROM `{$dbp}names`
         WHERE `book` = :book AND `number` = :number");
-    $q->bindValue(':book', $POST['book']);
-    $q->bindValue(':number', $POST['number']);
+    $q->bindValue(':book', $_GET['book']);
+    $q->bindValue(':number', $_GET['number']);
     $q->execute() or die(array_pop($q->errorInfo()));
-    $oldtitle = "";
-    if ($oldtitle = $q->fetchColumn(0)) {
+    $row = $q->fetch(PDO::FETCH_ASSOC);
+    $oldtitle = $row['title'];
+    if ($row && $row['number']) {
         //Update
         $q = $dbh->prepare("UPDATE `{$dbp}names` SET `title` = :title
             WHERE `book` = :book AND `number` = :number");
-        $message = "Hymn title for {$_POST['book']} {$_POST['number']} set "
-            . " to {$_POST["sethymntitle"]}.";
+        $message = "Hymn title for {$_GET['book']} {$_GET['number']} updated "
+            . " from \"{$oldtitle}\" to \"{$_GET["sethymntitle"]}\".";
     } else {
         //Insert
         $q = $dbh->prepare("INSERT INTO `{$dbp}names`
             (book, number, title)
-            VALUES (:book, :number, :title");
-        $message = "Hymn title for {$_POST['book']} {$_POST['number']} updated "
-            . " from {$oldtitle} to {$_POST["sethymntitle"]}.";
+            VALUES (:book, :number, :title)");
+        $message = "Hymn title for {$_GET['book']} {$_GET['number']} set "
+            . " to \"{$_GET["sethymntitle"]}\".";
     }
-    $q->bindValue(':book', $POST['book']);
-    $q->bindValue(':number', $POST['number']);
-    $q->bindValue(':title', $POST['sethymntitle']);
-    $q->execute() or die(array_pop($q->errorInfo()));
-    return json_encode(array($message));
+    $q->bindValue(':book', $_GET['book']);
+    $q->bindValue(':number', $_GET['number']);
+    $q->bindValue(':title', $_GET['sethymntitle']);
+    if ($q->execute()) {
+        $dbh->commit();
+        echo json_encode(array(true, $message));
+    } else {
+        $dbh->rollBack();
+        echo json_encode(array(false, array_pop($q->errorInfo())));
+    }
 }
-?>
+

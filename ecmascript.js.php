@@ -82,6 +82,9 @@ function addHymnToTable() {
         .attr("id", "title_new-"+indexStart)
         .attr("name", "title_new-"+indexStart)
         .val("");
+    $("#hymnentries > tbody > tr").eq(-2).find('[id^=savetitle]')
+        .attr("id", "savetitle-"+indexStart)
+        .attr("data-hymn", indexStart);
     $("#hymnentries > tbody > tr").eq(-2).removeClass("table-template");
 }
 
@@ -112,6 +115,9 @@ function addHymnToList() {
         .attr("id", "title_"+hymnIndex)
         .attr("name", "title_"+hymnIndex)
         .attr("tabindex", tabindexStart+7);
+    $("#hymnentries > li").eq(-1).children().filter('[id^="savetitle"]')
+        .attr("id", "savetitle_"+hymnIndex)
+        .attr("tabindex", tabindexStart+8);
     $("#hymnentries > li").eq(-1).children().filter('[id^="past"]')
         .text("")
         .hide();
@@ -166,12 +172,20 @@ function fetchHymnTitle() {
             function(result) {
                 var hymnTitle = result[0];
                 var pastServices = result[1];
+                var xref = result[2];
                 if (hymnTitle) {
                     $("#title_"+entryNumber).val(hymnTitle).show();
+                    if (! xref) {
+                        $("#title_"+entryNumber).addClass("data-saved");
+                        $("#savetitle_"+entryNumber).hide();
+                    } else {
+                        $("#savetitle_"+entryNumber).show();
+                    }
                 } else {
                     $("#title_"+entryNumber).val("")
                         .attr("placeholder", "<Please enter a title.>")
                         .show();
+                    $("#savetitle_"+entryNumber).show();
                 }
                 var past = new Array;
                 var locstr;

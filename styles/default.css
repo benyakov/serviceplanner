@@ -677,3 +677,7 @@ ul#adjusterlocations {
     padding: 0px;
     margin: 0px;
 }
+
+.data-saved {
+    border: 2px solid green;
+}
