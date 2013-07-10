@@ -69,8 +69,8 @@ function addHymnToTable() {
             if (evt.which == 9 ||
                 evt.which == 17) return;
             $(this).doTimeout('fetch-hymn-title', 250, fetchHymnTitle)
-        })
-        .change(fetchHymnTitle);
+        });
+        //.change(fetchHymnTitle); // Causes duplicate requests
     $("#hymnentries > tbody > tr").eq(-2).find('[id^=note]')
         .attr("id", "note_new-"+indexStart)
         .attr("name", "note_new-"+indexStart)
@@ -81,10 +81,30 @@ function addHymnToTable() {
     $("#hymnentries > tbody > tr").eq(-2).find('[id^=title]')
         .attr("id", "title_new-"+indexStart)
         .attr("name", "title_new-"+indexStart)
-        .val("");
+        .val("")
+        .change(function() {
+                var listingord = $(this).attr("data-hymn");
+                $(this).removeClass("data-saved");
+                $("#savetitle_"+listingord).show();
+        });
     $("#hymnentries > tbody > tr").eq(-2).find('[id^=savetitle]')
         .attr("id", "savetitle-"+indexStart)
-        .attr("data-hymn", indexStart);
+        .attr("data-hymn", indexStart)
+        .change(function(evt) {
+                evt.preventDefault();
+                var listingord = $(this).attr("data-hymn");
+                var xhr = $.getJSON("enter.php",
+                        { sethymntitle: $("#title_"+listingord).val(),
+                        number: $("#number_"+listingord).val(),
+                        book: $("#book_"+listingord).val() },
+                        function(result) {
+                            if (result[0]) {
+                                $("#title_"+listingord).addClass("data-saved");
+                                $("#savetitle_"+listingord).hide();
+                            }
+                            setMessage(result[1]);
+                        });
+        });
     $("#hymnentries > tbody > tr").eq(-2).removeClass("table-template");
 }
 
@@ -184,6 +204,7 @@ function fetchHymnTitle() {
                 } else {
                     $("#title_"+entryNumber).val("")
                         .attr("placeholder", "<Please enter a title.>")
+                        .removeClass("data-saved")
                         .show();
                     $("#savetitle_"+entryNumber).show();
                 }

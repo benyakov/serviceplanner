@@ -183,12 +183,12 @@ cross-reference table.</label>
         <input tabindex="<?=$tabindex+1?>" type="number" min="0" id="number_<?=$i?>" name="number_<?=$i?>" value="" class="edit-number" placeholder="<#>">
         <input tabindex="<?=$tabindex+2?>" type="text" id="note_<?=$i?>" name="note_<?=$i?>" class="edit-note" maxlength="100" value="" placeholder="<note>">
         <input tabindex="<?=$tabindex+3?>" data-hymn="<?=$i?>" type="text" id="title_<?=$i?>" name="title_<?=$i?>" class="edit-title hidden">
-        <a tabindex="<?=$tabindex+4?>" href="#" data-hymn="<?=$i?>" class="hidden save-title" id="savetitle_<?=$i?>">Save Title</a>
+        <a tabindex="<?=$tabindex+4?>" href="#" data-hymn="<?=$i?>" class="hidden save-title command-link" id="savetitle_<?=$i?>">Save Title</a>
         <div id="past_<?=$i?>" class="hymn-past"></div>
     </li>
     <? } ?>
     </ol>
-    <a id="addHymn" class="jsonly" tabindex="200"
+    <a id="addHymn" class="jsonly command-link" tabindex="200"
         href="javascript: void(0);" >Add another hymn.</a>
     <button tabindex="201" type="submit" value="Send">Send</button>
     <button tabindex="202" type="reset">Reset</button>

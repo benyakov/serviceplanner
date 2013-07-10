@@ -139,6 +139,20 @@ input.edit-note {
 }
 input.edit-title {
     width: 20em;
+    border: 2px solid red;
+}
+input.data-saved {
+    border: 2px solid green;
+}
+a.command-link {
+    font-family: sans-serif;
+    font-weight: bold;
+    font-size: small;
+}
+a.command-link:link,
+a.command-link:visited {
+    color: blue;
+    background-color: transparent;
 }
 input.edit-location {
     width: 10em;
@@ -678,6 +692,3 @@ ul#adjusterlocations {
     margin: 0px;
 }
 
-.data-saved {
-    border: 2px solid green;
-}
