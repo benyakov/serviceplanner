@@ -81,14 +81,15 @@ function addHymnToTable() {
     $("#hymnentries > tbody > tr").eq(-2).find('[id^=title]')
         .attr("id", "title_new-"+indexStart)
         .attr("name", "title_new-"+indexStart)
+        .attr("data-hymn", indexStart)
         .val("")
         .change(function() {
                 var listingord = $(this).attr("data-hymn");
                 $(this).removeClass("data-saved");
-                $("#savetitle_"+listingord).show();
+                $("#savetitle_new-"+listingord).show();
         });
     $("#hymnentries > tbody > tr").eq(-2).find('[id^=savetitle]')
-        .attr("id", "savetitle-"+indexStart)
+        .attr("id", "savetitle_new-"+indexStart)
         .attr("data-hymn", indexStart)
         .change(function(evt) {
                 evt.preventDefault();

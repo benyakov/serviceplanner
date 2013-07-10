@@ -125,7 +125,7 @@ if (! array_key_exists("stage", $_GET))
                      value="<?=$row['title']?>" class="edit-title"
                      data-hymn="<?=$row['hymnid']?>">
                     <a href="#" data-hymn="<?=$row['hymnid']?>"
-                     class="hidden save-title"
+                     class="hidden save-title command-link"
                      id="savetitle_<?=$row['hymnid']?>">Save</a>
                 </td>
             </tr>
@@ -159,12 +159,13 @@ if (! array_key_exists("stage", $_GET))
             </td>
             <td><input type="text" id="title_new" size="50"
                  maxlength="50" name="title_new" class="edit-title">
-                <a href="#" data-hymn="<?=$i?>" class="hidden save-title"
+                <a href="#" data-hymn="<?=$i?>"
+                 class="hidden save-title command-link"
                  id="savetitle_new">Save</a>
             </td>
         </tr>
         </tbody></table>
-        <a id="addHymn" class="jsonly" tabindex="200"
+        <a id="addHymn" class="jsonly command-link" tabindex="200"
             href="#" >Add another hymn.</a>
         <button type="submit" value="Commit">Commit</button>
         <button type="reset">Reset</button>
