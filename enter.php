@@ -57,6 +57,16 @@ if (array_key_exists("date", $_POST)) {
     }
     $(document).ready(function() {
         $("#existing-services").hide();
+        $("#block-info").hide();
+        $("#block-show-div").hide();
+        $("#block").change(function(){
+            if ("None" != $(this).val()) {
+                $("#block-info").show();
+            } else {
+                $("#block-info").hide();
+            }
+        });
+        // TODO: Add code to set up and respond to #block-info
         $("#date").keyup(function(){
             $(this).doTimeout('update-existing', 500, function() {
                 updateFromDate(this);
@@ -133,6 +143,8 @@ if (array_key_exists("date", $_POST)) {
     <form action="http://<?=$this_script?>" method="post">
     <section id="existing-services">
     </section>
+    <section id="block-info">
+    </section>
     <section id="service-items">
     <ul>
     <li>
@@ -164,6 +176,11 @@ if (array_key_exists("date", $_POST)) {
         <select tabindex="29" id="block" name="block">
             <option value="None" selected>None</option>
         </select>
+        <div id="block-show-div">
+        <select tabindex="30" id="block-show">
+            <option value="None" selected>None</option>
+        </select>
+        </div>
     </ul>
     </section>
     <h2>Hymns to Enter (Book, Number, Note)</h2>
