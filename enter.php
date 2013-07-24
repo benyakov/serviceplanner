@@ -55,18 +55,43 @@ if (array_key_exists("date", $_POST)) {
             updateBlocksAvailable(dateval);
         }
     }
+    function setupBlockInfo(blockval) {
+        var xhr = $.getJSON("block.php",
+            { "get": "blockitems",
+            "id": blockval,
+            "day": $("#liturgicalname").val() },
+            function(result) {
+                $("#block-show").html("");
+                for (var key in result) {
+                    $("#block-show").append("<option value=\""+key+"\">"+key+"</option>");
+                }
+                sessionStorage.setItem("blockValues", JSON.stringify(result));
+                $("#block-show").change(function() {
+                    if ("None" != $(this).val()) updateBlockInfo();
+                    else $("#block-info").hide();
+                }).change();
+            });
+            $("#block-show-div").show();
+    }
+    function updateBlockInfo() {
+        var blockvalues = $.parseJSON(sessionStorage.getItem("blockValues"));
+        $("#block-info").html("<div>"+
+            blockvalues[$('#block-show').val()]+
+            "</div>")
+        .show();
+    }
     $(document).ready(function() {
         $("#existing-services").hide();
         $("#block-info").hide();
         $("#block-show-div").hide();
         $("#block").change(function(){
             if ("None" != $(this).val()) {
-                $("#block-info").show();
+                setupBlockInfo($(this).val());
             } else {
                 $("#block-info").hide();
+                $("#block-show-div").hide();
             }
         });
-        // TODO: Add code to set up and respond to #block-info
         $("#date").keyup(function(){
             $(this).doTimeout('update-existing', 500, function() {
                 updateFromDate(this);
@@ -143,8 +168,6 @@ if (array_key_exists("date", $_POST)) {
     <form action="http://<?=$this_script?>" method="post">
     <section id="existing-services">
     </section>
-    <section id="block-info">
-    </section>
     <section id="service-items">
     <ul>
     <li>
@@ -172,11 +195,13 @@ if (array_key_exists("date", $_POST)) {
             name="servicenotes"></textarea>
     </li>
     <li>
+        <div id="block-info"> </div>
         <label for="block">Block Plan:</label><br>
         <select tabindex="29" id="block" name="block">
             <option value="None" selected>None</option>
         </select>
         <div id="block-show-div">
+        <label for="block-show">Show:</label>
         <select tabindex="30" id="block-show">
             <option value="None" selected>None</option>
         </select>

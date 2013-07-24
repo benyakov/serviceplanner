@@ -255,7 +255,7 @@ function display_records_table($q) {
                     <dt>Lesson 1</dt><dd><?=linkbgw($row['blesson1'], $row['l1link'])?></dd>
                         <dt>Lesson 2</dt><dd><?=linkbgw($row['blesson2'], $row['l2link'])?></dd>
                         <dt>Gospel</dt><dd><?=linkbgw($row['bgospel'], $row['golink'])?></dd>
-                        <dt>Psalm</dt><dd><?=linkbgw($row['bpsalm'], $row['pslink'], "Ps ")?></dd>
+                        <dt>Psalm</dt><dd><?=linkbgw($row['bpsalm'], "Ps ".$row['pslink'])?></dd>
                     </dl>
                     <h5>Collect (<?=$row['bcollectclass']?>)</h5>
                     <div class="collecttext maxcolumn">
@@ -345,7 +345,7 @@ function modify_records_table($q, $action) {
                         <dt>Lesson 1</dt><dd><?=linkbgw($row['blesson1'], $row['l1link'])?></dd>
                         <dt>Lesson 2</dt><dd><?=linkbgw($row['blesson2'], $row['l2link'])?></dd>
                         <dt>Gospel</dt><dd><?=linkbgw($row['bgospel'], $row['golink'])?></dd>
-                        <dt>Psalm</dt><dd><?=linkbgw($row['bpsalm'], $row['pslink'], "Ps ")?></dd>
+                        <dt>Psalm</dt><dd><?=linkbgw($row['bpsalm'], "Ps ".$row['pslink'])?></dd>
                     </dl>
                     <h5>Collect (<?=$row['bcollectclass']?>)</h5>
                     <div class="collecttext maxcolumn">
@@ -401,20 +401,20 @@ function html_head($title) {
     return implode("\n", $rv);
 }
 
-function linkbgw($ref, $linked, $prefix="") {
+function linkbgw($ref, $linked, $new=false) {
     // Return a link to BibleGateway for the given reference,
     // or if the version is not set, just the ref.
     if (! $linked) {
         return $ref;
-    } else {
-        $ref = "{$prefix} {$ref}";
     }
     global $config;
     $bgwversion = $config->get("biblegwversion");
+    if ($new) $new = " target=\"_blank\" ";
+    else $new = "";
     if ($bgwversion) {
         return "<a href=\"http://biblegateway.com/passage?search=".
             rawurlencode($ref).
-            "&version={$bgwversion}&interface=print\">{$ref}</a>";
+            "&version={$bgwversion}&interface=print\" ${new}>{$ref}</a>";
     } else {
         return $ref;
     }

@@ -295,6 +295,123 @@ if ($_GET['overlapstart'] && $_GET['overlapend']) {
     exit(0);
 }
 
+/* block.php?id=N&get=blockitems
+ * Return a list of items
+ */
+if ("blockitems" == $_GET['get'] && is_numeric($_GET['id']) && $_GET['day']) {
+    if (! $auth) {
+        setMessage("Access denied.  Please log in.");
+        header("location:index.php");
+        exit(0);
+    }
+    // Most of this query borrowed from functions.php
+    $q = $dbh->prepare("SELECT b.notes,
+        (CASE b.l1lect
+            WHEN 'historic' THEN
+            (CASE b.l1series
+                WHEN 'first' THEN
+                    (SELECT lesson1 FROM `{$dbp}synlessons` AS cl
+                    WHERE cl.dayname=:dayname AND cl.lectionary=b.l1lect
+                    LIMIT 1)
+                WHEN 'second' THEN
+                    (SELECT s2lesson FROM `{$dbp}synlessons` AS cl
+                    WHERE cl.dayname=:dayname AND cl.lectionary=b.l1lect
+                    LIMIT 1)
+                WHEN 'third' THEN
+                    (SELECT s3lesson FROM `{$dbp}synlessons` AS cl
+                    WHERE cl.dayname=:dayname AND cl.lectionary=b.l1lect
+                    LIMIT 1)
+                END)
+            WHEN 'custom' THEN b.l1series
+            ELSE
+                (SELECT lesson1 FROM `{$dbp}synlessons` AS cl
+                WHERE cl.dayname=:dayname AND cl.lectionary=b.l1lect
+                LIMIT 1)
+            END)
+            AS blesson1,
+        (CASE b.l2lect
+            WHEN 'historic' THEN
+            (CASE b.l2series
+                WHEN 'first' THEN
+                    (SELECT lesson2 FROM `{$dbp}synlessons` AS cl
+                    WHERE cl.dayname=:dayname AND cl.lectionary=b.l2lect
+                    LIMIT 1)
+                WHEN 'second' THEN
+                    (SELECT s2lesson FROM `{$dbp}synlessons` AS cl
+                    WHERE cl.dayname=:dayname AND cl.lectionary=b.l2lect
+                    LIMIT 1)
+                WHEN 'third' THEN
+                    (SELECT s3lesson FROM `{$dbp}synlessons` AS cl
+                    WHERE cl.dayname=:dayname AND cl.lectionary=b.l2lect
+                    LIMIT 1)
+                END)
+            WHEN 'custom' THEN b.l2series
+            ELSE
+                (SELECT lesson2 FROM `{$dbp}synlessons` AS cl
+                WHERE cl.dayname=:dayname AND cl.lectionary=b.l2lect
+                LIMIT 1)
+            END)
+            AS blesson2,
+        (CASE b.golect
+            WHEN 'historic' THEN
+            (CASE b.goseries
+                WHEN 'first' THEN
+                    (SELECT gospel FROM `{$dbp}synlessons` AS cl
+                    WHERE cl.dayname=:dayname AND cl.lectionary=b.golect
+                    LIMIT 1)
+                WHEN 'second' THEN
+                    (SELECT s2gospel FROM `{$dbp}synlessons` AS cl
+                    WHERE cl.dayname=:dayname AND cl.lectionary=b.golect
+                    LIMIT 1)
+                WHEN 'third' THEN
+                    (SELECT s3gospel FROM `{$dbp}synlessons` AS cl
+                    WHERE cl.dayname=:dayname AND cl.lectionary=b.golect
+                    LIMIT 1)
+                END)
+            WHEN 'custom' THEN b.goseries
+            ELSE
+                (SELECT gospel FROM `{$dbp}synlessons` AS cl
+                WHERE cl.dayname=:dayname AND cl.lectionary=b.golect
+                LIMIT 1)
+            END)
+            AS bgospel,
+        (CASE b.pslect
+            WHEN 'custom' THEN b.psseries
+            ELSE
+                (SELECT psalm FROM `{$dbp}synlessons` AS cl
+                WHERE cl.dayname=:dayname AND cl.lectionary=b.pslect
+                LIMIT 1)
+            END)
+            AS bpsalm,
+        (SELECT collect FROM `{$dbp}churchyear_collects` AS cyc
+        JOIN `{$dbp}churchyear_collect_index` AS cci
+        ON (cyc.id = cci.id)
+        WHERE cci.dayname=:dayname AND cci.lectionary=b.colect
+        AND cyc.class=b.coclass
+        LIMIT 1) AS bcollect,
+        b.l1lect != \"custom\" AS l1link,
+        b.l2lect != \"custom\" AS l2link,
+        b.golect != \"custom\" AS golink,
+        b.pslect != \"custom\" AS pslink
+        FROM `{$dbp}blocks` as b
+        WHERE id = :block");
+    $q->bindValue(":dayname", $_GET['day']);
+    $q->bindValue(":block", $_GET['id']);
+    if ($q->execute() && $row = $q->fetch(PDO::FETCH_ASSOC)) {
+        $rv = array("Lesson 1"=>linkbgw($row['blesson1'], $row['l1link'], true),
+            "Lesson 2"=>linkbgw($row['blesson2'], $row['l2link'], true),
+            "Gospel"=>linkbgw($row['bgospel'], $row['golink'], true),
+            "Psalm"=>linkbgw("Psalm ".$row['bpsalm'], $row['pslink'], true),
+            "Collect"=>$row['bcollect']);
+        if ($row['notes']) $rv["Notes"] = $row['notes'];
+        echo json_encode($rv);
+    } else {
+        echo array_pop($q->errorInfo());
+    }
+    exit(0);
+
+}
+
 // Display the block planning table
 if (! $auth) {
     setMessage("Access denied.  Please log in.");

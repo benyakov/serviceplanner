@@ -522,10 +522,14 @@ form#corsform #contents {
     height: 5em;
 }
 
-section#existing-services {
+section#existing-services,
+div#block-info {
     float: right;
     display: block;
     width: 350px;
+}
+div#block-info div {
+    border: thin solid green;
 }
 section#existing-services ul {
     margin: 0;
