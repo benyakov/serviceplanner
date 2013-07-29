@@ -255,7 +255,7 @@ function display_records_table($q) {
                     <dt>Lesson 1</dt><dd><?=linkbgw($row['blesson1'], $row['l1link'])?></dd>
                         <dt>Lesson 2</dt><dd><?=linkbgw($row['blesson2'], $row['l2link'])?></dd>
                         <dt>Gospel</dt><dd><?=linkbgw($row['bgospel'], $row['golink'])?></dd>
-                        <dt>Psalm</dt><dd><?=linkbgw($row['bpsalm'], "Ps ".$row['pslink'])?></dd>
+                        <dt>Psalm</dt><dd><?=linkbgw("Ps ".$row['bpsalm'], $row['pslink'])?></dd>
                     </dl>
                     <h5>Collect (<?=$row['bcollectclass']?>)</h5>
                     <div class="collecttext maxcolumn">
@@ -345,7 +345,7 @@ function modify_records_table($q, $action) {
                         <dt>Lesson 1</dt><dd><?=linkbgw($row['blesson1'], $row['l1link'])?></dd>
                         <dt>Lesson 2</dt><dd><?=linkbgw($row['blesson2'], $row['l2link'])?></dd>
                         <dt>Gospel</dt><dd><?=linkbgw($row['bgospel'], $row['golink'])?></dd>
-                        <dt>Psalm</dt><dd><?=linkbgw($row['bpsalm'], "Ps ".$row['pslink'])?></dd>
+                        <dt>Psalm</dt><dd><?=linkbgw("Ps ".$row['bpsalm'], $row['pslink'])?></dd>
                     </dl>
                     <h5>Collect (<?=$row['bcollectclass']?>)</h5>
                     <div class="collecttext maxcolumn">
