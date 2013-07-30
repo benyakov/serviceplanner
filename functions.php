@@ -222,7 +222,7 @@ function display_records_table($q) {
                 <td colspan=2><a name=\"service_{$row['serviceid']}\">{$row['dayname']}</a>: {$row['rite']}".
             ($auth?
             "<a class=\"menulink\" href=\"sermon.php?id={$row['id']}\">Sermon</a>
-            <a class=\"menulink\" href=\"csv.php?id={$row['id']}\">CSV Data</a>"
+            <a class=\"menulink\" href=\"export.php?service={$row['id']}\">CSV Data</a>"
 
             :"").
                 " <a class=\"menulink\" href=\"print.php?id={$row['id']}\" ".
