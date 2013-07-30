@@ -1,4 +1,4 @@
-<? /* Interface for exporting to CSV
+<? /* Interface for exporting data to a non-db format
     Copyright (C) 2012 Jesse Jacobsen
 
     This program is free software; you can redistribute it and/or modify
@@ -25,6 +25,27 @@
  */
 
 require("./init.php");
+require("./utility/csv.php");
+
+// Exports here don't require $auth
+if (is_numeric($_GET("service"))) {
+    $q = queryService($dbh, $_GET['service']);
+    $q->setFetchMode(PDO::FETCH_ASSOC);
+    $filebase = urlencode($row['dayname']);
+    $fieldnames = array("Date", "Day", "Order", "Service Notes", "Introit",
+        "Gradual", "Propers Note", "Color", "Theme", "Block", "Block Notes",
+        "Lesson 1", "Lesson 2", "Gospel", "Psalm", "Collect", "Hymnbook",
+        "Hymnnumber", "Hymnnote", "Hymnlocation", "Hymntitle");
+    $fieldselection = array('date', 'dayname', 'rite', 'servicenotes',
+        'introit', 'gradual', 'propersnote', 'color', 'theme', 'blabel',
+        'bnotes', 'blesson1', 'blesson2', 'bgospel', 'bpsalm', 'bcollect',
+        'book', 'number', 'note', 'location', 'title');
+    $csvex = new CSVExporter($q, $filebase, "utf-8",
+        $fieldnames, $fieldselection);
+    $csvex->export();
+}
+
+// Below here requires $auth
 if (! $auth) {
     setMessage("Access denied.");
     header("Location: index.php");
@@ -33,18 +54,23 @@ if (! $auth) {
 
 if ($_GET['lectionary']) {
     $lectname = $_GET['lectionary'];
-    $q = $dbh->prepare("SELECT `lectionary`, `dayname`, `lesson1`, `lesson2`,
+    $q = $dbh->prepare("SELECT `dayname`, `lesson1`, `lesson2`,
         `gospel`, `psalm`, `s2lesson`, `s2gospel`, `s3lesson`, `s3gospel`,
         `hymnabc`, `hymn` FROM `{$dbp}churchyear_lessons`
         WHERE `lectionary` = :lect");
     $q->bindValue(":lect", $lectname);
+    $q->setFetchMode(PDO::FETCH_NUM);
     if (! $q->execute()) {
         echo array_pop($q->errorInfo());
         exit(0);
     }
-    foreach ($q->fetch(PDO::FETCH_ASSOC) as $row) {
-
-    }
+    $filebase = $_GET['lectionary'];
+    $fieldnames = array("Dayname", "Lesson 1", "Lesson 2", "Gospel", "Psalm",
+        "Series 2 Lesson", "Series 2 Gospel", "Series 3 Lesson",
+        "Series 3 Gospel", "Week Hymn", "Year Hymn");
+    $csvex = new CSVExporter($q, $filebase, "utf-8", $fieldnames);
+    $csvex->export();
+}
 
 
 

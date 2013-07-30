@@ -23,28 +23,46 @@
     The Dalles, OR 97058
     USA
  */
-require("./init.php");
-$this_script = $_SERVER['HTTP_HOST'].$_SERVER['SCRIPT_NAME'] ;
-$q = queryService($dbh, $_GET['id']);
-$row = $q->fetch(PDO::FETCH_ASSOC);
-$filebase = urlencode($row['dayname']);
-header('Content-Type: text/csv; charset=utf-8');
-header("Content-Disposition: attachment; filename={$filebase}.csv");
-$output = fopen('php://output', 'w');
-fputcsv($output, array("Date", "Day", "Order", "Service Notes", "Introit", "Gradual", "Propers Note", "Color", "Theme", "Block", "Block Notes", "Lesson 1", "Lesson 2", "Gospel", "Psalm", "Collect", "Hymnbook", "Hymnnumber", "Hymnnote", "Hymnlocation", "Hymntitle"));
-while ($row) {
-    if ('' == $row['number']) {
-        $row = $q->fetch(PDO::FETCH_ASSOC);
-        continue;
+
+class CSVExporter{
+    public function __construct($iterable, $filebase,
+            $charset="utf-8", $fieldnames=array(), $fieldselection=false) {
+        $this->iterable = $iterable;
+        $this->filename = $filebase.".csv";
+        $this->charset = $charset;
+        $this->fieldnames = $fieldnames;
+        $this->fieldselection = $fieldselection;
     }
-    fputcsv($output, array(
-        $row['date'], $row['dayname'], $row['rite'], $row['servicenotes'],
-        $row['introit'], $row['gradual'], $row['propersnote'], $row['color'],
-        $row['theme'], $row['blabel'], $row['bnotes'], $row['blesson1'],
-        $row['blesson2'], $row['bgospel'], $row['bpsalm'], $row['bcollect'],
-        $row['book'], $row['number'], $row['note'], $row['location'],
-        $row['title']));
-    $row = $q->fetch(PDO::FETCH_ASSOC);
+
+    public setCharset($charset) {
+        $this->charset = $charset;
+    }
+    public setFieldnames($fieldnames) {
+        $this->fieldnames = $fieldnames);
+    }
+    public setFieldselection($fieldselection) {
+        $this->fieldselection = $fieldselection;
+    }
+    public setFilebase($filebase) {
+        $this->filebase = $filebase;
+    }
+
+    public function export() {
+        header('Content-Type: text/csv; charset=utf-8');
+        header("Content-Disposition: attachment; filename={$_GET['lectionary']}.csv");
+        $output = fopen('php://output', 'w');
+        if ($this->fieldnames) fputcsv($output, $this->fieldnames);
+        foreach ($this->iterable as $row) {
+            if ($this->fieldselection) {
+                $selectedrow = array();
+                foreach ($this->fieldselection as $fieldkey) {
+                    $selectedrow[] = $row[$fieldkey];
+                }
+                putcsv($output, $selectedrow);
+            } else fputcsv($output, $row);
+        }
+        fclose($output);
+    }
 }
-fclose($output);
+
 
