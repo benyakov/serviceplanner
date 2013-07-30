@@ -172,6 +172,12 @@ $(document).ready(function(){var a="http://www.bethanythedalles.org/services-dev
         <button type="reset">Reset</button>
     </form>  (Caution: This will replace all current data, and things could go wrong.  Test before relying upon it!)</li>
     <li><a href="dump.php?only=churchyear">Save a Backup of Your Church Year Modifications</a></li>  See the note above about restoring to the same version.  Use the field above to install a backup of your church year data.</li>
+    <li><form id="export-lectionary" action="export.php" method="get">
+    <label for="lectionary">Export single lectionary as CSV.</label>
+    <input type="text" name="lectionary" id="lectionary" required
+        placeholder="Lectionary name">
+    <button type="submit" id="submit">Export Lectionary</button>
+    </form></li>
     <li><form id="import-hymns" action="importhymns.php" method="post">
     <label for="prefix">Merge hymn titles from a co-installation.</label>
     <input type="text" name="prefix" pattern="[\w\d]+" id="prefix"

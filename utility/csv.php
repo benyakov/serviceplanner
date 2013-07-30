@@ -34,16 +34,16 @@ class CSVExporter{
         $this->fieldselection = $fieldselection;
     }
 
-    public setCharset($charset) {
+    public function setCharset($charset) {
         $this->charset = $charset;
     }
-    public setFieldnames($fieldnames) {
-        $this->fieldnames = $fieldnames);
+    public function setFieldnames($fieldnames) {
+        $this->fieldnames = $fieldnames;
     }
-    public setFieldselection($fieldselection) {
+    public function setFieldselection($fieldselection) {
         $this->fieldselection = $fieldselection;
     }
-    public setFilebase($filebase) {
+    public function setFilebase($filebase) {
         $this->filebase = $filebase;
     }
 
@@ -58,7 +58,7 @@ class CSVExporter{
                 foreach ($this->fieldselection as $fieldkey) {
                     $selectedrow[] = $row[$fieldkey];
                 }
-                putcsv($output, $selectedrow);
+                fputcsv($output, $selectedrow);
             } else fputcsv($output, $row);
         }
         fclose($output);
