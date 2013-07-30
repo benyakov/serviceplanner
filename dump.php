@@ -44,21 +44,31 @@ function adddbpfix ($name) {
     global $dbp;
     return "{$dbp}{$name}";
 }
+function churchyeartable ($name) {
+    return strpos($name, 'churchyear') !== false;
+}
 $tabledesclines = array();
 foreach ($tabledescfiles as $tabledescfile) {
     $tabledesclines =
         array_merge($tabledesclines,
             file($tabledescfile, FILE_IGNORE_NEW_LINES));
 }
-$tablenamelines = array_filter($tabledesclines, gettablename);
-$tablenames = array_map(gettablename, $tablenamelines);
-$finaltablenames = array_map(adddbpfix, $tablenames);
+$tablenamelines = array_filter($tabledesclines, 'gettablename');
+$tablenames = array_map('gettablename', $tablenamelines);
+$realtablenames = array_map(adddbpfix, $tablenames);
+$dbversion = $dbstate->get('dbversion');
+$timestamp = date("dMY-Hi");
+if ('churchyear' == $_GET['only']) {
+    $finaltablenames = array_filter($realtablenames, 'churchyeartable') ;
+    $dlfilename = "churchyear-{$dbversion}_{$timestamp}.dump";
+} else {
+    $finaltablenames = $realtablenames;
+    $dlfilename = "services-{$dbversion}_{$timestamp}.dump";
+}
 $tablenamestring = implode(" ", $finaltablenames);
 if (touch(".my.cnf") && chmod(".my.cnf", 0600)) {
     header("Content-type: text/plain");
-    $timestamp = date("dMY-Hi");
-    $dbversion = $dbstate->get('dbversion');
-    header("Content-disposition: attachment; filename=services-{$dbversion}_{$timestamp}.dump");
+    header("Content-disposition: attachment; filename={$dlfilename}");
     $fp = fopen("./.my.cnf", "w");
     fwrite($fp, "[client]
     user=\"{$dbconnection['dbuser']}\"

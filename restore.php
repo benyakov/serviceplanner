@@ -31,7 +31,7 @@ if (! $auth) {
 }
 $dumpfile = "./restore-{$dbconnection['dbname']}.txt";
 $fnmatches = array();
-if (! preg_match('/^services-(\d+\.\d+\.\d+)_(\d+[[:alpha:]]{3}\d{4}-\d{4}).dump$/',
+if (! preg_match('/^(services|churchyear)-(\d+\.\d+\.\d+)_(\d+[[:alpha:]]{3}\d{4}-\d{4}).dump$/',
     $_FILES['backup_file']['name'], $fnmatches))
     {
     setMessage("Please choose a backup dump file with its original name. (Uploaded {$_FILES['backup_file']['name']})");
@@ -39,8 +39,8 @@ if (! preg_match('/^services-(\d+\.\d+\.\d+)_(\d+[[:alpha:]]{3}\d{4}-\d{4}).dump
     exit(0);
 } else {
     $dbversion = $dbstate->get('dbversion');
-    $timestamp = $fnmatches[2];
-    $version = $fnmatches[1];
+    $timestamp = $fnmatches[3];
+    $version = $fnmatches[2];
     $dbrequired = implode('.', array_splice(explode('.', $dbversion), 0, -1));
     $dboffered=implode('.',array_splice(explode('.', $version), 0, -1));
     if ($dbrequired != $dboffered) {
@@ -55,6 +55,7 @@ if (! preg_match('/^services-(\d+\.\d+\.\d+)_(\d+[[:alpha:]]{3}\d{4}-\d{4}).dump
 }
 if (move_uploaded_file($_FILES['backup_file']['tmp_name'], $dumpfile)) {
     // Insert $dbp into dumpfile.
+    /* Still needed?  dump.php adds this itself!
     $dumplines = file($dumpfile, FILE_IGNORE_NEW_LINES);
     $newdumplines = array();
     foreach ($dumplines as $line) {
@@ -72,7 +73,7 @@ if (move_uploaded_file($_FILES['backup_file']['tmp_name'], $dumpfile)) {
     }
     $dumpfh = fopen($dumpfile, 'wb');
     fwrite($dumpfh, implode("\n", $newdumplines));
-    fclose($dumpfh);
+    fclose($dumpfh); */
     if (touch("./.my.cnf") && chmod(".my.cnf", 0600)) {
         $fp = fopen(".my.cnf", "w");
         fwrite($fp, "[client]
