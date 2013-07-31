@@ -45,6 +45,49 @@ if (is_numeric($_GET["service"])) {
     $csvex->export();
 }
 
+if ('synonyms' == $_GET['export']) {
+    $q = $dbh->prepare("SELECT canonical, synonym
+        FROM `{$dbp}churchyear_synonyms`
+        ORDER BY canonical");
+    if (! $q->execute()) {
+        echo array_pop($q->errorInfo());
+        exit(0);
+    }
+    $q->setFetchMode(PDO::FETCH_NUM);
+    $collector = array();
+    while ($row = $q->fetch()) {
+        if (! array_key_exists($row[0]), $collector)
+            $collector[$row[0]] = array($row[0]);
+        $collector[$row[0]][] = $row[1];
+    }
+    $out = array();
+    foreach (array_keys($collector) as $key) {
+        $out[] = $collector[$key];
+    }
+    $filebase = "synonyms";
+    $csvex = new CSVExporter(new ArrayIterator($out), $filebase);
+    $csvex->export();
+}
+
+if ('churchyear' == $_GET['export']) {
+    $q = $dbh->prepare("SELECT cy.`dayname`, cy.`season`, cy.`base`,
+        cy.`offset`, cy.`month`, cy.`day`,
+        cy.`observed_month`, cy.`observed_sunday`
+        FROM `{$dbp}churchyear` AS cy
+        LEFT OUTER JOIN `{$dbp}churchyear_order` AS cyo
+            ON (cy.season = cyo.name)
+            ORDER BY cyo.idx, cy.offset, cy.month, cy.day");
+    $q->setFetchMode(PDO::FETCH_ASSOC);
+    $filebase = "churchyear";
+    $fieldnames = array("Day", "Season", "Base", "Offset", "Month", "Day",
+        "Observed Month", "Observed Sunday");
+    $fieldselection = array("dayname", "season", "base", "offset", "month",
+        "day", "observed_month", "observed_sunday");
+    $csvex = new CSVExporter($q, $filebase, "utf-8", $fieldnames,
+        $fieldselection);
+    $csvex->export();
+}
+
 // Below here requires $auth
 if (! $auth) {
     setMessage("Access denied.");
@@ -71,8 +114,6 @@ if ($_GET['lectionary']) {
     $csvex = new CSVExporter($q, $filebase, "utf-8", $fieldnames);
     $csvex->export();
 }
-
-
 
 
 ?>

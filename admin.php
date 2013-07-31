@@ -159,6 +159,8 @@ $(document).ready(function(){var a="http://www.bethanythedalles.org/services-dev
 
     <h2>The Broom Closet</h2>
 
+    <h3>Backups and Exports</h3>
+
     <ul>
     <li><a href="dump.php">Save a Backup of the Database</a>
         When restoring, be sure to restore into a Services installation
@@ -178,6 +180,10 @@ $(document).ready(function(){var a="http://www.bethanythedalles.org/services-dev
         placeholder="Lectionary name">
     <button type="submit" id="submit">Export Lectionary</button>
     </form></li>
+    </ul>
+
+    <h3>Tweaking Your Installation</h3>
+    <ul>
     <li><form id="import-hymns" action="importhymns.php" method="post">
     <label for="prefix">Merge hymn titles from a co-installation.</label>
     <input type="text" name="prefix" pattern="[\w\d]+" id="prefix"
@@ -212,7 +218,7 @@ $(document).ready(function(){var a="http://www.bethanythedalles.org/services-dev
     </li>
     </ul>
 
-    <h2>Config Settings</h2>
+    <h3>Config Settings</h2>
     <form id="configsettings" action="utility/savesettings.php" method="post">
     <dl>
     <dt>Preferred Bible Abbreviation from <a href="http://www.biblegateway.com/versions/" title="BibleGateway.com">Bible Gateway</a></dt>
