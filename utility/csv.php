@@ -36,6 +36,7 @@ class CSVExporter{
         $this->fieldselection = $fieldselection;
     }
 
+    public $setEncoding = "setCharset";
     public function setCharset($charset) {
         $this->charset = $charset;
     }

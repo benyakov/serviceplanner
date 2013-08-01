@@ -70,21 +70,24 @@ if ('synonyms' == $_GET['export']) {
 }
 
 if ('churchyear' == $_GET['export']) {
-    $q = $dbh->prepare("SELECT cy.`dayname`, cy.`season`, cy.`base`,
-        cy.`offset`, cy.`month`, cy.`day`,
-        cy.`observed_month`, cy.`observed_sunday`
+    $q = $dbh->prepare("SELECT `dayname`, `season`, `base`,
+        `offset`, `month`, `day`, `observed_month`, `observed_sunday`
         FROM `{$dbp}churchyear` AS cy
         LEFT OUTER JOIN `{$dbp}churchyear_order` AS cyo
             ON (cy.season = cyo.name)
             ORDER BY cyo.idx, cy.offset, cy.month, cy.day");
+    if (! $q->execute()) {
+        echo array_pop($q->errorInfo());
+        exit(0);
+    }
     $q->setFetchMode(PDO::FETCH_ASSOC);
-    $filebase = "churchyear";
-    $fieldnames = array("Day", "Season", "Base", "Offset", "Month", "Day",
-        "Observed Month", "Observed Sunday");
-    $fieldselection = array("dayname", "season", "base", "offset", "month",
-        "day", "observed_month", "observed_sunday");
-    $csvex = new CSVExporter($q, $filebase, "utf-8", $fieldnames,
-        $fieldselection);
+    $csvex = new CSVExporter($q);
+    $csvex->setFilebase("churchyear");
+    $csvex->setCharset("utf-8");
+    $csvex->setFieldnames(array("Dayname", "Season", "Base", "Offset", "Month",
+        "Day", "Observed Month", "Observed Sunday"));
+    $csvex->setFieldselection(array("dayname", "season", "base", "offset",
+        "month", "day", "observed_month", "observed_sunday"));
     $csvex->export();
 }
 

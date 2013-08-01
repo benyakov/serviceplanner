@@ -203,16 +203,17 @@ of Lent 2 next time around, just find that row on the Church Year tab.</p>
 
     <h4><a name="housekeeping">Housekeeping</a></h4>
 
-    <p>This is where you can perform maintenance and get some extra information
-about the Service Planner.  The page is mostly self-documented, but it contains
-some advanced concepts.  You can safely ignore what you don't understand.  One
-item that you should not ignore is toward the bottom under the heading "The
-Broom Closet."  The very first item there contains a link you should use
-periodically to download a backup of all your data.  You should use the
-suggested filename, because it contains the version of the Service Planner you
-are backing up.  If you ever need to restore that data, you will need a
-compatible installation of the software, and that version number makes it
-possible.</p>
+    <p>This is where you can perform maintenance and get some extra
+information about the Service Planner.  The page is mostly
+self-documented, but it contains some advanced concepts.  You can safely
+ignore what you don't understand.  One item that you should not ignore
+is toward the bottom under the heading "The Broom Closet."  The very
+first item there under "Backups and Exports" contains a link you should
+use periodically to download a backup of all your data.  You should use
+the suggested filename, because it contains the version of the Service
+Planner you are backing up.  If you ever need to restore that data, you
+will need a compatible installation of the software, and that version
+number makes it possible.</p>
 
     <p>The other immediately noteworthy item, if you plan to use the block
 planning feature, is at the bottom of the page.  Here is where you set your
@@ -385,13 +386,14 @@ hymn titles into your own Service Planner database.  The advantage is that you
 can probably trust that they're correct, and it will save you from typing in
 all those hymn titles.</p>
 
-    <p>To do this, you will use the third item in the Broom Closet on the
-Housekeeping page.  Each shared installation uses a prefix to distinguish it
-from the other service planners.  You probably chose your prefix when you first
-signed up and had your Service Planner installed.  If you know the prefix of
-another installation with which you share the database, then you can enter that
-prefix in the entry box and click the "Import Titles" button.  It should be as
-easy as that.</p>
+    <p>To do this, you will use the first item in the Broom Closet under
+"Tweaking your Installation" on the Housekeeping page.  Each shared
+installation uses a prefix to distinguish it from the other service
+planners.  You probably chose your prefix when you first signed up and
+had your Service Planner installed.  If you know the prefix of another
+installation with which you share the database, then you can enter that
+prefix in the entry box and click the "Import Titles" button.  It should
+be as easy as that.</p>
 
     <h2><a name="mashups">Inserting a Service Listing into Another Web Page</a></h2>
 

@@ -180,6 +180,8 @@ $(document).ready(function(){var a="http://www.bethanythedalles.org/services-dev
         placeholder="Lectionary name">
     <button type="submit" id="submit">Export Lectionary</button>
     </form></li>
+    <li><a href="export.php?export=synonyms">Export Synonyms for Church Year Day Names</a></li>
+    <li><a href="export.php?export=churchyear">Export Church Year Configuration</a> (controlling when each day falls)</a></li>
     </ul>
 
     <h3>Tweaking Your Installation</h3>
