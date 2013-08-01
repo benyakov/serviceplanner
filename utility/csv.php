@@ -25,10 +25,12 @@
  */
 
 class CSVExporter{
-    public function __construct($iterable, $filebase,
+    private $filebase_index = false;
+
+    public function __construct($iterable, $filebase="",
             $charset="utf-8", $fieldnames=array(), $fieldselection=false) {
         $this->iterable = $iterable;
-        $this->filename = $filebase.".csv";
+        $this->filebase = $filebase;
         $this->charset = $charset;
         $this->fieldnames = $fieldnames;
         $this->fieldselection = $fieldselection;
@@ -46,13 +48,28 @@ class CSVExporter{
     public function setFilebase($filebase) {
         $this->filebase = $filebase;
     }
+    public function setFilebaseIndex($index) {
+        // Set up to pull the filename from this index of the first record
+        $this->filebase_index = $index;
+    }
+
+    private function sendStart($output, $filename) {
+        // Send headers and fieldnames
+        header("Content-Type: text/csv; charset={$this->charset}");
+        header("Content-Disposition: attachment; filename=\"{$filename}.csv\"");
+        if ($this->fieldnames) fputcsv($output, $this->fieldnames);
+    }
 
     public function export() {
-        header('Content-Type: text/csv; charset=utf-8');
-        header("Content-Disposition: attachment; filename={$_GET['lectionary']}.csv");
         $output = fopen('php://output', 'w');
-        if ($this->fieldnames) fputcsv($output, $this->fieldnames);
+        if (! $this->filebase_index) {
+            $this->sendStart($output, $this->filebase);
+        }
         foreach ($this->iterable as $row) {
+            if ($this->filebase_index) {
+                $this->sendStart($output, $row[$this->filebase_index]);
+                $this->filebase_index = false;
+            }
             if ($this->fieldselection) {
                 $selectedrow = array();
                 foreach ($this->fieldselection as $fieldkey) {

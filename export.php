@@ -31,17 +31,17 @@ require("./utility/csv.php");
 if (is_numeric($_GET["service"])) {
     $q = queryService($dbh, $_GET['service']);
     $q->setFetchMode(PDO::FETCH_ASSOC);
-    $filebase = urlencode($row['dayname']);
-    $fieldnames = array("Date", "Day", "Order", "Service Notes", "Introit",
-        "Gradual", "Propers Note", "Color", "Theme", "Block", "Block Notes",
-        "Lesson 1", "Lesson 2", "Gospel", "Psalm", "Collect", "Hymnbook",
-        "Hymnnumber", "Hymnnote", "Hymnlocation", "Hymntitle");
-    $fieldselection = array('date', 'dayname', 'rite', 'servicenotes',
+    $csvex = new CSVExporter($q);
+    $csvex->setCharset("utf-8");
+    $csvex->setFieldnames(array("Date", "Day", "Order", "Service Notes",
+        "Introit", "Gradual", "Propers Note", "Color", "Theme", "Block",
+        "Block Notes", "Lesson 1", "Lesson 2", "Gospel", "Psalm", "Collect",
+        "Hymnbook", "Hymnnumber", "Hymnnote", "Hymnlocation", "Hymntitle"));
+    $csvex->setFieldselection(array('date', 'dayname', 'rite', 'servicenotes',
         'introit', 'gradual', 'propersnote', 'color', 'theme', 'blabel',
         'bnotes', 'blesson1', 'blesson2', 'bgospel', 'bpsalm', 'bcollect',
-        'book', 'number', 'note', 'location', 'title');
-    $csvex = new CSVExporter($q, $filebase, "utf-8",
-        $fieldnames, $fieldselection);
+        'book', 'number', 'note', 'location', 'title'));
+    $csvex->setFilebaseIndex("dayname");
     $csvex->export();
 }
 
@@ -56,7 +56,7 @@ if ('synonyms' == $_GET['export']) {
     $q->setFetchMode(PDO::FETCH_NUM);
     $collector = array();
     while ($row = $q->fetch()) {
-        if (! array_key_exists($row[0]), $collector)
+        if (! array_key_exists($row[0], $collector))
             $collector[$row[0]] = array($row[0]);
         $collector[$row[0]][] = $row[1];
     }
