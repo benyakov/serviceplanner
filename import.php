@@ -48,6 +48,24 @@ if ("lectionary" == $_POST['import']) {
             exit(0);
         }
         $dbh->beginTransaction();
+        // Check for existing lessons and delete, if confirmed.
+        $q = $dbh->prepare("SELECT 1 FROM `{$dbp}churchyear_lessons`
+            WHERE lectionary = :lectionary");
+        $q->bindValue(":lectionary", $_POST['lectionary_name']);
+        $q->execute() or die(array_pop($q->errorInfo()));
+        if ($q->fetchColumn(0)) {
+            if (isset($_POST['replace']) && "on" == $_POST['replace']) {
+                $q = $dbh->prepare("DELETE FROM `{$dbp}churchyear_lessons`
+                    WHERE lectionary = :lectionary");
+                $q->bindValue(":lectionary", $_POST['lectionary_name']);
+                $q->execute() or die(array_pop($q->errorInfo()));
+            } else {
+                setMessage("Please confirm replacement of existing lectionary.");
+                header("Location: admin.php");
+                exit(0);
+            }
+        }
+        // Create records for new lessons
         $q = $dbh->prepare("INSERT INTO `{$dbp}churchyear_lessons` SET
             lectionary = :lectionary, dayname = :dayname, lesson1 = :lesson1,
             lesson2 = :lesson2, gospel = :gospel, psalm = :psalm,
@@ -79,7 +97,6 @@ if ("lectionary" == $_POST['import']) {
     }
     exit(0);
 }
-
 
 
 ?>
