@@ -128,6 +128,8 @@ if (array_key_exists('listinglimit', $_GET) &&
             $('#thisweek').click(function(evt) {
                 evt.preventDefault();
                 scrollTarget("now");
+                var dest1 = $("html").scrollTop();
+                $("html").scrollTop(dest1-75);
             });
         });
     </script>
