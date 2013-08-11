@@ -37,13 +37,17 @@ if (! $auth) {
  * import := <name of thing being imported>
  * $_POST['import'] := upload file to import
  *
- * For lectionary, also expect:
+ * For lectionary, also handle:
  * lectionary_name
- * replace := replacing existing records for this lectionary
+ * replace := replacing all existing records for this lectionary
  *
- * For synonyms, also expect:
- * replace := replace all synonyms for the given left-hand word
+ * For synonyms, also handle:
+ * replace := replace all synonyms for the given left-hand words
  *  (Caution: synonym deletions will cascade into other tables.)
+ *
+ * For churchyear, also handle:
+ * replaceall := remove all current days in churchyear before loading
+ *  Otherwise, only replace days already defined.
  */
 
 $loadfile = "./load-{$dbconnection['dbname']}.txt";
@@ -63,7 +67,11 @@ if ("lectionary" == $_POST['import']) {
 
 function importChurchyear($loadfile) {
     if (($fhandle = fopen($loadfile, "r")) !== false) {
-        // TODO
+        if (! $keys = fgetcsv($fhandle)) {
+            setMessage("Empty file upload.");
+            header("Location: index.php");
+            exit(0);
+        }
     } else {
         setMessage("Problem opening uploaded file.");
     }
@@ -111,13 +119,11 @@ function importSynonyms($loadfile) {
             $dbh->exec("INSERT INTO `{$dbh}churchyear_synonyms
                 SELECT `canonical`, `synonym`
                 FROM `{$dbh}addsynonyms`");
-            // Remove current db synonyms not in new list
+            // Remove current db canonicals not in new list
             // (This will cascade into other tables.)
-            $dbh->exec("DELETE FROM `{$dbh}churchyear_synonyms` AS cy
-                USING `{$dbh}newsynonyms` AS n
-                ON (cy.`canonical` = n.`canonical`
-                    AND cy.`synonym` = n.`synonym`)
-                WHERE n.`synonym` == NULL");
+            $dbh->exec("DELETE FROM `{$dbh}churchyear_synonyms`
+                WHERE `canonical` IN
+                (SELECT DISTINCT `canonical` FROM `{$dbh}newsynonyms`)");
         } else {
             $qexact = $dbh->prepare("SELECT 1 FROM `{$dbh}churchyear_synonyms`
                 WHERE `canonical` = :canonical
@@ -211,4 +217,5 @@ function importLectionary($loadfile) {
 }
 
 
+// vim: set foldmethod=indent :
 ?>
