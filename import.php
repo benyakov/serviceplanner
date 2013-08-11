@@ -33,14 +33,120 @@ if (! $auth) {
     exit(0);
 }
 
+/* Expects in $_POST:
+ * import := <name of thing being imported>
+ * $_POST['import'] := upload file to import
+ *
+ * For lectionary, also expect:
+ * lectionary_name
+ * replace := replacing existing records for this lectionary
+ *
+ * For synonyms, also expect:
+ * replace := replace all synonyms for the given left-hand word
+ *  (Caution: synonym deletions will cascade into other tables.)
+ */
+
 $loadfile = "./load-{$dbconnection['dbname']}.txt";
+if (! move_uploaded_file($_FILES[$_POST['import']]['tmp_name'], $loadfile)) {
+    setMessage("Problem with file upload.");
+    header("Location: index.php");
+    exit(0);
+}
 
 if ("lectionary" == $_POST['import']) {
-    if (! move_uploaded_file($_FILES['lectionary']['tmp_name'], $loadfile)) {
-        setMessage("Problem with file upload.");
-        header("Location: index.php");
-        exit(0);
+    importLectionary($loadfile);
+} elseif ("synonyms" == $_POST['import']) {
+    importSynonyms($loadfile);
+} elseif ("churchyear" == $_POST['import']) {
+    importChurchyear($loadfile);
+}
+
+function importChurchyear($loadfile) {
+    if (($fhandle = fopen($loadfile, "r")) !== false) {
+        // TODO
+    } else {
+        setMessage("Problem opening uploaded file.");
     }
+    setMessage("Church year data imported.");
+    header("Location: admin.php");
+    exit(0);
+}
+
+function importSynonyms($loadfile) {
+    if (($fhandle = fopen($loadfile, "r")) !== false) {
+        $dbh->beginTransaction();
+        $canonical = ""; $synonym = "";
+        // Replace using temporary tables;
+        if (isset($_POST['replace']) && "on" == $_POST['replace']) {
+            // Upload the new synonyms
+            $dbh->exec("CREATE TEMPORARY TABLE `{$dbh}newsynonyms`
+                    `canonical` varchar(255),
+                    `synonym`   varchar(255))
+                    ENGINE=InnoDB DEFAULT CHARSET=utf8");
+            $q = $dbh->prepare("INSERT INTO `{$dbh}newsynonyms`
+                (`canonical`, `synonym`)
+                VALUES (:canonical, :synonym)")
+            $q->bindParam(":canonical", $canonical);
+            $q->bindParam(":synonym", $synonym);
+            while ($oneset = fgetcsv($fhandle)) {
+               $canonical = $oneset[0];
+               for ($i=1; $i<count($oneset); $i++) {
+                   $synonym = $oneset[$i];
+                   $q->exec or die(array_pop($q->errorInfo()));
+               }
+            }
+            rewind($fhandle);
+            // Add new synonyms not in current db
+            $dbh->exec("CREATE TEMPORARY TABLE `{$dbh}addsynonyms`
+                    `canonical` varchar(255),
+                    `synonym`   varchar(255))
+                    ENGINE=InnoDB DEFAULT CHARSET=utf8");
+            $dbh->exec("INSERT INTO `{$dbh}addsynonyms`
+                SELECT n.`canonical`, n.`synonym`
+                FROM `{$dbh}newsynonyms` AS n
+                LEFT JOIN `{$dbh}churchyear_synonyms` AS cy
+                ON (cy.`canonical` = n.`canonical`
+                    AND cy.`synonym` = n.`synonym`)
+                WHERE cy.`synonym` == NULL");
+            $dbh->exec("INSERT INTO `{$dbh}churchyear_synonyms
+                SELECT `canonical`, `synonym`
+                FROM `{$dbh}addsynonyms`");
+            // Remove current db synonyms not in new list
+            // (This will cascade into other tables.)
+            $dbh->exec("DELETE FROM `{$dbh}churchyear_synonyms` AS cy
+                USING `{$dbh}newsynonyms` AS n
+                ON (cy.`canonical` = n.`canonical`
+                    AND cy.`synonym` = n.`synonym`)
+                WHERE n.`synonym` == NULL");
+        } else {
+            $qexact = $dbh->prepare("SELECT 1 FROM `{$dbh}churchyear_synonyms`
+                WHERE `canonical` = :canonical
+                AND `synonym` = :synonym");
+            $qinsert = $dbh->prepare("INSERT INTO `{$dbh}churchyear_synonyms`
+                (`canonical`, `synonym`) VALUES (:canonical, :synonym)");
+            $qexact->bindParam(":canonical", $canonical);
+            $qexact->bindParam(":synonym", $synonym);
+            $qinsert->bindParam(":canonical", $canonical);
+            $qinsert->bindParam(":synonym", $synonym);
+            while (list($canonical, $synonym) = fgetcsv($fhandle)) {
+                // If the record already exists, leave it
+                $qexact->execute() or die(array_pop($qexact->errorInfo()));
+                if ($qexact->fetchValue(1)) {
+                    continue;
+                }
+                $qinsert->execute() or die(array_pop($qinsert->errorInfo()));
+            }
+        }
+        $dbh->commit();
+    } else {
+        setMessage("Problem opening uploaded file.");
+    }
+    setMessage("Synonyms imported.");
+    header("Location: admin?flag=create-views");
+    exit(0);
+}
+
+function importLectionary($loadfile) {
     if (($fhandle = fopen($loadfile, "r")) !== false) {
         if (! $keys = fgetcsv($fhandle)) {
             setMessage("Empty file upload.");
@@ -66,28 +172,32 @@ if ("lectionary" == $_POST['import']) {
             }
         }
         // Create records for new lessons
-        $q = $dbh->prepare("INSERT INTO `{$dbp}churchyear_lessons` SET
-            lectionary = :lectionary, dayname = :dayname, lesson1 = :lesson1,
-            lesson2 = :lesson2, gospel = :gospel, psalm = :psalm,
-            s2lesson = :s2lesson, s2gospel = :s2gospel, s3lesson = :s3lesson,
-            s3gospel = :s3gospel, hymnabc = :hymnabc, hymn = :hymn");
+        $q = $dbh->prepare("INSERT INTO `{$dbp}churchyear_lessons`
+            (lectionary, dayname, lesson1, lesson2, gospel, psalm,
+            s2lesson, s2gospel, s3lesson, s3gospel, hymnabc, hymn)
+            VALUES
+            (:lectionary, :dayname, :lesson1, :lesson2, :gospel, :psalm,
+            :s2lesson, :s2gospel, :s3lesson, :s3gospel, :hymnabc, :hymn)");
+        $thisrec = array("Dayname"=>"", "Lesson 1"=>"", "Lesson 2"=>"",
+            "Gospel"=>"", "Psalm"=>"", "Series 2 Lesson"=>"",
+            "Series 2 Gospel"=>"", "Series 3 Lesson"=>"",
+            "Series 3 Gospel"=>"", "Week Hymn"=>"", "Year Hymn"=>"");
+        $q->bindParam(":lectionary", $_POST['lectionary_name']);
+        $q->bindParam(":dayname", $thisrec["Dayname"]);
+        $q->bindParam(":lesson1", $thisrec["Lesson 1"]);
+        $q->bindParam(":lesson2", $thisrec["Lesson 2"]);
+        $q->bindParam(":gospel", $thisrec["Gospel"]);
+        $q->bindParam(":psalm", $thisrec["Psalm"]);
+        $q->bindParam(":s2lesson", $thisrec["Series 2 Lesson"]);
+        $q->bindParam(":s2gospel", $thisrec["Series 2 Gospel"]);
+        $q->bindParam(":s3lesson", $thisrec["Series 3 Lesson"]);
+        $q->bindParam(":s3gospel", $thisrec["Series 3 Gospel"]);
+        $q->bindParam(":hymnabc", $thisrec["Week Hymn"]);
+        $q->bindParam(":hymn", $thisrec["Year Hymn"]);
         while ($record = fgetcsv($fhandle)) {
-            $thisrec = array();
             for ($i=0; $i<count($keys); $i++)
                 $thisrec[$keys[$i]] = $record[$i]];
-            $q->bindValue(":lectionary", $_POST['lectionary_name']);
-            $q->bindValue(":dayname", $thisrec["Dayname"]);
-            $q->bindValue(":lesson1", $thisrec["Lesson 1"]);
-            $q->bindValue(":lesson2", $thisrec["Lesson 2"]);
-            $q->bindValue(":gospel", $thisrec["Gospel"]);
-            $q->bindValue(":psalm", $thisrec["Psalm"]);
-            $q->bindValue(":s2lesson", $thisrec["Series 2 Lesson"]);
-            $q->bindValue(":s2gospel", $thisrec["Series 2 Gospel"]);
-            $q->bindValue(":s3lesson", $thisrec["Series 3 Lesson"]);
-            $q->bindValue(":s3gospel", $thisrec["Series 3 Gospel"]);
-            $q->bindValue(":hymnabc", $thisrec["Week Hymn"]);
-            $q->bindValue(":hymn", $thisrec["Year Hymn"]);
-            $q->execute();
+            $q->execute() or die(array_pop($q->errorInfo()));
         }
         $dbh->commit();
         setMessage("Loaded lectionary data.");
@@ -95,6 +205,8 @@ if ("lectionary" == $_POST['import']) {
     } else {
         setMessage("Problem opening uploaded file.");
     }
+    setMessage("Lectionary imported.");
+    header("Location: admin.php");
     exit(0);
 }
 
