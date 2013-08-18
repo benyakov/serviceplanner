@@ -122,7 +122,7 @@ function importSynonyms($loadfile) {
             // Remove current db canonicals not in new list
             // (This will cascade into other tables.)
             $dbh->exec("DELETE FROM `{$dbh}churchyear_synonyms`
-                WHERE `canonical` IN
+                WHERE ! `canonical` IN
                 (SELECT DISTINCT `canonical` FROM `{$dbh}newsynonyms`)");
         } else {
             $qexact = $dbh->prepare("SELECT 1 FROM `{$dbh}churchyear_synonyms`
