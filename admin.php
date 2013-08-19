@@ -171,17 +171,46 @@ $(document).ready(function(){var a="http://www.bethanythedalles.org/services-dev
         <input id="backup_file" type="file" name="backup_file"
             required placeholder="Select local file">
         <button type="submit">Send</button>
-        <button type="reset">Reset</button>
     </form>  (Caution: This will replace all current data, and things could go wrong.  Test before relying upon it!)</li>
-    <li><a href="dump.php?only=churchyear">Save a Backup of Your Church Year Modifications</a></li>  See the note above about restoring to the same version.  Use the field above to install a backup of your church year data.</li>
+    <li><a href="dump.php?only=churchyear">Save a Backup of Your Church Year Modifications</a>  See the note above about restoring to the same version.  Use the field above to install a backup of your church year data.</li>
     <li><form id="export-lectionary" action="export.php" method="get">
     <label for="lectionary">Export single lectionary as CSV.</label>
     <input type="text" name="lectionary" id="lectionary" required
         placeholder="Lectionary name">
     <button type="submit" id="submit">Export Lectionary</button>
     </form></li>
+    <li> <form id="import-lectionary" action="import.php" method="post">
+        <input type="hidden" name="import" value="lectionary">
+        <fieldset><legend>Import Lectionary</legend>
+        <input type="file" id="lectionary_file" name="import" required
+            placeholder="Select local file."><br />
+        <label for="lectionary_name">Name for imported lectionary</label>
+        <input type="text" id="lectionary_name" name="lectionary_name"
+            required placeholder="Enter name."><br />
+        <input type="checkbox" id="lect_replace" name="replace">
+        <label for="lect_replace">Replace all existing records for this lectionary?</label><br />
+        <button type="submit">Import Lectionary</button>
+    </fieldset></form></li>
     <li><a href="export.php?export=synonyms">Export Synonyms for Church Year Day Names</a></li>
+    <li><form id="import-synonyms" action="import.php" method="post">
+        <input type="hidden" name="import" value="synonyms">
+        <fieldset><legend>Import Synonyms</legend>
+        <input type="file" id="synonyms_file" name="import" required
+            placeholder="Select local file."><br />
+        <input type="checkbox" id="synonyms_replace" name="replace">
+        <label for="synonyms_replace">Replace all existing related synonyms?</label><br />
+        <button type="submit">Import Synonyms</button>
+    </fieldset></form></li>
     <li><a href="export.php?export=churchyear">Export Church Year Configuration</a> (controlling when each day falls)</a></li>
+    <li><form id="import-churchyear" action="import.php" method="post">
+        <input type="hidden" name="import" value="churchyear">
+        <fieldset><legend>Import Church Year</legend>
+        <input type="file" id="churchyear_file" name="import" required
+            placeholder="Select local file."><br />
+        <input type="checkbox" id="churchyear_replace" name="replaceall">
+        <label for="churchyear_replace">Replace all existing church year data?</label><br />
+        <button type="submit">Import Church Year Data</button>
+    </fieldset></form></li>
     </ul>
 
     <h3>Tweaking Your Installation</h3>

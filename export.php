@@ -100,6 +100,16 @@ if (! $auth) {
 
 if ($_GET['lectionary']) {
     $lectname = $_GET['lectionary'];
+    $dbh->beginTransaction();
+    $q = $dbh->prepare("SELECT COUNT() FROM `{$dbp}churchyear_lessons`
+        WHERE `lectionary` = :lect");
+    $q->bindValue(":lect", $lectname);
+    if (! ($q->execute() and 0 < $q->fetchColumn(0))) {
+        setMessage("No lectionary data for '".htmlentities($lectname)
+            ."'.");
+        header("location: admin.php");
+        exit(0);
+    }
     $q = $dbh->prepare("SELECT `dayname`, `lesson1`, `lesson2`,
         `gospel`, `psalm`, `s2lesson`, `s2gospel`, `s3lesson`, `s3gospel`,
         `hymnabc`, `hymn` FROM `{$dbp}churchyear_lessons`
@@ -110,12 +120,12 @@ if ($_GET['lectionary']) {
         echo array_pop($q->errorInfo());
         exit(0);
     }
-    $filebase = $_GET['lectionary'];
     $fieldnames = array("Dayname", "Lesson 1", "Lesson 2", "Gospel", "Psalm",
         "Series 2 Lesson", "Series 2 Gospel", "Series 3 Lesson",
         "Series 3 Gospel", "Week Hymn", "Year Hymn");
-    $csvex = new CSVExporter($q, $filebase, "utf-8", $fieldnames);
+    $csvex = new CSVExporter($q, $lectname, "utf-8", $fieldnames);
     $csvex->export();
+    $dbh->commit();
 }
 
 
