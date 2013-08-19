@@ -34,9 +34,12 @@ $rm[] = "Converting old DB connection script to a configfile...";
 require('./db-connection.php');
 require('./utility/configfile.php');
 $cf = new ConfigFile("dbconnection.ini");
-# TODO: Write a new config file here
-#
-#
+$cf->store("dbhost", $dbconnection["dbhost"]);
+$cf->store("dbname", $dbconnection["dbname"]);
+$cf->store("dbuser", $dbconnection["dbuser"]);
+$cf->store("dbpassword", $dbconnection["dbpassword"]);
+$cf->save();
+$rm[] = "Done."
 setMessage(implode("<br />\n", $rm));
 ?>
 
