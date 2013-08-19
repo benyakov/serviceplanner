@@ -40,22 +40,13 @@ if (array_key_exists("step", $_POST) && $_POST['step'] == '2') {
     $post = str_replace('\\', '\\\\', $_POST);
     $post = str_replace('\'', '\\\'', $post);
 
-    $fp = fopen("../db-connection.php", "w");
-    fwrite($fp, "<? // Do not change this file unless you know what you are doing.
-// This tells the web application how to connect to your database.
-try{
-    \$dbh = new PDO('mysql:host={$post['dbhost']};dbname={$post['dbname']}',
-        '{$post['dbuser']}', '{$post['dbpassword']}');
-} catch (PDOException \$e) {
-    die(\"Database Error: {\$e->getMessage()} </br>\");
-}
-\$dbp = '{$post['dbtableprefix']}';
-\$dbconnection = array(
-    'dbhost'=>'{$post['dbhost']}',
-    'dbname'=>'{$post['dbname']}',
-    'dbuser'=>'{$post['dbuser']}',
-    'dbpassword'=>'{$post['dbpassword']}');
-?>
+    $fp = fopen("../db-connection.ini", "w");
+    fwrite($fp, "# Do not change this file unless you know what you are doing.
+# This tells the web application how to connect to your database.
+dbhost = '{$post['dbhost']}'
+dbname = '{$post['dbname']}'
+dbuser = '{$post['dbuser']}'
+dbpassword = '{$post['dbpassword']}'
 ");
     fclose($fp);
     chmod("../db-connection.php", 0600);
