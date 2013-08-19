@@ -29,7 +29,7 @@ require("./utility/csv.php");
 
 // Exports here don't require $auth
 if (is_numeric($_GET["service"])) {
-    $q = queryService($dbh, $_GET['service']);
+    $q = queryService($_GET['service']);
     $q->setFetchMode(PDO::FETCH_ASSOC);
     $csvex = new CSVExporter($q);
     $csvex->setCharset("utf-8");

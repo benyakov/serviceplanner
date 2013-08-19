@@ -35,12 +35,13 @@ function checkContentReq() {
     return $_GET['contentonly'];
 }
 
-function queryService($dbh, $id) {
-    global $dbp;
-    return queryAllHymns($dbh, $dbp, 0, false, $id);
+function queryService($id) {
+    return queryAllHymns(0, false, $id);
 }
 
-function queryAllHymns($dbh, $dbp="", $limit=0, $future=false, $id="") {
+function queryAllHymns($limit=0, $future=false, $id="") {
+    $dbh = new DBConnection();
+    $dbp = $dbh->prefix;
     if ($id) $where = "WHERE d.pkey = ?";
     elseif ($future) {
         $where = "WHERE d.caldate >= CURDATE()";
@@ -474,19 +475,6 @@ function get_style($filename) {
     }
 }
 
-function dieWithRollback($q, $errorstr = "") {
-    // Rollback the db and die with errorInfo and errorstr
-    // If errorstr evaluates false, don't return anything.
-    global $dbh;
-    if ($errorstr && $q) {
-        $error = array_pop($q->errorInfo()) . " " . $errorstr;
-    } else {
-        $error = "";
-    }
-    $dbh->rollBack();
-    die($error);
-}
-
 function showMessage() {
     global $sprefix;
     if (array_key_exists('message', $_SESSION[$sprefix])) { ?>
@@ -661,7 +649,8 @@ function ordinal($n) {
 
 function daysForDate($date) {
     // Return an array of day names matching the given English-format date.
-    global $dbh, $dbp;
+    $dbh = new DBConnection();
+    $dbp = $dbh->prefix;
     if (! $date) return array();
     $found = array();
     $date = strtotime($date);
@@ -692,7 +681,8 @@ function getLessonField($lesson, $lect, $series) {
 /* Replace occurrences of {{DBP}} with $prefix or $dbp in text.
  */
 function replaceDBP($text, $prefix=false) {
-    global $dbp;
+    $dbh = new DBConnection();
+    $dbp = $dbh->prefix;
     if ($prefix !== false) {
         return str_replace('{{DBP}}', $prefix, $text);
     } else {

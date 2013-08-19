@@ -27,7 +27,8 @@
 function query_churchyear($json=false) {
     /* Return an executed query for all rows of the churchyear db
      */
-    global $dbh, $dbp;
+    $dbh = new DBConnection();
+    $dbp = $dbh->prefix;
     $q = $dbh->prepare("SELECT cy.`dayname`, cy.`season`, cy.`base`,
         cy.`offset`, cy.`month`, cy.`day`,
         cy.`observed_month`, cy.`observed_sunday`,

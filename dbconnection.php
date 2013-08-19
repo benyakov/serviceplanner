@@ -28,34 +28,37 @@ class DBConnection {
     private static $instance;
     public static $connection;
     private static $handle;
+    public static $prefix;
 
-    public function construct() {
+    public function __construct() {
         if (self::$instance) {
             return self::$instance;
         } else {
-            require_once("./utility/configfile.php");
-            $cf = new ConfigFile("dbconnection.ini");
             self::$instance = $this;
-            self::$connection = array(
-                "host"=>$cf->get("dbhost"),
-                "name"=>$cf->get("dbname"),
-                "user"=>$cf->get("dbuser"),
-                "password"=>$cf->get("dbpassword"));
-            self::$handle = new PDO("mysql:host={$dbhost};dbname={$dbname}",
-                "{$dbuser}", "{$dbpassword}");
+            $this->setupConnection();
             return self::$instance;
         }
     }
-    public function __call($name, $args) {
-        if ($this->handle)
-          call_user_func_array($this->handle->$name, $args);
-        else
-          throw new Exception("DBConnection not set up.");
+
+    private function setupConnection() {
+        require_once("./utility/configfile.php");
+        $cf = new ConfigFile("dbconnection.ini");
+        self::$connection = array(
+            "host"=>$cf->get("dbhost"),
+            "name"=>$cf->get("dbname"),
+            "user"=>$cf->get("dbuser"),
+            "password"=>$cf->get("dbpassword"),
+            "prefix"=>$cf->get("prefix"));
+        list($dbhost, $dbname, $dbuser, $dbpassword) = array(
+            $cf->get("dbhost"), $cf->get("dbname"),
+            $cf->get("dbuser"), $cf->get("dbpassword"));
+        self::$prefix = $cf->get("prefix");
+        self::$handle = new PDO("mysql:host={$dbhost};dbname={$dbname}",
+            "{$dbuser}", "{$dbpassword}");
     }
-    public static function __callStatic($name, $args) {
-        if (self::$handle)
-          call_user_func_array(self::$handle->$name, $args);
-        else
-          throw new Exception("DBConnection not set up.");
+    public function __call($name, $args) {
+        if (! self::$handle)
+            $this->setupConnection();
+        return call_user_func_array(array(self::$handle, $name), $args);
     }
 }

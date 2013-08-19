@@ -1,4 +1,4 @@
-<? /* Upgrade from version 0.2 to 0.3
+<? /* Upgrade from version 0.3 to 0.4
     Copyright (C) 2012 Jesse Jacobsen
 
     This program is free software; you can redistribute it and/or modify

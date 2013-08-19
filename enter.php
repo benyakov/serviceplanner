@@ -246,7 +246,8 @@ function existing($str) {
 function processFormData() {
     // echo "POST:"; print_r($_POST); exit(0);
     //// Add a new service, if needed.
-    global $dbh, $dbp;
+    $dbh = new DBConnection();
+    $dbp = $dbh->prefix;
     $dbh->beginTransaction();
     $feedback='<ol>';
     $date = strftime("%Y-%m-%d", strtotime($_POST['date']));
@@ -354,7 +355,8 @@ function processFormData() {
     header("Location: modify.php");
 }
 function setHymnTitle() {
-    global $dbh, $dbp;
+    $dbh = new DBConnection();
+    $dbp = $dbh->prefix;
     $dbh->beginTransaction();
     $q = $dbh->prepare("SELECT `title`, `number` FROM `{$dbp}names`
         WHERE `book` = :book AND `number` = :number");

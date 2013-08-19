@@ -24,7 +24,8 @@
     USA
    */
 function propersForm($dayname) {
-    global $dbp, $dbh;
+    $dbh = new DBConnection();
+    $dbp = $dbh->prefix;
     $q = $dbh->prepare("SELECT pr.color, pr.theme, pr.introit, pr.note,
         l.lesson1, l.lesson2, l.gospel, l.psalm, l.s2lesson, l.s2gospel,
         l.s3lesson, l.s3gospel, l.id, l.lectionary, l.hymnabc, l.hymn

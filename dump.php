@@ -41,7 +41,8 @@ function gettablename ($line) {
     }
 }
 function adddbpfix ($name) {
-    global $dbp;
+    $dbh = new DBConnection();
+    $dbp = $dbh->prefix;
     return "{$dbp}{$name}";
 }
 function churchyeartable ($name) {

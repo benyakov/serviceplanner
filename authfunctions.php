@@ -27,7 +27,9 @@
 
 
 function auth($login = '', $passwd = '') {
-    global $dbp, $sprefix, $dbh;
+    global $sprefix;
+    $dbh = new DBConnection();
+    $dbp = $dbh->prefix;
 	$authdata = $_SESSION[$sprefix]['authdata'];
     if (is_array($authdata) && empty($login)
         && $authdata["authtype"] == "password")
@@ -91,7 +93,9 @@ function authId($authdata=false) {
 function authcookie($authorized=null) {
     // Set the authorization cookies, if $authorized or not.
     // Return whether valid auth cookie exists.
-    global $dbh, $dbp, $sprefix;
+    global $sprefix;
+    $dbh = new DBConnection();
+    $dbp = $dbh->prefix;
     if (! file_exists("authcookies")) mkdir("authcookies");
     if (is_null($authorized)) {
         // Check cookie

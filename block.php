@@ -51,7 +51,8 @@ function ifVal($ary, $key) {
 /* Display the form for a block plan, including values if provided.
  */
 function blockPlanForm($vals=array()) {
-    global $dbh, $dbp;
+    $dbh = new DBConnection();
+    $dbp = $dbh->prefix;
     if ($vals['l1lect'] == 'custom') $vals['l1custom'] = $vals['l1series'];
     else $vals['l1custom'] = "";
     if ($vals['l2lect'] == 'custom') $vals['l2custom'] = $vals['l2series'];

@@ -242,7 +242,9 @@ if ( $flag=="edit" ) {
 ***************************************/
 
 function changePW($flag) {
-    global $dbp, $dbh, $sprefix;
+    global $sprefix;
+    $dbh = new DBConnection();
+    $dbp = $dbh->prefix;
 
     if ($flag=="reset") { // password reset request
         $q = $dbh->prepare("SELECT `uid`, `username` FROM `{$dbp}users`
@@ -400,7 +402,9 @@ function editUserForm($elementValues="", $mode="Add",
 
 
 function userList() {
-    global $authdata, $dbp, $dbh;
+    global $authdata;
+    $dbh = new DBConnection();
+    $dbp = $dbh->prefix;
 ?>
     <!DOCTYPE html>
     <html lang="en">

@@ -80,7 +80,7 @@ if (! array_key_exists('stage', $_GET)) {
     particular service.  The service is displayed below.  You can also store
     your sermon manuscript file in the system, from this page.</p>
     <?
-    $q = queryService($dbh, $id);
+    $q = queryService($id);
     display_records_table($q, "delete.php");
 
     $q = $dbh->prepare("SELECT bibletext, outline, notes, mstype

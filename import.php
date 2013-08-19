@@ -59,7 +59,8 @@ class LectionaryImporter extends FormImporter {
      */
 
     public function import() {
-        global $dbh;
+        $dbh = new DBConnection();
+        $dbp = $dbh->prefix;
         if (($fhandle = fopen($loadfile, "r")) !== false) {
             if (! $keys = fgetcsv($fhandle)) {
                 setMessage("Empty file upload.");

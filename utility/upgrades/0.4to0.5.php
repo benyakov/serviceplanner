@@ -1,4 +1,4 @@
-<? /* Upgrade from version 0.2 to 0.3
+<? /* Upgrade from version 0.4 to 0.5
     Copyright (C) 2012 Jesse Jacobsen
 
     This program is free software; you can redistribute it and/or modify
@@ -30,16 +30,23 @@ if ("0.4." != substr($oldversion, 0, 4).'.') {
     die("Can't upgrade from 0.4.x, since the current db version is {$oldversion}.");
 }
 // Update the database connection mechanism
-$rm[] = "Converting old DB connection script to a configfile...";
+$rm[] = "Converting old DB connection script to a configfile.";
 require('./db-connection.php');
-require('./utility/configfile.php');
 $cf = new ConfigFile("dbconnection.ini");
 $cf->store("dbhost", $dbconnection["dbhost"]);
 $cf->store("dbname", $dbconnection["dbname"]);
 $cf->store("dbuser", $dbconnection["dbuser"]);
 $cf->store("dbpassword", $dbconnection["dbpassword"]);
+$cf->store("prefix", $dbp);
 $cf->save();
-$rm[] = "Done."
+$rm[] = "Deleting old db-connection script.";
+unlink("db-connection.php");
+$rm[] = "Loading a new database connection object.";
+$db = new DBConnection();
+$rm[] = "Done.  Writing new dbversion to dbstate file.";
+$newversion = "{$version['major']}.{$version['minor']}.{$version['tick']}";
+$dbstate->store('dbversion', $newversion);
+$dbstate->save() or die("Problem saving dbstate file.");
+$rm[] = "Upgraded to {$newversion}";
 setMessage(implode("<br />\n", $rm));
 ?>
-

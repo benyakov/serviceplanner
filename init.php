@@ -32,6 +32,7 @@ if (! file_exists("options.php")) {
 require("./options.php");
 require("./setup-session.php");
 require("./functions.php");
+require("./utility/configfile.php");
 require("./dbconnection.php");
 $db = new DBConnection();
 $serverdir = dirname($_SERVER['PHP_SELF']);
@@ -41,7 +42,6 @@ $script_basename = basename($_SERVER['PHP_SELF'], '.php');
         header("Location: {$serverdir}/utility/setup-dbconfig.php");
         exit(0);
     } */
-require("./utility/configfile.php");
 $dbstate = new Configfile("./dbstate.ini", false);
 $config = new Configfile("./config.ini", false);
 $upgradedb = false;
@@ -68,7 +68,7 @@ if (! ($dbstate->get("has-user") || $_GET['flag'] == 'inituser')) {
     header("Location: {$serverdir}/utility/inituser.php");
     exit(0);
 }
-require("./db-connection.php");
+// require("./db-connection.php");
 if (! ($_GET['flag'] == "inituser"
     || array_key_exists('username', $_POST))) $auth = auth();
 if ((! $dbstate->get("churchyear-filled")) or
@@ -85,7 +85,7 @@ if ((! $dbstate->get("has-churchyear-functions")) or
     $functionsfh = fopen($functionsfile, "rb");
     $functionstext = fread($functionsfh, filesize($functionsfile));
     fclose($functionsfh);
-    $q = $dbh->prepare(replaceDBP($functionstext));
+    $q = $db->prepare(replaceDBP($functionstext));
     $q->execute() or die("Problem creating functions<br>".
         array_pop($q->errorInfo()));
     $q->closeCursor();
