@@ -179,7 +179,8 @@ $(document).ready(function(){var a="http://www.bethanythedalles.org/services-dev
         placeholder="Lectionary name">
     <button type="submit" id="submit">Export Lectionary</button>
     </form></li>
-    <li> <form id="import-lectionary" action="import.php" method="post">
+    <li> <form id="import-lectionary" action="import.php" method="post"
+            enctype="multipart/form-data">
         <input type="hidden" name="import" value="lectionary">
         <fieldset><legend>Import Lectionary</legend>
         <input type="file" id="lectionary_file" name="import" required
@@ -192,7 +193,8 @@ $(document).ready(function(){var a="http://www.bethanythedalles.org/services-dev
         <button type="submit">Import Lectionary</button>
     </fieldset></form></li>
     <li><a href="export.php?export=synonyms">Export Synonyms for Church Year Day Names</a></li>
-    <li><form id="import-synonyms" action="import.php" method="post">
+    <li><form id="import-synonyms" action="import.php" method="post"
+            enctype="multipart/form-data">
         <input type="hidden" name="import" value="synonyms">
         <fieldset><legend>Import Synonyms</legend>
         <input type="file" id="synonyms_file" name="import" required
@@ -202,7 +204,8 @@ $(document).ready(function(){var a="http://www.bethanythedalles.org/services-dev
         <button type="submit">Import Synonyms</button>
     </fieldset></form></li>
     <li><a href="export.php?export=churchyear">Export Church Year Configuration</a> (controlling when each day falls)</a></li>
-    <li><form id="import-churchyear" action="import.php" method="post">
+    <li><form id="import-churchyear" action="import.php" method="post"
+            enctype="multipart/form-data">
         <input type="hidden" name="import" value="churchyear">
         <fieldset><legend>Import Church Year</legend>
         <input type="file" id="churchyear_file" name="import" required

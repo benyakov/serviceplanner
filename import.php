@@ -29,7 +29,7 @@ require("./utility/csv.php");
 
 if (! $auth) {
     setMessage("Access denied.");
-    header("Location: index.php");
+    header("Location: admin.php");
     exit(0);
 }
 
@@ -51,9 +51,9 @@ if (! $auth) {
  */
 
 $loadfile = "./load-{$dbconnection['dbname']}.txt";
-if (! move_uploaded_file($_FILES[$_POST['import']]['tmp_name'], $loadfile)) {
+if (! move_uploaded_file($_FILES['import']['tmp_name'], $loadfile)) {
     setMessage("Problem with file upload.");
-    header("Location: index.php");
+    header("Location: admin.php");
     exit(0);
 }
 
@@ -69,7 +69,7 @@ function importChurchyear($loadfile) {
     if (($fhandle = fopen($loadfile, "r")) !== false) {
         if (! $keys = fgetcsv($fhandle)) {
             setMessage("Empty file upload.");
-            header("Location: index.php");
+            header("Location: admin.php");
             exit(0);
         }
     } else {
@@ -93,7 +93,7 @@ function importSynonyms($loadfile) {
                     ENGINE=InnoDB DEFAULT CHARSET=utf8");
             $q = $dbh->prepare("INSERT INTO `{$dbh}newsynonyms`
                 (`canonical`, `synonym`)
-                VALUES (:canonical, :synonym)")
+                VALUES (:canonical, :synonym)");
             $q->bindParam(":canonical", $canonical);
             $q->bindParam(":synonym", $synonym);
             while ($oneset = fgetcsv($fhandle)) {
@@ -153,10 +153,11 @@ function importSynonyms($loadfile) {
 }
 
 function importLectionary($loadfile) {
+    global $dbh;
     if (($fhandle = fopen($loadfile, "r")) !== false) {
         if (! $keys = fgetcsv($fhandle)) {
             setMessage("Empty file upload.");
-            header("Location: index.php");
+            header("Location: admin.php");
             exit(0);
         }
         $dbh->beginTransaction();
@@ -202,7 +203,7 @@ function importLectionary($loadfile) {
         $q->bindParam(":hymn", $thisrec["Year Hymn"]);
         while ($record = fgetcsv($fhandle)) {
             for ($i=0; $i<count($keys); $i++)
-                $thisrec[$keys[$i]] = $record[$i]];
+                $thisrec[$keys[$i]] = $record[$i];
             $q->execute() or die(array_pop($q->errorInfo()));
         }
         $dbh->commit();

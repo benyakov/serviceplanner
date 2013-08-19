@@ -101,10 +101,10 @@ if (! $auth) {
 if ($_GET['lectionary']) {
     $lectname = $_GET['lectionary'];
     $dbh->beginTransaction();
-    $q = $dbh->prepare("SELECT COUNT() FROM `{$dbp}churchyear_lessons`
+    $q = $dbh->prepare("SELECT COUNT(*) as c FROM `{$dbp}churchyear_lessons`
         WHERE `lectionary` = :lect");
-    $q->bindValue(":lect", $lectname);
-    if (! ($q->execute() and 0 < $q->fetchColumn(0))) {
+    $q->bindParam(":lect", $lectname);
+    if (! ($q->execute() and 0 < intval($q->fetchColumn()))) {
         setMessage("No lectionary data for '".htmlentities($lectname)
             ."'.");
         header("location: admin.php");
