@@ -26,22 +26,105 @@
 
 require("./init.php");
 require("./utility/csv.php");
+requireAuth("admin.php");
 
-if (! $auth) {
-    setMessage("Access denied.");
-    header("Location: admin.php");
-    exit(0);
+if ("lectionary" == $_POST['import'])
+  $importer = new LectionaryImporter();
+elseif ("synonyms" == $_POST['import'])
+  $importer = new SynonymImporter();
+elseif ("churchyear" == $_POST['import'])
+  $importer = new ChurchyearImporter();
+
+class FormImporter {
+    /* Expects in $_POST:
+     * import := <name of thing being imported>
+     * $_POST['import'] := upload file to import
+     */
+    private $loadfile;
+
+    public function _construct() {
+        $dbconnection = new DBConnection();
+        $this->loadfile = "./load-{$dbconnection['dbname']}.txt";
+        if (! move_uploaded_file($_FILES['import']['tmp_name'], $loadfile)) {
+            setMessage("Problem with file upload.");
+            header("Location: admin.php");
+            exit(0);
+        }
 }
 
-/* Expects in $_POST:
- * import := <name of thing being imported>
- * $_POST['import'] := upload file to import
- *
- * For lectionary, also handle:
- * lectionary_name
- * replace := replacing all existing records for this lectionary
- *
- * For synonyms, also handle:
+class LectionaryImporter extends FormImporter {
+    /* For lectionary, also handle:
+     * lectionary_name
+     * replace := replacing all existing records for this lectionary
+     */
+
+    public function import() {
+        global $dbh;
+        if (($fhandle = fopen($loadfile, "r")) !== false) {
+            if (! $keys = fgetcsv($fhandle)) {
+                setMessage("Empty file upload.");
+                header("Location: admin.php");
+                exit(0);
+            }
+            $dbh->beginTransaction();
+            // Check for existing lessons and delete, if confirmed.
+            $q = $dbh->prepare("SELECT 1 FROM `{$dbp}churchyear_lessons`
+                WHERE lectionary = :lectionary");
+            $q->bindValue(":lectionary", $_POST['lectionary_name']);
+            $q->execute() or die(array_pop($q->errorInfo()));
+            if ($q->fetchColumn(0)) {
+                if (isset($_POST['replace']) && "on" == $_POST['replace']) {
+                    $q = $dbh->prepare("DELETE FROM `{$dbp}churchyear_lessons`
+                        WHERE lectionary = :lectionary");
+                    $q->bindValue(":lectionary", $_POST['lectionary_name']);
+                    $q->execute() or die(array_pop($q->errorInfo()));
+                } else {
+                    setMessage("Please confirm replacement of existing lectionary.");
+                    header("Location: admin.php");
+                    exit(0);
+                }
+            }
+            // Create records for new lessons
+            $q = $dbh->prepare("INSERT INTO `{$dbp}churchyear_lessons`
+                (lectionary, dayname, lesson1, lesson2, gospel, psalm,
+                s2lesson, s2gospel, s3lesson, s3gospel, hymnabc, hymn)
+                VALUES
+                (:lectionary, :dayname, :lesson1, :lesson2, :gospel, :psalm,
+                :s2lesson, :s2gospel, :s3lesson, :s3gospel, :hymnabc, :hymn)");
+            $thisrec = array("Dayname"=>"", "Lesson 1"=>"", "Lesson 2"=>"",
+                "Gospel"=>"", "Psalm"=>"", "Series 2 Lesson"=>"",
+                "Series 2 Gospel"=>"", "Series 3 Lesson"=>"",
+                "Series 3 Gospel"=>"", "Week Hymn"=>"", "Year Hymn"=>"");
+            $q->bindParam(":lectionary", $_POST['lectionary_name']);
+            $q->bindParam(":dayname", $thisrec["Dayname"]);
+            $q->bindParam(":lesson1", $thisrec["Lesson 1"]);
+            $q->bindParam(":lesson2", $thisrec["Lesson 2"]);
+            $q->bindParam(":gospel", $thisrec["Gospel"]);
+            $q->bindParam(":psalm", $thisrec["Psalm"]);
+            $q->bindParam(":s2lesson", $thisrec["Series 2 Lesson"]);
+            $q->bindParam(":s2gospel", $thisrec["Series 2 Gospel"]);
+            $q->bindParam(":s3lesson", $thisrec["Series 3 Lesson"]);
+            $q->bindParam(":s3gospel", $thisrec["Series 3 Gospel"]);
+            $q->bindParam(":hymnabc", $thisrec["Week Hymn"]);
+            $q->bindParam(":hymn", $thisrec["Year Hymn"]);
+            while ($record = fgetcsv($fhandle)) {
+                for ($i=0; $i<count($keys); $i++)
+                    $thisrec[$keys[$i]] = $record[$i];
+                $q->execute() or die(array_pop($q->errorInfo()));
+            }
+            $dbh->commit();
+            setMessage("Loaded lectionary data.");
+            header("Location: admin.php");
+        } else {
+            setMessage("Problem opening uploaded file.");
+        }
+        setMessage("Lectionary imported.");
+        header("Location: admin.php");
+        exit(0);
+    }
+}
+
+/* For synonyms, also handle:
  * replace := replace all synonyms for the given left-hand words
  *  (Caution: synonym deletions will cascade into other tables.)
  *
@@ -50,20 +133,7 @@ if (! $auth) {
  *  Otherwise, only replace days already defined.
  */
 
-$loadfile = "./load-{$dbconnection['dbname']}.txt";
-if (! move_uploaded_file($_FILES['import']['tmp_name'], $loadfile)) {
-    setMessage("Problem with file upload.");
-    header("Location: admin.php");
-    exit(0);
-}
 
-if ("lectionary" == $_POST['import']) {
-    importLectionary($loadfile);
-} elseif ("synonyms" == $_POST['import']) {
-    importSynonyms($loadfile);
-} elseif ("churchyear" == $_POST['import']) {
-    importChurchyear($loadfile);
-}
 
 function importChurchyear($loadfile) {
     if (($fhandle = fopen($loadfile, "r")) !== false) {
@@ -152,70 +222,6 @@ function importSynonyms($loadfile) {
     exit(0);
 }
 
-function importLectionary($loadfile) {
-    global $dbh;
-    if (($fhandle = fopen($loadfile, "r")) !== false) {
-        if (! $keys = fgetcsv($fhandle)) {
-            setMessage("Empty file upload.");
-            header("Location: admin.php");
-            exit(0);
-        }
-        $dbh->beginTransaction();
-        // Check for existing lessons and delete, if confirmed.
-        $q = $dbh->prepare("SELECT 1 FROM `{$dbp}churchyear_lessons`
-            WHERE lectionary = :lectionary");
-        $q->bindValue(":lectionary", $_POST['lectionary_name']);
-        $q->execute() or die(array_pop($q->errorInfo()));
-        if ($q->fetchColumn(0)) {
-            if (isset($_POST['replace']) && "on" == $_POST['replace']) {
-                $q = $dbh->prepare("DELETE FROM `{$dbp}churchyear_lessons`
-                    WHERE lectionary = :lectionary");
-                $q->bindValue(":lectionary", $_POST['lectionary_name']);
-                $q->execute() or die(array_pop($q->errorInfo()));
-            } else {
-                setMessage("Please confirm replacement of existing lectionary.");
-                header("Location: admin.php");
-                exit(0);
-            }
-        }
-        // Create records for new lessons
-        $q = $dbh->prepare("INSERT INTO `{$dbp}churchyear_lessons`
-            (lectionary, dayname, lesson1, lesson2, gospel, psalm,
-            s2lesson, s2gospel, s3lesson, s3gospel, hymnabc, hymn)
-            VALUES
-            (:lectionary, :dayname, :lesson1, :lesson2, :gospel, :psalm,
-            :s2lesson, :s2gospel, :s3lesson, :s3gospel, :hymnabc, :hymn)");
-        $thisrec = array("Dayname"=>"", "Lesson 1"=>"", "Lesson 2"=>"",
-            "Gospel"=>"", "Psalm"=>"", "Series 2 Lesson"=>"",
-            "Series 2 Gospel"=>"", "Series 3 Lesson"=>"",
-            "Series 3 Gospel"=>"", "Week Hymn"=>"", "Year Hymn"=>"");
-        $q->bindParam(":lectionary", $_POST['lectionary_name']);
-        $q->bindParam(":dayname", $thisrec["Dayname"]);
-        $q->bindParam(":lesson1", $thisrec["Lesson 1"]);
-        $q->bindParam(":lesson2", $thisrec["Lesson 2"]);
-        $q->bindParam(":gospel", $thisrec["Gospel"]);
-        $q->bindParam(":psalm", $thisrec["Psalm"]);
-        $q->bindParam(":s2lesson", $thisrec["Series 2 Lesson"]);
-        $q->bindParam(":s2gospel", $thisrec["Series 2 Gospel"]);
-        $q->bindParam(":s3lesson", $thisrec["Series 3 Lesson"]);
-        $q->bindParam(":s3gospel", $thisrec["Series 3 Gospel"]);
-        $q->bindParam(":hymnabc", $thisrec["Week Hymn"]);
-        $q->bindParam(":hymn", $thisrec["Year Hymn"]);
-        while ($record = fgetcsv($fhandle)) {
-            for ($i=0; $i<count($keys); $i++)
-                $thisrec[$keys[$i]] = $record[$i];
-            $q->execute() or die(array_pop($q->errorInfo()));
-        }
-        $dbh->commit();
-        setMessage("Loaded lectionary data.");
-        header("Location: admin.php");
-    } else {
-        setMessage("Problem opening uploaded file.");
-    }
-    setMessage("Lectionary imported.");
-    header("Location: admin.php");
-    exit(0);
-}
 
 
 // vim: set foldmethod=indent :

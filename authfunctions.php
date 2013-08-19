@@ -228,5 +228,11 @@ function checkCorsAuth() {
     } else return false;
 }
 
+function requireAuth($location="index.php", $message="Access denied.") {
+    setMessage($message);
+    header("Location: {$location}");
+    exit(0);
+}
+
 // vim: set foldmethod=indent :
 ?>
