@@ -33,7 +33,7 @@ class DBConnection {
         if (self::$instance) {
             return self::$instance;
         } else {
-            require_once("utility/configfile.php");
+            require_once("./utility/configfile.php");
             $cf = new ConfigFile("dbconnection.ini");
             self::$instance = $this;
             self::$connection = array(

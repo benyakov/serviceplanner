@@ -32,13 +32,15 @@ if (! file_exists("options.php")) {
 require("./options.php");
 require("./setup-session.php");
 require("./functions.php");
+require("./dbconnection.php");
+$db = new DBConnection();
 $serverdir = dirname($_SERVER['PHP_SELF']);
 $script_basename = basename($_SERVER['PHP_SELF'], '.php');
-if ((! file_exists("db-connection.php") and
+/* if ((! file_exists("db-connection.php") and
     (! is_link($_SERVER['SCRIPT_FILENAME'])))) {
         header("Location: {$serverdir}/utility/setup-dbconfig.php");
         exit(0);
-}
+    } */
 require("./utility/configfile.php");
 $dbstate = new Configfile("./dbstate.ini", false);
 $config = new Configfile("./config.ini", false);
