@@ -27,7 +27,7 @@ require("./init.php");
 $this_script = $_SERVER['HTTP_HOST'].$_SERVER['SCRIPT_NAME'] ;
 if (array_key_exists('manuscript', $_GET)) {
     // Send the sermon manuscript, or a message saying it ain't there
-    $q = $dbh->prepare("SELECT manuscript, mstype FROM `{$dbp}sermons`
+    $q = $db->prepare("SELECT manuscript, mstype FROM `{$db->prefix}sermons`
         WHERE service=:id");
     $q->bindParam(":id", $_GET['id']);
     $q->execute();
@@ -83,8 +83,8 @@ if (! array_key_exists('stage', $_GET)) {
     $q = queryService($id);
     display_records_table($q, "delete.php");
 
-    $q = $dbh->prepare("SELECT bibletext, outline, notes, mstype
-        FROM `{$dbp}sermons` WHERE service=:id");
+    $q = $db->prepare("SELECT bibletext, outline, notes, mstype
+        FROM `{$db->prefix}sermons` WHERE service=:id");
     $q->bindParam(":id", $id);
     $q->execute();
     $row = $q->fetch(PDO::FETCH_ASSOC);
@@ -122,7 +122,7 @@ if (! array_key_exists('stage', $_GET)) {
 <?
 } elseif (2 == $_GET["stage"])
 {
-    $dbh->beginTransaction();
+    $db->beginTransaction();
     $msfile = "manuscript-{$dbconnection['dbname']}.txt";
     if ((! move_uploaded_file($_FILES['manuscript_file']['tmp_name'], $msfile))
             || $_POST['deletems']) {
@@ -135,17 +135,17 @@ if (! array_key_exists('stage', $_GET)) {
     if ($ft || $_POST['deletems']) {
         // Update the saved file blob and type field
         // This is handled separately from the other data updates
-        $q = $dbh->prepare("SELECT 1 from `{$dbp}sermons`
+        $q = $db->prepare("SELECT 1 from `{$db->prefix}sermons`
             WHERE service=?");
         $q->execute(array($_POST['service']))
             or die(array_pop($q->errorInfo()));
         $exists = $q->fetchColumn();
         if ($exists) {
-            $q = $dbh->prepare("UPDATE `{$dbp}sermons`
+            $q = $db->prepare("UPDATE `{$db->prefix}sermons`
                 SET manuscript=?, mstype=?
                 WHERE service=?");
         } else {
-            $q = $dbh->prepare("INSERT INTO `{$dbp}sermons`
+            $q = $db->prepare("INSERT INTO `{$db->prefix}sermons`
                 (manuscript, mstype, service)
                 VALUES (?, ?, ?)");
         }
@@ -155,7 +155,7 @@ if (! array_key_exists('stage', $_GET)) {
         $q->execute() or die(array_pop($q->errorInfo()));
     }
     // Insert or update the sermon plans.
-    $q = $dbh->prepare("INSERT INTO `{$dbp}sermons`
+    $q = $db->prepare("INSERT INTO `{$db->prefix}sermons`
         (bibletext, outline, notes, service)
         VALUES (:bibletext, :outline, :notes, :id)");
     $q->bindParam(':bibletext', $_POST['bibletext']);
@@ -163,7 +163,7 @@ if (! array_key_exists('stage', $_GET)) {
     $q->bindParam(':notes', $_POST['notes']);
     $q->bindParam(':id', $_POST['service']);
     if (! $q->execute()) {
-        $q = $dbh->prepare("UPDATE `{$dbp}sermons`
+        $q = $db->prepare("UPDATE `{$db->prefix}sermons`
             SET bibletext = :bibletext,
             outline = :outline, notes = :notes
             WHERE service = :id");
@@ -173,7 +173,7 @@ if (! array_key_exists('stage', $_GET)) {
         $q->bindParam(':id', $_POST['service']);
         $q->execute() or die(array_pop($q->errorInfo()));
     }
-    $dbh->commit();
+    $db->commit();
     fclose($fp);
     $now = strftime('%T');
     setMessage("Sermon plans saved at {$now} server time.");

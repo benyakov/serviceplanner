@@ -40,11 +40,11 @@ if (! $auth) {
         </span>
         <h1>Sermon Plan</h1>
     <?
-        $q = $dbh->prepare("SELECT s.bibletext, s.outline,
+        $q = $db->prepare("SELECT s.bibletext, s.outline,
             s.notes, DATE_FORMAT(d.caldate, '%e %b %Y') as date,
             d.name, d.rite
-            FROM `{$dbp}sermons` AS s
-            JOIN `{$dbp}days` AS d ON (s.service=d.pkey)
+            FROM `{$db->prefix}sermons` AS s
+            JOIN `{$db->prefix}days` AS d ON (s.service=d.pkey)
             WHERE service=:id");
         $q->execute(array("id"=>$_GET['id']))
             or die(array_pop($q->errorInfo()));

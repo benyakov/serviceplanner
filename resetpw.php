@@ -42,8 +42,8 @@ if ( $_POST ) {
         $svalue = $_POST['email'];
         $where .= "`email` = :value";
     }
-    $q = $dbh->prepare("SELECT `email`, `username`
-        FROM `{$dbp}users` WHERE {$where}");
+    $q = $db->prepare("SELECT `email`, `username`
+        FROM `{$db->prefix}users` WHERE {$where}");
     $q->bindParam(':value', $svalue);
     $q->execute();
     if (! $result = $q->fetchAll(PDO::FETCH_ASSOC)) {
@@ -53,7 +53,7 @@ if ( $_POST ) {
     }
     foreach ($result as $row) {
         $resetkey = md5($row['username'].date('%c').$row['email']);
-        $q1 = $dbh->prepare("UPDATE `{$dbp}users`
+        $q1 = $db->prepare("UPDATE `{$db->prefix}users`
             SET `resetkey` = '{$resetkey}',
             `resetexpiry` = DATE_ADD(NOW(),INTERVAL 6 DAY)
             WHERE {$where}");
@@ -61,9 +61,9 @@ if ( $_POST ) {
         $q1->execute();
         $resetkey = urlencode($resetkey);
         $mailresult = mail($to=$row['email'],
-            $subject="Password reset for {$dbp} services at {$_SERVER['HTTP_HOST']}",
+            $subject="Password reset for {$db->prefix} services at {$_SERVER['HTTP_HOST']}",
             $message=<<<EOM
-Someone has requested to reset your password in the {$dbp} service planning
+Someone has requested to reset your password in the {$db->prefix} service planning
 application at {$_SERVER['HTTP_HOST']}.  If it was not you, you can safely
 ignore this message.
 

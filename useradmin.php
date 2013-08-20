@@ -32,7 +32,7 @@ $auth = auth();
 if ( $flag=="edit" ) {
     adminOnly($authdata['userlevel']);
     $id = $_GET['id'];
-    $q = $dbh->prepare("SELECT * FROM `{$dbp}users` WHERE `uid`=:id");
+    $q = $db->prepare("SELECT * FROM `{$db->prefix}users` WHERE `uid`=:id");
     $q->bindParam(":id", $id);
     $q->execute();
     $row = $q->fetch(PDO::FETCH_ASSOC);
@@ -51,7 +51,7 @@ if ( $flag=="edit" ) {
     $lname = htmlentities($_POST['lname']);
     $email = $_POST['email'];
     $uid = intval($_POST['uid']);
-    $q = $dbh->prepare("UPDATE `{$dbp}users` SET {$pwstr}
+    $q = $db->prepare("UPDATE `{$db->prefix}users` SET {$pwstr}
         `fname`=:fname, `lname`=:lname, `userlevel`=:ulevel,
         `email`=:email WHERE `username`=:uname");
     $q->bindParam(':fname', $fname);
@@ -64,7 +64,7 @@ if ( $flag=="edit" ) {
     if ( $uname==$authdata['login'] ) {
         if ($newpw) auth($uname, $newpw);
         else {
-            $q = $dbh->prepare("SELECT password FROM `{$dbp}users`
+            $q = $db->prepare("SELECT password FROM `{$db->prefix}users`
                 WHERE `uid` = :uid");
             $q->bindParam(':uid', $uid);
             $q->execute();
@@ -85,7 +85,7 @@ if ( $flag=="edit" ) {
     adminOnly($authdata['userlevel']);
     $id = $_GET['id'];
     if ($authdata['uid'] != $id) {
-        $q = $dbh->prepare("DELETE FROM `{$dbp}users`
+        $q = $db->prepare("DELETE FROM `{$db->prefix}users`
             WHERE `uid`=:id");
         $q->bindParam(':id', $id);
         $q->execute();
@@ -105,9 +105,9 @@ if ( $flag=="edit" ) {
     $fname = htmlentities($_POST['fname']);
     $lname = htmlentities($_POST['lname']);
     $email = $_POST['email'];
-    $dbh->beginTransaction();
+    $db->beginTransaction();
     // Check for existing user name
-    $qu = $dbh->prepare("SELECT * FROM `{$dbp}users`
+    $qu = $db->prepare("SELECT * FROM `{$db->prefix}users`
         WHERE `username`=:uname");
     $qu->bindParam(":uname", $uname);
     $qu->execute();
@@ -116,7 +116,7 @@ if ( $flag=="edit" ) {
         $unameerror = $uname;
     }
     // Check for existing email address
-    $qe = $dbh->prepare("SELECT * FROM `{$dbp}users`
+    $qe = $db->prepare("SELECT * FROM `{$db->prefix}users`
         WHERE `email`=:email");
     $qe->bindParam(":email", $email);
     $qe->execute();
@@ -124,11 +124,11 @@ if ( $flag=="edit" ) {
         $emailerror = $email;
     }
     if ( $unameerror || $emailerror ) {
-        $dbh->rollBack();
+        $db->rollBack();
         $elementValues = array("", "", "", $fname, $lname, $ulevel, $email);
         editUserForm($elementValues, "Add", $unameerror, $emailerror);
     } else {
-        $q = $dbh->prepare("INSERT INTO {$dbp}users
+        $q = $db->prepare("INSERT INTO {$db->prefix}users
             SET `username`=:uname, `password`=:pw, `fname`=:fname,
             `lname`=:lname, `userlevel`=:ulevel, `email`=:email");
         $q->bindParam(":uname", $uname);
@@ -139,7 +139,7 @@ if ( $flag=="edit" ) {
         $q->bindParam(":email", $email);
         $q->execute();
         header("location:useradmin.php");
-        $dbh->commit();
+        $db->commit();
     }
 } elseif ( $flag=="add" ) {
     editUserForm();
@@ -149,7 +149,7 @@ if ( $flag=="edit" ) {
     changePW($flag);
 } elseif ($flag=="updatepw" && array_key_exists('auth', $_POST)) {
     // Password reset
-    $q = $dbh->prepare("UPDATE `{$dbp}users` SET `password`=:pw,
+    $q = $db->prepare("UPDATE `{$db->prefix}users` SET `password`=:pw,
         `resetkey`=DEFAULT
         WHERE `resetkey`=:resetkey AND `resetexpiry` >= NOW()");
     $q->bindParam(':resetkey', $_POST['auth']);
@@ -165,13 +165,13 @@ if ( $flag=="edit" ) {
 } elseif ( $flag=="updatepw" ) {
     // Password change
     authOnly($authdata['userlevel']);
-    $dbh->beginTransaction();
-    $q = $dbh->prepare("SELECT `password` FROM `{$dbp}users`
+    $db->beginTransaction();
+    $q = $db->prepare("SELECT `password` FROM `{$db->prefix}users`
         WHERE `uid`=:id");
     $q->bindParam(':id', $_POST['id']);
     $q->execute();
     $currentpw = $q->fetchColumn(0);
-    $q = $dbh->prepare("UPDATE `{$dbp}users` SET `password`=:pw
+    $q = $db->prepare("UPDATE `{$db->prefix}users` SET `password`=:pw
         WHERE `uid`=:id AND `password`=:oldpw");
     $q->bindParam(':id', $_POST['id']);
     $q->bindParam(':pw', hashPassword($_POST['pw']));
@@ -179,10 +179,10 @@ if ( $flag=="edit" ) {
     $q->bindParam(':oldpw', $compare);
     $q->execute();
     if (! $q->rowCount()) {
-        $dbh->rollBack();
+        $db->rollBack();
         setMessage("Problem saving new password. ".$q->queryString);
     } else {
-        $dbh->commit();
+        $db->commit();
         $_SESSION[$sprefix]['authdata']['password'] = $pw;
         setMessage("Password changed.");
     }
@@ -192,24 +192,24 @@ if ( $flag=="edit" ) {
     authOnly($authdata['userlevel']);
     $id = $_GET['id'];
     if ($authdata['uid'] == $id) {
-        $q = $dbh->prepare("DELETE FROM `{$dbp}users`
+        $q = $db->prepare("DELETE FROM `{$db->prefix}users`
             WHERE `uid`=:id");
         $q->bindParam(':id', $id);
         $q->execute();
     }
 } elseif ( $flag=="inituser") {
-        $dbh->beginTransaction();
+        $db->beginTransaction();
         // Check that the table is really empty.
-        $q = $dbh->query("SELECT `username` from `{$dbp}users`
+        $q = $db->query("SELECT `username` from `{$db->prefix}users`
                     LIMIT 1");
         if ($q->fetch()) {
-            $dbh->rollBack();
+            $db->rollBack();
             setMessage("Access denied.  Users already exist.");
             header("Location: index.php");
             exit(0);
         }
         // Save the posted user
-        $q = $dbh->prepare("INSERT INTO `{$dbp}users`
+        $q = $db->prepare("INSERT INTO `{$db->prefix}users`
             SET `username`=:username, `password`=:pw,
             `fname`=:fname, `lname`=:lname,
             `userlevel`=:ulevel, `email`=:email");
@@ -220,7 +220,7 @@ if ( $flag=="edit" ) {
         $q->bindParam(':email', $_POST['email']);
         $q->bindParam(':pw', hashPassword($_POST['pw']));
         $q->execute() or dieWithRollback($q);
-        $dbh->commit();
+        $db->commit();
         session_destroy();
         require("./setup-session.php");
         auth($_POST['username'], $_POST['pw']);
@@ -243,11 +243,11 @@ if ( $flag=="edit" ) {
 
 function changePW($flag) {
     global $sprefix;
-    $dbh = new DBConnection();
-    $dbp = $dbh->prefix;
+    $db = new DBConnection();
+    $dbp = $db->prefix;
 
     if ($flag=="reset") { // password reset request
-        $q = $dbh->prepare("SELECT `uid`, `username` FROM `{$dbp}users`
+        $q = $db->prepare("SELECT `uid`, `username` FROM `{$dbp}users`
             WHERE `resetkey` = :resetkey
             AND `resetexpiry` >= NOW() LIMIT 1");
         $q->bindParam(':resetkey', $_GET['auth']);
@@ -403,8 +403,8 @@ function editUserForm($elementValues="", $mode="Add",
 
 function userList() {
     global $authdata;
-    $dbh = new DBConnection();
-    $dbp = $dbh->prefix;
+    $db = new DBConnection();
+    $dbp = $db->prefix;
 ?>
     <!DOCTYPE html>
     <html lang="en">
@@ -443,7 +443,7 @@ function userList() {
         <td>Delete</td>
     </tr>
 <?
-    $q = $dbh->query("SELECT * FROM `{$dbp}users`");
+    $q = $db->query("SELECT * FROM `{$dbp}users`");
     while( $row = $q->fetch() ) {
         //$userlevel = ($row[5] == 2) ? __('admin') : __('editor');
         $userlevel = $row[5];

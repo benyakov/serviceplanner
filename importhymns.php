@@ -29,14 +29,14 @@ if (! $auth) {
     exit(0);
 }
 if ($_POST['prefix'] && strpos($_POST['prefix'], ' ') === false) {
-    $namestable = $dbh->quote("{$_POST['prefix']}names");
-    $q = $dbh->query("SHOW TABLES LIKE '{$namestable}'");
+    $namestable = $db->quote("{$_POST['prefix']}names");
+    $q = $db->query("SHOW TABLES LIKE '{$namestable}'");
     if (! count($q->fetchAll())) {
         setMessage("No names table exists with prefix `".htmlentities($_POST['prefix'])."'");
         header('Location: admin.php');
         exit(0);
     }
-    $rowcount = $dbh->exec("INSERT IGNORE INTO `{$dbp}names`
+    $rowcount = $db->exec("INSERT IGNORE INTO `{$db->prefix}names`
         (book, number, title)
         SELECT n2.book, n2.number, n2.title
             FROM `{$namestable}` AS n2");
