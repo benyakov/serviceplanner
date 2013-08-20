@@ -34,8 +34,6 @@ require("./setup-session.php");
 require("./functions.php");
 require("./utility/configfile.php");
 require("./dbconnection.php");
-$db = new DBConnection();
-$serverdir = dirname($_SERVER['PHP_SELF']);
 $script_basename = basename($_SERVER['PHP_SELF'], '.php');
 /* if ((! file_exists("db-connection.php") and
     (! is_link($_SERVER['SCRIPT_FILENAME'])))) {
@@ -69,6 +67,8 @@ if (! ($dbstate->get("has-user") || $_GET['flag'] == 'inituser')) {
     exit(0);
 }
 // require("./db-connection.php");
+$db = new DBConnection();
+$serverdir = dirname($_SERVER['PHP_SELF']);
 if (! ($_GET['flag'] == "inituser"
     || array_key_exists('username', $_POST))) $auth = auth();
 if ((! $dbstate->get("churchyear-filled")) or
