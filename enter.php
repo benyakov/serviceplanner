@@ -122,6 +122,8 @@ if (array_key_exists("date", $_POST)) {
             if (evt.which != 9 &&
                 evt.which != 17) {
                 $(this).doTimeout('fetch-hymn-title', 250, fetchHymnTitle);
+                var listingord = $(this).attr("data-hymn");
+                $("#savetitle_"+listingord).hide();
             }
         });
             //.focusout(fetchHymnTitle);  // Results in second request
@@ -222,7 +224,7 @@ cross-reference table.</label>
             <option><?=$hymnbook?></option>
         <? } ?>
         </select>
-        <input tabindex="<?=$tabindex+1?>" type="number" min="0" id="number_<?=$i?>" name="number_<?=$i?>" value="" class="edit-number" placeholder="<#>">
+        <input tabindex="<?=$tabindex+1?>" data-hymn="<?=$i?>" type="number" min="0" id="number_<?=$i?>" name="number_<?=$i?>" value="" class="edit-number" placeholder="<#>">
         <input tabindex="<?=$tabindex+2?>" type="text" id="note_<?=$i?>" name="note_<?=$i?>" class="edit-note" maxlength="100" value="" placeholder="<note>">
         <input tabindex="<?=$tabindex+3?>" data-hymn="<?=$i?>" type="text" id="title_<?=$i?>" name="title_<?=$i?>" class="edit-title hidden">
         <a tabindex="<?=$tabindex+4?>" href="#" data-hymn="<?=$i?>" class="hidden save-title command-link" id="savetitle_<?=$i?>">Save Title</a>
