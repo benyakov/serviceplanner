@@ -586,10 +586,10 @@ when new services are created.  Services may be assigned to an existing
 applicable block plan when they are created or edited.</p>
     <table id="block-listing">
     <?
-$q = $dbh->prepare("SELECT DATE_FORMAT(blockstart, '%c/%e/%Y') AS blockstart,
+$q = $db->prepare("SELECT DATE_FORMAT(blockstart, '%c/%e/%Y') AS blockstart,
     DATE_FORMAT(blockend, '%c/%e/%Y') AS blockend, label, notes, l1lect,
     l1series, l2lect, l2series, golect, goseries, pslect, psseries,
-    colect, coclass, id FROM `{$dbp}blocks` AS b
+    colect, coclass, id FROM `{$dbh->prefix}blocks` AS b
     ORDER BY b.blockstart DESC, b.blockend DESC");
 if ($q->execute()) {
     while ($row = $q->fetch(PDO::FETCH_ASSOC)) { ?>

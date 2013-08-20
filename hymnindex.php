@@ -42,14 +42,14 @@ function togglebg($current) {
 }
 
 if ($_GET['drop'] == 'yes' && $auth) {
-    $dbh->query("DROP TABLE `{$dbp}xref`");
+    $db->query("DROP TABLE `{$db->prefix}xref`");
     setMessage("Cross-reference table repopulated.");
 }
 
-if (! $dbh->query("SELECT 1 FROM {$dbp}xref")) {
+if (! $db->query("SELECT 1 FROM {$db->prefix}xref")) {
     /**** To create the cross reference table ****/
 
-    $q = $dbh->prepare("CREATE TABLE `{$dbp}xref` (
+    $q = $db->prepare("CREATE TABLE `{$db->prefix}xref` (
         `title` varchar(80),
         `text` varchar(60),
         `elh` smallint,
@@ -65,7 +65,7 @@ if (! $dbh->query("SELECT 1 FROM {$dbp}xref")) {
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8") ;
     $q->execute() or die(array_pop($q->errorInfo()));
 
-    $dbh->beginTransaction();
+    $db->beginTransaction();
     $fh = fopen("./utility/hymnindex.csv", "r");
     $headings = fgetcsv($fh);
     while (($record = fgetcsv($fh, 250)) != FALSE) {
@@ -80,11 +80,11 @@ if (! $dbh->query("SELECT 1 FROM {$dbp}xref")) {
             }
             $r[] = $f;
         }
-        $q = $dbh->prepare("INSERT INTO {$dbp}xref (title, text, lsb, tlh, lw, lbw, elh, cw, wov, hs98)
+        $q = $db->prepare("INSERT INTO {$db->prefix}xref (title, text, lsb, tlh, lw, lbw, elh, cw, wov, hs98)
             VALUES ({$r[0]}, {$r[1]}, {$r[2]}, {$r[3]}, {$r[4]}, {$r[5]}, {$r[6]}, {$r[7]}, {$r[8]}, {$r[9]})");
         $q->execute() or dieWithRollback($q, "\n".__FILE__.":".__LINE__);
     }
-    $dbh->commit();
+    $db->commit();
 }
 /* To Display the cross-reference table */
 
@@ -98,7 +98,7 @@ if (array_key_exists('sort', $_GET) && strpos($_GET['sort'], ';') == False) {
     $sort_by = "";
     $sorted_on = "";
 }
-$q = $dbh->prepare("SELECT * FROM {$dbp}xref{$sort_by}") ;
+$q = $db->prepare("SELECT * FROM {$db->prefix}xref{$sort_by}") ;
 if (!$q->execute()) die(array_pop($q->errorInfo()));
 ?><!DOCTYPE html>
 <html lang="en">

@@ -28,9 +28,9 @@
         echo "Access denied.  Please log in.";
         exit(0);
     }
-    $q = $dbh->prepare("SELECT `season`, `base`, `offset`, `month`, `day`,
+    $q = $db->prepare("SELECT `season`, `base`, `offset`, `month`, `day`,
         `observed_month`, `observed_sunday`
-        FROM `{$dbp}churchyear`
+        FROM `{$db->prefix}churchyear`
         WHERE `dayname` = :dayname");
     $q->bindParam(":dayname", $_GET['dayname']);
     $q->execute();

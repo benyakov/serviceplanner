@@ -162,7 +162,7 @@ for that service, use the "Sermon" link.</p>
 <?
 if ("Future" == $_SESSION[$sprefix]['modifyorder']) $future = true;
 else $future = false;
-$q = queryAllHymns($dbh, $dbp, $_SESSION[$sprefix]['listinglimit'], $future);
+$q = queryAllHymns($_SESSION[$sprefix]['listinglimit'], $future);
 modify_records_table($q, "delete.php");
 ?>
 </div>

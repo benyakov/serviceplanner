@@ -26,14 +26,15 @@
 require("./init.php");
 require("./churchyear/functions.php");
 $auth = auth();
+$dbp = $db->prefix;
 
 /* churchyear.php?dropfunctions=1
  * Drops all the churchyear functions and sets a message about
  * creating them again.
  */
 if ($_GET['request'] == 'dropfunctions') {
-    $dbh->beginTransaction();
-    $dbh->exec("DROP FUNCTION `{$dbp}easter_in_year`;
+    $db->beginTransaction();
+    $db->exec("DROP FUNCTION `{$dbp}easter_in_year`;
     DROP FUNCTION IF EXISTS `{$dbp}christmas1_in_year`;
     DROP FUNCTION IF EXISTS `{$dbp}michaelmas1_in_year`;
     DROP FUNCTION IF EXISTS `{$dbp}epiphany1_in_year`;
@@ -45,7 +46,7 @@ if ($_GET['request'] == 'dropfunctions') {
     DROP PROCEDURE IF EXISTS `{$dbp}get_days_for_date`");
     setMessage("Church year functions dropped.  To re-create them, visit"
         ." the Church Year tab.  They will be created automatically.");
-    $dbh->commit();
+    $db->commit();
     $dbstate->store("has-churchyear-functions", 0);
     $dbstate->save() or die("Problem saving dbstate file.");
     header("location: index.php");
@@ -69,24 +70,24 @@ if ($_GET['request'] == 'purgetables') {
         header("location: index.php");
         exit(0);
     }
-    $dbh->beginTransaction();
-    $dbh->exec("DELETE FROM `{$dbp}churchyear_graduals`");
-    $dbh->exec("DELETE FROM `{$dbp}churchyear_collects_index`");
-    $dbh->exec("DELETE FROM `{$dbp}churchyear_collects`");
-    $dbh->exec("DELETE FROM `{$dbp}churchyear_synonyms`");
-    $dbh->exec("DELETE FROM `{$dbp}churchyear_lessons`");
-    $dbh->exec("DELETE FROM `{$dbp}churchyear_propers`");
-    $dbh->exec("DELETE FROM `{$dbp}churchyear_order`");
-    $dbh->exec("DELETE FROM `{$dbp}churchyear`");
+    $db->beginTransaction();
+    $db->exec("DELETE FROM `{$dbp}churchyear_graduals`");
+    $db->exec("DELETE FROM `{$dbp}churchyear_collects_index`");
+    $db->exec("DELETE FROM `{$dbp}churchyear_collects`");
+    $db->exec("DELETE FROM `{$dbp}churchyear_synonyms`");
+    $db->exec("DELETE FROM `{$dbp}churchyear_lessons`");
+    $db->exec("DELETE FROM `{$dbp}churchyear_propers`");
+    $db->exec("DELETE FROM `{$dbp}churchyear_order`");
+    $db->exec("DELETE FROM `{$dbp}churchyear`");
     if ($dbstate->save()) {
         setMessage("Church year tables purged.  They should be re-populated "
             ."by the time you see this message.");
-        $dbh->commit();
+        $db->commit();
         $dbstate->store("churchyear-filled", 0);
         $dbstate->save();
     } else {
         setMessage("Problem saving dbstate config file.  Tables not purged.");
-        $dbh->rollback();
+        $db->rollback();
     }
     header("location: index.php");
     exit(0);
@@ -111,7 +112,7 @@ if ($_GET['request'] == "params") {
     header('Cache-Control: no-cache, must-revalidate');
     header('Expires: Mon, 01 Jan 1996 00:00:00 GMT');
     header("Content-type: application/json");
-    $q = $dbh->prepare("SELECT `season`, `base`, `offset`, `month`, `day`,
+    $q = $db->prepare("SELECT `season`, `base`, `offset`, `month`, `day`,
         `observed_month`, `observed_sunday`
         FROM `{$dbp}churchyear`
         WHERE `dayname` = :dayname");
@@ -146,7 +147,7 @@ if ($_POST['del']) {
     header('Cache-Control: no-cache, must-revalidate');
     header('Expires: Mon, 01 Jan 1996 00:00:00 GMT');
     header("Content-type: application/json");
-    $q = $dbh->prepare("DELETE FROM `{$dbp}churchyear`
+    $q = $db->prepare("DELETE FROM `{$dbp}churchyear`
         WHERE `dayname` = :dayname");
     $q->bindValue(":dayname", $_POST['del']);
     if ($q->execute()) {
@@ -173,7 +174,7 @@ if ($_POST['submit_day']==1) {
         $_POST['base'] = "";
         $_POST['offset'] = 0;
     }
-    $q = $dbh->prepare("INSERT INTO `{$dbp}churchyear`
+    $q = $db->prepare("INSERT INTO `{$dbp}churchyear`
         (season, base, offset, month, day,
         observed_month, observed_sunday, dayname)
         VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
@@ -182,7 +183,7 @@ if ($_POST['submit_day']==1) {
         $_POST['observed-month'], $_POST['observed-sunday'],
         $_POST['dayname']);
     if (! $q->execute($bound)) {
-        $q = $dbh->prepare("UPDATE `{$dbp}churchyear`
+        $q = $db->prepare("UPDATE `{$dbp}churchyear`
             SET season=?, base=?, offset=?, month=?, day=?,
             observed_month=?, observed_sunday=?
             WHERE dayname=?");
@@ -215,18 +216,18 @@ if ($_POST['synonyms']) {
     $synonyms = explode("\n", $_POST['synonyms']);
     $canonical = $_POST['canonical'];
     // Remove current entries for canonical
-    $dbh->beginTransaction();
-    $q = $dbh->prepare("DELETE FROM `{$dbp}churchyear_synonyms`
+    $db->beginTransaction();
+    $q = $db->prepare("DELETE FROM `{$dbp}churchyear_synonyms`
         WHERE canonical = ?");
     $success = $q->execute(array($canonical));
     if ($success) {
-        $q = $dbh->prepare("INSERT INTO `{$dbp}churchyear_synonyms`
+        $q = $db->prepare("INSERT INTO `{$dbp}churchyear_synonyms`
             (canonical, synonym) VALUES (?, ?)");
         foreach ($synonyms as $synonym) {
             $success = $q->execute(array($canonical, $synonym));
             if (! $success) break;
         }
-        if ($success) $dbh->commit();
+        if ($success) $db->commit();
     }
     echo json_encode($success);
     exit(0);
@@ -240,7 +241,7 @@ if ($_GET['request'] == "synonyms") {
         echo json_encode(array(false));
         exit(0);
     }
-    $q = $dbh->prepare("SELECT `synonym` FROM `{$dbp}churchyear_synonyms`
+    $q = $db->prepare("SELECT `synonym` FROM `{$dbp}churchyear_synonyms`
         WHERE `canonical` = ?");
     if ($q->execute(array($_GET['name']))) {
         $rv = array();
@@ -257,7 +258,7 @@ if ($_GET['request'] == "synonyms") {
  * Return the collect text for the given collect id
  */
 if ($_GET['request'] == "collect") {
-    $q = $dbh->prepare("SELECT collect, class FROM `{$dbp}churchyear_collects`
+    $q = $db->prepare("SELECT collect, class FROM `{$dbp}churchyear_collects`
         WHERE id = ?");
     $q->execute(array($_GET['id']));
     echo json_encode($q->fetch(PDO::FETCH_NUM));
@@ -272,9 +273,9 @@ if ($_POST['existing-collect']) {
         echo json_encode(false, "Access denied. Please log in first.");
         exit(0);
     }
-    $dbh->beginTransaction();
+    $db->beginTransaction();
     if ($_POST['existing-collect'] == "new") {
-        $q = $dbh->prepare("INSERT INTO `{$dbp}churchyear_collects`
+        $q = $db->prepare("INSERT INTO `{$dbp}churchyear_collects`
             (class, collect) VALUES (?, ?)");
         if (!$q->execute(array($_POST['collect-class'],
             $_POST['collect-text'])))
@@ -282,9 +283,9 @@ if ($_POST['existing-collect']) {
             $rv = array(false, "Problem inserting new collect text: ".
                 array_pop($q->errorInfo()));
         } else {
-            $qid = $dbh->query("SELECT LAST_INSERT_ID()");
+            $qid = $db->query("SELECT LAST_INSERT_ID()");
             $qid = $qid->fetchColumn(0);
-            $q = $dbh->prepare("INSERT INTO `{$dbp}churchyear_collect_index`
+            $q = $db->prepare("INSERT INTO `{$dbp}churchyear_collect_index`
                 (`dayname`, `lectionary`, `id`) VALUES (?, ?, ?)");
             if (! $q->execute(array($_POST['dayname'],
                 $_POST['lectionary'], $qid)))
@@ -292,13 +293,13 @@ if ($_POST['existing-collect']) {
                 $rv = array(false, "Problem inserting new collect: ".
                     array_pop($q->errorInfo()));
             } else {
-                $dbh->commit();
+                $db->commit();
                 $rv = array(true,
                     "New collect inserted for {$_POST['dayname']}");
             }
         }
     } else {
-        $q = $dbh->prepare("INSERT INTO `{$dbp}churchyear_collect_index`
+        $q = $db->prepare("INSERT INTO `{$dbp}churchyear_collect_index`
             (`dayname`, `lectionary`, `id`) VALUES (?, ?, ?)");
         if (! $q->execute(array($_POST['dayname'], $_POST['lectionary'],
             $_POST['existing-collect'])))
@@ -306,7 +307,7 @@ if ($_POST['existing-collect']) {
             $rv = array(false, "Problem inserting collect: ".
                 array_pop($q->errorInfo()));
         } else {
-            $dbh->commit();
+            $db->commit();
             $rv = array(true,
                 "Existing collect attached to {$_POST['dayname']}");
         }
@@ -327,7 +328,7 @@ if ($_GET['requestform'] == "collect") {
         echo "Access denied.  Please log in.";
         exit(0);
     }
-    $q = $dbh->prepare("SELECT c.class, i.dayname, i.lectionary, i.id
+    $q = $db->prepare("SELECT c.class, i.dayname, i.lectionary, i.id
         FROM `{$dbp}churchyear_collect_index` AS i
         JOIN `{$dbp}churchyear_collects` AS c ON (c.id = i.id)
         WHERE i.dayname != ? OR i.lectionary != ?
@@ -372,7 +373,7 @@ if ($_GET['requestform'] == "delete-collect") {
         exit(0);
     }
     // Show collect, lectionaries using it, and daynames when used
-    $q = $dbh->prepare("SELECT
+    $q = $db->prepare("SELECT
         c.collect, c.class, i.lectionary, i.dayname, i.id
         FROM `{$dbp}churchyear_collect_index` AS i
         RIGHT OUTER JOIN `{$dbp}churchyear_collects` AS c ON (c.id = i.id)
@@ -409,7 +410,7 @@ if ($_POST['deletecollect']) {
         echo json_encode("Access denied.  Please log in.");
         exit(0);
     }
-    $q = $dbh->prepare("DELETE i, c FROM `{$dbp}churchyear_collect_index` AS i
+    $q = $db->prepare("DELETE i, c FROM `{$dbp}churchyear_collect_index` AS i
         JOIN `{$dbp}churchyear_collects` AS c
         ON (i.id = c.id)
         WHERE i.id = :index");
@@ -432,7 +433,7 @@ if ($_GET['detachcollect']) {
         echo json_encode("Access denied.  Please log in.");
         exit(0);
     }
-    $q = $dbh->prepare("DELETE FROM `{$dbp}churchyear_collect_index`
+    $q = $db->prepare("DELETE FROM `{$dbp}churchyear_collect_index`
         WHERE dayname = ? AND lectionary = ? AND id = ?");
     if (! $q->execute(array($_GET['dayname'], $_GET['lectionary'],
         $_GET['detachcollect'])))
@@ -470,7 +471,7 @@ if ($_POST['propers']) {
         echo json_encode(array(false, "Access denied.  Please log in."));
         exit(0);
     }
-    $q = $dbh->prepare("UPDATE `{$dbp}churchyear_propers` SET
+    $q = $db->prepare("UPDATE `{$dbp}churchyear_propers` SET
         color=?, theme=?, introit=?, note=? WHERE dayname = ?");
     if (! $q->execute(array($_POST['color'], $_POST['theme'],
         $_POST['introit'], $_POST['note'], $_POST['propers'])))
@@ -492,7 +493,7 @@ if ($_POST['lessontype'] == "historic") {
         echo json_encode(array(false, "Access denied.  Please log in."));
         exit(0);
     }
-    $q = $dbh->prepare("UPDATE `{$dbp}churchyear_lessons` SET
+    $q = $db->prepare("UPDATE `{$dbp}churchyear_lessons` SET
        lectionary='historic', lesson1=?, lesson2=?, gospel=?, psalm=?,
        s2lesson=?, s2gospel=?, s3lesson=?, s3gospel=?, hymnabc='', hymn=''
        WHERE id=?");
@@ -517,7 +518,7 @@ if ($_POST['lessontype'] == "ilcw") {
         echo json_encode(array(false, "Access denied.  Please log in."));
         exit(0);
     }
-    $q = $dbh->prepare("UPDATE `{$dbp}churchyear_lessons` SET
+    $q = $db->prepare("UPDATE `{$dbp}churchyear_lessons` SET
        lesson1=?, lesson2=?, gospel=?, psalm=?,
        s2lesson='', s2gospel='', s3lesson='', s3gospel='',
        hymnabc=?, hymn=?  WHERE id=?");
@@ -541,7 +542,7 @@ if ($_POST['lessons'] == "New") {
         echo json_encode(array(false, "Access denied.  Please log in."));
         exit(0);
     }
-    $q = $dbh->prepare("INSERT INTO `{$dbp}churchyear_lessons`
+    $q = $db->prepare("INSERT INTO `{$dbp}churchyear_lessons`
         (dayname, lectionary, lesson1, lesson2, gospel, psalm, hymnabc, hymn)
         VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
     if (! $q->execute(array($_POST['dayname'], $_POST['lectionary'],
@@ -568,8 +569,8 @@ if ($_GET['delpropers']) {
         echo json_encode(array(false, "Access denied. Please log in."));
         exit(0);
     }
-    $dbh->beginTransaction();
-    $q = $dbh->prepare("SELECT dayname FROM `{$dbp}churchyear_lessons` AS l
+    $db->beginTransaction();
+    $q = $db->prepare("SELECT dayname FROM `{$dbp}churchyear_lessons` AS l
         WHERE l.id = ?");
     if (! $q->execute(array($_GET['delpropers']))) {
         echo json_encode(array(false,
@@ -578,7 +579,7 @@ if ($_GET['delpropers']) {
     } else {
         $dayname = $q->fetchColumn(0);
     }
-    $q = $dbh->prepare("DELETE i, l
+    $q = $db->prepare("DELETE i, l
         FROM `{$dbp}churchyear_lessons` AS l
         LEFT OUTER JOIN `{$dbp}churchyear_collect_index` AS i
         ON (i.dayname = l.dayname AND  i.lectionary = l.lectionary)
@@ -587,7 +588,7 @@ if ($_GET['delpropers']) {
         $rv = array(false,
             "Problem deleting propers: ".array_pop($q->errorInfo()));
     } else {
-        $dbh->commit();
+        $db->commit();
         require("./churchyear/get_propersform.php");
         $rv = array(true, "Propers deleted.", propersForm($dayname));
     }

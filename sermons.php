@@ -35,11 +35,12 @@ if (! $auth) {
 <? echo html_head("Sermon Plans"); ?>
 <body>
 <?
-$q = $dbh->query("SELECT sermons.bibletext, sermons.outline,
+$q = $db->query("SELECT sermons.bibletext, sermons.outline,
     sermons.notes, sermons.service, sermons.mstype,
     DATE_FORMAT(days.caldate, '%e %b %Y') as date,
     days.name, days.rite
-    FROM `{$dbp}sermons` AS sermons JOIN `{$dbp}days` AS days
+    FROM `{$db->prefix}sermons` AS sermons
+    JOIN `{$db->prefix}days` AS days
         ON (sermons.service=days.pkey)
     ORDER BY days.caldate DESC");
 $q->execute() or die(array_pop($q->errorInfo));
