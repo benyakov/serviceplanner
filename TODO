@@ -1,4 +1,4 @@
+- Debug csv importers.
+- Set up separate id'd <div>s in churchyear page for each dialog.
 - Add "gradual" field to churchyear_propers table which can override the
   seasonal gradual
-- Add an admin function for saving churchyear data to flat files that can be
-  loaded independently of the default files.
