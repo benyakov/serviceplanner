@@ -46,8 +46,8 @@ if (is_numeric($_GET["service"])) {
 }
 
 if ('synonyms' == $_GET['export']) {
-    $q = $dbh->prepare("SELECT canonical, synonym
-        FROM `{$dbp}churchyear_synonyms`
+    $q = $db->prepare("SELECT canonical, synonym
+        FROM `{$db->prefix}churchyear_synonyms`
         ORDER BY canonical");
     if (! $q->execute()) {
         echo array_pop($q->errorInfo());
@@ -70,10 +70,10 @@ if ('synonyms' == $_GET['export']) {
 }
 
 if ('churchyear' == $_GET['export']) {
-    $q = $dbh->prepare("SELECT `dayname`, `season`, `base`,
+    $q = $db->prepare("SELECT `dayname`, `season`, `base`,
         `offset`, `month`, `day`, `observed_month`, `observed_sunday`
-        FROM `{$dbp}churchyear` AS cy
-        LEFT OUTER JOIN `{$dbp}churchyear_order` AS cyo
+        FROM `{$db->prefix}churchyear` AS cy
+        LEFT OUTER JOIN `{$db->prefix}churchyear_order` AS cyo
             ON (cy.season = cyo.name)
             ORDER BY cyo.idx, cy.offset, cy.month, cy.day");
     if (! $q->execute()) {
@@ -100,8 +100,9 @@ if (! $auth) {
 
 if ($_GET['lectionary']) {
     $lectname = $_GET['lectionary'];
-    $dbh->beginTransaction();
-    $q = $dbh->prepare("SELECT COUNT(*) as c FROM `{$dbp}churchyear_lessons`
+    $db->beginTransaction();
+    $q = $db->prepare("SELECT COUNT(*) as c
+        FROM `{$db->prefix}churchyear_lessons`
         WHERE `lectionary` = :lect");
     $q->bindParam(":lect", $lectname);
     if (! ($q->execute() and 0 < intval($q->fetchColumn()))) {
@@ -110,9 +111,9 @@ if ($_GET['lectionary']) {
         header("location: admin.php");
         exit(0);
     }
-    $q = $dbh->prepare("SELECT `dayname`, `lesson1`, `lesson2`,
+    $q = $db->prepare("SELECT `dayname`, `lesson1`, `lesson2`,
         `gospel`, `psalm`, `s2lesson`, `s2gospel`, `s3lesson`, `s3gospel`,
-        `hymnabc`, `hymn` FROM `{$dbp}churchyear_lessons`
+        `hymnabc`, `hymn` FROM `{$db->prefix}churchyear_lessons`
         WHERE `lectionary` = :lect");
     $q->bindValue(":lect", $lectname);
     $q->setFetchMode(PDO::FETCH_NUM);
@@ -125,7 +126,7 @@ if ($_GET['lectionary']) {
         "Series 3 Gospel", "Week Hymn", "Year Hymn");
     $csvex = new CSVExporter($q, $lectname, "utf-8", $fieldnames);
     $csvex->export();
-    $dbh->commit();
+    $db->commit();
 }
 
 

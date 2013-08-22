@@ -28,14 +28,14 @@ header('Cache-Control: no-cache, must-revalidate');
 header('Expires: Mon, 01 Jan 1996 00:00:00 GMT');
 header("Content-type: application/json");
 
-$q = $dbh->prepare("SELECT `names`.`title` as title,
+$q = $db->prepare("SELECT `names`.`title` as title,
     `hymns`.`location` as location,
     DATE_FORMAT(`days`.`caldate`, '%e %b %Y') as date
-    FROM `{$dbp}names` AS `names`
-    LEFT OUTER JOIN `{$dbp}hymns` AS `hymns`
+    FROM `{$db->prefix}names` AS `names`
+    LEFT OUTER JOIN `{$db->prefix}hymns` AS `hymns`
       ON (`names`.`book` = `hymns`.`book`
       AND `names`.`number` = `hymns`.`number`)
-    LEFT OUTER JOIN `{$dbp}days` AS `days`
+    LEFT OUTER JOIN `{$db->prefix}days` AS `days`
       ON (`days`.`pkey` = `hymns`.`service`)
     WHERE `names`.`book` = :book
     AND `names`.`number` = :number
@@ -56,7 +56,7 @@ if ($title || $_GET['xref']=="off") {
     exit(0);
 }
 $bookname = strtolower($_GET['book']);
-$q = $dbh->prepare("SELECT `title` from `{$dbp}xref`
+$q = $db->prepare("SELECT `title` from `{$db->prefix}xref`
     WHERE `{$_GET['book']}` = :number LIMIT 1");
 $q->bindParam(':number', $_GET['number']);
 if ($q->execute() && ($row = $q->fetch())) {

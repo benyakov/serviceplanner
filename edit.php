@@ -34,14 +34,14 @@ if (! array_key_exists("stage", $_GET))
     ?>
     <h1>Edit a Service</h1>
     <?
-        $q = $dbh->prepare("SELECT
+        $q = $db->prepare("SELECT
             DATE_FORMAT(days.caldate, '%Y-%m-%d') as date,
             hymns.book, hymns.number, hymns.note,
             hymns.pkey as hymnid, hymns.location,
             hymns.sequence, days.name as dayname, days.rite, days.block,
             days.servicenotes
             FROM `${dbp}hymns` AS hymns
-            RIGHT OUTER JOIN `{$dbp}days` AS days ON (hymns.service=days.pkey)
+            RIGHT OUTER JOIN `{$db->prefix}days` AS days ON (hymns.service=days.pkey)
             WHERE days.pkey = ?
             ORDER BY days.caldate DESC, hymns.location, hymns.sequence");
         $q->execute(array($_GET['id'])) or die(array_pop($q->errorInfo()));
@@ -177,7 +177,7 @@ if (! array_key_exists("stage", $_GET))
 } elseif (2 == $_GET['stage']) {
     //// Commit changes to db
     // Pull out changes for each table into separate arrays
-    $dbh->beginTransaction();
+    $db->beginTransaction();
     $tohymns = array();
     $tonames = array();
     $todays = array();
@@ -200,12 +200,12 @@ if (! array_key_exists("stage", $_GET))
     }
     // Update hymn names
     $ititle = $inumber = $ibook = 0;
-    $q = $dbh->prepare("INSERT INTO {$dbp}names (title, number, book)
+    $q = $db->prepare("INSERT INTO {$db->prefix}names (title, number, book)
         VALUES (:title, :number, :book)");
     $q->bindParam(":title", $ititle);
     $q->bindParam(":number", $inumber);
     $q->bindParam(":book", $ibook);
-    $qu = $dbh->prepare("UPDATE {$dbp}names SET title = :title
+    $qu = $db->prepare("UPDATE {$db->prefix}names SET title = :title
         WHERE number = :number
         AND book = :book");
     $qu->bindParam(":title", $ititle);
@@ -221,7 +221,7 @@ if (! array_key_exists("stage", $_GET))
         }
     }
     // Update day information
-    $q = $dbh->prepare("UPDATE `{$dbp}days` SET `caldate`=:date,
+    $q = $db->prepare("UPDATE `{$db->prefix}days` SET `caldate`=:date,
         `name`=:name, `rite`=:rite,
         `servicenotes`=:servicenotes, `block`=:block
         WHERE `pkey` = :id");
@@ -234,12 +234,12 @@ if (! array_key_exists("stage", $_GET))
     $q->execute() or dieWithRollback($q, $q->queryString);
 
     // Update hymns
-    $q = $dbh->prepare("UPDATE {$dbp}hymns
+    $q = $db->prepare("UPDATE {$db->prefix}hymns
         SET number=:number,
         note=:note, location=:location,
         book=:book, sequence=:sequence
         WHERE pkey=:hymnid");
-    $qi = $dbh->prepare("INSERT INTO {$dbp}hymns
+    $qi = $db->prepare("INSERT INTO {$db->prefix}hymns
         (service, location, book, number, note, sequence)
         VALUES (:service, :location, :book, :number, :note, :sequence)");
     $qi->bindValue(":service", $_POST['id']);
@@ -258,7 +258,7 @@ if (! array_key_exists("stage", $_GET))
     }
 
     // Delete tagged hymns
-    $q = $dbh->prepare("DELETE FROM {$dbp}hymns
+    $q = $db->prepare("DELETE FROM {$db->prefix}hymns
         WHERE pkey = :hymnid");
     $hymnid = 0;
     $q->bindParam(":hymnid", $hymnid);
@@ -266,7 +266,7 @@ if (! array_key_exists("stage", $_GET))
         $hymnid = $id;
         $q->execute() or dieWithRollback($q, $q->queryString);
     }
-    $dbh->commit();
+    $db->commit();
     setMessage("Edit complete.");
     header("Location: modify.php");
     exit(0);

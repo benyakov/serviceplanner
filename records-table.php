@@ -38,6 +38,6 @@ if (array_key_exists('listinglimit', $_GET) &&
 <button type="submit" value="Apply">Apply</button>
 </form>
 <?php
-$q = queryAllHymns($dbh, $dbp, $_SESSION[$sprefix]['listinglimit']);
+$q = queryAllHymns($_SESSION[$sprefix]['listinglimit']);
 display_records_table($q);
 ?>
