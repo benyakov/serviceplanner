@@ -27,7 +27,7 @@ require("./init.php");
 $this_script = $_SERVER['HTTP_HOST'].$_SERVER['SCRIPT_NAME'] ;
 if (array_key_exists('manuscript', $_GET)) {
     // Send the sermon manuscript, or a message saying it ain't there
-    $q = $db->prepare("SELECT manuscript, mstype FROM `{$db->prefix}sermons`
+    $q = $db->prepare("SELECT manuscript, mstype FROM `{$db->getPrefix()}sermons`
         WHERE service=:id");
     $q->bindParam(":id", $_GET['id']);
     $q->execute();
@@ -84,7 +84,7 @@ if (! array_key_exists('stage', $_GET)) {
     display_records_table($q, "delete.php");
 
     $q = $db->prepare("SELECT bibletext, outline, notes, mstype
-        FROM `{$db->prefix}sermons` WHERE service=:id");
+        FROM `{$db->getPrefix()}sermons` WHERE service=:id");
     $q->bindParam(":id", $id);
     $q->execute();
     $row = $q->fetch(PDO::FETCH_ASSOC);
@@ -135,17 +135,17 @@ if (! array_key_exists('stage', $_GET)) {
     if ($ft || $_POST['deletems']) {
         // Update the saved file blob and type field
         // This is handled separately from the other data updates
-        $q = $db->prepare("SELECT 1 from `{$db->prefix}sermons`
+        $q = $db->prepare("SELECT 1 from `{$db->getPrefix()}sermons`
             WHERE service=?");
         $q->execute(array($_POST['service']))
             or die(array_pop($q->errorInfo()));
         $exists = $q->fetchColumn();
         if ($exists) {
-            $q = $db->prepare("UPDATE `{$db->prefix}sermons`
+            $q = $db->prepare("UPDATE `{$db->getPrefix()}sermons`
                 SET manuscript=?, mstype=?
                 WHERE service=?");
         } else {
-            $q = $db->prepare("INSERT INTO `{$db->prefix}sermons`
+            $q = $db->prepare("INSERT INTO `{$db->getPrefix()}sermons`
                 (manuscript, mstype, service)
                 VALUES (?, ?, ?)");
         }
@@ -155,7 +155,7 @@ if (! array_key_exists('stage', $_GET)) {
         $q->execute() or die(array_pop($q->errorInfo()));
     }
     // Insert or update the sermon plans.
-    $q = $db->prepare("INSERT INTO `{$db->prefix}sermons`
+    $q = $db->prepare("INSERT INTO `{$db->getPrefix()}sermons`
         (bibletext, outline, notes, service)
         VALUES (:bibletext, :outline, :notes, :id)");
     $q->bindParam(':bibletext', $_POST['bibletext']);
@@ -163,7 +163,7 @@ if (! array_key_exists('stage', $_GET)) {
     $q->bindParam(':notes', $_POST['notes']);
     $q->bindParam(':id', $_POST['service']);
     if (! $q->execute()) {
-        $q = $db->prepare("UPDATE `{$db->prefix}sermons`
+        $q = $db->prepare("UPDATE `{$db->getPrefix()}sermons`
             SET bibletext = :bibletext,
             outline = :outline, notes = :notes
             WHERE service = :id");

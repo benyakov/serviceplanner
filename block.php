@@ -52,7 +52,7 @@ function ifVal($ary, $key) {
  */
 function blockPlanForm($vals=array()) {
     $dbh = new DBConnection();
-    $dbp = $dbh->prefix;
+    $dbp = $dbh->getPrefix();
     if ($vals['l1lect'] == 'custom') $vals['l1custom'] = $vals['l1series'];
     else $vals['l1custom'] = "";
     if ($vals['l2lect'] == 'custom') $vals['l2custom'] = $vals['l2series'];
@@ -185,14 +185,14 @@ if ($_POST['label']) {
         $_POST['psseries'], $_POST['colect'], $_POST['coclass']);
     if ($_POST['id']) { // Update existing record
         array_push($binding, $_POST['id']);
-        $q = $db->prepare("UPDATE `{$db->prefix}blocks`
+        $q = $db->prepare("UPDATE `{$db->getPrefix()}blocks`
             SET label = ?, blockstart = ?, blockend = ?, notes = ?,
             l1lect = ?, l1series = ?, l2lect = ?, l2series = ?,
             golect = ?, goseries = ?, pslect = ?, psseries = ?,
             colect = ?, coclass = ?
             WHERE id = ?");
     } else { // Create new record
-        $q = $db->prepare("INSERT INTO `{$db->prefix}blocks`
+        $q = $db->prepare("INSERT INTO `{$db->getPrefix()}blocks`
             (label, blockstart, blockend, notes, l1lect, l1series, l2lect,
             l2series, golect, goseries, pslect, psseries, colect, coclass)
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
@@ -228,7 +228,7 @@ if ($_GET['action'] == "edit" && $_GET['id']) {
         DATE_FORMAT(blockstart, '%Y-%m-%d') AS blockstart,
         DATE_FORMAT(blockend, '%Y-%m-%d') AS blockend, label, notes, l1lect,
         l1series, l2lect, l2series, golect, goseries, pslect, psseries,
-        colect, coclass, id FROM `{$db->prefix}blocks`
+        colect, coclass, id FROM `{$db->getPrefix()}blocks`
         WHERE id = ?");
     if ($q->execute(array($_GET['id'])) && $row = $q->fetch(PDO::FETCH_ASSOC)) {
         blockPlanForm($row);
@@ -247,7 +247,7 @@ if ($_GET['delete']) {
         header("location:index.php");
         exit(0);
     }
-    $q = $db->prepare("DELETE FROM `{$db->prefix}blocks` WHERE id = ?");
+    $q = $db->prepare("DELETE FROM `{$db->getPrefix()}blocks` WHERE id = ?");
     if ($q->execute(array($_GET['delete']))) {
         setMessage($q->rowCount() . " blocks deleted.");
     } else {
@@ -259,7 +259,7 @@ if ($_GET['delete']) {
  * Return a json list of blocks available for the date given
  */
 if ($_GET['available']) {
-    $q = $db->prepare("SELECT id, label FROM `{$db->prefix}blocks`
+    $q = $db->prepare("SELECT id, label FROM `{$db->getPrefix()}blocks`
         WHERE blockstart <= ? AND blockend >= ?");
     if ($q->execute(array($_GET['available'], $_GET['available']))) {
         $rv = array();
@@ -277,7 +277,7 @@ if ($_GET['available']) {
  * Return whether the dates overlap an existing block
  */
 if ($_GET['overlapstart'] && $_GET['overlapend']) {
-    $q = $db->prepare("SELECT label FROM `{$db->prefix}blocks`
+    $q = $db->prepare("SELECT label FROM `{$db->getPrefix()}blocks`
         WHERE (blockstart < :date1 AND blockend > :date1)
         OR (blockstart < :date2 AND blockend > :date2)
         OR (:date1 < blockstart AND :date2 > blockend)");
@@ -311,21 +311,21 @@ if ("blockitems" == $_GET['get'] && is_numeric($_GET['id']) && $_GET['day']) {
             WHEN 'historic' THEN
             (CASE b.l1series
                 WHEN 'first' THEN
-                    (SELECT lesson1 FROM `{$db->prefix}synlessons` AS cl
+                    (SELECT lesson1 FROM `{$db->getPrefix()}synlessons` AS cl
                     WHERE cl.dayname=:dayname AND cl.lectionary=b.l1lect
                     LIMIT 1)
                 WHEN 'second' THEN
-                    (SELECT s2lesson FROM `{$db->prefix}synlessons` AS cl
+                    (SELECT s2lesson FROM `{$db->getPrefix()}synlessons` AS cl
                     WHERE cl.dayname=:dayname AND cl.lectionary=b.l1lect
                     LIMIT 1)
                 WHEN 'third' THEN
-                    (SELECT s3lesson FROM `{$db->prefix}synlessons` AS cl
+                    (SELECT s3lesson FROM `{$db->getPrefix()}synlessons` AS cl
                     WHERE cl.dayname=:dayname AND cl.lectionary=b.l1lect
                     LIMIT 1)
                 END)
             WHEN 'custom' THEN b.l1series
             ELSE
-                (SELECT lesson1 FROM `{$db->prefix}synlessons` AS cl
+                (SELECT lesson1 FROM `{$db->getPrefix()}synlessons` AS cl
                 WHERE cl.dayname=:dayname AND cl.lectionary=b.l1lect
                 LIMIT 1)
             END)
@@ -334,21 +334,21 @@ if ("blockitems" == $_GET['get'] && is_numeric($_GET['id']) && $_GET['day']) {
             WHEN 'historic' THEN
             (CASE b.l2series
                 WHEN 'first' THEN
-                    (SELECT lesson2 FROM `{$db->prefix}synlessons` AS cl
+                    (SELECT lesson2 FROM `{$db->getPrefix()}synlessons` AS cl
                     WHERE cl.dayname=:dayname AND cl.lectionary=b.l2lect
                     LIMIT 1)
                 WHEN 'second' THEN
-                    (SELECT s2lesson FROM `{$db->prefix}synlessons` AS cl
+                    (SELECT s2lesson FROM `{$db->getPrefix()}synlessons` AS cl
                     WHERE cl.dayname=:dayname AND cl.lectionary=b.l2lect
                     LIMIT 1)
                 WHEN 'third' THEN
-                    (SELECT s3lesson FROM `{$db->prefix}synlessons` AS cl
+                    (SELECT s3lesson FROM `{$db->getPrefix()}synlessons` AS cl
                     WHERE cl.dayname=:dayname AND cl.lectionary=b.l2lect
                     LIMIT 1)
                 END)
             WHEN 'custom' THEN b.l2series
             ELSE
-                (SELECT lesson2 FROM `{$db->prefix}synlessons` AS cl
+                (SELECT lesson2 FROM `{$db->getPrefix()}synlessons` AS cl
                 WHERE cl.dayname=:dayname AND cl.lectionary=b.l2lect
                 LIMIT 1)
             END)
@@ -357,21 +357,21 @@ if ("blockitems" == $_GET['get'] && is_numeric($_GET['id']) && $_GET['day']) {
             WHEN 'historic' THEN
             (CASE b.goseries
                 WHEN 'first' THEN
-                    (SELECT gospel FROM `{$db->prefix}synlessons` AS cl
+                    (SELECT gospel FROM `{$db->getPrefix()}synlessons` AS cl
                     WHERE cl.dayname=:dayname AND cl.lectionary=b.golect
                     LIMIT 1)
                 WHEN 'second' THEN
-                    (SELECT s2gospel FROM `{$db->prefix}synlessons` AS cl
+                    (SELECT s2gospel FROM `{$db->getPrefix()}synlessons` AS cl
                     WHERE cl.dayname=:dayname AND cl.lectionary=b.golect
                     LIMIT 1)
                 WHEN 'third' THEN
-                    (SELECT s3gospel FROM `{$db->prefix}synlessons` AS cl
+                    (SELECT s3gospel FROM `{$db->getPrefix()}synlessons` AS cl
                     WHERE cl.dayname=:dayname AND cl.lectionary=b.golect
                     LIMIT 1)
                 END)
             WHEN 'custom' THEN b.goseries
             ELSE
-                (SELECT gospel FROM `{$db->prefix}synlessons` AS cl
+                (SELECT gospel FROM `{$db->getPrefix()}synlessons` AS cl
                 WHERE cl.dayname=:dayname AND cl.lectionary=b.golect
                 LIMIT 1)
             END)
@@ -379,13 +379,13 @@ if ("blockitems" == $_GET['get'] && is_numeric($_GET['id']) && $_GET['day']) {
         (CASE b.pslect
             WHEN 'custom' THEN b.psseries
             ELSE
-                (SELECT psalm FROM `{$db->prefix}synlessons` AS cl
+                (SELECT psalm FROM `{$db->getPrefix()}synlessons` AS cl
                 WHERE cl.dayname=:dayname AND cl.lectionary=b.pslect
                 LIMIT 1)
             END)
             AS bpsalm,
-        (SELECT collect FROM `{$db->prefix}churchyear_collects` AS cyc
-        JOIN `{$db->prefix}churchyear_collect_index` AS cci
+        (SELECT collect FROM `{$db->getPrefix()}churchyear_collects` AS cyc
+        JOIN `{$db->getPrefix()}churchyear_collect_index` AS cci
         ON (cyc.id = cci.id)
         WHERE cci.dayname=:dayname AND cci.lectionary=b.colect
         AND cyc.class=b.coclass
@@ -394,7 +394,7 @@ if ("blockitems" == $_GET['get'] && is_numeric($_GET['id']) && $_GET['day']) {
         b.l2lect != \"custom\" AS l2link,
         b.golect != \"custom\" AS golink,
         b.pslect != \"custom\" AS pslink
-        FROM `{$db->prefix}blocks` as b
+        FROM `{$db->getPrefix()}blocks` as b
         WHERE id = :block");
     $q->bindValue(":dayname", $_GET['day']);
     $q->bindValue(":block", $_GET['id']);
@@ -589,7 +589,7 @@ applicable block plan when they are created or edited.</p>
 $q = $db->prepare("SELECT DATE_FORMAT(blockstart, '%c/%e/%Y') AS blockstart,
     DATE_FORMAT(blockend, '%c/%e/%Y') AS blockend, label, notes, l1lect,
     l1series, l2lect, l2series, golect, goseries, pslect, psseries,
-    colect, coclass, id FROM `{$db->prefix}blocks` AS b
+    colect, coclass, id FROM `{$db->getPrefix()}blocks` AS b
     ORDER BY b.blockstart DESC, b.blockend DESC");
 if ($q->execute()) {
     while ($row = $q->fetch(PDO::FETCH_ASSOC)) { ?>

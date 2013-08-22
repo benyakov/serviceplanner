@@ -36,7 +36,7 @@ if ($_POST['prefix'] && strpos($_POST['prefix'], ' ') === false) {
         header('Location: admin.php');
         exit(0);
     }
-    $rowcount = $db->exec("INSERT IGNORE INTO `{$db->prefix}names`
+    $rowcount = $db->exec("INSERT IGNORE INTO `{$db->getPrefix()}names`
         (book, number, title)
         SELECT n2.book, n2.number, n2.title
             FROM `{$namestable}` AS n2");

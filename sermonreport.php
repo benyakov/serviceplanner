@@ -43,8 +43,8 @@ if (! $auth) {
         $q = $db->prepare("SELECT s.bibletext, s.outline,
             s.notes, DATE_FORMAT(d.caldate, '%e %b %Y') as date,
             d.name, d.rite
-            FROM `{$db->prefix}sermons` AS s
-            JOIN `{$db->prefix}days` AS d ON (s.service=d.pkey)
+            FROM `{$db->getPrefix()}sermons` AS s
+            JOIN `{$db->getPrefix()}days` AS d ON (s.service=d.pkey)
             WHERE service=:id");
         $q->execute(array("id"=>$_GET['id']))
             or die(array_pop($q->errorInfo()));

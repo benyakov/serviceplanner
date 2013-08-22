@@ -31,11 +31,11 @@ header("Content-type: application/json");
 $q = $db->prepare("SELECT `names`.`title` as title,
     `hymns`.`location` as location,
     DATE_FORMAT(`days`.`caldate`, '%e %b %Y') as date
-    FROM `{$db->prefix}names` AS `names`
-    LEFT OUTER JOIN `{$db->prefix}hymns` AS `hymns`
+    FROM `{$db->getPrefix()}names` AS `names`
+    LEFT OUTER JOIN `{$db->getPrefix()}hymns` AS `hymns`
       ON (`names`.`book` = `hymns`.`book`
       AND `names`.`number` = `hymns`.`number`)
-    LEFT OUTER JOIN `{$db->prefix}days` AS `days`
+    LEFT OUTER JOIN `{$db->getPrefix()}days` AS `days`
       ON (`days`.`pkey` = `hymns`.`service`)
     WHERE `names`.`book` = :book
     AND `names`.`number` = :number
@@ -56,7 +56,7 @@ if ($title || $_GET['xref']=="off") {
     exit(0);
 }
 $bookname = strtolower($_GET['book']);
-$q = $db->prepare("SELECT `title` from `{$db->prefix}xref`
+$q = $db->prepare("SELECT `title` from `{$db->getPrefix()}xref`
     WHERE `{$_GET['book']}` = :number LIMIT 1");
 $q->bindParam(':number', $_GET['number']);
 if ($q->execute() && ($row = $q->fetch())) {

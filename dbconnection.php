@@ -39,7 +39,6 @@ class DBConnection {
             return self::$instance;
         }
     }
-
     private function setupConnection() {
         require_once("./utility/configfile.php");
         $cf = new ConfigFile("dbconnection.ini");
@@ -49,12 +48,15 @@ class DBConnection {
             "user"=>$cf->get("dbuser"),
             "password"=>$cf->get("dbpassword"),
             "prefix"=>$cf->get("prefix"));
-        list($dbhost, $dbname, $dbuser, $dbpassword) = array(
+        list($dbhost, $dbname, $dbuser, $dbpassword, $prefix) = array(
             $cf->get("dbhost"), $cf->get("dbname"),
-            $cf->get("dbuser"), $cf->get("dbpassword"));
-        self::$prefix = $cf->get("prefix");
+            $cf->get("dbuser"), $cf->get("dbpassword"),
+            $cf->get("prefix"));
         self::$handle = new PDO("mysql:host={$dbhost};dbname={$dbname}",
             "{$dbuser}", "{$dbpassword}");
+    }
+    public function getPrefix() {
+        return self::$connection['prefix'];
     }
     public function __call($name, $args) {
         if (! self::$handle)

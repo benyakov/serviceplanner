@@ -26,7 +26,7 @@
 require("./init.php");
 require("./churchyear/functions.php");
 $auth = auth();
-$dbp = $db->prefix;
+$dbp = $db->getPrefix();
 
 /* churchyear.php?dropfunctions=1
  * Drops all the churchyear functions and sets a message about

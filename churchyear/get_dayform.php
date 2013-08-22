@@ -30,7 +30,7 @@
     }
     $q = $db->prepare("SELECT `season`, `base`, `offset`, `month`, `day`,
         `observed_month`, `observed_sunday`
-        FROM `{$db->prefix}churchyear`
+        FROM `{$db->getPrefix()}churchyear`
         WHERE `dayname` = :dayname");
     $q->bindParam(":dayname", $_GET['dayname']);
     $q->execute();

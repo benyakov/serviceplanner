@@ -88,13 +88,13 @@ class LectionaryImporter extends FormImporter {
         $fhandle = $this->getfhandle();
         $db->beginTransaction();
         // Check for existing lessons and delete, if confirmed.
-        $q = $db->prepare("SELECT 1 FROM `{$db->prefix}churchyear_lessons`
+        $q = $db->prepare("SELECT 1 FROM `{$db->getPrefix()}churchyear_lessons`
             WHERE lectionary = :lectionary");
         $q->bindValue(":lectionary", $_POST['lectionary_name']);
         $q->execute() or die(array_pop($q->errorInfo()));
         if ($q->fetchColumn(0)) {
             if (isset($_POST['replace']) && "on" == $_POST['replace']) {
-                $q = $db->prepare("DELETE FROM `{$db->prefix}churchyear_lessons`
+                $q = $db->prepare("DELETE FROM `{$db->getPrefix()}churchyear_lessons`
                     WHERE lectionary = :lectionary");
                 $q->bindValue(":lectionary", $_POST['lectionary_name']);
                 $q->execute() or die(array_pop($q->errorInfo()));
@@ -105,7 +105,7 @@ class LectionaryImporter extends FormImporter {
             }
         }
         // Create records for new lessons
-        $q = $db->prepare("INSERT INTO `{$db->prefix}churchyear_lessons`
+        $q = $db->prepare("INSERT INTO `{$db->getPrefix()}churchyear_lessons`
             (lectionary, dayname, lesson1, lesson2, gospel, psalm,
             s2lesson, s2gospel, s3lesson, s3gospel, hymnabc, hymn)
             VALUES
@@ -166,11 +166,11 @@ class SynonymImporter extends FileImporter {
         // Replace using temporary tables;
         if (isset($_POST['replace']) && "on" == $_POST['replace']) {
             // Upload the new synonyms
-            $db->exec("CREATE TEMPORARY TABLE `{$db->prefix}newsynonyms`
+            $db->exec("CREATE TEMPORARY TABLE `{$db->getPrefix()}newsynonyms`
                     `canonical` varchar(255),
                     `synonym`   varchar(255))
                     ENGINE=InnoDB DEFAULT CHARSET=utf8");
-            $q = $db->prepare("INSERT INTO `{$db->prefix}newsynonyms`
+            $q = $db->prepare("INSERT INTO `{$db->getPrefix()}newsynonyms`
                 (`canonical`, `synonym`)
                 VALUES (:canonical, :synonym)");
             $q->bindParam(":canonical", $canonical);
@@ -184,32 +184,32 @@ class SynonymImporter extends FileImporter {
             }
             rewind($fhandle);
             // Add new synonyms not in current db
-            $db->exec("CREATE TEMPORARY TABLE `{$db->prefix}addsynonyms`
+            $db->exec("CREATE TEMPORARY TABLE `{$db->getPrefix()}addsynonyms`
                     `canonical` varchar(255),
                     `synonym`   varchar(255))
                     ENGINE=InnoDB DEFAULT CHARSET=utf8");
-            $db->exec("INSERT INTO `{$db->prefix}addsynonyms`
+            $db->exec("INSERT INTO `{$db->getPrefix()}addsynonyms`
                 SELECT n.`canonical`, n.`synonym`
-                FROM `{$db->prefix}newsynonyms` AS n
-                LEFT JOIN `{$db->prefix}churchyear_synonyms` AS cy
+                FROM `{$db->getPrefix()}newsynonyms` AS n
+                LEFT JOIN `{$db->getPrefix()}churchyear_synonyms` AS cy
                 ON (cy.`canonical` = n.`canonical`
                     AND cy.`synonym` = n.`synonym`)
                 WHERE cy.`synonym` == NULL");
-            $db->exec("INSERT INTO `{$db->prefix}churchyear_synonyms
+            $db->exec("INSERT INTO `{$db->getPrefix()}churchyear_synonyms
                 SELECT `canonical`, `synonym`
-                FROM `{$db->prefix}addsynonyms`");
+                FROM `{$db->getPrefix()}addsynonyms`");
             // Remove current db canonicals not in new list
             // (This will cascade into other tables.)
-            $db->exec("DELETE FROM `{$db->prefix}churchyear_synonyms`
+            $db->exec("DELETE FROM `{$db->getPrefix()}churchyear_synonyms`
                 WHERE ! `canonical` IN
                 (SELECT DISTINCT `canonical`
-                    FROM `{$db->prefix}newsynonyms`)");
+                    FROM `{$db->getPrefix()}newsynonyms`)");
         } else {
             $qexact = $db->prepare("SELECT 1
-                FROM `{$db->prefix}churchyear_synonyms`
+                FROM `{$db->getPrefix()}churchyear_synonyms`
                 WHERE `canonical` = :canonical
                 AND `synonym` = :synonym");
-            $qinsert = $db->prepare("INSERT INTO `{$db->prefix}churchyear_synonyms`
+            $qinsert = $db->prepare("INSERT INTO `{$db->getPrefix()}churchyear_synonyms`
                 (`canonical`, `synonym`) VALUES (:canonical, :synonym)");
             $qexact->bindParam(":canonical", $canonical);
             $qexact->bindParam(":synonym", $synonym);
@@ -245,7 +245,7 @@ class HymnNameImporter {
 
     function import() {
         $db = new DBConnection();
-        $rowcount = $db->exec("INSERT IGNORE INTO `{$db->prefix}names`
+        $rowcount = $db->exec("INSERT IGNORE INTO `{$db->getPrefix()}names`
             (book, number, title)
             SELECT n2.book, n2.number, n2.title
                 FROM `{$this->namestable}` AS n2");

@@ -60,10 +60,10 @@ if ((! array_key_exists("stage", $_GET)) || $ajax) {
                 hymns.book, hymns.number, hymns.note,
                 hymns.location, days.name as dayname, days.rite,
                 days.pkey as id, days.servicenotes, names.title
-                FROM {$db->prefix}hymns AS hymns
-                RIGHT OUTER JOIN {$db->prefix}days AS days
+                FROM {$db->getPrefix()}hymns AS hymns
+                RIGHT OUTER JOIN {$db->getPrefix()}days AS days
                     ON (hymns.service = days.pkey)
-                LEFT OUTER JOIN {$db->prefix}names AS names
+                LEFT OUTER JOIN {$db->getPrefix()}names AS names
                     ON (hymns.number = names.number)
                         AND (hymns.book = names.book)
                 WHERE days.pkey IN({$deletions})
@@ -93,8 +93,8 @@ if ((! array_key_exists("stage", $_GET)) || $ajax) {
         // Check to see if service has hymns at another location
         $deletions = implode(", ", array_map($db->quote, $deletions));
         $q = $db->prepare("SELECT number
-                FROM {$db->prefix}hymns as hymns
-                JOIN {$db->prefix}days as days
+                FROM {$db->getPrefix()}hymns as hymns
+                JOIN {$db->getPrefix()}days as days
                 ON (hymns.service = days.pkey)
                 WHERE hymns.location != :location
                     AND days.pkey IN({$deletions})
@@ -103,8 +103,8 @@ if ((! array_key_exists("stage", $_GET)) || $ajax) {
         $q->execute();
         if ($q->fetch()) {
             // If so, delete only the hymns.
-            $q = $db->prepare("DELETE FROM {$db->prefix}hymns as hymns
-                USING hymns JOIN {$db->prefix}days as days
+            $q = $db->prepare("DELETE FROM {$db->getPrefix()}hymns as hymns
+                USING hymns JOIN {$db->getPrefix()}days as days
                     ON (hymns.service = days.pkey)
                 WHERE days.pkey IN({$deletions})
                   AND hymns.location = :location");
@@ -112,7 +112,7 @@ if ((! array_key_exists("stage", $_GET)) || $ajax) {
             $q->execute() or dieWithRollback($q, ".");
         } else {
             // If not, delete the service (should cascade to hymns)
-            $q = $db->prepare("DELETE FROM `{$db->prefix}days`
+            $q = $db->prepare("DELETE FROM `{$db->getPrefix()}days`
                 WHERE `pkey` IN({$deletions})");
             $q->execute() or die(array_pop($q->errorInfo()));
         }

@@ -47,7 +47,7 @@ if (is_numeric($_GET["service"])) {
 
 if ('synonyms' == $_GET['export']) {
     $q = $db->prepare("SELECT canonical, synonym
-        FROM `{$db->prefix}churchyear_synonyms`
+        FROM `{$db->getPrefix()}churchyear_synonyms`
         ORDER BY canonical");
     if (! $q->execute()) {
         echo array_pop($q->errorInfo());
@@ -72,8 +72,8 @@ if ('synonyms' == $_GET['export']) {
 if ('churchyear' == $_GET['export']) {
     $q = $db->prepare("SELECT `dayname`, `season`, `base`,
         `offset`, `month`, `day`, `observed_month`, `observed_sunday`
-        FROM `{$db->prefix}churchyear` AS cy
-        LEFT OUTER JOIN `{$db->prefix}churchyear_order` AS cyo
+        FROM `{$db->getPrefix()}churchyear` AS cy
+        LEFT OUTER JOIN `{$db->getPrefix()}churchyear_order` AS cyo
             ON (cy.season = cyo.name)
             ORDER BY cyo.idx, cy.offset, cy.month, cy.day");
     if (! $q->execute()) {
@@ -102,7 +102,7 @@ if ($_GET['lectionary']) {
     $lectname = $_GET['lectionary'];
     $db->beginTransaction();
     $q = $db->prepare("SELECT COUNT(*) as c
-        FROM `{$db->prefix}churchyear_lessons`
+        FROM `{$db->getPrefix()}churchyear_lessons`
         WHERE `lectionary` = :lect");
     $q->bindParam(":lect", $lectname);
     if (! ($q->execute() and 0 < intval($q->fetchColumn()))) {
@@ -113,7 +113,7 @@ if ($_GET['lectionary']) {
     }
     $q = $db->prepare("SELECT `dayname`, `lesson1`, `lesson2`,
         `gospel`, `psalm`, `s2lesson`, `s2gospel`, `s3lesson`, `s3gospel`,
-        `hymnabc`, `hymn` FROM `{$db->prefix}churchyear_lessons`
+        `hymnabc`, `hymn` FROM `{$db->getPrefix()}churchyear_lessons`
         WHERE `lectionary` = :lect");
     $q->bindValue(":lect", $lectname);
     $q->setFetchMode(PDO::FETCH_NUM);

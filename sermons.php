@@ -39,8 +39,8 @@ $q = $db->query("SELECT sermons.bibletext, sermons.outline,
     sermons.notes, sermons.service, sermons.mstype,
     DATE_FORMAT(days.caldate, '%e %b %Y') as date,
     days.name, days.rite
-    FROM `{$db->prefix}sermons` AS sermons
-    JOIN `{$db->prefix}days` AS days
+    FROM `{$db->getPrefix()}sermons` AS sermons
+    JOIN `{$db->getPrefix()}days` AS days
         ON (sermons.service=days.pkey)
     ORDER BY days.caldate DESC");
 $q->execute() or die(array_pop($q->errorInfo));

@@ -42,7 +42,7 @@ function gettablename ($line) {
 }
 function adddbpfix ($name) {
     $dbh = new DBConnection();
-    return "{$dbh->prefix}{$name}";
+    return "{$dbh->getPrefix()}{$name}";
 }
 function churchyeartable ($name) {
     return strpos($name, 'churchyear') !== false;

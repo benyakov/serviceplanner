@@ -28,7 +28,7 @@ $date = date("Y-m-d", $_GET['date']);
 $db->beginTransaction();
 $q = $db->prepare("SELECT d.name AS dayname, d.rite, d.pkey AS service,
     d.servicenotes, d.block
-    FROM `{$db->prefix}days` AS d
+    FROM `{$db->getPrefix()}days` AS d
     WHERE `caldate` = ?
     ORDER BY dayname");
 $q->execute(array($date)) or die(array_pop($q->errorInfo()));
@@ -40,7 +40,7 @@ if ($q->rowCount()) {
         $servicenoteFormatted = translate_markup($row['servicenotes']);
         echo "<li><input type=\"checkbox\" tabindex=\"{$tabindex}\" class=\"existingservice\" name=\"{$thisname}\" id=\"{$thisname}\" data-block=\"{$row['block']}\"><label for=\"{$thisname}\"><a href=\"print.php?id={$row['service']}\" target=\"_new\">{$row['dayname']}</a> ({$row['rite']})</label><br/><div class=\"servicenote\">{$servicenoteFormatted}</div>";
         $qh = $db->prepare("SELECT h.book, h.number
-            FROM `{$db->prefix}hymns` AS h
+            FROM `{$db->getPrefix()}hymns` AS h
             WHERE h.service = ?
             ORDER BY h.location, h.sequence");
         $qh->execute(array($row['service'])) or die(array_pop($qh->errorInfo()));

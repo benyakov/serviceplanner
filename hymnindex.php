@@ -42,14 +42,14 @@ function togglebg($current) {
 }
 
 if ($_GET['drop'] == 'yes' && $auth) {
-    $db->query("DROP TABLE `{$db->prefix}xref`");
+    $db->query("DROP TABLE `{$db->getPrefix()}xref`");
     setMessage("Cross-reference table repopulated.");
 }
 
-if (! $db->query("SELECT 1 FROM {$db->prefix}xref")) {
+if (! $db->query("SELECT 1 FROM {$db->getPrefix()}xref")) {
     /**** To create the cross reference table ****/
 
-    $q = $db->prepare("CREATE TABLE `{$db->prefix}xref` (
+    $q = $db->prepare("CREATE TABLE `{$db->getPrefix()}xref` (
         `title` varchar(80),
         `text` varchar(60),
         `elh` smallint,
@@ -80,7 +80,7 @@ if (! $db->query("SELECT 1 FROM {$db->prefix}xref")) {
             }
             $r[] = $f;
         }
-        $q = $db->prepare("INSERT INTO {$db->prefix}xref (title, text, lsb, tlh, lw, lbw, elh, cw, wov, hs98)
+        $q = $db->prepare("INSERT INTO {$db->getPrefix()}xref (title, text, lsb, tlh, lw, lbw, elh, cw, wov, hs98)
             VALUES ({$r[0]}, {$r[1]}, {$r[2]}, {$r[3]}, {$r[4]}, {$r[5]}, {$r[6]}, {$r[7]}, {$r[8]}, {$r[9]})");
         $q->execute() or dieWithRollback($q, "\n".__FILE__.":".__LINE__);
     }
@@ -98,7 +98,7 @@ if (array_key_exists('sort', $_GET) && strpos($_GET['sort'], ';') == False) {
     $sort_by = "";
     $sorted_on = "";
 }
-$q = $db->prepare("SELECT * FROM {$db->prefix}xref{$sort_by}") ;
+$q = $db->prepare("SELECT * FROM {$db->getPrefix()}xref{$sort_by}") ;
 if (!$q->execute()) die(array_pop($q->errorInfo()));
 ?><!DOCTYPE html>
 <html lang="en">

@@ -41,7 +41,7 @@ if (! array_key_exists("stage", $_GET))
             hymns.sequence, days.name as dayname, days.rite, days.block,
             days.servicenotes
             FROM `${dbp}hymns` AS hymns
-            RIGHT OUTER JOIN `{$db->prefix}days` AS days ON (hymns.service=days.pkey)
+            RIGHT OUTER JOIN `{$db->getPrefix()}days` AS days ON (hymns.service=days.pkey)
             WHERE days.pkey = ?
             ORDER BY days.caldate DESC, hymns.location, hymns.sequence");
         $q->execute(array($_GET['id'])) or die(array_pop($q->errorInfo()));
@@ -200,12 +200,12 @@ if (! array_key_exists("stage", $_GET))
     }
     // Update hymn names
     $ititle = $inumber = $ibook = 0;
-    $q = $db->prepare("INSERT INTO {$db->prefix}names (title, number, book)
+    $q = $db->prepare("INSERT INTO {$db->getPrefix()}names (title, number, book)
         VALUES (:title, :number, :book)");
     $q->bindParam(":title", $ititle);
     $q->bindParam(":number", $inumber);
     $q->bindParam(":book", $ibook);
-    $qu = $db->prepare("UPDATE {$db->prefix}names SET title = :title
+    $qu = $db->prepare("UPDATE {$db->getPrefix()}names SET title = :title
         WHERE number = :number
         AND book = :book");
     $qu->bindParam(":title", $ititle);
@@ -221,7 +221,7 @@ if (! array_key_exists("stage", $_GET))
         }
     }
     // Update day information
-    $q = $db->prepare("UPDATE `{$db->prefix}days` SET `caldate`=:date,
+    $q = $db->prepare("UPDATE `{$db->getPrefix()}days` SET `caldate`=:date,
         `name`=:name, `rite`=:rite,
         `servicenotes`=:servicenotes, `block`=:block
         WHERE `pkey` = :id");
@@ -234,12 +234,12 @@ if (! array_key_exists("stage", $_GET))
     $q->execute() or dieWithRollback($q, $q->queryString);
 
     // Update hymns
-    $q = $db->prepare("UPDATE {$db->prefix}hymns
+    $q = $db->prepare("UPDATE {$db->getPrefix()}hymns
         SET number=:number,
         note=:note, location=:location,
         book=:book, sequence=:sequence
         WHERE pkey=:hymnid");
-    $qi = $db->prepare("INSERT INTO {$db->prefix}hymns
+    $qi = $db->prepare("INSERT INTO {$db->getPrefix()}hymns
         (service, location, book, number, note, sequence)
         VALUES (:service, :location, :book, :number, :note, :sequence)");
     $qi->bindValue(":service", $_POST['id']);
@@ -258,7 +258,7 @@ if (! array_key_exists("stage", $_GET))
     }
 
     // Delete tagged hymns
-    $q = $db->prepare("DELETE FROM {$db->prefix}hymns
+    $q = $db->prepare("DELETE FROM {$db->getPrefix()}hymns
         WHERE pkey = :hymnid");
     $hymnid = 0;
     $q->bindParam(":hymnid", $hymnid);

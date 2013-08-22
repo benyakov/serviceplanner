@@ -41,7 +41,7 @@ function queryService($id) {
 
 function queryAllHymns($limit=0, $future=false, $id="") {
     $dbh = new DBConnection();
-    $dbp = $dbh->prefix;
+    $dbp = $dbh->getPrefix();
     if ($id) $where = "WHERE d.pkey = ?";
     elseif ($future) {
         $where = "WHERE d.caldate >= CURDATE()";
@@ -650,7 +650,7 @@ function ordinal($n) {
 function daysForDate($date) {
     // Return an array of day names matching the given English-format date.
     $dbh = new DBConnection();
-    $dbp = $dbh->prefix;
+    $dbp = $dbh->getPrefix();
     if (! $date) return array();
     $found = array();
     $date = strtotime($date);
@@ -682,7 +682,7 @@ function getLessonField($lesson, $lect, $series) {
  */
 function replaceDBP($text, $prefix=false) {
     $dbh = new DBConnection();
-    $dbp = $dbh->prefix;
+    $dbp = $dbh->getPrefix();
     if ($prefix !== false) {
         return str_replace('{{DBP}}', $prefix, $text);
     } else {
