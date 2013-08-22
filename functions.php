@@ -147,7 +147,7 @@ function queryAllHymns($limit=0, $future=false, $id="") {
     WHERE cci.dayname=d.name AND cci.lectionary=b.colect
     AND cyc.class=b.coclass
     LIMIT 1) AS bcollect
-    FROM {$dbp}hymns AS h
+    FROM `{$dbp}hymns` AS h
     RIGHT OUTER JOIN `{$dbp}days` AS d ON (h.service = d.pkey)
     LEFT OUTER JOIN `{$dbp}names` AS n ON (h.number = n.number)
         AND (h.book = n.book)
