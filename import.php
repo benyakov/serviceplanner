@@ -36,7 +36,7 @@ elseif ("churchyear" == $_POST['import'])
 elseif ($_POST['prefix'])
     try {
         $importer = new HymnNameImporter();
-    } catch HymnTableNameError, $e {
+    } catch (HymnTableNameError $e) {
         setMessage($e->getMessage());
         header('Location: admin.php');
         exit(0);
@@ -66,12 +66,8 @@ class FormImporter {
         if (($fhandle = fopen($this->loadfile, "r")) !== false) {
             if (! $keys = fgetcsv($fhandle)) {
                 setMessage("Empty file upload.");
-            } else
-                return $fhandle;
-            }
-        } else {
-            setMessage("Problem opening uploaded file.");
-        }
+            } else return $fhandle;
+        } else setMessage("Problem opening uploaded file.");
         header("Location: admin.php");
         exit(0);
     }
@@ -232,9 +228,9 @@ class SynonymImporter extends FileImporter {
 }
 
 class HymnNameImporter {
-    function __construct(
-        if (! strpos($_POST['prefix'], ' ') === false) {
-            throw new HymnTableNameError("Bad prefix: `".htmlentities({$_POST['prefix']})."'");
+    public function __construct() {
+        if (! strpos($_POST['prefix'], ' ') === false)
+            throw new HymnTableNameError("Bad prefix: `".htmlentities($_POST['prefix']."'"));
         $db = new DBConnection();
         $this->namestable = $db->quote("{$_POST['prefix']}names");
         $q = $db->query("SHOW TABLES LIKE '{$this->namestable}'");
