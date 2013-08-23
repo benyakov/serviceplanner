@@ -71,11 +71,11 @@ if (touch(".my.cnf") && chmod(".my.cnf", 0600)) {
     header("Content-disposition: attachment; filename={$dlfilename}");
     $fp = fopen("./.my.cnf", "w");
     fwrite($fp, "[client]
-    user=\"{$dbconnection['dbuser']}\"
-    password=\"{$dbconnection['dbpassword']}\"\n") ;
+    user=\"{$db->getUser()}\"
+    password=\"{$db->getPassword()}\"\n") ;
     fclose($fp);
     $rv = 0;
-    passthru("mysqldump --defaults-file=.my.cnf -h {$dbconnection['dbhost']} {$dbconnection['dbname']} {$tablenamestring}", $rv);
+    passthru("mysqldump --defaults-file=.my.cnf -h {$db->getHost()} {$db->getName()} {$tablenamestring}", $rv);
     unlink("./.my.cnf");
     if ($rv != 0) {
         echo "mysqldump returned {$rv}";

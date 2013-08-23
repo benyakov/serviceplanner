@@ -55,6 +55,18 @@ class DBConnection {
         self::$handle = new PDO("mysql:host={$dbhost};dbname={$dbname}",
             "{$dbuser}", "{$dbpassword}");
     }
+    public function getHost() {
+        return self::$connection['host'];
+    }
+    public function getName() {
+        return self::$connection['name'];
+    }
+    public function getUser() {
+        return self::$connection['user'];
+    }
+    public function getPassword() {
+        return self::$connection['password'];
+    }
     public function getPrefix() {
         return self::$connection['prefix'];
     }

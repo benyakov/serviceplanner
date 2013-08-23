@@ -29,7 +29,7 @@ if (! $auth) {
     header("location: index.php");
     exit(0);
 }
-$dumpfile = "./restore-{$dbconnection['dbname']}.txt";
+$dumpfile = "./restore-{$db->getName()}.txt";
 $fnmatches = array();
 if (! preg_match('/^(services|churchyear)-(\d+\.\d+\.\d+)_(\d+[[:alpha:]]{3}\d{4}-\d{4}).dump$/',
     $_FILES['backup_file']['name'], $fnmatches))
@@ -55,9 +55,9 @@ if (! preg_match('/^(services|churchyear)-(\d+\.\d+\.\d+)_(\d+[[:alpha:]]{3}\d{4
 }
 if (move_uploaded_file($_FILES['backup_file']['tmp_name'], $dumpfile)) {
     // Insert $dbp into dumpfile.
-    /* Still needed?  dump.php adds this itself!
     $dumplines = file($dumpfile, FILE_IGNORE_NEW_LINES);
     $newdumplines = array();
+    $dbp = $db->getPrefix();
     foreach ($dumplines as $line) {
         array_push($newdumplines,
             preg_replace(
@@ -73,14 +73,14 @@ if (move_uploaded_file($_FILES['backup_file']['tmp_name'], $dumpfile)) {
     }
     $dumpfh = fopen($dumpfile, 'wb');
     fwrite($dumpfh, implode("\n", $newdumplines));
-    fclose($dumpfh); */
+    fclose($dumpfh);
     if (touch("./.my.cnf") && chmod(".my.cnf", 0600)) {
         $fp = fopen(".my.cnf", "w");
         fwrite($fp, "[client]
-        user=\"{$dbconnection['dbuser']}\"
-        password=\"{$dbconnection['dbpassword']}\"\n") ;
+        user=\"{$db->getUser()}\"
+        password=\"{$db->getPassword()}\"\n") ;
         fclose($fp);
-        $cmdline = "mysql --defaults-file=.my.cnf -h {$dbconnection['dbhost']} {$dbconnection['dbname']} ".
+        $cmdline = "mysql --defaults-file=.my.cnf -h {$db->getHost()} {$db->getName()} ".
             "-e 'source ${dumpfile}';";
         $result = system($cmdline, $return);
         unlink($dumpfile);
