@@ -25,7 +25,7 @@
  */
 $fh = fopen("./utility/churchyear/historictable.csv", "r");
 $headings = fgetcsv($fh);
-$q = $dbh->prepare("INSERT INTO {$dbp}churchyear
+$q = $db->prepare("INSERT INTO {$db->getPrefix()}churchyear
     (season, dayname, base, offset, month, day,
         observed_month, observed_sunday)
     VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
@@ -41,8 +41,8 @@ while (($record = fgetcsv($fh)) != FALSE) {
 }
 
 // Make sure it's empty.
-$dbh->exec("DELETE FROM `{$dbp}churchyear_order`");
-$q = $dbh->prepare("INSERT INTO `{$dbp}churchyear_order`
+$db->exec("DELETE FROM `{$db->getPrefix()}churchyear_order`");
+$q = $db->prepare("INSERT INTO `{$db->getPrefix()}churchyear_order`
     (name, idx) VALUES
     (\"Advent\", 1),
     (\"Christmas\", 2),
@@ -59,7 +59,7 @@ $q->execute() or die("Problem populating churchyear_order:" .
 
 // Populate synonyms table
 $fh = fopen("./utility/churchyear/synonyms.csv", "r");
-$qs = $dbh->prepare("INSERT INTO `{$dbp}churchyear_synonyms`
+$qs = $db->prepare("INSERT INTO `{$db->getPrefix()}churchyear_synonyms`
     (canonical, synonym) VALUES (:canonical, :synonym)");
 while (($record = fgetcsv($fh)) != FALSE) {
     $canonical = $record[0];
@@ -74,7 +74,7 @@ while (($record = fgetcsv($fh)) != FALSE) {
 // Fill propers table
 $fh = fopen("./utility/churchyear/propers.csv", "r");
 $headings = fgetcsv($fh);
-$qp = $dbh->prepare("INSERT INTO {$dbp}churchyear_propers
+$qp = $db->prepare("INSERT INTO {$db->getPrefix()}churchyear_propers
     (dayname, color, theme, introit)
     VALUES (?, ?, ?, ?)");
 while (($record = fgetcsv($fh)) != FALSE) {
@@ -90,7 +90,7 @@ while (($record = fgetcsv($fh)) != FALSE) {
 // Fill lessons table
 $fh = fopen("./utility/churchyear/lessons.csv", "r");
 $headings = fgetcsv($fh);
-$ql = $dbh->prepare("INSERT INTO {$dbp}churchyear_lessons
+$ql = $db->prepare("INSERT INTO {$db->getPrefix()}churchyear_lessons
     (dayname, lectionary, lesson1, lesson2, gospel, psalm,
     s2lesson, s2gospel, s3lesson, s3gospel, hymnabc, hymn)
     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
@@ -114,7 +114,7 @@ while (($record = fgetcsv($fh)) != FALSE) {
 // Fill collect text
 $fh = fopen("./utility/churchyear/collecttext.csv", "r");
 $headings = fgetcsv($fh);
-$ql = $dbh->prepare("INSERT INTO {$dbp}churchyear_collects
+$ql = $db->prepare("INSERT INTO {$db->getPrefix()}churchyear_collects
     (id, class, collect)
     VALUES (?, ?, ?)");
 while (($record = fgetcsv($fh)) != FALSE) {
@@ -129,7 +129,7 @@ while (($record = fgetcsv($fh)) != FALSE) {
 // Fill collect indexes
 $fh = fopen("./utility/churchyear/collectindex.csv", "r");
 $headings = fgetcsv($fh);
-$ql = $dbh->prepare("INSERT INTO `{$dbp}churchyear_collect_index`
+$ql = $db->prepare("INSERT INTO `{$db->getPrefix()}churchyear_collect_index`
     (dayname, lectionary, id)
     VALUES (?, ?, ?)");
 while (($record = fgetcsv($fh)) != FALSE) {
@@ -144,7 +144,7 @@ while (($record = fgetcsv($fh)) != FALSE) {
 // Fill graduals
 $fh = fopen("./utility/churchyear/graduals.csv", "r");
 $headings = fgetcsv($fh);
-$ql = $dbh->prepare("INSERT INTO `{$dbp}churchyear_graduals`
+$ql = $db->prepare("INSERT INTO `{$db->getPrefix()}churchyear_graduals`
     (season, gradual)
     VALUES (?, ?)");
 while (($record = fgetcsv($fh)) != FALSE) {
