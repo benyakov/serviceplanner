@@ -202,11 +202,14 @@ function display_records_table($q) {
         <tr><th>Date &amp; Location</th><th colspan=2>Liturgical Day Name: Service/Rite</th></tr>
     <?
     $serviceid = "";
+    $location = "";
     $rowcount = 1;
     $thesehymns = array();
     $hymnlocation = "";
     while ($row = $q->fetch(PDO::FETCH_ASSOC)) {
-        if ($row['serviceid'] != $serviceid) {
+        if (! ($row['serviceid'] == $serviceid
+            && $row['location'] == $location))
+        {
             $rowcount += listthesehymns($thesehymns, $rowcount, $hymnlocation);
             // Display the heading line
             if (is_within_week($row['date'])) {
@@ -264,6 +267,7 @@ function display_records_table($q) {
                      translate_markup($row['servicenotes'])."</td></tr>\n";
             }
             $serviceid = $row['serviceid'];
+            $location = $row['location'];
         }
         // Collect hymns
         $thesehymns[] = $row;
@@ -285,11 +289,14 @@ function modify_records_table($q, $action) {
         <tr><th>Date &amp; Location</th><th colspan=2>Liturgical Day Name: Service/Rite</th></tr>
     <?
     $serviceid = "";
+    $location = "";
     $rowcount = 1;
     $thesehymns = array();
     $hymnlocation = "";
     while ($row = $q->fetch(PDO::FETCH_ASSOC)) {
-        if ($row['serviceid'] != $serviceid) {
+        if (! ($row['serviceid'] == $serviceid
+            && $row['location'] == $location))
+        {
             $rowcount += listthesehymns($thesehymns, $rowcount, $hymnlocation);
             // Display the heading line
             if (is_within_week($row['date'])) {
@@ -348,6 +355,7 @@ function modify_records_table($q, $action) {
                      translate_markup($row['servicenotes'])."</td></tr>\n";
             }
             $serviceid = $row['serviceid'];
+            $location = $row['location'];
         }
         // Collect hymns
         $thesehymns[] = $row;
