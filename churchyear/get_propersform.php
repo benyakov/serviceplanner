@@ -36,7 +36,8 @@ function propersForm($dayname) {
             ON (pr.dayname = s.synonym)
         WHERE s.canonical = ?
         ORDER BY l.lectionary");
-    if (! $q->execute(array($dayname))) {
+    $q->bindValue(1, $dayname);
+    if (! $q->execute()) {
         die(array_pop($q->errorInfo()));
         $pdata = array("color"=>"", "theme"=>"", "introit"=>"",
             "note"=>"", "lesson1"=>"", "lesson2"=>"", "gospel"=>"",

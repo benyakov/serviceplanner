@@ -205,6 +205,80 @@ if ($_POST['submit_day']==1) {
     exit(0);
 }
 
+
+/* Do the work of updating existing synonyms from a new list.
+ * Called by the next two options.
+ */
+function updateSynonyms($oldlist, $newlist, $canonical, $confirmed=array()) {
+    $db = new DBConnection();
+    $dbp = $db->getPrefix();
+    for ($i=0, $len=count($newlist); $i<=$len; $i++) {
+        if (! array_key_exists($i, $oldlist) { // Insert a new synonym
+            $q = $db->prepare("INSERT INTO `{$dbp}churchyear_synonyms`
+                (canonical, synonym) VALUES (?, ?)");
+            $q->bindValue(1, $canonical);
+            $q->bindValue(2, $newlist[$i]);
+            $q->execute();
+        } else { // Update an existing synonym
+            $q = $db->prepare("UPDATE `{$dbp}churchyear_synonyms`
+                SET `synonym` = ?
+                WHERE `canonical` = ?
+                AND `synonym` = ?");
+            $q->bindValue(1, $newlist[$i]);
+            $q->bindValue(2, $canonical);
+            $q->bindValue(4, $oldlist[$i]);
+            $q->execute();
+        }
+    }
+    if (count($oldlist) > count($newlist)) {
+        $extra = array_slice($oldlist(count($newlist)));
+        if ($extra == $confirmed) {  // Check the extra are still extra
+            $placeholders = implode(',' array_fill(0, count($extra)-1, '?'));
+            $q = $db->prepare("DELETE FROM `{$dbp}churchyear_propers`
+                WHERE `dayname` IN({$placeholders})");
+            $q->execute($extra);
+            $q = $db->prepare("DELETE FROM `{$dbp}churchyear_lessons`
+                WHERE `dayname` IN({$placeholders})");
+            $q->execute($extra);
+            $q = $db->prepare("DELETE FROM `{$dbp}churchyear_collect_index`
+                WHERE `dayname` IN({$placeholders})");
+            $q->execute($extra);
+            $q = $db->prepare("DELETE FROM `{$dbp}churchyear_synonyms`
+                WHERE canonical IN({$placeholders})");
+            $q->execute($extra);
+        } else {
+            // FIXME: This is only for debugging
+            echo "Extra and confirmed don't match...<br>";
+            print_r($extra);
+            echo "<br>";
+            print_r($confirmed);
+            exit(0);
+        }
+    }
+}
+
+/* churchyear.php with $_POST of commitsynonyms (canonical dayname)
+ * Pulls the list of items for comfirmed deletion from the $_SESSION.
+ */
+if ($_POST['commitsynonyms']) {
+    if (! $auth) {
+        echo json_encode(array(false));
+        exit(0);
+    }
+    list($new, $del) = $_SESSION[$sprefix]['commitsynonyms'];
+    $canonical = $_POST['commitsynonyms'];
+    $db->beginTransaction();
+    $q = $db->prepare("SELECT `synonym` FROM `{$dbp}churchyear_synonyms`
+        WHERE `canonical` = ? SORT ASC");
+    $q->bindValue(1, $canonical);
+    $q->execute();
+    $old = array_map(array_pop, $q->fetchAll(PDO::FETCH_NUM));
+    updateSynonyms($old, $new, $canonical, $del);
+    $db->commit();
+    unset($_SESSION[$sprefix]['commitsynonyms']);
+    echo json_encode(array('success'));
+}
+
 /* churchyear.php with $_POST of synonyms (lines) and canonical (dayname)
  * Update synonyms for canonical.
  */
@@ -215,22 +289,31 @@ if ($_POST['synonyms']) {
     }
     $synonyms = explode("\n", $_POST['synonyms']);
     $canonical = $_POST['canonical'];
-    // Remove current entries for canonical
     $db->beginTransaction();
-    $q = $db->prepare("DELETE FROM `{$dbp}churchyear_synonyms`
-        WHERE canonical = ?");
-    $success = $q->execute(array($canonical));
-    if ($success) {
-        $q = $db->prepare("INSERT INTO `{$dbp}churchyear_synonyms`
-            (canonical, synonym) VALUES (?, ?)");
-        foreach ($synonyms as $synonym) {
-            $success = $q->execute(array($canonical, $synonym));
-            if (! $success) break;
+    $q = $db->prepare("SELECT `synonym` FROM `{$dbp}churchyear_synonyms`
+        WHERE `canonical` = ? SORT ASC");
+    $q->bindValue(1, $canonical);
+    $q->execute();
+    $olddblist = array_map(array_pop, $q->fetchAll(PDO::FETCH_NUM));
+    if (count($olddblist) > count($synonyms)) {
+        // Verify the desire to lose data.
+        $db->rollback();
+        for ($i=count($synonyms), $len=count($olddblist); $i<=$len; $i++) {
+            $delsynonyms[] = $olddblist[$i];
         }
-        if ($success) $db->commit();
+        $_SESSION[$sprefix]['commitsynonyms'] = array($synonyms, $delsynonyms);
+        $confirm = "Please confirm deletion of propers, lessons, and collect assignments ".
+            "for the following existing daynames: ".
+            implode(", ", $delsynonyms).".<br>".
+            "[ <a href=\"churchyear.php?commitsynonyms={$canonical}\">I Confirm</a> ]".
+            "[ <a href=\"churchyear.php\">Cancel</a> ]";
+        echo json_encode(array('confirm', $confirm));
+        exit();
+    } else {
+        updateSynonyms($olddblist, $synonyms, $canonical);
+        $db->commit();
+        echo json_encode(array('success'));
     }
-    echo json_encode($success);
-    exit(0);
 }
 
 /* churchyear.php?synonyms=dayname
@@ -242,7 +325,7 @@ if ($_GET['request'] == "synonyms") {
         exit(0);
     }
     $q = $db->prepare("SELECT `synonym` FROM `{$dbp}churchyear_synonyms`
-        WHERE `canonical` = ?");
+        WHERE `canonical` = ? SORT ASC");
     if ($q->execute(array($_GET['name']))) {
         $rv = array();
         while ($aval = $q->fetch(PDO::FETCH_NUM)) {

@@ -83,7 +83,7 @@ function setupPropers() {
         var orig = $(this).attr("data-day");
         $.get("churchyear.php", {propers: orig},
             function(rv) {
-                rv = eval(rv);
+                rv = $.parseJSON(rv);
                 if (! rv[0]) {
                     return;
                 }
@@ -107,7 +107,7 @@ function setupSynonym() {
         $.get("churchyear.php", {request: "synonyms",
             name: orig},
             function(rv) {
-                rv = eval(rv);
+                rv = $.parseJSON(rv);
                 if (rv[0]) {
                     var lines = rv[1].join("\n");
                 } else {
@@ -124,11 +124,12 @@ function setupSynonym() {
                 {synonyms: $("#synonyms").val(),
                  canonical: orig}, function(rv) {
                             $("#dialog").dialog("close");
-                            rv = eval(rv);
-                            if (rv) {
+                            rv = $.parseJSON(rv);
+                            if (rv[0]) {
                                 setMessage("Saved synonyms.");
                             } else {
-                                setMessage("Failed to save synonyms");
+                                setMessage("Failed to save synonyms: "+
+                                    rv[1]);
                             }
                     });
                 });
@@ -191,7 +192,7 @@ function setupCollectDialog(addlink) {
         if (choice != "new") {
             $.get("churchyear.php", { request: "collect", id: choice },
                 function(rv) {
-                    rv = eval(rv);
+                    rv = $.parseJSON(rv);
                     $("#collect-text").val(rv[0]);
                     $("#collect-class").val(rv[1]);
             });
@@ -206,7 +207,7 @@ function setupCollectDialog(addlink) {
         var data = $(this).serialize();
         $.post('churchyear.php', data, function(rv) {
             $("#dialog2").dialog("close");
-            rv = eval(rv);
+            rv = $.parseJSON(rv);
             if (rv[0]) {
                 $("#dialog").html(rv[2]);
             }
@@ -223,7 +224,7 @@ function setupCollectDeleteDialog() {
             detachcollect: $(this).attr("data-cid"),
             lectionary: $(this).attr("data-lectionary"),
             dayname: $(this).attr("data-dayname") }, function(rv) {
-                rv = eval(rv);
+                rv = $.parseJSON(rv);
                 if (rv[0]) {
                     $("#dialog").html(rv[2]);
                 }
@@ -235,7 +236,7 @@ function setupCollectDeleteDialog() {
         var vals = $(this).serialize();
         $.post("churchyear.php", vals, function(rv) {
             $("#dialog2").dialog("close");
-            rv = eval(rv);
+            rv = $.parseJSON(rv);
             if (rv[0]) {
                 $("#dialog").html(rv[2]);
             }
@@ -273,7 +274,7 @@ function setupEditDialog() {
         var vals = $(this).serialize();
         $.post("churchyear.php", vals, function(rv) {
             $("#dialog").dialog("close");
-            rv = eval(rv);
+            rv = $.parseJSON(rv);
             if (rv[0]) {
                 $("#churchyear-listing").replaceWith(rv[2]);
                 setupEdit();
@@ -294,7 +295,7 @@ function setupPropersDialog() {
            "from this day & lectionary.)")) {
             var id = $(this).attr("data-id");
             $.get("churchyear.php", { delpropers: id }, function(rv) {
-                rv = eval(rv);
+                rv = $.parseJSON(rv);
                 if (rv[0]) {
                     $("#dialog").html(rv[2]);
                 }
@@ -363,7 +364,7 @@ function setupPropersDialog() {
         evt.preventDefault();
         $.post("churchyear.php", $(this).serialize(),
             function(rv) {
-                rv = eval(rv);
+                rv = $.parseJSON(rv);
                 setMessage(rv[1]);
         });
     });
@@ -371,7 +372,7 @@ function setupPropersDialog() {
         evt.preventDefault();
         $.post("churchyear.php", $(this).serialize(),
             function(rv) {
-                rv = eval(rv);
+                rv = $.parseJSON(rv);
                 if (rv[0]) {
                     $("#dialog").html(rv[2]);
                 }
