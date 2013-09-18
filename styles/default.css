@@ -81,7 +81,7 @@ p.hymnlist {
     margin: 0.2em 0 0.2em 2em;
 }
 #message {
-    position: absolute;
+    position: fixed;
     right: 12px;
     top: .75in;
     width: 30em;

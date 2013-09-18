@@ -205,13 +205,15 @@ if ($_POST['submit_day']==1) {
     exit(0);
 }
 
-
 /* Do the work of updating existing synonyms from a new list.
  * Called by the next two options.
  */
 function updateSynonyms($oldlist, $newlist, $canonical, $confirmed=array()) {
     $db = new DBConnection();
     $dbp = $db->getPrefix();
+    if (count($oldlist) > count($newlist)) {
+        $extra = array_slice($oldlist(count($newlist)));
+    } else $extra = array();
     for ($i=0, $len=count($newlist); $i<=$len; $i++) {
         if (! array_key_exists($i, $oldlist)) { // Insert a new synonym
             $q = $db->prepare("INSERT INTO `{$dbp}churchyear_synonyms`
@@ -220,6 +222,9 @@ function updateSynonyms($oldlist, $newlist, $canonical, $confirmed=array()) {
             $q->bindValue(2, $newlist[$i]);
             $q->execute();
         } else { // Update an existing synonym
+            if ($newlist[$i] == "") { // Delete this one
+                $extra[] = $oldlist[$i];
+            }
             $q = $db->prepare("UPDATE `{$dbp}churchyear_synonyms`
                 SET `synonym` = ?
                 WHERE `canonical` = ?
@@ -230,23 +235,8 @@ function updateSynonyms($oldlist, $newlist, $canonical, $confirmed=array()) {
             $q->execute();
         }
     }
-    if (count($oldlist) > count($newlist)) {
-        $extra = array_slice($oldlist(count($newlist)));
-        if ($extra == $confirmed) {  // Check the extra are still extra
-            $placeholders = implode(',', array_fill(0, count($extra), '?'));
-            $q = $db->prepare("DELETE FROM `{$dbp}churchyear_propers`
-                WHERE `dayname` IN({$placeholders})");
-            $q->execute($extra);
-            $q = $db->prepare("DELETE FROM `{$dbp}churchyear_lessons`
-                WHERE `dayname` IN({$placeholders})");
-            $q->execute($extra);
-            $q = $db->prepare("DELETE FROM `{$dbp}churchyear_collect_index`
-                WHERE `dayname` IN({$placeholders})");
-            $q->execute($extra);
-            $q = $db->prepare("DELETE FROM `{$dbp}churchyear_synonyms`
-                WHERE canonical IN({$placeholders})");
-            $q->execute($extra);
-        } else {
+    if ($extra) {
+        if ($extra != $confirmed) {  // Check the extra are still extra
             // FIXME: This is only for debugging
             echo "Extra and confirmed don't match...<br>";
             print_r($extra);
@@ -254,6 +244,19 @@ function updateSynonyms($oldlist, $newlist, $canonical, $confirmed=array()) {
             print_r($confirmed);
             exit(0);
         }
+        $placeholders = implode(',', array_fill(0, count($extra), '?'));
+        $q = $db->prepare("DELETE FROM `{$dbp}churchyear_propers`
+            WHERE `dayname` IN({$placeholders})");
+        $q->execute($extra);
+        $q = $db->prepare("DELETE FROM `{$dbp}churchyear_lessons`
+            WHERE `dayname` IN({$placeholders})");
+        $q->execute($extra);
+        $q = $db->prepare("DELETE FROM `{$dbp}churchyear_collect_index`
+            WHERE `dayname` IN({$placeholders})");
+        $q->execute($extra);
+        $q = $db->prepare("DELETE FROM `{$dbp}churchyear_synonyms`
+            WHERE `synonym` IN({$placeholders})");
+        $q->execute($extra);
     }
 }
 
@@ -277,6 +280,7 @@ if ($_POST['commitsynonyms']) {
     $db->commit();
     unset($_SESSION[$sprefix]['commitsynonyms']);
     echo json_encode(array('success'));
+    exit(0);
 }
 
 /* churchyear.php with $_POST of synonyms (lines) and canonical (dayname)
@@ -299,7 +303,14 @@ if ($_POST['synonyms']) {
         // Verify the desire to lose data.
         $db->rollback();
         for ($i=count($synonyms), $len=count($olddblist); $i<=$len; $i++) {
+            // Deletes past the end of the new synonym list
             $delsynonyms[] = $olddblist[$i];
+        }
+        for ($i=0, $len=count($synonyms); $i<=$len; $i++) {
+            // Directed deletes
+            if ("" == $synonyms[$i]) {
+                $delsynonyms[] = $olddblist[$i];
+            }
         }
         $_SESSION[$sprefix]['commitsynonyms'] = array($synonyms, $delsynonyms);
         $confirm = "Please confirm deletion of propers, lessons, and collect assignments ".
@@ -313,6 +324,7 @@ if ($_POST['synonyms']) {
         updateSynonyms($olddblist, $synonyms, $canonical);
         $db->commit();
         echo json_encode(array('success'));
+        exit(0);
     }
 }
 
