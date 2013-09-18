@@ -213,7 +213,7 @@ function updateSynonyms($oldlist, $newlist, $canonical, $confirmed=array()) {
     $db = new DBConnection();
     $dbp = $db->getPrefix();
     for ($i=0, $len=count($newlist); $i<=$len; $i++) {
-        if (! array_key_exists($i, $oldlist) { // Insert a new synonym
+        if (! array_key_exists($i, $oldlist)) { // Insert a new synonym
             $q = $db->prepare("INSERT INTO `{$dbp}churchyear_synonyms`
                 (canonical, synonym) VALUES (?, ?)");
             $q->bindValue(1, $canonical);
@@ -226,14 +226,14 @@ function updateSynonyms($oldlist, $newlist, $canonical, $confirmed=array()) {
                 AND `synonym` = ?");
             $q->bindValue(1, $newlist[$i]);
             $q->bindValue(2, $canonical);
-            $q->bindValue(4, $oldlist[$i]);
+            $q->bindValue(3, $oldlist[$i]);
             $q->execute();
         }
     }
     if (count($oldlist) > count($newlist)) {
         $extra = array_slice($oldlist(count($newlist)));
         if ($extra == $confirmed) {  // Check the extra are still extra
-            $placeholders = implode(',' array_fill(0, count($extra)-1, '?'));
+            $placeholders = implode(',', array_fill(0, count($extra), '?'));
             $q = $db->prepare("DELETE FROM `{$dbp}churchyear_propers`
                 WHERE `dayname` IN({$placeholders})");
             $q->execute($extra);
@@ -269,7 +269,7 @@ if ($_POST['commitsynonyms']) {
     $canonical = $_POST['commitsynonyms'];
     $db->beginTransaction();
     $q = $db->prepare("SELECT `synonym` FROM `{$dbp}churchyear_synonyms`
-        WHERE `canonical` = ? SORT ASC");
+        WHERE `canonical` = ? ORDER BY `synonym` ASC");
     $q->bindValue(1, $canonical);
     $q->execute();
     $old = array_map(array_pop, $q->fetchAll(PDO::FETCH_NUM));
@@ -291,7 +291,7 @@ if ($_POST['synonyms']) {
     $canonical = $_POST['canonical'];
     $db->beginTransaction();
     $q = $db->prepare("SELECT `synonym` FROM `{$dbp}churchyear_synonyms`
-        WHERE `canonical` = ? SORT ASC");
+        WHERE `canonical` = ? ORDER BY `synonym` ASC");
     $q->bindValue(1, $canonical);
     $q->execute();
     $olddblist = array_map(array_pop, $q->fetchAll(PDO::FETCH_NUM));
@@ -325,7 +325,7 @@ if ($_GET['request'] == "synonyms") {
         exit(0);
     }
     $q = $db->prepare("SELECT `synonym` FROM `{$dbp}churchyear_synonyms`
-        WHERE `canonical` = ? SORT ASC");
+        WHERE `canonical` = ? ORDER BY `synonym` ASC");
     if ($q->execute(array($_GET['name']))) {
         $rv = array();
         while ($aval = $q->fetch(PDO::FETCH_NUM)) {
