@@ -90,8 +90,8 @@ CREATE TABLE `churchyear_order` (
     PRIMARY KEY (`name`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 CREATE TABLE `churchyear_synonyms` (
-    `canonical` varchar(255),
-    `synonym`   varchar(255),
+    `canonical` varchar(255) NOT NULL,
+    `synonym`   varchar(255) UNIQUE NOT NULL,
     FOREIGN KEY (`canonical`) REFERENCES `churchyear` (`dayname`)
         ON UPDATE CASCADE
         ON DELETE CASCADE,

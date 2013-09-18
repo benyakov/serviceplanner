@@ -99,6 +99,19 @@ function setupPropers() {
     });
 }
 
+function setupCommitSynonymsForm() {
+    $("#commitsynonyms").submit(function(evt) {
+        evt.preventDefault();
+        $.post("churchyear.php",
+            {commitsynonyms: $("#commitsynonymsfield").val()},
+             function(rv) {
+                $("#dialog").dialog("close");
+                rv = $.parseJSON(rv);
+                setMessage(rv[1]);
+             });
+    });
+}
+
 function setupSynonym() {
     $(".synonym").click(function(evt) {
         evt.preventDefault();
@@ -113,7 +126,11 @@ function setupSynonym() {
                 } else {
                     var lines = "";
                 }
-                $("#dialog").html('<form id="synonymsform" method="post">'
+                $("#dialog").html('<p>Each line is a synonym. '
+                    +'Add new synonyms at the bottom, '
+                    +'or rename one by changing it in-place, '
+                    +'or delete one by making it a blank line.</p>\n'
+                    +'<form id="synonymsform" method="post">'
                     +'<textarea id="synonyms">'+lines+'</textarea><br>'
                     +'<button type="submit" id="submit">Submit</button>'
                     +'<button type="reset" id="reset">Reset</button>'
@@ -121,24 +138,29 @@ function setupSynonym() {
                 $("#synonymsform").submit(function(evt) {
                     evt.preventDefault();
                     $.post("churchyear.php",
-                {synonyms: $("#synonyms").val(),
-                 canonical: orig}, function(rv) {
+                        {synonyms: $("#synonyms").val(),
+                         canonical: orig,
+                         submitsynonyms: 'true'},
+                         function(rv) {
                             $("#dialog").dialog("close");
                             rv = $.parseJSON(rv);
-                            if (rv[0]) {
-                                setMessage("Saved synonyms.");
+                            if ('confirm' == rv[0]) {
+                                $("#dialog").html(rv[1]);
+                                $("#dialog").dialog("open");
+                            } else if (rv[0]) {
+                                setMessage(rv[1]);
                             } else {
                                 setMessage("Failed to save synonyms: "+
                                     rv[1]);
                             }
-                    });
+                        });
                 });
                 $("#dialog").dialog({modal: true,
                     title: "Synonyms for "+orig,
                     width: $(window).width()*0.4,
                     height: "auto",
                     maxHeight: $(window).height()*0.7,
-                    position: [30, loc.top],
+                    position: [30, loc.top]
                 });
             });
     });
