@@ -32,14 +32,14 @@ if ("0.5." != substr($oldversion, 0, 4).'.') {
 $db = new DBConnection();
 $db->beginTransaction();
 // Delete churchyear data.
-$db->exec("DELETE FROM `{$dbp}churchyear_graduals`");
-$db->exec("DELETE FROM `{$dbp}churchyear_collects_index`");
-$db->exec("DELETE FROM `{$dbp}churchyear_collects`");
-$db->exec("DELETE FROM `{$dbp}churchyear_synonyms`");
-$db->exec("DELETE FROM `{$dbp}churchyear_lessons`");
-$db->exec("DELETE FROM `{$dbp}churchyear_propers`");
-$db->exec("DELETE FROM `{$dbp}churchyear_order`");
-$db->exec("DELETE FROM `{$dbp}churchyear`");
+$db->exec("DELETE FROM `{$db->getPrefix()}churchyear_graduals`");
+$db->exec("DELETE FROM `{$db->getPrefix()}churchyear_collects_index`");
+$db->exec("DELETE FROM `{$db->getPrefix()}churchyear_collects`");
+$db->exec("DELETE FROM `{$db->getPrefix()}churchyear_synonyms`");
+$db->exec("DELETE FROM `{$db->getPrefix()}churchyear_lessons`");
+$db->exec("DELETE FROM `{$db->getPrefix()}churchyear_propers`");
+$db->exec("DELETE FROM `{$db->getPrefix()}churchyear_order`");
+$db->exec("DELETE FROM `{$db->getPrefix()}churchyear`");
 if ($dbstate->save()) {
     $rm[] = "Deleting churchyear data (will restore defaults)";
     $dbstate->store("churchyear-filled", 0);
