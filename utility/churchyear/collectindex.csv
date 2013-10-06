@@ -1,4 +1,10 @@
 dayname,type,number
+Anytime,historic,139
+Anytime,historic,140
+Anytime,historic,141
+Anytime,historic,142
+Anytime,historic,143
+Anytime,historic,144
 Advent 1,historic,1
 Advent 1,historic,2
 Advent 2,historic,3
@@ -152,7 +158,8 @@ All Saints Day,historic,138
 Mission Festival,historic,139
 Mission Festival,historic,140
 Day of Humiliation and Prayer,historic,141
-Reformation Day,historic,142
+Festival of the Reformation,historic,142
+Festival of the Reformation,historic,132
 Thanksgiving,historic,143
 Harvest,historic,144
 Presentation,historic,145
@@ -160,8 +167,11 @@ Presentation,historic,146
 Visitation,historic,147
 Visitation,historic,148
 Thomas,historic,149
+Thomas,historic,132
 Stephen,historic,150
+Stephen,historic,132
 "St. John, Apostle and Evangelist",historic,151
+"St. John, Apostle and Evangelist",historic,132
 Trinity,ilcwb,80
 Trinity,ilcwb,81
 Trinity,ilcwc,80
