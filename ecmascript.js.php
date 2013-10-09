@@ -160,10 +160,20 @@ function updateExisting(dateitem) {
                         $('.existingservice').not(this)
                             .prop('checked', false)
                             .prop('disabled', true);
-                        $("#liturgicalname").prop('disabled', true);
-                        $("#rite").prop('disabled', true);
-                        $("#servicenotes").prop('disabled', true);
-                        $("#block").val($(this).attr('data-block'))
+                        var details = sessionStorage.getItem("ExistingServices");
+                        details = $.parseJSON(details);
+                        var option = $(this).data('option');
+                        $("#liturgicalname")
+                            .val(details[option]['dayname'])
+                            .prop('disabled', true);
+                        $("#rite")
+                            .val(details[option]['rite'])
+                            .prop('disabled', true);
+                        $("#servicenotes")
+                            .val(details[option]['servicenotes'])
+                            .prop('disabled', true);
+                        $("#block")
+                            .val(details[option]['block'])
                             .prop('disabled', true);
                     } else {
                         $('.existingservice').prop('disabled', false);

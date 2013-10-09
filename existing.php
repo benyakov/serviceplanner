@@ -35,10 +35,18 @@ $q->execute(array($date)) or die(array_pop($q->errorInfo()));
 if ($q->rowCount()) {
     echo "<fieldset><legend>Existing Services</legend><ul>";
     $tabindex = 3;
+    $options = array();
+    $option = 0;
     while ($row = $q->fetch(PDO::FETCH_ASSOC)) {
         $thisname = "existing_{$row['service']}";
         $servicenoteFormatted = translate_markup($row['servicenotes']);
-        echo "<li><input type=\"checkbox\" tabindex=\"{$tabindex}\" class=\"existingservice\" name=\"{$thisname}\" id=\"{$thisname}\" data-block=\"{$row['block']}\"><label for=\"{$thisname}\"><a href=\"print.php?id={$row['service']}\" target=\"_new\">{$row['dayname']}</a> ({$row['rite']})</label><br/><div class=\"servicenote\">{$servicenoteFormatted}</div>";
+        echo "<li><input type=\"checkbox\" tabindex=\"{$tabindex}\" class=\"existingservice\" name=\"{$thisname}\" id=\"{$thisname}\" data-option=\"{$option}\"><label for=\"{$thisname}\"><a href=\"print.php?id={$row['service']}\" target=\"_new\">{$row['dayname']}</a> ({$row['rite']})</label><br/><div class=\"servicenote\">{$servicenoteFormatted}</div>";
+        $option += 1;
+        $options[] = array(
+            "dayname" => $row['dayname'],
+            "rite" => $row['rite'],
+            "servicenotes" => $row['servicenotes'],
+            "block" => $row['block']);
         $qh = $db->prepare("SELECT h.book, h.number
             FROM `{$db->getPrefix()}hymns` AS h
             WHERE h.service = ?
@@ -52,6 +60,10 @@ if ($q->rowCount()) {
         if ($tabindex < 25) $tabindex++;
     }
     echo "</ul></fieldset>";
+    echo "<script type=\"text/javascript\">\n"
+        ."sessionStorage.setItem(\"ExistingServices\", JSON.stringify(".json_encode($options)
+        ."));\n"
+        ."</script>";
 } else {
     echo "";
 }
