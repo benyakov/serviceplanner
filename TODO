@@ -1,4 +1,5 @@
+- Add "gradual" field to churchyear_propers table which would override the
+  seasonal gradual
+- Set up csv export/import for churchyear_propers, which includes notes.
 - Debug csv importers.
 - Set up separate id'd <div>s in churchyear page for each dialog.
-- Add "gradual" field to churchyear_propers table which can override the
-  seasonal gradual
