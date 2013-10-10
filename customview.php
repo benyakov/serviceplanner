@@ -33,10 +33,93 @@ siteTabs($auth, "index"); ?>
 <div id="content-container">
 <? if ($auth) {
     // Place to reconfigure custom display fields
+    fieldForm();
    }
-?>
 
+$q = queryAllHymns($limit=int $config["custom view"]["limit"],
+    $future=bool $config["custom view"]["future"]);
+// Group by service
+$servicelisting = array();
+$service = array();
+$prevservice = false;
+foreach ($q as $hymndata) {
+    if ($hymndata['service'] != $prevservice) {
+        $servicelisting[] = $service
+        $service = array($hymndata);
+        $prevservice = $hymndata['service'];
+    } else {
+        $service[] = $hymndata;
+    }
+}
+
+// Display the table
+if (! $config["custom view"]["start"]) {
+    $config["custom view"]["start"] = "<table>";
+    $config->save();
+}
+echo $config["custom view"]["start"];
+foreach ($servicelisting as $service) {
+    displayService($service, $config);
+}
+echo $config["custom view"]["end"];
+?>
 </div>
 </body>
 </html>
 
+
+<?
+define fieldForm() {
+}
+
+define displayService($service, $config) {
+    echo "<tr class=\"customservice\">\n";
+    foreach ($config['custom view']['fields'] as $field) {
+        // Special field names
+        if ("hymn numbers" == $field) {
+            echo "<td class=\"customservice-hymnnumbers\">";
+            foreach ($service as $hymn) {
+                echo "{$hymn["number"]}<br>";
+            }
+            echo "</td>";
+            continue;
+        } elseif ("hymn books" == $field) {
+            echo "<td class=\"customservice-hymnbooks\">";
+            foreach ($service as $hymn) {
+                echo "{$hymn["book"]}<br>";
+            }
+            echo "</td>";
+            continue;
+        } elseif ("hymn notes" == $field) {
+            echo "<td class=\"customservice-hymnnotes\">";
+            foreach ($service as $hymn) {
+                echo "{$hymn["note"]}<br>";
+            }
+            echo "</td>";
+            continue;
+        } elseif ("hymn location" == $field) {
+            echo "<td class=\"customservice-hymnlocation\">";
+            foreach ($service as $hymn) {
+                echo "{$hymn["location"]}<br>";
+            }
+            echo "</td>";
+            continue;
+        } elseif ("hymn title" == $field) {
+            echo "<td class=\"customservice-hymntitle\">";
+            foreach ($service as $hymn) {
+                echo "{$hymn["title"]}<br>";
+            }
+            echo "</td>";
+            continue;
+        }
+        // DB fields
+        echo "<td class=\"customservice-dbfield\">";
+        if (array_key_exists($field, $service[0])) {
+            $service[0][$field];
+        } else {
+            echo "Unknown Field: ".htmlentities($field);
+        }
+        echo "</td>";
+    }
+    echo "\n</tr>";
+}
