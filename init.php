@@ -41,7 +41,7 @@ $script_basename = basename($_SERVER['PHP_SELF'], '.php');
         exit(0);
     } */
 $dbstate = new Configfile("./dbstate.ini", false);
-$config = new Configfile("./config.ini", false);
+$config = new Configfile("./config.ini", true);
 $upgradedb = false;
 if (null == $dbstate->get('dbversion')) {
     $upgradedb = true;
