@@ -33,7 +33,7 @@ siteTabs($auth, "index"); ?>
 <div id="content-container">
 <? if ($auth) {
     // Place to reconfigure custom display fields
-    fieldForm();
+    fieldLayout();
    }
 
 $q = queryAllHymns($limit=int $config["custom view"]["limit"],
@@ -64,12 +64,16 @@ foreach ($servicelisting as $service) {
 echo $config["custom view"]["end"];
 ?>
 </div>
+<div id="dialog"></div>
 </body>
 </html>
 
 
 <?
-define fieldForm() {
+define fieldLayout() {
+    $this_script = $_SERVER['HTTP_HOST'].$_SERVER['SCRIPT_NAME'];
+    echo "<div id=\"fieldcontainer\"></div>";
+    echo "<a href=\"javascript: void();\" id=\"addfield\">Add Field</a>";
 }
 
 define displayService($service, $config) {
