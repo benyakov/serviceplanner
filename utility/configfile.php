@@ -1,4 +1,5 @@
-<?  /* Manage a configuration file
+<?php
+/* Manage a configuration file
     Copyright (C) 2012 Jesse Jacobsen
 
     This program is free software; you can redistribute it and/or modify
@@ -24,7 +25,10 @@
     USA
  */
 
-class Configfile implements ArrayAccess {
+class ConfigfileError extends Exception { }
+
+class Configfile implements ArrayAccess
+{
     private $IniFile;
     private $IniData;
     private $HasSections;
@@ -36,6 +40,10 @@ class Configfile implements ArrayAccess {
             touch($FileName);
         }
         $this->IniData = parse_ini_file($FileName, $HasSections);
+    }
+
+    public function debugData() {
+        print_r($this->IniData);
     }
 
     public function get($Key) {
@@ -60,25 +68,34 @@ class Configfile implements ArrayAccess {
     }
 
     public function deepSet() {
-        // FIXME: This seems like deep magic.  Debug carefully.
-        if (func_num_args() < 2) return NULL;
+        if ($this->HasSections) $max_args = 4;
+        else $max_args = 3;
+        if (func_num_args() < 2 || func_num_args() > $max_args)
+            throw new ConfigfileError("deepSet needs 2 to $max_args args.");
+        // Note: It will create deeper arrays with more args,
+        // but ini file syntax won't handle it.
         $args = func_get_args();
-        // Check keys to depth
         $structure = &$this->IniData;
         while (count($args) > 2) {
             $k = array_shift($args);
-            if (is_array($structure) && isset($structure[$k]))
-                $temp = &$structure[$k];
-                unset $structure;
-                $structure = &$temp;
-                unset $temp;
-            else
-                return NULL;
+            if (is_array($structure)) {
+                if (isset($structure[$k])) {
+                    $temp = &$structure[$k];
+                    unset($structure);
+                    $structure = &$temp;
+                    unset($temp);
+                } else {
+                    $structure[$k] = array();
+                    $temp = &$structure[$k];
+                    unset($structure);
+                    $structure = &$temp;
+                    unset($temp);
+                }
+            } else
+                throw new ConfigFileError("Can't deepSet below a scalar.");
         }
-        $structure[$args[0]] = [$args[1]];
+        $structure[$args[0]] = $args[1];
     }
-
-
 
     public function offsetSet($offset, $value) {
         $this->store($offset, $value);
@@ -120,9 +137,9 @@ class Configfile implements ArrayAccess {
         $out = array();
         foreach ($Ary as $key => $val) {
             if (is_array($val)) {
-                $out[] = writeArrayValue($key, $val);
+                $out[] = $this->writeArrayValue($key, $val);
             } else {
-                $out[] = writeSimpleValue($key, $val);
+                $out[] = $this->writeSimpleValue($key, $val);
             }
         }
         return implode("\n", $out);
@@ -157,7 +174,7 @@ class Configfile implements ArrayAccess {
                     $out[] = "[{$key}]";
                     $out[] = $this->serializeSection($val);
                 } else {
-                    $out[] = writeSimpleValue($key, $val);
+                    $out[] = $this->writeSimpleValue($key, $val);
                 }
             }
         } else {
