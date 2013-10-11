@@ -97,14 +97,14 @@ define displayService($service, $config) {
             }
             echo "</td>";
             continue;
-        } elseif ("hymn location" == $field) {
+        } elseif ("hymn locations" == $field) {
             echo "<td class=\"customservice-hymnlocation\">";
             foreach ($service as $hymn) {
                 echo "{$hymn["location"]}<br>";
             }
             echo "</td>";
             continue;
-        } elseif ("hymn title" == $field) {
+        } elseif ("hymn titles" == $field) {
             echo "<td class=\"customservice-hymntitle\">";
             foreach ($service as $hymn) {
                 echo "{$hymn["title"]}<br>";
@@ -117,7 +117,8 @@ define displayService($service, $config) {
         if (array_key_exists($field, $service[0])) {
             $service[0][$field];
         } else {
-            echo "Unknown Field: ".htmlentities($field);
+            echo "Unknown Field: <span class=\"unknown-field\">"
+                .htmlentities($field)."</span>";
         }
         echo "</td>";
     }
