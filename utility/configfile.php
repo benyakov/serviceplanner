@@ -24,7 +24,7 @@
     USA
  */
 
-class Configfile{
+class Configfile implements ArrayAccess {
     private $IniFile;
     private $IniData;
     private $HasSections;
@@ -44,15 +44,52 @@ class Configfile{
                 ."Use a string or integer.";
             exit(1);
         }
-        if (array_key_exists($Key, $this->IniData)) {
+        if (isset($this->IniData[$Key])) {
             return $this->IniData[$Key];
         } else {
             return null;
         }
     }
 
+    public function offsetGet($offset) {
+        return $this->get($offset);
+    }
+
     public function store($Key, $Value) {
         $this->IniData[$Key] = $Value;
+    }
+
+    public function deepSet() {
+        // FIXME: This seems like deep magic.  Debug carefully.
+        if (func_num_args() < 2) return NULL;
+        $args = func_get_args();
+        // Check keys to depth
+        $structure = &$this->IniData;
+        while (count($args) > 2) {
+            $k = array_shift($args);
+            if (is_array($structure) && isset($structure[$k]))
+                $temp = &$structure[$k];
+                unset $structure;
+                $structure = &$temp;
+                unset $temp;
+            else
+                return NULL;
+        }
+        $structure[$args[0]] = [$args[1]];
+    }
+
+
+
+    public function offsetSet($offset, $value) {
+        $this->store($offset, $value);
+    }
+
+    public function offsetExists($offset) {
+        return isset($this->IniData[$offset]);
+    }
+
+    public function offsetUnset($offset) {
+        unset($this->IniData[$offset]);
     }
 
     private function writeVal($Val) {
@@ -67,15 +104,25 @@ class Configfile{
         }
     }
 
+    private function writeSimpleValue($key, $val) {
+        return "{$key} = ".$this->writeVal($val);
+    }
+
+    private function writeArrayValue($key, $val) {
+        $out = array();
+        foreach ($val as $k => $v) {
+            $out[] = "{$key}[{$k}] = ".$this->writeVal($v);
+        }
+        return implode("\n", $out);
+    }
+
     private function serializeSection($Ary) {
         $out = array();
         foreach ($Ary as $key => $val) {
             if (is_array($val)) {
-                foreach ($val as $k => $v) {
-                    $out[] = "{$key}[{$k}] = ".$this->writeVal($v);
-                }
+                $out[] = writeArrayValue($key, $val);
             } else {
-                $out[] = "{$key} = ".$this->writeVal($val);
+                $out[] = writeSimpleValue($key, $val);
             }
         }
         return implode("\n", $out);
@@ -106,8 +153,12 @@ class Configfile{
         $out = array();
         if ($this->HasSections) {
             foreach ($this->IniData as $key => $val) {
+                if (is_array($val)) {
                     $out[] = "[{$key}]";
                     $out[] = $this->serializeSection($val);
+                } else {
+                    $out[] = writeSimpleValue($key, $val);
+                }
             }
         } else {
             $out[] = $this->serializeSection($this->IniData);
