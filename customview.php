@@ -23,18 +23,81 @@
     USA
  */
 require("./init.php");
+$this_script = $_SERVER['HTTP_HOST'].$_SERVER['SCRIPT_NAME'];
 ?>
 <!DOCTYPE html>
 <html lang="en">
 <?=html_head("Custom View of Service Records")?>
 <body>
+<script type="text/javascript">
+function loadFieldContainer() {
+    var xhr = $.getJSON("<?=$this_script?>",
+        { "action": "customfields" },
+        fillFieldContainer);
+}
+
+function fillFieldContainer(result) {
+    var fields = Array();
+    for (f in result) {
+        fields.push(reprField(f));
+    }
+    $("#fieldcontainer").append(fields.join("\n"));
+    setupFields();
+}
+
+function reprField(field) {
+    var rv = Array("<div class=\"customfield\" data-order=\""
+        +field.order+"\" id=\"customfield-"+field.order+"\">");
+    rv.push("<a href=\"javascript: void();\" class=\"field-left\">&lt;</a>&nbsp;");
+    rv.push("<a href=\"javascript: void();\" class=\"field-right\">&gt;</a>&nbsp;");
+    rv.push("<a href=\"javascript: void();\" class=\"field-delete\">-</a>&nbsp;");
+    rv.push("<a href=\"javascript: void();\" class=\"field-insert\">+</a><br>");
+    rv.push(field.name);
+    rv.push("</div>");
+    return rv.join("\n");
+}
+
+function setupFields() {
+    $("a.field-left").click(function(evt) {
+        evt.preventDefault();
+        var order = $(this).parent().data("order");
+        $.getJSON("<?=$this_script?>",
+            { "move-field": "left",
+            "index": order },
+            fillFieldContainer);
+    });
+    $("a.field-right").click(function(evt) {
+        evt.preventDefault();
+        var order = $(this).parent().data("order");
+        $.getJSON("<?=$this_script?>",
+            { "move-field": "right",
+            "index": order },
+            fillFieldContainer);
+    });
+    $("a.field-delete").click(function(evt) {
+        evt.preventDefault();
+        var order = $(this).parent().data("order");
+        $.getJSON("<?=$this_script?>",
+            { "delete-field": order },
+            fillFieldContainer);
+    });
+    $("a.field-insert").click(function(evt) {
+        evt.preventDefault();
+        // TODO: open a dialog to set up a new field here,
+        // and insert it into the interface when submitting the form.
+    });
+}
+
+$(document).ready(function() {
+    loadFieldContainer();
+});
+</script>
 <? pageHeader();
 siteTabs($auth, "index"); ?>
 <div id="content-container">
 <? if ($auth) {
-    // Place to reconfigure custom display fields
-    fieldLayout();
-   }
+    echo "<div id=\"fieldcontainer\"></div>";
+}
 
 $q = queryAllHymns($limit=int $config["custom view"]["limit"],
     $future=bool $config["custom view"]["future"]);
@@ -70,12 +133,6 @@ echo $config["custom view"]["end"];
 
 
 <?
-define fieldLayout() {
-    $this_script = $_SERVER['HTTP_HOST'].$_SERVER['SCRIPT_NAME'];
-    echo "<div id=\"fieldcontainer\"></div>";
-    echo "<a href=\"javascript: void();\" id=\"addfield\">Add Field</a>";
-}
-
 define displayService($service, $config) {
     echo "<tr class=\"customservice\">\n";
     foreach ($config['custom view']['fields'] as $field) {
