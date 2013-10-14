@@ -58,6 +58,7 @@ function reprField(field) {
 }
 
 function setupFields() {
+    // TODO: Write php responses to the following get/post requests
     $("a.field-left").click(function(evt) {
         evt.preventDefault();
         var order = $(this).parent().data("order");
@@ -83,13 +84,52 @@ function setupFields() {
     });
     $("a.field-insert").click(function(evt) {
         evt.preventDefault();
-        // TODO: open a dialog to set up a new field here,
-        // and insert it into the interface when submitting the form.
+        var order = $(this).parent().data("order");
+        $("#dialog").html("<form id=\"selectfieldform\">"
+            +"<select id=\"fieldselector\" name=\"fieldselector\">"
+            +generateFieldOptionList()+"</select><br>"
+            +"<button type=\"submit\">Insert Field</button>\n"
+            +"</form>")
+            .dialog({modal: true,
+                position: "center",
+                title: "Insert Field At "+order,
+                width: $(window).width()*0.4,
+                open: function() { setupInsertDialog(order); },
+                close: function() { $("#dialog").empty(); }
+            });
     });
+}
+
+function setupInsertDialog(order) {
+    $("#selectfieldform").submit(function(evt) {
+        evt.preventDefault();
+        $.post("<?=$this_script?>?insert="+order,
+            { selection: $("#fieldselector").val() },
+            function(rv) {
+                $("#dialog").close();
+                rv = $.parseJSON(rv);
+                if (rv[0]) {
+                    loadFieldContainer();
+                }
+                setMessage(rv[1]);
+            });
+}
+
+function generateFieldOptionList(selected="") {
+    var customfields = $.parseJSON(sessionStorage.getItem("customfields"));
+    var options = Array();
+    for (f in customfields) {
+        if (f.name == selected) selectedflag = "selected";
+        else selectedflag = "";
+        options.push("<option value=\""+f.name+"\" "+selectedflag+">"
+            +f.name+"</option>");
+    }
+    return options.join("\n");
 }
 
 $(document).ready(function() {
     loadFieldContainer();
+    loadAvailableFields();
 });
 </script>
 <? pageHeader();
