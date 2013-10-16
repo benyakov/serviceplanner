@@ -24,6 +24,75 @@
  */
 require("./init.php");
 $this_script = $_SERVER['HTTP_HOST'].$_SERVER['SCRIPT_NAME'];
+
+/* Note on storage in $config['custom view']:
+ *
+ * $config['custom view']['fields'] is an enumerated array
+ * containing the names of the chosen fields.
+ *
+ * $config['custom view']['field-order'] is an enumerated array,
+ * in which the keys represent field ordering, and
+ * the values are indexes into $custom['custom view']['fields'].
+ */
+if ("left" == $_GET['move-field']) {
+    validateAuth(true);
+    if (1 > $_GET['index']) {
+        echo json_encode(Array(0, "Can't move before the beginning."));
+        exit(0);
+    }
+    $currentloc = (int) $_GET['index'];
+    array_splice($config['custom view']['field-order'],
+        $currentloc-1, 2,
+        Array($config['custom view']['field-order'][$currentloc],
+             $config['custom view']['field-order'][$currentloc-1]));
+    $config->save();
+    echo json_encode(Array(1, "Success."));
+    exit(0);
+} elseif ("right" == $_GET['move-field']) {
+    validateAuth(true);
+    if ((count($config['custom view']['field-order'])-2) < $_GET['index']) {
+        echo json_encode(Array(0, "Can't move after the end."));
+        exit(0);
+    }
+    $currentloc = (int) $_GET['index'];
+    array_splice($config['custom view']['field-order'],
+        $currentloc, 2,
+        Array($config['custom view']['field-order'][$currentloc+1],
+             $config['custom view']['field-order'][$currentloc]));
+    $config->save();
+    echo json_encode(Array(1, "Success."));
+    exit(0);
+} elseif (isset($_GET['delete-field'])) {
+    validateAuth(true);
+    if (0 > $_GET['delete-field'] or
+        count($config['custom view']['field-order']) <= $_GET['delete-field']) {
+        echo json_encode(Array(0, "Can't delete a nonexistent item."));
+        exit(0);
+    }
+    $delloc = (int) $_GET['index'];
+    unset($config['custom view']['fields'][
+        $config['custom view']['field-order'][$delloc]]);
+    unset($config['custom view']['field-order'][$delloc]);
+    $config->save();
+    echo json_encode(Array(1, "Success."));
+    exit(0);
+} elseif (isset($_GET['insert'])) {
+    validateAuth(true);
+    $priorlength = count($config['custom view']['field-order']);
+    if (0 > $_GET['insert'] or $priorlength < $_GET['insert']) {
+        echo json_encode(Array(0, "Can't insert beyond the end."));
+        exit(0);
+    }
+    $config['custom view']['fields'][] = $_POST['selection'];
+    $newindex = $priorlength;
+    foreach ($config['custom view']['fields'] as &$val)
+        if ($val >= $_GET['insert']) $val += 1;
+    $config['custom view']['field-order'][] = $newindex;
+    $config->save();
+    echo json_encode(Array(1, "Success."));
+    exit(0);
+}
+
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -58,7 +127,6 @@ function reprField(field) {
 }
 
 function setupFields() {
-    // TODO: Write php responses to the following get/post requests
     $("a.field-left").click(function(evt) {
         evt.preventDefault();
         var order = $(this).parent().data("order");
@@ -225,3 +293,4 @@ define displayService($service, $config) {
     }
     echo "\n</tr>";
 }
+
