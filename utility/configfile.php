@@ -46,7 +46,7 @@ class Configfile implements ArrayAccess
         print_r($this->IniData);
     }
 
-    public function get($Key) {
+    public function &get($Key) {
         if (! (is_string($Key) or is_int($Key))) {
             echo var_dump($Key)."is an invalid configfile key. "
                 ."Use a string or integer.";
@@ -94,7 +94,10 @@ class Configfile implements ArrayAccess
             } else
                 throw new ConfigFileError("Can't deepSet below a scalar.");
         }
-        $structure[$args[0]] = $args[1];
+        if ('[]' == $args[0])
+            $structure[] = $args[1];
+        else
+            $structure[$args[0]] = $args[1];
     }
 
     public function offsetSet($offset, $value) {
@@ -183,4 +186,5 @@ class Configfile implements ArrayAccess
         return $this->rewriteWithLock(implode("\n", $out)."\n");
     }
 }
+
 ?>

@@ -23,7 +23,6 @@
     USA
  */
 require("./init.php");
-$this_script = $_SERVER['HTTP_HOST'].$_SERVER['SCRIPT_NAME'];
 
 /* Note on storage in $config['custom view']:
  *
@@ -34,7 +33,31 @@ $this_script = $_SERVER['HTTP_HOST'].$_SERVER['SCRIPT_NAME'];
  * in which the keys represent field ordering, and
  * the values are indexes into $custom['custom view']['fields'].
  */
-if ("left" == $_GET['move-field']) {
+if ("customfields" == $_GET['action']) { // Works
+    // Expecting JSON array of objects {order: X, name: Y}
+    $rv = Array();
+    // Set up default if nothing is configured
+    if (! $config['custom view']['fields']) {
+        $config->deepSet('custom view', 'fields', 0, "date");
+        $config->deepSet('custom view', 'field-order', 0, 0);
+        $config->save();
+    }
+    // Pull a data structure from the configuration
+    for ($i=0, $len = count($config['custom view']['fields']); $len>$i; $i++) {
+        $rv[] = Array("order"=>$config['custom view']['field-order'][$i],
+            "name"=>$config['custom view']['fields'][
+            $config['custom view']['field-order'][$i]]);
+    }
+    echo json_encode($rv);
+    exit(0);
+} elseif ("available" == $_GET['action']) { // Works
+    $q = queryAllHymns(1);
+    $rec = $q->fetch(PDO::FETCH_ASSOC);
+    echo json_encode(array_keys($rec));
+    exit(0);
+} elseif ("left" == $_GET['move-field']) {
+    // FIXME: These don't work.  Perhaps implement a transpose() method
+    // on the $config object?
     validateAuth(true);
     if (1 > $_GET['index']) {
         echo json_encode(Array(0, "Can't move before the beginning."));
@@ -63,6 +86,7 @@ if ("left" == $_GET['move-field']) {
     echo json_encode(Array(1, "Success."));
     exit(0);
 } elseif (isset($_GET['delete-field'])) {
+    // FIXME: perhaps implement a deepUnset() method on the config object?
     validateAuth(true);
     if (0 > $_GET['delete-field'] or
         count($config['custom view']['field-order']) <= $_GET['delete-field']) {
@@ -76,18 +100,21 @@ if ("left" == $_GET['move-field']) {
     $config->save();
     echo json_encode(Array(1, "Success."));
     exit(0);
-} elseif (isset($_GET['insert'])) {
+} elseif (isset($_GET['insert'])) { // Works; tested 10/17/13
     validateAuth(true);
-    $priorlength = count($config['custom view']['field-order']);
-    if (0 > $_GET['insert'] or $priorlength < $_GET['insert']) {
+    $newindex = (int) $_GET['insert'];
+    $newslot = count($config['custom view']['fields']);
+    if (0 > $newindex or $newslot < $newindex) {
         echo json_encode(Array(0, "Can't insert beyond the end."));
         exit(0);
     }
-    $config['custom view']['fields'][] = $_POST['selection'];
-    $newindex = $priorlength;
-    foreach ($config['custom view']['fields'] as &$val)
-        if ($val >= $_GET['insert']) $val += 1;
-    $config['custom view']['field-order'][] = $newindex;
+    $config->deepSet('custom view', 'fields', '[]', $_POST['selection']);
+    $newfieldorder = Array();
+    foreach ($config['custom view']['field-order'] as $key=>$val)
+        if ($key >= $newindex) $newfieldorder[$key+1] = $val;
+        else $newfieldorder[$key] = $val;
+    $newfieldorder[$newindex] = $newslot;
+    $config->deepSet('custom view', 'field-order', $newfieldorder);
     $config->save();
     echo json_encode(Array(1, "Success."));
     exit(0);
@@ -108,9 +135,9 @@ function loadFieldContainer() {
 function fillFieldContainer(result) {
     var fields = Array();
     for (f in result) {
-        fields.push(reprField(f));
+        fields.push(reprField(result[f]));
     }
-    $("#fieldcontainer").append(fields.join("\n"));
+    $("#fieldcontainer").html(fields.join("\n"));
     setupFields();
 }
 
@@ -174,25 +201,35 @@ function setupInsertDialog(order) {
         $.post("<?=$this_script?>?insert="+order,
             { selection: $("#fieldselector").val() },
             function(rv) {
-                $("#dialog").close();
+                $("#dialog").dialog("close");
                 rv = $.parseJSON(rv);
                 if (rv[0]) {
                     loadFieldContainer();
                 }
                 setMessage(rv[1]);
             });
+    });
 }
 
-function generateFieldOptionList(selected="") {
+function generateFieldOptionList(selected) {
+    if (typeof selected == 'undefined') selected = "";
     var customfields = $.parseJSON(sessionStorage.getItem("customfields"));
     var options = Array();
     for (f in customfields) {
-        if (f.name == selected) selectedflag = "selected";
+        if (customfields[f] == selected) selectedflag = "selected";
         else selectedflag = "";
-        options.push("<option value=\""+f.name+"\" "+selectedflag+">"
-            +f.name+"</option>");
+        options.push("<option value=\""+customfields[f]+"\" "+selectedflag+">"
+            +customfields[f]+"</option>");
     }
     return options.join("\n");
+}
+
+function loadAvailableFields() {
+    var xhr = $.get("<?=$this_script?>",
+        { "action": "available" },
+        function(rv) {
+            sessionStorage.setItem("customfields", rv);
+        });
 }
 
 $(document).ready(function() {
@@ -207,6 +244,9 @@ siteTabs($auth, "index"); ?>
     echo "<div id=\"fieldcontainer\"></div>";
 }
 
+/* FIXME: Add config for custom view variables:
+ * limit, future, start, end
+ */
 $q = queryAllHymns($limit=(int) $config["custom view"]["limit"],
     $future=(bool) $config["custom view"]["future"]);
 // Group by service
