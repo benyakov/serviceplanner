@@ -207,15 +207,15 @@ siteTabs($auth, "index"); ?>
     echo "<div id=\"fieldcontainer\"></div>";
 }
 
-$q = queryAllHymns($limit=int $config["custom view"]["limit"],
-    $future=bool $config["custom view"]["future"]);
+$q = queryAllHymns($limit=(int) $config["custom view"]["limit"],
+    $future=(bool) $config["custom view"]["future"]);
 // Group by service
 $servicelisting = array();
 $service = array();
 $prevservice = false;
 foreach ($q as $hymndata) {
     if ($hymndata['service'] != $prevservice) {
-        $servicelisting[] = $service
+        $servicelisting[] = $service;
         $service = array($hymndata);
         $prevservice = $hymndata['service'];
     } else {
@@ -241,7 +241,7 @@ echo $config["custom view"]["end"];
 
 
 <?
-define displayService($service, $config) {
+function displayService($service, $config) {
     echo "<tr class=\"customservice\">\n";
     foreach ($config['custom view']['fields'] as $field) {
         // Special field names
