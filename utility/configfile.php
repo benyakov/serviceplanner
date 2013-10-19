@@ -28,10 +28,90 @@
 class ConfigfileError extends Exception { }
 class ConfigfileUnknownKey extends ConfigfileError { }
 
+class Configsection
+{
+    private $ConfigKey;
+    private $ConfigData;
+    public $Extends;
+
+    public function __construct($key, $structure, $extends=NULL) {
+        $this->ConfigKey = $key;
+        $this->ConfigData = $structure;
+        $this->Extends = $extends;
+    }
+
+    /**
+     * Return whether a given series of keys leads to a set value,
+     * without defaulting to an extended section.
+     */
+    public function exists() {
+        if (func_num_args() < 1)
+            throw new ConfigfileError("No key supplied to exists");
+        elseif (func_num_args() == 1) {
+            if (! (is_string($Key) or is_int($Key)))
+                throw new ConfigfileError(
+                    var_dump($Key)."is an invalid configfile key. "
+                    ."Use a string or integer.");
+            if (isset($this->ConfigData[$Key]))
+                return true;
+            else
+                return false;
+        } else {
+            $args = func_get_args();
+            $data = $this->ConfigData;
+            $used = Array();
+            while ($arg = shift($args))
+                if (is_array($data) && isset($data[$arg]))
+                    $data = $data[$arg];
+                elseif ($this->Extends->exists($Key))
+                    return true;
+                else
+                    return false;
+        }
+    }
+
+    /**
+     * Get a value, providing either
+     * - a key as a single argument for a top-level value/array
+     * - a progressive series of keys as arguments for a deeper value/array
+     * - an unknown key will default to an extended section, if it exists.
+     */
+    public function get() {
+        if (func_num_args() < 1)
+            throw new ConfigfileError("No key supplied to get");
+        elseif (func_num_args() == 1) {
+            if (! (is_string($Key) or is_int($Key)))
+                throw new ConfigfileError(
+                    var_dump($Key)."is an invalid configfile key. "
+                    ."Use a string or integer.");
+            if (isset($this->ConfigData[$Key]))
+                return $this->ConfigData[$Key];
+            elseif ($this->Extends->exists($Key))
+                return $this->Extends->get($Key);
+            else
+                throw new ConfigfileUnknownKey("Unknown key: {$Key}");
+        } else {
+            $args = func_get_args();
+            $data = $this->IniData;
+            $used = Array();
+            while ($arg = shift($args))
+                $used[] = $arg;
+                if (is_array($data) && isset($data[$arg]))
+                    $data = $data[$arg];
+                elseif ($this->Extends->exists($Key))
+                    return $this->Extends->get($Key);
+                else
+                    throw new ConfigfileUnknownKey("Unknown key: ".
+                        implode(", ", $used));
+        }
+    }
+}
+
 class Configfile
 {
     private $IniFile;
     private $IniData;
+    private $SectionData = Array();
     private $HasSections;
     private $Sections = Array();
     private $Extensions = Array();
@@ -60,17 +140,17 @@ class Configfile
         if (func_num_args() < 1)
             throw new ConfigfileError("No key supplied to get");
         elseif (func_num_args() == 1) {
-            if (! (is_string($Key) or is_int($Key))) {
-                echo var_dump($Key)."is an invalid configfile key. "
-                    ."Use a string or integer.";
-                exit(1);
-            }
+            if (! (is_string($Key) or is_int($Key)))
+                throw new ConfigfileError(
+                    var_dump($Key)."is an invalid configfile key. "
+                    ."Use a string or integer.");
             if (isset($this->IniData[$Key])) {
                 return $this->IniData[$Key];
             } else {
                 return null;
             }
         } else {
+            // TODO: Pull from SectionData
             $args = func_get_args();
             $data = $this->IniData;
             $used = Array();
@@ -119,6 +199,8 @@ class Configfile
      * The first series of arguments are progressive keys to the structure.
      */
     public function set() {
+        // TODO: Consider setting in SectionData
+        // and propagating to IniData
         $argcount = func_num_args();
         if ($argcount < 2)
             throw new ConfigfileError("deepSet needs at least 2 args.");
@@ -172,9 +254,11 @@ class Configfile
     }
 
     public function delExtension() {
+        // TODO
     }
 
     public function newExtension() {
+        // TODO
     }
 
     public function &getSections() {
@@ -223,12 +307,19 @@ class Configfile
                     $result[$section] = $this->_mergeRecursive($result[$source],
                         $sectionResult);
                     $this->Extensions[$section] = $source;
-                } else
+                    $this->SectionData[$section] =
+                        new Configsection($section, $sectionResult, $source);
+                } else {
                     $result[$section] = $this->_processSection($values);
+                    $this->SectionData[$section] =
+                        new Configsection($section, $sectionResult);
+                }
                 $this->Sections[] = $section;
             }
             $result += $ini;
-        }
+            foreach ($this->SectionData as $section)
+                $section->Extends =
+                    $this->SectionData[$section->Extends];
         return $result;
     }
 
@@ -238,6 +329,7 @@ class Configfile
     public function save() {
         $out = array();
         if ($this->HasSections)
+            // TODO: save sections from SectionData
             foreach ($this->IniData as $key => $val)
                 if (is_array($val))
                     if (in_array($key, $this->Sections)) {
