@@ -26,6 +26,7 @@
  */
 
 class ConfigfileError extends Exception { }
+class ConfigfileUnknownKey extends ConfigfileError { }
 
 class Configfile
 {
@@ -78,7 +79,7 @@ class Configfile
                 if (is_array($data) && isset($data[$arg]))
                     $data = $data[$arg];
                 else
-                    throw new ConfigfileError("Unknown key: ".
+                    throw new ConfigfileUnknownKey("Unknown key: ".
                         implode(", ", $used));
         }
     }
@@ -101,13 +102,27 @@ class Configfile
     }
 
     /**
+     * Delete a key/value pair from the structure,
+     * specified by arguments being a progressive set of keys
+     * A convenience shortcut for ->set(key..., NULL)
+     */
+    public function del() {
+        if (func_num_args() < 1)
+            throw new ConfigfileError("del needs at least 1 arg.");
+        $args = func_get_args();
+        $args[] = NULL;
+        call_user_func_array(Array($this, "set"), $args);
+    }
+
+    /**
      * Set a value, provided as the last of at least two arguments.
      * The first series of arguments are progressive keys to the structure.
      */
     public function set() {
-        if (func_num_args() < 2)
+        $argcount = func_num_args();
+        if ($argcount < 2)
             throw new ConfigfileError("deepSet needs at least 2 args.");
-        $args = func_get_args();
+        $args = $origargs = func_get_args();
         $structure = &$this->IniData;
         while (count($args) > 2) {
             $k = array_shift($args);
@@ -127,10 +142,47 @@ class Configfile
             } else
                 throw new ConfigFileError("Can't deepSet below a scalar.");
         }
+        $MyExtensions = array_keys($this->Extensions, $origargs[0]);
+        foreach ($MyExtensions as $Ext) {
+            $origargs[0] = $Ext;
+            $ExtArgs = array_slice($origargs, 1, -1);
+            $currentloc = array_slice($origargs, 0, -1);
+            $this->_updateExtension($ExtArgs,
+                call_user_func_array(Array($this, "get"), $currentloc),
+                $origargs[-1]);
+        }
         if ('[]' == $args[0])
             $structure[] = $args[1];
+        elseif ($args[1] == NULL)
+            unset($structure[$args[0]])
+            // Delete metadata for sections/extensions when needed
+            if (2 == $argcount && in_array($args[0], $this->Sections)) {
+                unset($this->Sections[array_search($args[0], $this->Sections)]);
+                if (isset($this->Extensions[$args[0]]))
+                    unset($this->Extensions[$args[0]]);
+                foreach ($MyExtensions as $Ext)
+                    unset($this->Extensions[$Ext]);
+            }
         else
             $structure[$args[0]] = $args[1];
+    }
+
+    /**
+     * TODO: Write methods for getting/setting extensions
+     */
+
+    /**
+     * Update an extending section of one being changed.
+     */
+    private function _updateExtension($location, $oldvalue, $newvalue) {
+        try
+            $current = call_user_func_array(Array($this, "get"), $location);
+        catch (ConfigfileUnknownKey $e)
+            return;
+        if ($current == $oldvalue) {
+            $location[] = $newvalue;
+            call_user_func_array(Array($this, "set"), $location);
+        }
     }
 
     /**
@@ -158,7 +210,8 @@ class Configfile
                     if (!isset($result[$source]))
                         throw new ConfigfileError("No $source to expand $section");
                     $sectionResult = $this->_processSection($values);
-                    $result[$section] = $this->_mergeRecursive($result[$source], $sectionResult);
+                    $result[$section] = $this->_mergeRecursive($result[$source],
+                        $sectionResult);
                     $this->Extensions[$section] = $source;
                 } else
                     $result[$section] = $this->_processSection($values);
