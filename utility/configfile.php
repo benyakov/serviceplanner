@@ -167,9 +167,19 @@ class Configfile
             $structure[$args[0]] = $args[1];
     }
 
-    /**
-     * TODO: Write methods for getting/setting extensions
-     */
+    public function getExtensions() {
+        return $this->Extensions;
+    }
+
+    public function delExtension() {
+    }
+
+    public function newExtension() {
+    }
+
+    public function &getSections() {
+        return $this->Sections;
+    }
 
     /**
      * Update an extending section of one being changed.
