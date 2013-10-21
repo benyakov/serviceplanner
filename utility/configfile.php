@@ -41,6 +41,17 @@ class Configsection
     }
 
     /**
+     * Return the data structure for
+     */
+    public function dump($extend=false) {
+        if ($extend)
+            return array_replace_recursive($this->Extends->dump(),
+                $this->ConfigData);
+        else
+            return $this->ConfigData;
+    }
+
+    /**
      * Return whether a given series of keys leads to a set value,
      * without defaulting to an extended section.
      */
@@ -116,15 +127,13 @@ class Configfile
     private $Sections = Array();
     private $Extensions = Array();
 
-    public function __construct($FileName, $HasSections=false,
-        $RequestSect=false)
-    {
+    public function __construct($FileName, $HasSections=false) {
         $this->IniFile = $FileName;
         $this->HasSections = $HasSections;
         if (! file_exists($FileName)) {
             touch($FileName);
         }
-        $this->IniData = $this->_parse($FileName, $HasSections, $RequestSect);
+        $this->IniData = $this->_parse($FileName, $HasSections);
     }
 
     public function debugData() {
@@ -150,17 +159,9 @@ class Configfile
                 return null;
             }
         } else {
-            // TODO: Pull from SectionData
             $args = func_get_args();
-            $data = $this->IniData;
-            $used = Array();
-            while ($arg = shift($args))
-                $used[] = $arg;
-                if (is_array($data) && isset($data[$arg]))
-                    $data = $data[$arg];
-                else
-                    throw new ConfigfileUnknownKey("Unknown key: ".
-                        implode(", ", $used));
+            $sectionname = array_shift($args);
+            $val = $this->SectionData[$sectionname]->get($args);
         }
     }
 
@@ -282,45 +283,35 @@ class Configfile
     /**
      * Parse with extensions
      */
-    private function _parse($filename, $process_sections = true,
-        $getsection = null)
-    {
+    private function _parse($filename, $process_sections = true) {
         $ini = parse_ini_file($filename, $process_sections);
         if ($ini === false)
             throw new ConfigfileError('Unable to parse ini file.');
-        if (!$process_sections && $getsection) {
-            $values = $process_sections ? $ini[$getsection] : $ini;
-            $result = $this->_processSection($values);
-            $this->Sections[] = $getsection;
-        } else {
-            $result = array();
-            foreach ($ini as $section => $values) {
-                if (!is_array($values)) continue;
-                unset($ini[$section]);
-                $expand = explode(':', $section);
-                if (count($expand) == 2) {
-                    $section = trim($expand[0]);
-                    $source = trim($expand[1]);
-                    if (!isset($result[$source]))
-                        throw new ConfigfileError("No $source to expand $section");
-                    $sectionResult = $this->_processSection($values);
-                    $result[$section] = $this->_mergeRecursive($result[$source],
-                        $sectionResult);
-                    $this->Extensions[$section] = $source;
-                    $this->SectionData[$section] =
-                        new Configsection($section, $sectionResult, $source);
-                } else {
-                    $result[$section] = $this->_processSection($values);
-                    $this->SectionData[$section] =
-                        new Configsection($section, $sectionResult);
-                }
-                $this->Sections[] = $section;
+        $result = array();
+        // Process sections first
+        foreach ($ini as $section => $values) {
+            if (!is_array($values)) continue;
+            unset($ini[$section]);
+            $expand = explode(':', $section);
+            if (count($expand) == 2) {
+                $section = trim($expand[0]);
+                $source = trim($expand[1]);
+                if (!isset($result[$source]))
+                    throw new ConfigfileError("No $source to expand $section");
+                $this->Extensions[$section] = $source;
+                $this->SectionData[$section] =
+                    new Configsection($section, $sectionResult, $source);
+            } else {
+                $result[$section] = $this->_processSection($values);
+                $this->SectionData[$section] =
+                    new Configsection($section, $sectionResult);
             }
-            $result += $ini;
-            foreach ($this->SectionData as $section)
-                $section->Extends =
-                    $this->SectionData[$section->Extends];
-        return $result;
+            $this->Sections[] = $section;
+        }
+        $result += $ini;
+        foreach ($this->SectionData as $section)
+            $section->Extends = $this->SectionData[$section->Extends];
+    return $result;
     }
 
     /**
@@ -328,27 +319,25 @@ class Configfile
      */
     public function save() {
         $out = array();
+        foreach ($this->IniData as $key => $val)
+            if (is_array($val))
+                $out[] = $this->_recursiveWriteArrayAssign($key, $val);
+            else
+                $out[] = $this->_writeSimpleAssign($key, $val);
         if ($this->HasSections)
-            // TODO: save sections from SectionData
-            foreach ($this->IniData as $key => $val)
-                if (is_array($val))
-                    if (in_array($key, $this->Sections)) {
-                        if (isset($this->Extensions[$key]))
-                            $extension = ":{$this->Extensions[$key]}";
-                        else
-                            $extension = "";
-                        $out[] = "[{$key}{$extension}]";
-                        $out[] = $this->_serializeSection($val, $key);
-                    } else
-                        $out += _recursiveWriteArrayAssign($key, $val);
+            foreach ($this->Sections as $section)
+                if (isset($this->Extensions[$section]))
+                    $extension = " : {$this->Extensions[$section]}";
                 else
-                    $out[] = $this->_writeSimpleAssign($key, $val);
-        else $out[] = $this->_serializeSection($this->IniData);
+                    $extension = "";
+                $out[] = "[{$section}{$extension}]";
+                $out[] = $this->_serializeSection(
+                    $this->SectionData[$section]->dump(), $section);
         return $this->_rewriteWithLock(implode("\n", $out)."\n");
     }
 
     /**
-     * Process a single section with values.
+     * Parse a single section with values.
      */
     private function _processSection($values) {
         $result = array();
@@ -360,7 +349,7 @@ class Configfile
     }
 
     /**
-     * Create the values recursively.
+     * Parse: Create the values recursively.
      */
     private function _recurseValue($array, $keys, $value) {
         $key = array_shift($keys);
@@ -374,7 +363,7 @@ class Configfile
     }
 
     /**
-     * Merge a value with the previous value, as an array if needed.
+     * Parse: Merge a value with the previous value, as an array if needed.
      */
     private function _mergeValue($array, $key, $value) {
         if (!isset($array[$key]))
@@ -389,7 +378,7 @@ class Configfile
     }
 
     /**
-     * Recursively merge arrays
+     * Parse: Recursively merge arrays
      */
     private function _mergeRecursive($left, $right) {
         // merge arrays if both variables are arrays
@@ -406,7 +395,7 @@ class Configfile
     }
 
     /**
-     * Return a formatted scalar value
+     * Write: Return a formatted scalar value
      */
     private function _writeVal($Val) {
         if (is_numeric($Val)) {
@@ -421,7 +410,7 @@ class Configfile
     }
 
     /**
-     * Return a simple value assignment
+     * Write: Return a simple value assignment
      */
     private function _writeSimpleAssign($key, $val) {
         return "{$key} = ".$this->_writeVal($val);
@@ -432,15 +421,9 @@ class Configfile
      * The optional $section argument will allow trimming
      * overlap already included in extended sections.
      */
-    private function _serializeSection($ary, $section="") {
+    private function _serializeSection($sectdata, $section="") {
         $out = Array();
-        if (isset($this->Extensions[$section]))
-            $check = $this->IniData[$this->Extensions[$section]];
-        else
-            $check = Array();
-        foreach ($ary as $key => $val)
-            if (isset($check[$key]) && $check[$key] == $val)
-                continue;
+        foreach ($sectdata as $key => $val)
             if (is_array($val))
                 $out += $this->_recursiveWriteArrayAssign($key, $val);
             else
