@@ -55,15 +55,18 @@ class Configsection
      * Return whether a given series of keys leads to a set value,
      * without defaulting to an extended section.
      */
-    public function exists() {
+    public function exists($extend=true) {
+        // TODO: use get
         if (func_num_args() < 1)
             throw new ConfigfileError("No key supplied to exists");
         elseif (func_num_args() == 1) {
-            if (! (is_string($Key) or is_int($Key)))
+            $key = func_get_args();
+            $key = $key[0];
+            if (! (is_string($key) or is_int($key)))
                 throw new ConfigfileError(
-                    var_dump($Key)."is an invalid configfile key. "
+                    var_dump($key)."is an invalid configfile key. "
                     ."Use a string or integer.");
-            if (isset($this->ConfigData[$Key]))
+            if (isset($this->ConfigData[$key]))
                 return true;
             else
                 return false;
@@ -71,11 +74,16 @@ class Configsection
             $args = func_get_args();
             $data = $this->ConfigData;
             $used = Array();
-            while ($arg = shift($args))
-                if (is_array($data) && isset($data[$arg]))
-                    $data = $data[$arg];
-                elseif ($this->Extends->exists($Key))
-                    return true;
+            while ($key = shift($args))
+                $final = count($args);
+                if (is_array($data))
+                    if (isset($data[$key]))
+                        if ($final) return true;
+                        else $data = $data[$key];
+                    elseif ($extend && $this->Extends->exists($key))
+                        return true;
+                    else
+                        return false;
                 else
                     return false;
         }
@@ -87,32 +95,51 @@ class Configsection
      * - a progressive series of keys as arguments for a deeper value/array
      * - an unknown key will default to an extended section, if it exists.
      */
-    public function get() {
+    public function get($extend=true) {
         if (func_num_args() < 1)
             throw new ConfigfileError("No key supplied to get");
         elseif (func_num_args() == 1) {
-            if (! (is_string($Key) or is_int($Key)))
+            $key = func_get_args();
+            $key = $key[0];
+            if (! (is_string($key) or is_int($key)))
                 throw new ConfigfileError(
-                    var_dump($Key)."is an invalid configfile key. "
+                    var_dump($key)."is an invalid configfile key. "
                     ."Use a string or integer.");
-            if (isset($this->ConfigData[$Key]))
-                return $this->ConfigData[$Key];
-            elseif ($this->Extends->exists($Key))
-                return $this->Extends->get($Key);
+            if (isset($this->ConfigData[$key]))
+                return $this->ConfigData[$key];
+            elseif ($extend && $this->Extends->exists($key))
+                return $this->Extends->get($key);
             else
-                throw new ConfigfileUnknownKey("Unknown key: {$Key}");
+                throw new ConfigfileUnknownKey(
+                    "Unknown key in {$this->ConfigKey}: ".
+                    implode(", ", $used));
         } else {
             $args = func_get_args();
-            $data = $this->IniData;
+            $data = $this->ConfigData;
             $used = Array();
-            while ($arg = shift($args))
-                $used[] = $arg;
-                if (is_array($data) && isset($data[$arg]))
-                    $data = $data[$arg];
-                elseif ($this->Extends->exists($Key))
-                    return $this->Extends->get($Key);
+            while ($key = shift($args))
+                $used[] = $key;
+                $final = count($args);
+                if (is_array($data))
+                    if (isset($data[$key]))
+                        if ($final) return $data[$key];
+                        else $data = $data[$key];
+                    elseif ($extend)
+                        try {
+                            $extendedval = $this->Extends->get($used));
+                            return $extendedval;
+                        } catch ConfigfileUnknownKey $e {
+                            throw new ConfigfileUnknownKey(
+                                "Extended section from {$this->ConfigKey}: ".
+                                $e->getMessage());
+                        }
+                    else
+                        throw new ConfigfileUnknownKey(
+                            "Unknown key in {$this->ConfigKey}: ".
+                            implode(", ", $used));
                 else
-                    throw new ConfigfileUnknownKey("Unknown key: ".
+                    throw new ConfigfileUnknownKey(
+                        "Unknown key in {$this->ConfigKey}: ".
                         implode(", ", $used));
         }
     }
