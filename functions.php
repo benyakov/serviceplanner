@@ -397,7 +397,7 @@ function html_head($title) {
     return implode("\n", $rv);
 }
 
-function linkbgw($ref, $linked, $new=false) {
+function linkbgw($ref, $linked, $other=false) {
     // Return a link to BibleGateway for the given reference,
     // or if the version is not set, just the ref.
     if (! $linked) {
@@ -405,12 +405,12 @@ function linkbgw($ref, $linked, $new=false) {
     }
     global $config;
     $bgwversion = $config->get("biblegwversion");
-    if ($new) $new = " target=\"_blank\" ";
-    else $new = "";
+    if ($other) $other = " target=\"bgmain\" ";
+    else $other = "";
     if ($bgwversion) {
         return "<a href=\"http://biblegateway.com/passage?search=".
             rawurlencode($ref).
-            "&version={$bgwversion}&interface=print\" ${new}>{$ref}</a>";
+            "&version={$bgwversion}&interface=print\" ${other}>{$ref}</a>";
     } else {
         return $ref;
     }
