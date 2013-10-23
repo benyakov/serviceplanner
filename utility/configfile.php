@@ -32,12 +32,68 @@ class Configsection
 {
     private $ConfigKey;
     private $ConfigData;
-    public $Extends;
+    private $Extends;
 
     public function __construct($key, $structure, $extends=NULL) {
         $this->ConfigKey = $key;
         $this->ConfigData = $structure;
         $this->Extends = $extends;
+    }
+
+    /**
+     * Allow reading of internals
+     */
+    function __get($item) {
+        switch ($item) {
+        case 'Extends':
+            return $this->Extends;
+        default:
+            throw new ConfigfileError("Unknown attribute: {$item}");
+        }
+    }
+
+    /**
+     * Change which section this one extends.  Expects a Configsection.
+     */
+    public function setExtends($configsection) {
+        $this->Extends = $configsection;
+    }
+
+    /**
+     * Set a value, provided as the last of at least two arguments.
+     * The first series of arguments are progressive keys to the structure.
+     */
+    public function set() {
+        $argcount = func_num_args();
+        if ($argcount < 2)
+            throw new ConfigfileError("Set needs at least 2 args.");
+        $args = $origargs = func_get_args();
+        $structure = &$this->ConfigData;
+        while (count($args) > 2) {
+            $k = array_shift($args);
+            if (is_array($structure)) {
+                if (isset($structure[$k])) {
+                    $temp = &$structure[$k];
+                    unset($structure);
+                    $structure = &$temp;
+                    unset($temp);
+                } else {
+                    $structure[$k] = array();
+                    $temp = &$structure[$k];
+                    unset($structure);
+                    $structure = &$temp;
+                    unset($temp);
+                }
+            } else
+                throw new ConfigFileError("Can't set below a scalar.");
+        }
+        if ('[]' == $args[0])
+            $structure[] = $args[1];
+        elseif ($args[1] == NULL)
+            unset($structure[$args[0]])
+            // Delete metadata for sections/extensions when needed
+        else
+            $structure[$args[0]] = $args[1];
     }
 
     /**
@@ -56,37 +112,14 @@ class Configsection
      * without defaulting to an extended section.
      */
     public function exists($extend=true) {
-        // TODO: use get
-        if (func_num_args() < 1)
-            throw new ConfigfileError("No key supplied to exists");
-        elseif (func_num_args() == 1) {
-            $key = func_get_args();
-            $key = $key[0];
-            if (! (is_string($key) or is_int($key)))
-                throw new ConfigfileError(
-                    var_dump($key)."is an invalid configfile key. "
-                    ."Use a string or integer.");
-            if (isset($this->ConfigData[$key]))
-                return true;
-            else
-                return false;
-        } else {
-            $args = func_get_args();
-            $data = $this->ConfigData;
-            $used = Array();
-            while ($key = shift($args))
-                $final = count($args);
-                if (is_array($data))
-                    if (isset($data[$key]))
-                        if ($final) return true;
-                        else $data = $data[$key];
-                    elseif ($extend && $this->Extends->exists($key))
-                        return true;
-                    else
-                        return false;
-                else
-                    return false;
+        $args = func_get_args();
+        $args["extend"] = $extend;
+        try {
+            call_user_func_array(Array($this, "get"), $args);
+            return true;
         }
+        catch ConfigfileUnknownKey, $e
+            return false;
     }
 
     /**
@@ -197,7 +230,7 @@ class Configfile
      */
     public function &getSection($Key) {
         if (in_array($Key, $this->Sections))
-            return $this->IniData[$Key];
+            return $this->SectionData[$Key];
         else
             throw new ConfigfileError("Unknown section: {$Key}");
     }
@@ -227,11 +260,9 @@ class Configfile
      * The first series of arguments are progressive keys to the structure.
      */
     public function set() {
-        // TODO: Consider setting in SectionData
-        // and propagating to IniData
         $argcount = func_num_args();
         if ($argcount < 2)
-            throw new ConfigfileError("deepSet needs at least 2 args.");
+            throw new ConfigfileError("Set needs at least 2 args.");
         $args = $origargs = func_get_args();
         $structure = &$this->IniData;
         while (count($args) > 2) {
@@ -250,7 +281,7 @@ class Configfile
                     unset($temp);
                 }
             } else
-                throw new ConfigFileError("Can't deepSet below a scalar.");
+                throw new ConfigFileError("Can't set below a scalar.");
         }
         $MyExtensions = array_keys($this->Extensions, $origargs[0]);
         foreach ($MyExtensions as $Ext) {
@@ -314,7 +345,6 @@ class Configfile
         $ini = parse_ini_file($filename, $process_sections);
         if ($ini === false)
             throw new ConfigfileError('Unable to parse ini file.');
-        $result = array();
         // Process sections first
         foreach ($ini as $section => $values) {
             if (!is_array($values)) continue;
@@ -323,22 +353,22 @@ class Configfile
             if (count($expand) == 2) {
                 $section = trim($expand[0]);
                 $source = trim($expand[1]);
-                if (!isset($result[$source]))
-                    throw new ConfigfileError("No $source to expand $section");
+                if (!isset($this->SectionData[$source]))
+                    throw new ConfigfileError("No prior '$source' to expand '$section'");
                 $this->Extensions[$section] = $source;
                 $this->SectionData[$section] =
-                    new Configsection($section, $sectionResult, $source);
+                    new Configsection($section,
+                        $this->_processSection($values), $source);
             } else {
-                $result[$section] = $this->_processSection($values);
                 $this->SectionData[$section] =
-                    new Configsection($section, $sectionResult);
+                    new Configsection($section,
+                        $this->_processSection($values));
             }
             $this->Sections[] = $section;
         }
-        $result += $ini;
         foreach ($this->SectionData as $section)
             $section->Extends = $this->SectionData[$section->Extends];
-    return $result;
+        return $ini;
     }
 
     /**
