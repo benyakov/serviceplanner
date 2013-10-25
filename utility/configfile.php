@@ -59,7 +59,7 @@ class Configsection
         if (isset($this->Extends))
             return $this->Extends->ConfigKey;
         else
-            return NULL
+            return NULL;
     }
 
     /**
@@ -107,7 +107,7 @@ class Configsection
         if ('[]' == $args[0])
             $structure[] = $args[1];
         elseif ($args[1] == NULL)
-            unset($structure[$args[0]])
+            unset($structure[$args[0]]);
             // Delete metadata for sections/extensions when needed
         else
             $structure[$args[0]] = $args[1];
@@ -135,8 +135,9 @@ class Configsection
             call_user_func_array(Array($this, "get"), $args);
             return true;
         }
-        catch ConfigfileUnknownKey, $e
+        catch (ConfigfileUnknownKey $e) {
             return false;
+        }
     }
 
     /**
@@ -176,9 +177,9 @@ class Configsection
                         else $data = $data[$key];
                     elseif ($extend)
                         try {
-                            $extendedval = $this->Extends->get($used));
+                            $extendedval = $this->Extends->get($used);
                             return $extendedval;
-                        } catch ConfigfileUnknownKey $e {
+                        } catch (ConfigfileUnknownKey $e) {
                             throw new ConfigfileUnknownKey(
                                 "Extended section from {$this->ConfigKey}: ".
                                 $e->getMessage());
@@ -304,7 +305,7 @@ class Configfile
             if ('[]' == $args[0])
                 $structure[] = $args[1];
             elseif ($args[1] == NULL)
-                unset($structure[$args[0]])
+                unset($structure[$args[0]]);
             else
                 $structure[$args[0]] = $args[1];
         }
@@ -333,9 +334,9 @@ class Configfile
      */
     public function setExtension($section, $source) {
         if (! isset($this->Sections[$source]))
-            raise new ConfigfileError("Source section '{$source}' not set.");
+            throw new ConfigfileError("Source section '{$source}' not set.");
         if (! isset($this->Sections[$section]))
-            raise new ConfigfileError("Section '{$section}' not set.");
+            throw new ConfigfileError("Section '{$section}' not set.");
         $this->SectionData[$section]->setExtends($this->SectionData[$source]);
     }
 
@@ -499,13 +500,13 @@ class Configfile
     /**
      * Return formatted array assignments in an array of assignment lines
      */
-    private _recursiveWriteArrayAssign($key, $val) {
+    private function _recursiveWriteArrayAssign($key, $val) {
         $rv = Array();
         if (is_array($val)) {
             $subassignments = Array();
             foreach ($val as $k=>$v)
                 foreach ($this->recursiveWriteArrayAssign($k, $v) as $newline)
-                   $rv[] = "{$key}.".$newline
+                   $rv[] = "{$key}.".$newline;
         } elseif (is_numeric($key) && ($key == (int) $key))
             $rv[] = "[{$key}] = ".$this->_writeVal($val);
         else
