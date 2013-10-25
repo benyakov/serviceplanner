@@ -41,7 +41,7 @@ class Configsection
     }
 
     /**
-     * Allow reading of internals
+     * Allow reading of internals, like Extends
      */
     function __get($item) {
         switch ($item) {
@@ -50,6 +50,23 @@ class Configsection
         default:
             throw new ConfigfileError("Unknown attribute: {$item}");
         }
+    }
+
+    /**
+     * Return the configuration key for the extended section
+     */
+    public function getExtends() {
+        if (isset($this->Extends))
+            return $this->Extends->ConfigKey;
+        else
+            return NULL
+    }
+
+    /**
+     * Delete the existing extension
+     */
+    public function delExtends() {
+        $this->setExtends(NULL);
     }
 
     /**
@@ -196,10 +213,6 @@ class Configfile
         $this->IniData = $this->_parse($FileName, $HasSections);
     }
 
-    public function debugData() {
-        print_r($this->IniData);
-    }
-
     /**
      * Get a value, providing either
      * - a key as a single argument for a top-level value/array
@@ -226,9 +239,9 @@ class Configfile
     }
 
     /**
-     * Return a reference to a section
+     * Return a section
      */
-    public function &getSection($Key) {
+    public function getSection($Key) {
         if (in_array($Key, $this->Sections))
             return $this->SectionData[$Key];
         else
@@ -264,78 +277,73 @@ class Configfile
         if ($argcount < 2)
             throw new ConfigfileError("Set needs at least 2 args.");
         $args = $origargs = func_get_args();
-        $structure = &$this->IniData;
-        while (count($args) > 2) {
-            $k = array_shift($args);
-            if (is_array($structure)) {
-                if (isset($structure[$k])) {
-                    $temp = &$structure[$k];
-                    unset($structure);
-                    $structure = &$temp;
-                    unset($temp);
-                } else {
-                    $structure[$k] = array();
-                    $temp = &$structure[$k];
-                    unset($structure);
-                    $structure = &$temp;
-                    unset($temp);
-                }
-            } else
-                throw new ConfigFileError("Can't set below a scalar.");
-        }
-        $MyExtensions = array_keys($this->Extensions, $origargs[0]);
-        foreach ($MyExtensions as $Ext) {
-            $origargs[0] = $Ext;
-            $ExtArgs = array_slice($origargs, 1, -1);
-            $currentloc = array_slice($origargs, 0, -1);
-            $this->_updateExtension($ExtArgs,
-                call_user_func_array(Array($this, "get"), $currentloc),
-                $origargs[-1]);
-        }
-        if ('[]' == $args[0])
-            $structure[] = $args[1];
-        elseif ($args[1] == NULL)
-            unset($structure[$args[0]])
-            // Delete metadata for sections/extensions when needed
-            if (2 == $argcount && in_array($args[0], $this->Sections)) {
-                unset($this->Sections[array_search($args[0], $this->Sections)]);
-                if (isset($this->Extensions[$args[0]]))
-                    unset($this->Extensions[$args[0]]);
-                foreach ($MyExtensions as $Ext)
-                    unset($this->Extensions[$Ext]);
+        if ($this->HasSections && in_array($args[0], $this->Sections)) {
+            // Set in the configsection object
+            call_user_func_array(Array($this->SectionData[$args[0]], 'set'),
+                array_slice($args, 1, -1));
+        } else {
+            $structure = &$this->IniData;
+            while (count($args) > 2) {
+                $k = array_shift($args);
+                if (is_array($structure)) {
+                    if (isset($structure[$k])) {
+                        $temp = &$structure[$k];
+                        unset($structure);
+                        $structure = &$temp;
+                        unset($temp);
+                    } else {
+                        $structure[$k] = array();
+                        $temp = &$structure[$k];
+                        unset($structure);
+                        $structure = &$temp;
+                        unset($temp);
+                    }
+                } else
+                    throw new ConfigFileError("Can't set below a scalar.");
             }
-        else
-            $structure[$args[0]] = $args[1];
-    }
-
-    public function getExtensions() {
-        return $this->Extensions;
-    }
-
-    public function delExtension() {
-        // TODO
-    }
-
-    public function newExtension() {
-        // TODO
-    }
-
-    public function &getSections() {
-        return $this->Sections;
+            if ('[]' == $args[0])
+                $structure[] = $args[1];
+            elseif ($args[1] == NULL)
+                unset($structure[$args[0]])
+            else
+                $structure[$args[0]] = $args[1];
+        }
     }
 
     /**
-     * Update an extending section of one being changed.
+     * Return the name of another section extended by $section
      */
-    private function _updateExtension($location, $oldvalue, $newvalue) {
-        try
-            $current = call_user_func_array(Array($this, "get"), $location);
-        catch (ConfigfileUnknownKey $e)
-            return;
-        if ($current == $oldvalue) {
-            $location[] = $newvalue;
-            call_user_func_array(Array($this, "set"), $location);
-        }
+    public function getExtension($section) {
+        return $this->Extensions[$section];
+    }
+
+    /**
+     * Delete an extension of $source by $section
+     */
+    public function delExtension($section, $source) {
+        if (isset($this->Extensions[$section]) &&
+            $this->Extensions[$section] == $source)
+            $this->SectionData[$section]->delExtends();
+        else
+            throw new ConfigfileError("Extension '{$section}:{$source}' does not exist.");
+    }
+
+    /**
+     * Set $section as an extension of $source section
+     */
+    public function setExtension($section, $source) {
+        if (! isset($this->Sections[$source]))
+            raise new ConfigfileError("Source section '{$source}' not set.");
+        if (! isset($this->Sections[$section]))
+            raise new ConfigfileError("Section '{$section}' not set.");
+        $this->SectionData[$section]->setExtends($this->SectionData[$source]);
+    }
+
+    /**
+     * Return a list of sections
+     */
+    public function getSections() {
+        return $this->Sections;
     }
 
     /**
