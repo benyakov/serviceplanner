@@ -223,6 +223,8 @@ class Configfile
         if (func_num_args() < 1)
             throw new ConfigfileError("No key supplied to get");
         elseif (func_num_args() == 1) {
+            $args = func_get_args();
+            $Key = $args[0];
             if (! (is_string($Key) or is_int($Key)))
                 throw new ConfigfileError(
                     var_dump($Key)."is an invalid configfile key. "
@@ -232,10 +234,29 @@ class Configfile
             } else {
                 return null;
             }
-        } else {
+        } elseif ($this->HasSections) {
             $args = func_get_args();
             $sectionname = array_shift($args);
             $val = $this->SectionData[$sectionname]->get($args);
+        } else {
+            $args = func_get_args();
+            $data = $this->IniData;
+            $used = Array();
+            while ($key = array_shift($args))
+                $used[] = $key;
+                $final = count($args);
+                if (is_array($data))
+                    if (isset($data[$key]))
+                        if ($final) return $data[$key];
+                        else $data = $data[$key];
+                    else
+                        throw new ConfigfileUnknownKey(
+                            "Unknown global key: ".
+                            implode(", ", $used));
+                else
+                    throw new ConfigfileUnknownKey(
+                        "Unknown global key: ".
+                        implode(", ", $used));
         }
     }
 
@@ -390,8 +411,8 @@ class Configfile
                 $out[] = $this->_recursiveWriteArrayAssign($key, $val);
             else
                 $out[] = $this->_writeSimpleAssign($key, $val);
-        if ($this->HasSections)
-            foreach ($this->Sections as $section)
+        if ($this->HasSections) {
+            foreach ($this->Sections as $section) {
                 if (isset($this->Extensions[$section]))
                     $extension = " : {$this->Extensions[$section]}";
                 else
@@ -399,6 +420,8 @@ class Configfile
                 $out[] = "[{$section}{$extension}]";
                 $out[] = $this->_serializeSection(
                     $this->SectionData[$section]->dump(), $section);
+            }
+        }
         return $this->_rewriteWithLock(implode("\n", $out)."\n");
     }
 
@@ -501,16 +524,14 @@ class Configfile
      * Return formatted array assignments in an array of assignment lines
      */
     private function _recursiveWriteArrayAssign($key, $val) {
-        $rv = Array();
         if (is_array($val)) {
-            $subassignments = Array();
+            $rv = "";
             foreach ($val as $k=>$v)
-                foreach ($this->recursiveWriteArrayAssign($k, $v) as $newline)
-                   $rv[] = "{$key}.".$newline;
+                $rv .= "{$k}.".$this->_recursiveWriteArrayAssign($k, $v);
         } elseif (is_numeric($key) && ($key == (int) $key))
-            $rv[] = "[{$key}] = ".$this->_writeVal($val);
+            $rv = "[{$key}] = {$this->_writeVal($val)}\n";
         else
-            $rv[] = "{$key} = ".$this->_writeVal($val);
+            $rv = "{$key} = {$this->_writeVal($val)}\n";
         return $rv;
     }
 
