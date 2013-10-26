@@ -14,7 +14,7 @@ if ($contents != 'bleh = "blue"'."\n")
 unset($cf);
 echo " passed<br>";
 
-echo "Set and get...";
+echo "Open/get, set and get...";
 $cf = new Configfile('./test.ini', false);
 if ($cf->get('bleh') != "blue")
     die("Configfile failed: value of key 'bleh' was {$cf->get('bleh')}.");
@@ -28,15 +28,12 @@ if ($cf->get('item2') != 5)
 echo " passed<br>";
 
 echo "Globals as arrays...";
+unlink('./test.ini');
 $cf = new Configfile('./test.ini', false);
-$cf->set('bleh', 'blue');
 $cf->set('foo', 'bar', 'baz');
 $cf->save();
 unset($cf);
 $cf = new Configfile('./test.ini', false);
-if ($cf->get('bleh') != 'blue')
-    die("Configfile failed: value of 'bleh' was ".var_dump($cf->get('bleh'))
-        .".");
 if ($cf->get('foo', 'bar') != 'baz')
     die("Configfile failed: value of 'foo.bar' was ".
         var_dump($cf->get('foo', 'bar'))

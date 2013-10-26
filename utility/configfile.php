@@ -154,7 +154,7 @@ class Configsection
             $key = $key[0];
             if (! (is_string($key) or is_int($key)))
                 throw new ConfigfileError(
-                    var_dump($key)."is an invalid configfile key. "
+                    print_r($key, true)."is an invalid configfile key. "
                     ."Use a string or integer.");
             if (isset($this->ConfigData[$key]))
                 return $this->ConfigData[$key];
@@ -227,7 +227,7 @@ class Configfile
             $Key = $args[0];
             if (! (is_string($Key) or is_int($Key)))
                 throw new ConfigfileError(
-                    var_dump($Key)."is an invalid configfile key. "
+                    print_r($Key, true)."is an invalid configfile key. "
                     ."Use a string or integer.");
             if (isset($this->IniData[$Key])) {
                 return $this->IniData[$Key];
@@ -242,10 +242,13 @@ class Configfile
             $args = func_get_args();
             $data = $this->IniData;
             $used = Array();
+            var_dump($args);
             while ($key = array_shift($args))
+                echo "'$key'";
                 $used[] = $key;
                 $final = count($args);
-                if (is_array($data))
+                if (is_array($data)) {
+                    var_dump($data);
                     if (isset($data[$key]))
                         if ($final) return $data[$key];
                         else $data = $data[$key];
@@ -253,6 +256,7 @@ class Configfile
                         throw new ConfigfileUnknownKey(
                             "Unknown global key: ".
                             implode(", ", $used));
+                }
                 else
                     throw new ConfigfileUnknownKey(
                         "Unknown global key: ".
@@ -371,33 +375,36 @@ class Configfile
     /**
      * Parse with extensions
      */
-    private function _parse($filename, $process_sections = true) {
+    private function _parse($filename, $process_sections=true) {
         $ini = parse_ini_file($filename, $process_sections);
         if ($ini === false)
             throw new ConfigfileError('Unable to parse ini file.');
         // Process sections first
-        foreach ($ini as $section => $values) {
-            if (!is_array($values)) continue;
-            unset($ini[$section]);
-            $expand = explode(':', $section);
-            if (count($expand) == 2) {
-                $section = trim($expand[0]);
-                $source = trim($expand[1]);
-                if (!isset($this->SectionData[$source]))
-                    throw new ConfigfileError("No prior '$source' to expand '$section'");
-                $this->Extensions[$section] = $source;
-                $this->SectionData[$section] =
-                    new Configsection($section,
-                        $this->_processSection($values), $source);
-            } else {
-                $this->SectionData[$section] =
-                    new Configsection($section,
-                        $this->_processSection($values));
+        if ($this->HasSections) {
+            foreach ($ini as $section => $values) {
+                if (!is_array($values)) continue;
+                unset($ini[$section]);
+                $expand = explode(':', $section);
+                if (count($expand) == 2) {
+                    $section = trim($expand[0]);
+                    $source = trim($expand[1]);
+                    if (!isset($this->SectionData[$source]))
+                        throw new ConfigfileError("No prior '$source' to expand '$section'");
+                    $this->Extensions[$section] = $source;
+                    $this->SectionData[$section] =
+                        new Configsection($section,
+                            $this->_processSection($values), $source);
+                } else {
+                    $this->SectionData[$section] =
+                        new Configsection($section,
+                            $this->_processSection($values));
+                }
+                $this->Sections[] = $section;
             }
-            $this->Sections[] = $section;
-        }
-        foreach ($this->SectionData as $section)
-            $section->Extends = $this->SectionData[$section->Extends];
+            foreach ($this->SectionData as $section)
+                $section->Extends = $this->SectionData[$section->Extends];
+        } else
+            $ini = $this->_processSection($ini);
         return $ini;
     }
 
@@ -527,7 +534,7 @@ class Configfile
         if (is_array($val)) {
             $rv = "";
             foreach ($val as $k=>$v)
-                $rv .= "{$k}.".$this->_recursiveWriteArrayAssign($k, $v);
+                $rv .= "{$key}.".$this->_recursiveWriteArrayAssign($k, $v);
         } elseif (is_numeric($key) && ($key == (int) $key))
             $rv = "[{$key}] = {$this->_writeVal($val)}\n";
         else
@@ -560,4 +567,5 @@ class Configfile
     }
 }
 
+// vim: set foldmethod=indent :
 ?>
