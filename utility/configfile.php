@@ -242,13 +242,11 @@ class Configfile
             $args = func_get_args();
             $data = $this->IniData;
             $used = Array();
-            var_dump($args);
-            while ($key = array_shift($args))
-                echo "'$key'";
+            while ($key = array_shift($args)) {
                 $used[] = $key;
-                $final = count($args);
+                $final = (count($args) == 0);
+                // Apply the key
                 if (is_array($data)) {
-                    var_dump($data);
                     if (isset($data[$key]))
                         if ($final) return $data[$key];
                         else $data = $data[$key];
@@ -256,11 +254,11 @@ class Configfile
                         throw new ConfigfileUnknownKey(
                             "Unknown global key: ".
                             implode(", ", $used));
-                }
-                else
+                } else
                     throw new ConfigfileUnknownKey(
-                        "Unknown global key: ".
+                        "Scalar value found; can't index: ".
                         implode(", ", $used));
+            }
         }
     }
 
@@ -414,9 +412,9 @@ class Configfile
     public function save() {
         $out = array();
         foreach ($this->IniData as $key => $val)
-            if (is_array($val))
-                $out[] = $this->_recursiveWriteArrayAssign($key, $val);
-            else
+            if (is_array($val)) {
+                $out += $this->_recursiveWriteArrayAssign($key, $val);
+            } else
                 $out[] = $this->_writeSimpleAssign($key, $val);
         if ($this->HasSections) {
             foreach ($this->Sections as $section) {
@@ -530,15 +528,21 @@ class Configfile
     /**
      * Return formatted array assignments in an array of assignment lines
      */
-    private function _recursiveWriteArrayAssign($key, $val) {
-        if (is_array($val)) {
-            $rv = "";
-            foreach ($val as $k=>$v)
-                $rv .= "{$key}.".$this->_recursiveWriteArrayAssign($k, $v);
-        } elseif (is_numeric($key) && ($key == (int) $key))
-            $rv = "[{$key}] = {$this->_writeVal($val)}\n";
-        else
-            $rv = "{$key} = {$this->_writeVal($val)}\n";
+    private function _recursiveWriteArrayAssign($key, $val, $pre="", $join="")
+    {
+        if (!is_array($val)) {
+            if (is_numeric($key) && ($key == (int) $key))
+                return Array("{$pre}[] = {$this->_writeVal($val)}");
+            else
+                return Array("{$pre}{$join}{$key} = {$this->_writeVal($val)}");
+        } else {
+            $rv = Array();
+            foreach ($val as $k=>$v) {
+                $rv = array_merge($rv,
+                    $this->_recursiveWriteArrayAssign($k, $v,
+                    "{$pre}{$join}{$key}", "."));
+            }
+        }
         return $rv;
     }
 
