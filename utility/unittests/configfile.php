@@ -24,13 +24,13 @@ function get_manipulation($configfile) {
         error("Configfile failed: value of 'foo.bar' was ".
             print_r($configfile->get('foo', 'bar'), true) .".");
     if ($configfile->get('foo', 'bin') != 'zap')
-        error("Configfile failed: value of 'foo.bar' was ".
+        error("Configfile failed: value of 'foo.bin' was ".
             print_r($configfile->get('foo', 'bin'), true) .".");
     if ($configfile->get('foo', 'num') != Array('one', 'two', 'three'))
-        error("Configfile failed: value of 'foo.bar' was ".
+        error("Configfile failed: value of 'foo.num' was ".
             print_r($configfile->get('foo', 'num'), true) .".");
     if ($configfile->get('foo', 'num2', 0) != 'four')
-        error("Configfile failed: value of 'foo.bar' was ".
+        error("Configfile failed: value of 'foo.num2.0' was ".
             print_r($configfile->get('foo', 'num2', 0), true) .".");
 }
 

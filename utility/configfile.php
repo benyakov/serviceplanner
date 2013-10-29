@@ -168,7 +168,7 @@ class Configsection
             $args = func_get_args();
             $data = $this->ConfigData;
             $used = Array();
-            while ($key = shift($args))
+            while (($key = shift($args))!==NULL)
                 $used[] = $key;
                 $final = count($args);
                 if (is_array($data))
@@ -242,14 +242,16 @@ class Configfile
             $args = func_get_args();
             $data = $this->IniData;
             $used = Array();
-            while ($key = array_shift($args)) {
+            while (($key = array_shift($args)) !== NULL) {
                 $used[] = $key;
                 $final = (count($args) == 0);
                 // Apply the key
                 if (is_array($data)) {
                     if (isset($data[$key]))
-                        if ($final) return $data[$key];
-                        else $data = $data[$key];
+                        if ($final)
+                            return $data[$key];
+                        else
+                            $data = $data[$key];
                     else
                         throw new ConfigfileUnknownKey(
                             "Unknown global key: ".
