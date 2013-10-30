@@ -75,9 +75,14 @@ get_manipulation($cf);
 unset($cf);
 unlink('./test.ini');
 
-echo "Manipulating values in a section...<br>";
+echo "Manipulating values in a section...<br>\n";
 $cf = new Configfile('./test.ini', true);
 set_manipulation($cf);
+$cf->save();
+get_manipulation($cf);
+echo "...after loading from file...<br>\n";
+unset($cf);
+$cf = new Configfile('./test.ini', true);
 get_manipulation($cf);
 unset($cf);
 unlink('./test.ini');

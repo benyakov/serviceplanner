@@ -83,7 +83,8 @@ class Configsection
     public function set() {
         $argcount = func_num_args();
         if ($argcount < 2)
-            throw new ConfigfileError("Set needs at least 2 args.");
+            throw new ConfigfileError("Set needs at least 2 args.  "
+                ."Got ".print_r(func_get_args(), true));
         $args = $origargs = func_get_args();
         $structure = &$this->ConfigData;
         while (count($args) > 2) {
@@ -108,7 +109,6 @@ class Configsection
             $structure[] = $args[1];
         elseif ($args[1] == NULL)
             unset($structure[$args[0]]);
-            // Delete metadata for sections/extensions when needed
         else
             $structure[$args[0]] = $args[1];
     }
@@ -158,42 +158,52 @@ class Configsection
                     ."Use a string or integer.");
             if (isset($this->ConfigData[$key]))
                 return $this->ConfigData[$key];
-            // FIXME: check to see if $this->Extends is an object first
-            elseif ($extend && $this->Extends->exists($key))
+            elseif ($extend && $this->_extendable()
+                && $this->Extends->exists($key))
                 return $this->Extends->get($key);
             else
+                echo "Configdata is ".print_r($this->ConfigData, true)."<br>";
                 throw new ConfigfileUnknownKey(
-                    "Unknown key in {$this->ConfigKey}: ".
-                    implode(", ", $used));
+                    "Unknown key in section {$this->ConfigKey}: ".$key);
         } else {
             $args = func_get_args();
             $data = $this->ConfigData;
             $used = Array();
-            while (($key = shift($args))!==NULL)
+            while (($key = array_shift($args))!==NULL) {
                 $used[] = $key;
-                $final = count($args);
+                $final = (count($args) == 0);
                 if (is_array($data))
                     if (isset($data[$key]))
-                        if ($final) return $data[$key];
-                        else $data = $data[$key];
-                    elseif ($extend)
+                        if ($final)
+                            return $data[$key];
+                        else
+                            $data = $data[$key];
+                    elseif ($extend && $this->_extendable())
                         try {
-                            $extendedval = $this->Extends->get($used);
-                            return $extendedval;
+                            return $this->Extends->get($used, false);
                         } catch (ConfigfileUnknownKey $e) {
                             throw new ConfigfileUnknownKey(
-                                "Extended section from {$this->ConfigKey}: ".
+                                "With extended section from "
+                                ."{$this->ConfigKey}: ".
                                 $e->getMessage());
                         }
-                    else
+                    else {
+                        echo "Did not find {$key} in ".print_r($data, true)
+                            ."<br>";
                         throw new ConfigfileUnknownKey(
-                            "Unknown key in {$this->ConfigKey}: ".
+                            "Unknown key in section {$this->ConfigKey}: ".
                             implode(", ", $used));
+                    }
                 else
                     throw new ConfigfileUnknownKey(
-                        "Unknown key in {$this->ConfigKey}: ".
+                        "Unknown key in section {$this->ConfigKey}: ".
                         implode(", ", $used));
+            }
         }
+    }
+
+    private function _extendable() {
+        return is_a($this->Extends, "Configobject");
     }
 }
 
@@ -211,8 +221,10 @@ class Configfile
         $this->HasSections = $HasSections;
         if (! file_exists($FileName)) {
             touch($FileName);
+            $this->IniData = Array();
+        } else {
+            $this->IniData = $this->_parse($FileName, $HasSections);
         }
-        $this->IniData = $this->_parse($FileName, $HasSections);
     }
 
     /**
@@ -238,7 +250,7 @@ class Configfile
         } elseif ($this->HasSections) {
             $args = func_get_args();
             $sectionname = array_shift($args);
-            $val = call_user_func_array(Array($this->SectionData[$sectionname],
+            return call_user_func_array(Array($this->SectionData[$sectionname],
                 "get"), $args);
         } else {
             $args = func_get_args();
@@ -306,7 +318,10 @@ class Configfile
             throw new ConfigfileError("deepCreate needs at least 2 args.");
         $rv = array_pop($args);
         while (($k = array_pop($args)) !== NULL)
-           $rv = Array($k => $rv);
+            if ("[]" == $k)
+                $rv = Array($rv);
+            else
+                $rv = Array($k => $rv);
         return $rv;
     }
 
@@ -320,16 +335,16 @@ class Configfile
             throw new ConfigfileError("Set needs at least 2 args.");
         $args = $origargs = func_get_args();
         if ($this->HasSections && $argcount > 2) {
-           echo "Setting into section {$args[0]}.<br>";
            if (in_array($args[0], $this->Sections)) {
                // Set in the configsection object
                call_user_func_array(Array($this->SectionData[$args[0]], 'set'),
-                    array_slice($args, 1, -1));
+                    array_slice($args, 1));
            } else {
                // Create a new configsection object.
                $k = array_shift($args);
-               $this->SectionData[$k] =
-                   new Configsection($k, $this->_deepCreate($args));
+               $args = $this->_deepCreate($args);
+               $this->SectionData[$k] = new Configsection($k, $args);
+               $this->Sections[] = $k;
            }
         } else {
             $structure = &$this->IniData;
@@ -421,6 +436,7 @@ class Configfile
                         new Configsection($section,
                             $this->_processSection($values), $source);
                 } else {
+                    echo "Creating section with ".print_r($values, true)."<br>";
                     $this->SectionData[$section] =
                         new Configsection($section,
                             $this->_processSection($values));
