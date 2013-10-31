@@ -19,6 +19,22 @@ function set_manipulation($configfile) {
     $configfile->save();
 }
 
+function set_extends_manipulation($cfh) {
+    $cfh->set('ext', 'ownkey', 'This rocks.');
+    $cfh->setExtension('ext', 'foo');
+}
+
+function get_extends_manipulation($cfh) {
+    if ($cfh->getExtension('ext') != 'foo')
+        error("Configfile failed: value of getExtension('ext') was".
+            print_r($cfh->getExtension('ext'), true).".");
+    if ($cfh->get('ext', 'num', '1') != 'two')
+        error("Configfile failed: value of 'ext.num[1]' was".
+            print_r($cfh->get('ext', 'num', '1'), true).".");
+    $cfh->delExtension('ext', 'foo');
+    $cfh->getExtension('ext');
+}
+
 function get_manipulation($configfile) {
     if ($configfile->get('foo', 'bar') != 'baz')
         error("Configfile failed: value of 'foo.bar' was ".
@@ -80,12 +96,25 @@ $cf = new Configfile('./test.ini', true);
 set_manipulation($cf);
 $cf->save();
 get_manipulation($cf);
-echo "...after loading from file...<br>\n";
+echo "&nbsp;&nbsp;...after loading from file...<br>\n";
 unset($cf);
 $cf = new Configfile('./test.ini', true);
 get_manipulation($cf);
 unset($cf);
 unlink('./test.ini');
+
+echo "Testing section inheritance...<br>\n";
+$cf = new Configfile('./test.ini', true);
+set_manipulation($cf);
+set_extends_manipulation($cf);
+$cf->save();
+get_manipulation($cf);
+get_extends_manipulation($cf);
+echo "&nbsp;&nbsp;...after loading from file...<br>\n";
+get_manipulation($cf);
+get_extends_manipulation($cf);
+unset($cf);
+//unlink('./test.ini');
 
 echo "If you see no errors, all tests passed.<br>";
 ?>
