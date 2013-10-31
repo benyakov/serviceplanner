@@ -31,8 +31,22 @@ function get_extends_manipulation($cfh) {
     if ($cfh->get('ext', 'num', '1') != 'two')
         error("Configfile failed: value of 'ext.num[1]' was".
             print_r($cfh->get('ext', 'num', '1'), true).".");
+    echo "&nbsp;&nbsp;&nbsp;...trying ext value on unextended object... ";
     $cfh->delExtension('ext', 'foo');
-    $cfh->getExtension('ext');
+    try {
+        if ($cfh->get('ext', 'bar') == "baz")
+            error("Configfile failed: "
+                ."unextended object failed to throw exception.");
+    } catch (ConfigfileUnknownKey $e) {
+        echo "Success.<br>";
+    }
+    echo "&nbsp;&nbsp;&nbsp;...the same when extended... ";
+    $cfh->setExtension("ext", "foo");
+    if ($cfh->get('ext', 'bar') != "baz")
+        error("Configfile failed: "
+            ."ext.bar = '".$cfh->get('ext', 'bar')."'.");
+    else
+        echo "Success.<br>";
 }
 
 function get_manipulation($configfile) {
@@ -111,6 +125,8 @@ $cf->save();
 get_manipulation($cf);
 get_extends_manipulation($cf);
 echo "&nbsp;&nbsp;...after loading from file...<br>\n";
+unset($cf);
+$cf = new Configfile('./test.ini', true);
 get_manipulation($cf);
 get_extends_manipulation($cf);
 unset($cf);

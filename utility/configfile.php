@@ -115,7 +115,6 @@ class Configsection
             unset($structure[$args[0]]);
         else
             $structure[$args[0]] = $args[1];
-        echo "Resulting structure: ".print_r($this->ConfigData, true)."<br>\n";
     }
 
     /**
@@ -392,8 +391,10 @@ class Configfile
     public function delExtension($section, $source) {
         if (isset($this->Extensions[$section]) &&
             $this->Extensions[$section] == $source)
+        {
             $this->SectionData[$section]->delExtends();
-        else
+            unset($this->Extensions[$section]);
+        } else
             throw new ConfigfileError("Extension '{$section}:{$source}' does not exist.");
     }
 
@@ -457,7 +458,6 @@ class Configfile
             }
         } else
             $ini = $this->_processSection($ini);
-        echo "Result: ".print_r($ini, true)."<br>\n";
         return $ini;
     }
 
