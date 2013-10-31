@@ -33,6 +33,10 @@ class Configsection
     private $ConfigKey;
     private $ConfigData;
     private $Extends;
+    /**
+     * $extend: A flag to suppress extending another section temporarily.
+     */
+    public  $extend = true;
 
     public function __construct($key, $structure, $extends=NULL) {
         $this->ConfigKey = $key;
@@ -128,9 +132,8 @@ class Configsection
      * Return whether a given series of keys leads to a set value,
      * without defaulting to an extended section.
      */
-    public function exists($extend=true) {
+    public function exists() {
         $args = func_get_args();
-        $args["extend"] = $extend;
         try {
             call_user_func_array(Array($this, "get"), $args);
             return true;
@@ -146,7 +149,7 @@ class Configsection
      * - a progressive series of keys as arguments for a deeper value/array
      * - an unknown key will default to an extended section, if it exists.
      */
-    public function get($extend=true) {
+    public function get() {
         if (func_num_args() < 1)
             throw new ConfigfileError("No key supplied to get");
         elseif (func_num_args() == 1) {
@@ -158,43 +161,42 @@ class Configsection
                     ."Use a string or integer.");
             if (isset($this->ConfigData[$key]))
                 return $this->ConfigData[$key];
-            elseif ($extend && $this->_extendable()
+            elseif ($this->extend && $this->_isExtendable()
                 && $this->Extends->exists($key))
                 return $this->Extends->get($key);
             else
-                echo "Configdata is ".print_r($this->ConfigData, true)."<br>";
                 throw new ConfigfileUnknownKey(
                     "Unknown key in section {$this->ConfigKey}: ".$key);
         } else {
-            $args = func_get_args();
+            $args = $origargs = func_get_args();
+            //echo "\$args is ".print_r($args, true)."<br>\n"; // FIXME
             $data = $this->ConfigData;
             $used = Array();
             while (($key = array_shift($args))!==NULL) {
                 $used[] = $key;
                 $final = (count($args) == 0);
-                if (is_array($data))
+                if (is_array($data)){
                     if (isset($data[$key]))
                         if ($final)
                             return $data[$key];
                         else
                             $data = $data[$key];
-                    elseif ($extend && $this->_extendable())
+                    elseif ($this->extend && $this->_isExtendable())
                         try {
-                            return $this->Extends->get($used, false);
+                            return call_user_func_array(
+                                Array($this->Extends, "get"), $origargs);
                         } catch (ConfigfileUnknownKey $e) {
                             throw new ConfigfileUnknownKey(
-                                "With extended section from "
+                                "With extended section in "
                                 ."{$this->ConfigKey}: ".
                                 $e->getMessage());
                         }
                     else {
-                        echo "Did not find {$key} in ".print_r($data, true)
-                            ."<br>";
                         throw new ConfigfileUnknownKey(
                             "Unknown key in section {$this->ConfigKey}: ".
                             implode(", ", $used));
                     }
-                else
+                } else
                     throw new ConfigfileUnknownKey(
                         "Unknown key in section {$this->ConfigKey}: ".
                         implode(", ", $used));
@@ -202,8 +204,9 @@ class Configsection
         }
     }
 
-    private function _extendable() {
-        return is_a($this->Extends, "Configobject");
+    private function _isExtendable() {
+        return (is_object($this->Extends)
+            && is_a($this->Extends, "Configsection"));
     }
 }
 
@@ -397,11 +400,16 @@ class Configfile
      * Set $section as an extension of $source section
      */
     public function setExtension($section, $source) {
-        if (! isset($this->Sections[$source]))
+        if (! in_array($source, $this->Sections))
             throw new ConfigfileError("Source section '{$source}' not set.");
-        if (! isset($this->Sections[$section]))
+        if (! in_array($section, $this->Sections))
             throw new ConfigfileError("Section '{$section}' not set.");
+        if (isset($this->Extends[$source])
+            && $this->Extends[$source]==$section)
+            throw new ConfigfileError("Setting $section to extend $source "
+                ."would be a circular extension.");
         $this->SectionData[$section]->setExtends($this->SectionData[$source]);
+        $this->Extensions[$section] = $source;
     }
 
     /**
@@ -420,9 +428,7 @@ class Configfile
             throw new ConfigfileError('Unable to parse ini file.');
         // Process sections first
         if ($this->HasSections) {
-            echo "Processing for sections...<br>";
             foreach ($ini as $section => $values) {
-                echo "... $section<br>";
                 if (!is_array($values)) continue;
                 unset($ini[$section]);
                 $expand = explode(':', $section);
@@ -436,13 +442,11 @@ class Configfile
                         new Configsection($section,
                             $this->_processSection($values), $source);
                 } else {
-                    echo "Creating section with ".print_r($values, true)."<br>";
                     $this->SectionData[$section] =
                         new Configsection($section,
                             $this->_processSection($values));
                 }
                 $this->Sections[] = $section;
-                echo "Got a new section: ".print_r($section, true)."<br>";
             }
             foreach ($this->SectionData as $section)
                 $section->setExtends($this->SectionData[$section->Extends]);
@@ -564,7 +568,8 @@ class Configfile
         $out = Array();
         foreach ($sectdata as $key => $val)
             if (is_array($val))
-                $out += $this->_recursiveWriteArrayAssign($key, $val);
+                $out = array_merge($out,
+                    $this->_recursiveWriteArrayAssign($key, $val));
             else
                 $out[] = $this->_writeSimpleAssign($key, $val);
         return implode("\n", $out);
@@ -583,9 +588,9 @@ class Configfile
         } else {
             $rv = Array();
             foreach ($val as $k=>$v) {
-                $rv = array_merge($rv,
-                    $this->_recursiveWriteArrayAssign($k, $v,
-                    "{$pre}{$join}{$key}", "."));
+                $result = $this->_recursiveWriteArrayAssign($k, $v,
+                    "{$pre}{$join}{$key}", ".");
+                $rv = array_merge($rv, $result);
             }
         }
         return $rv;
