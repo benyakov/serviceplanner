@@ -111,6 +111,7 @@ class Configsection
             unset($structure[$args[0]]);
         else
             $structure[$args[0]] = $args[1];
+        echo "Resulting structure: ".print_r($this->ConfigData, true)."<br>\n";
     }
 
     /**
