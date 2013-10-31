@@ -62,6 +62,13 @@ function get_manipulation($configfile) {
     if ($configfile->get('foo', 'num2', 0) != 'four')
         error("Configfile failed: value of 'foo.num2.0' was ".
             print_r($configfile->get('foo', 'num2', 0), true) .".");
+    $configfile->transpose(Array("foo"), "bar", "bin");
+    if ($configfile->get('foo', 'bin') != 'baz'
+        && $configfile->get('foo', 'bar') != 'zap')
+        error("Configfile failed: transpose resulted in 'foo.bin' = "
+            .print_r($configfile->get('foo', 'bin'), true). " and foo.bar = "
+            .print_r($configfile->get('foo', 'bar'), true));
+    $configfile->transpose(Array("foo"), "bar", "bin");
 }
 
 

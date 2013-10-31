@@ -241,18 +241,21 @@ class Configfile
         elseif (func_num_args() == 1) {
             $key = func_get_args();
             $key = $key[0];
+            echo "Key is $key<br>";
             if (! (is_string($key) or is_int($key)))
                 if (is_array($key)) {
-                    call_user_func_array(Array($this, "get"), $key);
-                else
+                    return call_user_func_array(Array($this, "get"), $key);
+                } else
                     throw new ConfigfileError(
                         print_r($key, true)."is an invalid configfile key. "
                         ."Use a string or integer.");
-            if (isset($this->IniData[$key])) {
+            if (isset($this->IniData[$key]))
                 return $this->IniData[$key];
-            } else {
+            elseif ($this->HasSections && isset($this->Sections[$key])) {
+                echo "Returning a section for $key<br>"; // FIXME
+                return $this->SectionData[$key]->dump();
+            } else
                 return NULL;
-            }
         } elseif ($this->HasSections) {
             $args = func_get_args();
             $sectionname = array_shift($args);
@@ -456,8 +459,9 @@ class Configfile
      */
     public function transpose($location, $key1, $key2) {
         $parent = $this->get($location);
-        if (! is_array($parent) && array_key_exists($key1, $parent)
-            && array_key_exists($key2, parent))
+        echo "Parent is '".print_r($parent, true)."'<br>";
+        if (! (is_array($parent) && array_key_exists($key1, $parent)
+            && array_key_exists($key2, $parent)))
             throw new ConfigfileError("Can't transpose {$key1} and {$key2} "
                 ."at ".print_r($location, true));
         $loc1 = array_merge($location, Array($key1));
