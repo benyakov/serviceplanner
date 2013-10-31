@@ -435,8 +435,6 @@ class Configfile
                 if (count($expand) == 2) {
                     $section = trim($expand[0]);
                     $source = trim($expand[1]);
-                    if (!isset($this->SectionData[$source]))
-                        throw new ConfigfileError("No prior '$source' to expand '$section'");
                     $this->Extensions[$section] = $source;
                     $this->SectionData[$section] =
                         new Configsection($section,
@@ -448,10 +446,17 @@ class Configfile
                 }
                 $this->Sections[] = $section;
             }
-            foreach ($this->SectionData as $section)
-                $section->setExtends($this->SectionData[$section->Extends]);
+            foreach ($this->SectionData as $section) {
+                if (NULL == $section->Extends) continue;
+                if (isset($this->SectionData[$section->Extends]))
+                    $section->setExtends($this->SectionData[$section->Extends]);
+                else
+                    throw new ConfigfileError("Undefined source section: '"
+                        .$section->Extends."'.");
+            }
         } else
             $ini = $this->_processSection($ini);
+        echo "Result: ".print_r($ini, true)."<br>\n";
         return $ini;
     }
 
