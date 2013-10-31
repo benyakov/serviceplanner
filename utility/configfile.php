@@ -242,9 +242,12 @@ class Configfile
             $key = func_get_args();
             $key = $key[0];
             if (! (is_string($key) or is_int($key)))
-                throw new ConfigfileError(
-                    print_r($key, true)."is an invalid configfile key. "
-                    ."Use a string or integer.");
+                if (is_array($key)) {
+                    call_user_func_array(Array($this, "get"), $key);
+                else
+                    throw new ConfigfileError(
+                        print_r($key, true)."is an invalid configfile key. "
+                        ."Use a string or integer.");
             if (isset($this->IniData[$key])) {
                 return $this->IniData[$key];
             } else {
@@ -334,9 +337,12 @@ class Configfile
      */
     public function set() {
         $argcount = func_num_args();
-        if ($argcount < 2)
-            throw new ConfigfileError("Set needs at least 2 args.");
         $args = $origargs = func_get_args();
+        if ($argcount < 2)
+            if (is_array($args[0]))
+                return call_user_func_array(Array($this, "set"), $args[0]);
+            else
+                throw new ConfigfileError("Set needs at least 2 args.");
         if ($this->HasSections && $argcount > 2) {
            if (in_array($args[0], $this->Sections)) {
                // Set in the configsection object
@@ -422,6 +428,48 @@ class Configfile
     }
 
     /**
+     * Save the file
+     */
+    public function save() {
+        $out = array();
+        foreach ($this->IniData as $key => $val)
+            if (is_array($val)) {
+                $out += $this->_recursiveWriteArrayAssign($key, $val);
+            } else
+                $out[] = $this->_writeSimpleAssign($key, $val);
+        if ($this->HasSections) {
+            foreach ($this->Sections as $section) {
+                if (isset($this->Extensions[$section]))
+                    $extension = " : {$this->Extensions[$section]}";
+                else
+                    $extension = "";
+                $out[] = "[{$section}{$extension}]";
+                $out[] = $this->_serializeSection(
+                    $this->SectionData[$section]->dump(), $section);
+            }
+        }
+        return $this->_rewriteWithLock(implode("\n", $out)."\n");
+    }
+
+    /**
+     * Exchange the values of the two coordinate keys at the given location.
+     */
+    public function transpose($location, $key1, $key2) {
+        $parent = $this->get($location);
+        if (! is_array($parent) && array_key_exists($key1, $parent)
+            && array_key_exists($key2, parent))
+            throw new ConfigfileError("Can't transpose {$key1} and {$key2} "
+                ."at ".print_r($location, true));
+        $loc1 = array_merge($location, Array($key1));
+        $loc2 = array_merge($location, Array($key2));
+        $val1 = $this->get($loc1);
+        $set1 = array_merge($location, Array($key1, $this->get($loc2)));
+        $this->set($set1);
+        $set2 = array_merge($location, Array($key2, $val1));
+        $this->set($set2);
+    }
+
+    /**
      * Parse with extensions
      */
     private function _parse($filename, $process_sections=true) {
@@ -459,30 +507,6 @@ class Configfile
         } else
             $ini = $this->_processSection($ini);
         return $ini;
-    }
-
-    /**
-     * Save the file
-     */
-    public function save() {
-        $out = array();
-        foreach ($this->IniData as $key => $val)
-            if (is_array($val)) {
-                $out += $this->_recursiveWriteArrayAssign($key, $val);
-            } else
-                $out[] = $this->_writeSimpleAssign($key, $val);
-        if ($this->HasSections) {
-            foreach ($this->Sections as $section) {
-                if (isset($this->Extensions[$section]))
-                    $extension = " : {$this->Extensions[$section]}";
-                else
-                    $extension = "";
-                $out[] = "[{$section}{$extension}]";
-                $out[] = $this->_serializeSection(
-                    $this->SectionData[$section]->dump(), $section);
-            }
-        }
-        return $this->_rewriteWithLock(implode("\n", $out)."\n");
     }
 
     /**

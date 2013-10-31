@@ -87,7 +87,7 @@ $dbh->commit();
 // Write database version to dbstate file.
 require("configfile.php");
 $dbstate = new Configfile("../dbstate.ini", false);
-$dbstate->store('dbversion',
+$dbstate->set('dbversion',
     "{$version['major']}.{$version['minor']}.{$version['tick']}");
 $dbstate->save();
 // Create the initial user

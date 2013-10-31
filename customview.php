@@ -38,15 +38,17 @@ if ("customfields" == $_GET['action']) { // Works
     $rv = Array();
     // Set up default if nothing is configured
     if (! $config['custom view']['fields']) {
-        $config->deepSet('custom view', 'fields', 0, "date");
-        $config->deepSet('custom view', 'field-order', 0, 0);
+        $config->set('custom view', 'fields', 0, "date");
+        $config->set('custom view', 'field-order', [], 0);
         $config->save();
     }
     // Pull a data structure from the configuration
-    for ($i=0, $len = count($config['custom view']['fields']); $len>$i; $i++) {
-        $rv[] = Array("order"=>$config['custom view']['field-order'][$i],
-            "name"=>$config['custom view']['fields'][
-            $config['custom view']['field-order'][$i]]);
+    for ($i=0, $len = count($config->get('custom view','fields'));
+        $len>$i; $i++)
+    {
+        $rv[] = Array("order"=>$config->get('custom view', 'field-order', $i),
+            "name"=>$config->get('custom view', 'fields',
+                $config->get('custom view', 'field-order', $i)));
     }
     echo json_encode($rv);
     exit(0);
@@ -64,24 +66,20 @@ if ("customfields" == $_GET['action']) { // Works
         exit(0);
     }
     $currentloc = (int) $_GET['index'];
-    array_splice($config['custom view']['field-order'],
-        $currentloc-1, 2,
-        Array($config['custom view']['field-order'][$currentloc],
-             $config['custom view']['field-order'][$currentloc-1]));
+    $config->transpose(Array('custom view', 'field-order'),
+        $currentloc, $currentloc-1);
     $config->save();
     echo json_encode(Array(1, "Success."));
     exit(0);
 } elseif ("right" == $_GET['move-field']) {
     validateAuth(true);
-    if ((count($config['custom view']['field-order'])-2) < $_GET['index']) {
+    if ((count($config->get('custom view', 'field-order'))-2)<$_GET['index']) {
         echo json_encode(Array(0, "Can't move after the end."));
         exit(0);
     }
     $currentloc = (int) $_GET['index'];
-    array_splice($config['custom view']['field-order'],
-        $currentloc, 2,
-        Array($config['custom view']['field-order'][$currentloc+1],
-             $config['custom view']['field-order'][$currentloc]));
+    $config->transpose(Array('custom view', 'field-order'),
+        $currentloc, $currentloc+1);
     $config->save();
     echo json_encode(Array(1, "Success."));
     exit(0);
@@ -89,32 +87,34 @@ if ("customfields" == $_GET['action']) { // Works
     // FIXME: perhaps implement a deepUnset() method on the config object?
     validateAuth(true);
     if (0 > $_GET['delete-field'] or
-        count($config['custom view']['field-order']) <= $_GET['delete-field']) {
+        count($config->get('custom view','field-order')) <=
+        $_GET['delete-field'])
+    {
         echo json_encode(Array(0, "Can't delete a nonexistent item."));
         exit(0);
     }
     $delloc = (int) $_GET['index'];
-    unset($config['custom view']['fields'][
-        $config['custom view']['field-order'][$delloc]]);
-    unset($config['custom view']['field-order'][$delloc]);
+    $config->del('custom view', 'fields',
+        $config->get('custom view', 'field-order', $delloc));
+    $config->del('custom view', 'field-order', $delloc);
     $config->save();
     echo json_encode(Array(1, "Success."));
     exit(0);
 } elseif (isset($_GET['insert'])) { // Works; tested 10/17/13
     validateAuth(true);
     $newindex = (int) $_GET['insert'];
-    $newslot = count($config['custom view']['fields']);
+    $newslot = count($config->get('custom view', 'fields'));
     if (0 > $newindex or $newslot < $newindex) {
         echo json_encode(Array(0, "Can't insert beyond the end."));
         exit(0);
     }
-    $config->deepSet('custom view', 'fields', '[]', $_POST['selection']);
+    $config->set('custom view', 'fields', '[]', $_POST['selection']);
     $newfieldorder = Array();
-    foreach ($config['custom view']['field-order'] as $key=>$val)
+    foreach ($config->get('custom view', 'field-order') as $key=>$val)
         if ($key >= $newindex) $newfieldorder[$key+1] = $val;
         else $newfieldorder[$key] = $val;
     $newfieldorder[$newindex] = $newslot;
-    $config->deepSet('custom view', 'field-order', $newfieldorder);
+    $config->set('custom view', 'field-order', $newfieldorder);
     $config->save();
     echo json_encode(Array(1, "Success."));
     exit(0);
@@ -247,8 +247,8 @@ siteTabs($auth, "index"); ?>
 /* FIXME: Add config for custom view variables:
  * limit, future, start, end
  */
-$q = queryAllHymns($limit=(int) $config["custom view"]["limit"],
-    $future=(bool) $config["custom view"]["future"]);
+$q = queryAllHymns($limit=(int) $config->get("custom view", "limit"),
+    $future=(bool) $config->get("custom view", "future"));
 // Group by service
 $servicelisting = array();
 $service = array();
@@ -264,15 +264,15 @@ foreach ($q as $hymndata) {
 }
 
 // Display the table
-if (! $config["custom view"]["start"]) {
-    $config["custom view"]["start"] = "<table>";
+if (! $config->get("custom view", "start")) {
+    $config->set("custom view", "start", "<table>");
     $config->save();
 }
-echo $config["custom view"]["start"];
+echo $config->get("custom view", "start");
 foreach ($servicelisting as $service) {
     displayService($service, $config);
 }
-echo $config["custom view"]["end"];
+echo $config->get("custom view", "end");
 ?>
 </div>
 <div id="dialog"></div>
@@ -283,7 +283,7 @@ echo $config["custom view"]["end"];
 <?
 function displayService($service, $config) {
     echo "<tr class=\"customservice\">\n";
-    foreach ($config['custom view']['fields'] as $field) {
+    foreach ($config->get('custom view', 'fields') as $field) {
         // Special field names
         if ("hymn numbers" == $field) {
             echo "<td class=\"customservice-hymnnumbers\">";

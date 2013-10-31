@@ -29,7 +29,7 @@ require("init.php");
 
 // Check for set values and store them.
 if (array_key_exists("biblegwversion", $_POST))
-    $config->store("biblegwversion", htmlentities($_POST['biblegwversion']));
+    $config->set("biblegwversion", htmlentities($_POST['biblegwversion']));
 
 // Save the file
 $config->save();
