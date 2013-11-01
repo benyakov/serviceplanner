@@ -47,13 +47,20 @@ class Configsection
     /**
      * Allow reading of internals, like Extends
      */
-    function __get($item) {
+    public function __get($item) {
         switch ($item) {
         case 'Extends':
             return $this->Extends;
         default:
             throw new ConfigfileError("Unknown attribute: {$item}");
         }
+    }
+
+    /**
+     * Rename this section's configuration key
+     */
+    public function rename($newname) {
+        $this->ConfigKey = $newname;
     }
 
     /**
@@ -134,11 +141,14 @@ class Configsection
      */
     public function exists() {
         $args = func_get_args();
+        $extend = $this->extend;
+        $this->extend = false;
         try {
             call_user_func_array(Array($this, "get"), $args);
+            $this->extend = $extend;
             return true;
-        }
-        catch (ConfigfileUnknownKey $e) {
+        } catch (ConfigfileUnknownKey $e) {
+            $this->extend = $extend;
             return false;
         }
     }
@@ -169,7 +179,6 @@ class Configsection
                     "Unknown key in section {$this->ConfigKey}: ".$key);
         } else {
             $args = $origargs = func_get_args();
-            //echo "\$args is ".print_r($args, true)."<br>\n"; // FIXME
             $data = $this->ConfigData;
             $used = Array();
             while (($key = array_shift($args))!==NULL) {
@@ -236,26 +245,27 @@ class Configfile
      * - a progressive series of keys as arguments for a deeper value/array
      */
     public function get() {
-        if (func_num_args() < 1)
+        $argcount = func_num_args();
+        if ($argcount < 1)
             throw new ConfigfileError("No key supplied to get");
-        elseif (func_num_args() == 1) {
+        elseif ($argcount == 1) {
             $key = func_get_args();
             $key = $key[0];
-            echo "Key is $key<br>";
             if (! (is_string($key) or is_int($key)))
-                if (is_array($key)) {
+                if (is_array($key))
+                    // Take single array arg as address
                     return call_user_func_array(Array($this, "get"), $key);
-                } else
+                else
                     throw new ConfigfileError(
                         print_r($key, true)."is an invalid configfile key. "
                         ."Use a string or integer.");
             if (isset($this->IniData[$key]))
                 return $this->IniData[$key];
-            elseif ($this->HasSections && isset($this->Sections[$key])) {
-                echo "Returning a section for $key<br>"; // FIXME
+            elseif ($this->HasSections && in_array($key, $this->Sections)) {
                 return $this->SectionData[$key]->dump();
-            } else
+            } else {
                 return NULL;
+            }
         } elseif ($this->HasSections) {
             $args = func_get_args();
             $sectionname = array_shift($args);
@@ -284,6 +294,19 @@ class Configfile
                         "Scalar value found; can't index: ".
                         implode(", ", $used));
             }
+        }
+    }
+
+    /**
+     * Return whether a given series of keys leads to a set value.
+     */
+    public function exists() {
+        $args = func_get_args();
+        try {
+            call_user_func_array(Array($this, "get"), $args);
+            return true;
+        } catch (ConfigfileUnknownKey $e) {
+            return false;
         }
     }
 
@@ -455,22 +478,64 @@ class Configfile
     }
 
     /**
+     * Exchange the objects behind the given section keys.
+     */
+    private function _swapSections($key1, $key2) {
+        $hold = $this->SectionData[$key1];
+        $this->SectionData[$key1] = $this->SectionData[$key2];
+        $this->SectionData[$key2] = $hold;
+        $this->SectionData[$key1]->rename($key1);
+        $this->SectionData[$key2]->rename($key2);
+    }
+
+    /**
+     * Exchange the keys between a section and a global value
+     */
+    private function _swapGlobalWithSection($globalkey, $sectionkey) {
+        $this->SectionData[$globalkey] = $this->SectionData[$sectionkey];
+        $this->SectionData[$globalkey]->rename($globalkey);
+        $this->IniData[$sectionkey] = $this->IniData[$globalkey];
+        unset($this->SectionData[$sectionkey]);
+        unset($this->IniData[$globalkey]);
+    }
+
+    /**
+     * Exchange keys between two values which are not section objects
+     */
+    private function _swapNonSectionKeys($prefix, $key1, $key2) {
+        $loc1 = array_merge($prefix, Array($key1));
+        $loc2 = array_merge($prefix, Array($key2));
+        $val1 = $this->get($loc1);
+        $set1 = array_merge($prefix, Array($key1, $this->get($loc2)));
+        $this->set($set1);
+        $set2 = array_merge($prefix, Array($key2, $val1));
+        $this->set($set2);
+    }
+
+    /**
      * Exchange the values of the two coordinate keys at the given location.
      */
     public function transpose($location, $key1, $key2) {
         $parent = $this->get($location);
-        echo "Parent is '".print_r($parent, true)."'<br>";
-        if (! (is_array($parent) && array_key_exists($key1, $parent)
-            && array_key_exists($key2, $parent)))
+        $key1addr = array_merge($location, Array($key1));
+        $key2addr = array_merge($location, Array($key2));
+        if (! (is_array($parent) && $this->exists($key1addr)
+            && $this->exists($key2addr)))
             throw new ConfigfileError("Can't transpose {$key1} and {$key2} "
                 ."at ".print_r($location, true));
-        $loc1 = array_merge($location, Array($key1));
-        $loc2 = array_merge($location, Array($key2));
-        $val1 = $this->get($loc1);
-        $set1 = array_merge($location, Array($key1, $this->get($loc2)));
-        $this->set($set1);
-        $set2 = array_merge($location, Array($key2, $val1));
-        $this->set($set2);
+        if (0 == count($location) && $this->HasSections) {
+            if (in_array($key1, $this->Sections))
+                if (in_array($key2, $this->Sections))
+                    $this->_swapSections($key1, $key2);
+                else
+                    $this->_swapGlobalWithSection($key2, $key1);
+            else
+                if (in_array($key2, $this->Section))
+                    $this->_swapGlobalWithSection($key1, $key2);
+                else
+                    $this->_swapNonSectionKeys(Array(), $key1, $key2);
+        } else
+            $this->_swapNonSectionKeys($location, $key1, $key2);
     }
 
     /**
