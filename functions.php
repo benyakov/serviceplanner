@@ -397,7 +397,7 @@ function html_head($title) {
     return implode("\n", $rv);
 }
 
-function linkbgw($ref, $linked, $other=false) {
+function linkbgw($ref, $linked, $other=true) {
     // Return a link to BibleGateway for the given reference,
     // or if the version is not set, just the ref.
     if (! $linked) {
