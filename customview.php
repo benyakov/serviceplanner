@@ -39,7 +39,7 @@ if ("customfields" == $_GET['action']) { // Works
     // Set up default if nothing is configured
     if (! $config['custom view']['fields']) {
         $config->set('custom view', 'fields', 0, "date");
-        $config->set('custom view', 'field-order', [], 0);
+        $config->set('custom view', 'field-order', '[]', 0);
         $config->save();
     }
     // Pull a data structure from the configuration
@@ -247,6 +247,26 @@ siteTabs($auth, "index"); ?>
 /* FIXME: Add config for custom view variables:
  * limit, future, start, end
  */
+// Set up reasonable defaults, if necessary
+$saveconfig = false;
+if (! $config->exists("custom view", "limit")) {
+    $config->set("custom view", "limit", 100);
+    $saveconfig = true;
+}
+if (! $config->exists("custom view", "future")) {
+    $config->set("custom view", "future", 1);
+    $saveconfig = true;
+}
+if (! $config->exists("custom view", "start")) {
+    $config->set("custom view", "start", "<table>");
+    $saveconfig = true;
+}
+if (! $config->exists("custom view", "end")) {
+    $config->set("custom view", "end", "</table>");
+    $saveconfig = true;
+}
+if ($saveconfig) $config->save();
+
 $q = queryAllHymns($limit=(int) $config->get("custom view", "limit"),
     $future=(bool) $config->get("custom view", "future"));
 // Group by service
@@ -254,22 +274,19 @@ $servicelisting = array();
 $service = array();
 $prevservice = false;
 foreach ($q as $hymndata) {
-    if ($hymndata['service'] != $prevservice) {
+    if ($hymndata['serviceid'] != $prevservice) {
         $servicelisting[] = $service;
         $service = array($hymndata);
-        $prevservice = $hymndata['service'];
+        $prevservice = $hymndata['serviceid'];
     } else {
         $service[] = $hymndata;
     }
 }
 
 // Display the table
-if (! $config->get("custom view", "start")) {
-    $config->set("custom view", "start", "<table>");
-    $config->save();
-}
 echo $config->get("custom view", "start");
 foreach ($servicelisting as $service) {
+    echo "Displaying.";
     displayService($service, $config);
 }
 echo $config->get("custom view", "end");
