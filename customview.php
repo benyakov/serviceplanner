@@ -53,6 +53,7 @@ if ("customfields" == $_GET['action']) { // Works
     echo json_encode($rv);
     exit(0);
 } elseif ("available" == $_GET['action']) { // Works
+    // TODO: Add custom (non-key) actions
     $q = queryAllHymns(1);
     $rec = $q->fetch(PDO::FETCH_ASSOC);
     echo json_encode(array_keys($rec));
@@ -84,7 +85,6 @@ if ("customfields" == $_GET['action']) { // Works
     echo json_encode(Array(1, "Success."));
     exit(0);
 } elseif (isset($_GET['delete-field'])) {
-    // FIXME: perhaps implement a deepUnset() method on the config object?
     validateAuth(true);
     if (0 > $_GET['delete-field'] or
         count($config->get('custom view','field-order')) <=
@@ -93,10 +93,12 @@ if ("customfields" == $_GET['action']) { // Works
         echo json_encode(Array(0, "Can't delete a nonexistent item."));
         exit(0);
     }
-    $delloc = (int) $_GET['index'];
-    $config->del('custom view', 'fields',
-        $config->get('custom view', 'field-order', $delloc));
-    $config->del('custom view', 'field-order', $delloc);
+    $delloc = (int) $_GET['delete-field'];
+    $config->del('custom view', 'fields', $delloc);
+    $field_order_idx = array_search($delloc,
+        $config->get('custom view', 'field-order'));
+    echo "field_order_idx is ".print_r($field_order_idx, true)."<br>";
+    $config->del('custom view', 'field-order', $field_order_idx);
     $config->save();
     echo json_encode(Array(1, "Success."));
     exit(0);
@@ -265,6 +267,16 @@ if (! $config->exists("custom view", "end")) {
     $config->set("custom view", "end", "</table>");
     $saveconfig = true;
 }
+if (! $config->exists("custom view", "fields")) {
+    $config->set("custom view", "fields", "[]", "date");
+    $saveconfig = true;
+}
+if (! $config->exists("custom view", "field-order")) {
+    for ($i=0, $limit=count($config->get("custom view", "fields"));
+            $i<$limit; $i++)
+        $config->set("custom view", "field-order", $i, $i);
+    $saveconfig = true;
+}
 if ($saveconfig) $config->save();
 
 $q = queryAllHymns($limit=(int) $config->get("custom view", "limit"),
@@ -299,7 +311,9 @@ echo $config->get("custom view", "end");
 
 <?
 function displayService($service, $config) {
-    foreach ($config->get('custom view', 'fields') as $field) {
+    foreach ($config->get('custom view', 'field-order') as $fieldindex) {
+        $fields = $config->get('custom view', 'fields');
+        $field = $fields[$fieldindex];
         // Special field names
         if ("hymn numbers" == $field) {
             echo "<td class=\"customservice-hymnnumbers\">";
