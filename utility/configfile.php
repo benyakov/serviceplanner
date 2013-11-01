@@ -248,17 +248,16 @@ class Configfile
         $argcount = func_num_args();
         if ($argcount < 1)
             throw new ConfigfileError("No key supplied to get");
+        $args = func_get_args();
+        foreach ($args as $key)
+            if (! ((is_string($key) && $key!="") or is_int($key)))
+                throw new ConfigfileError("'"
+                    .print_r($key, true)."' is an invalid configfile key. "
+                    ."Use a non-empty string or integer.");
         elseif ($argcount == 1) {
-            $key = func_get_args();
-            $key = $key[0];
-            if (! (is_string($key) or is_int($key)))
-                if (is_array($key))
-                    // Take single array arg as address
-                    return call_user_func_array(Array($this, "get"), $key);
-                else
-                    throw new ConfigfileError(
-                        print_r($key, true)."is an invalid configfile key. "
-                        ."Use a string or integer.");
+            $key = $args[0];
+            if (is_array($key)) // Take single array arg as address
+                return call_user_func_array(Array($this, "get"), $key);
             if (isset($this->IniData[$key]))
                 return $this->IniData[$key];
             elseif ($this->HasSections && in_array($key, $this->Sections)) {
@@ -267,12 +266,10 @@ class Configfile
                 return NULL;
             }
         } elseif ($this->HasSections) {
-            $args = func_get_args();
             $sectionname = array_shift($args);
             return call_user_func_array(Array($this->SectionData[$sectionname],
                 "get"), $args);
         } else {
-            $args = func_get_args();
             $data = $this->IniData;
             $used = Array();
             while (($key = array_shift($args)) !== NULL) {
