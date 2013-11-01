@@ -37,7 +37,7 @@ if ("customfields" == $_GET['action']) { // Works
     // Expecting JSON array of objects {order: X, name: Y}
     $rv = Array();
     // Set up default if nothing is configured
-    if (! $config['custom view']['fields']) {
+    if (! $config->exists('custom view', 'fields')) {
         $config->set('custom view', 'fields', 0, "date");
         $config->set('custom view', 'field-order', '[]', 0);
         $config->save();
@@ -286,7 +286,7 @@ foreach ($q as $hymndata) {
 // Display the table
 echo $config->get("custom view", "start");
 foreach ($servicelisting as $service) {
-    echo "Displaying.";
+    if (! $service) continue;
     displayService($service, $config);
 }
 echo $config->get("custom view", "end");
@@ -299,7 +299,6 @@ echo $config->get("custom view", "end");
 
 <?
 function displayService($service, $config) {
-    echo "<tr class=\"customservice\">\n";
     foreach ($config->get('custom view', 'fields') as $field) {
         // Special field names
         if ("hymn numbers" == $field) {
@@ -340,8 +339,8 @@ function displayService($service, $config) {
         }
         // DB fields
         echo "<td class=\"customservice-dbfield\">";
-        if (array_key_exists($field, $service[0])) {
-            $service[0][$field];
+        if (isset($service[0][$field])) {
+            echo $service[0][$field];
         } else {
             echo "Unknown Field: <span class=\"unknown-field\">"
                 .htmlentities($field)."</span>";
