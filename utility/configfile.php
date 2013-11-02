@@ -677,12 +677,13 @@ class Configfile
     private function _recursiveWriteArrayAssign($key, $val, $pre="", $join="")
     {
         if (!is_array($val)) {
-            if (is_numeric($key) && ($key == (int) $key))
+            if (is_int($key))
                 return Array("{$pre}[] = {$this->_writeVal($val)}");
             else
                 return Array("{$pre}{$join}{$key} = {$this->_writeVal($val)}");
         } else {
             $rv = Array();
+            ksort($val);
             foreach ($val as $k=>$v) {
                 $result = $this->_recursiveWriteArrayAssign($k, $v,
                     "{$pre}{$join}{$key}", ".");

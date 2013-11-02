@@ -94,11 +94,11 @@ if ("customfields" == $_GET['action']) { // Works
         exit(0);
     }
     $delloc = (int) $_GET['delete-field'];
-    $config->del('custom view', 'fields', $delloc);
-    $field_order_idx = array_search($delloc,
+    $field_order_idx = (int) array_search($delloc,
         $config->get('custom view', 'field-order'));
     echo "field_order_idx is ".print_r($field_order_idx, true)."<br>";
     $config->del('custom view', 'field-order', $field_order_idx);
+    $config->del('custom view', 'fields', $delloc);
     $config->save();
     echo json_encode(Array(1, "Success."));
     exit(0);
