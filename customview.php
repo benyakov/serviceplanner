@@ -302,6 +302,11 @@ foreach ($servicelisting as $service) {
     displayService($service, $config);
 }
 echo $config->get("custom view", "end");
+
+echo "<pre>";
+print_r($config->get("custom view"));
+echo "</pre>";
+
 ?>
 </div>
 <div id="dialog"></div>
