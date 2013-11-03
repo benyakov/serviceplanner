@@ -25,13 +25,7 @@
 require("./init.php");
 
 /* Note on storage in $config['custom view']:
- *
- * $config['custom view']['fields'] is an enumerated array
- * containing the names of the chosen fields.
- *
- * $config['custom view']['field-order'] is an enumerated array,
- * in which the keys represent field ordering, and
- * the values are indexes into $custom['custom view']['fields'].
+ * FIXME
  */
 if ("customfields" == $_GET['action']) { // Works
     // Expecting JSON array of objects {order: X, name: Y}
@@ -72,37 +66,37 @@ if ("customfields" == $_GET['action']) { // Works
     echo json_encode(Array(1, "Success."));
     exit(0);
 } elseif ("right" == $_GET['move-field']) {
-    // TODO: Convert here down to new field storage
     validateAuth(true);
-    if ((count($config->get('custom view', 'field-order'))-2)<$_GET['index']) {
+    if ((count($config->get('custom view', 'fields'))-2)<$_GET['index']) {
         echo json_encode(Array(0, "Can't move after the end."));
         exit(0);
     }
     $currentloc = (int) $_GET['index'];
-    $config->transpose(Array('custom view', 'field-order'),
-        $currentloc, $currentloc+1);
+    $tmpary = cfgToFieldlist($config);
+    $tmpval = $tmpary[$currentloc];
+    $tmpary[$currentloc] = $tmpary[$currentloc+1];
+    $tmpary[$currentloc+1] = $tmpval;
+    fieldlistToCfg(normFieldlist($tmpary), $config);
     $config->save();
     echo json_encode(Array(1, "Success."));
     exit(0);
 } elseif (isset($_GET['delete-field'])) {
     validateAuth(true);
     if (0 > $_GET['delete-field'] or
-        count($config->get('custom view','field-order')) <=
+        count($config->get('custom view','fields')) <=
         $_GET['delete-field'])
     {
         echo json_encode(Array(0, "Can't delete a nonexistent item."));
         exit(0);
     }
     $delloc = (int) $_GET['delete-field'];
-    $config->del('custom view', 'fields', $delloc);
-    $field_order_idx = array_search($delloc,
-        $config->get('custom view', 'field-order'));
-    echo "field_order_idx is ".print_r($field_order_idx, true)."<br>";
-    $config->del('custom view', 'field-order', $field_order_idx);
+    $tmpary = cfgToFieldlist($config);
+    unset($tmpary[$delloc]);
+    fieldlistToCfg(normFieldlist($tmpary), $config);
     $config->save();
     echo json_encode(Array(1, "Success."));
     exit(0);
-} elseif (isset($_GET['insert'])) { // Works; tested 10/17/13
+} elseif (isset($_GET['insert'])) {
     validateAuth(true);
     $newindex = (int) $_GET['insert'];
     $newslot = count($config->get('custom view', 'fields'));
@@ -110,13 +104,17 @@ if ("customfields" == $_GET['action']) { // Works
         echo json_encode(Array(0, "Can't insert beyond the end."));
         exit(0);
     }
-    $config->set('custom view', 'fields', '[]', $_POST['selection']);
-    $newfieldorder = Array();
-    foreach ($config->get('custom view', 'field-order') as $key=>$val)
-        if ($key >= $newindex) $newfieldorder[$key+1] = $val;
-        else $newfieldorder[$key] = $val;
-    $newfieldorder[$newindex] = $newslot;
-    $config->set('custom view', 'field-order', $newfieldorder);
+    $tmpary = cfgToFieldlist($config);
+    $newfields = Array();
+    foreach ($tmpary as $key, $val)
+        if ($key = $newindex) {
+            $newfields[$key] = $_POST['selection'];
+            $newfields[$key+1] = $val;
+        } elseif ($key > $newindex)
+            $newfields[$key+1] = $val;
+        else
+            $newfieldorder[$key] = $val;
+    fieldlistToCfg(normFieldlist($newfields), $config);
     $config->save();
     echo json_encode(Array(1, "Success."));
     exit(0);
@@ -271,12 +269,6 @@ if (! $config->exists("custom view", "fields")) {
     $config->set("custom view", "fields", "[]", "date");
     $saveconfig = true;
 }
-if (! $config->exists("custom view", "field-order")) {
-    for ($i=0, $limit=count($config->get("custom view", "fields"));
-            $i<$limit; $i++)
-        $config->set("custom view", "field-order", $i, $i);
-    $saveconfig = true;
-}
 if ($saveconfig) $config->save();
 
 $q = queryAllHymns($limit=(int) $config->get("custom view", "limit"),
@@ -316,9 +308,8 @@ echo "</pre>";
 
 <?
 function displayService($service, $config) {
-    foreach ($config->get('custom view', 'field-order') as $fieldindex) {
-        $fields = $config->get('custom view', 'fields');
-        $field = $fields[$fieldindex];
+    $fieldlist = cfgToFieldlist($config);
+    foreach ($fieldlist as $field) {
         // Special field names
         if ("hymn numbers" == $field) {
             echo "<td class=\"customservice-hymnnumbers\">";
