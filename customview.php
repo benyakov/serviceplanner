@@ -38,41 +38,41 @@ if ("customfields" == $_GET['action']) { // Works
     $rv = Array();
     // Set up default if nothing is configured
     if (! $config->exists('custom view', 'fields')) {
-        $config->set('custom view', 'fields', 0, "date");
-        $config->set('custom view', 'field-order', '[]', 0);
+        $config->set('custom view', 'fields', [],
+            Array("name"=>"date", "order"=>0));
         $config->save();
     }
     // Pull a data structure from the configuration
-    for ($i=0, $len = count($config->get('custom view','fields'));
-        $len>$i; $i++)
-    {
-        $rv[] = Array("order"=>$config->get('custom view', 'field-order', $i),
-            "name"=>$config->get('custom view', 'fields',
-                $config->get('custom view', 'field-order', $i)));
-    }
-    echo json_encode($rv);
+    echo json_encode($config->get('custom view', 'fields'));
     exit(0);
 } elseif ("available" == $_GET['action']) { // Works
-    // TODO: Add custom (non-key) actions
     $q = queryAllHymns(1);
-    $rec = $q->fetch(PDO::FETCH_ASSOC);
+    $rec = array_key($q->fetch(PDO::FETCH_ASSOC));
+    $rec = array_merge($rec, Array(
+        "hymn numbers",
+        "hymn books",
+        "hymn notes",
+        "hymn locations",
+        "hymn titles"));
     echo json_encode(array_keys($rec));
     exit(0);
 } elseif ("left" == $_GET['move-field']) {
-    // FIXME: These don't work.  Perhaps implement a transpose() method
-    // on the $config object?
     validateAuth(true);
     if (1 > $_GET['index']) {
         echo json_encode(Array(0, "Can't move before the beginning."));
         exit(0);
     }
     $currentloc = (int) $_GET['index'];
-    $config->transpose(Array('custom view', 'field-order'),
-        $currentloc, $currentloc-1);
+    $tmpary = cfgToFieldlist($config);
+    $tmpval = $tmpary[$currentloc];
+    $tmpary[$currentloc] = $tmpary[$currentloc-1];
+    $tmpary[$currentloc-1] = $tmpval;
+    fieldlistToCfg(normFieldlist($tmpary), $config);
     $config->save();
     echo json_encode(Array(1, "Success."));
     exit(0);
 } elseif ("right" == $_GET['move-field']) {
+    // TODO: Convert here down to new field storage
     validateAuth(true);
     if ((count($config->get('custom view', 'field-order'))-2)<$_GET['index']) {
         echo json_encode(Array(0, "Can't move after the end."));
@@ -368,4 +368,26 @@ function displayService($service, $config) {
     }
     echo "\n</tr>";
 }
+
+function cfgToFieldlist($config) {
+    $tmpary = Array();
+    foreach ($config->get('custom view', 'fields') as $field)
+        $tmpary[$field['order']] = $tmpary['name'];
+    return $tmpary;
+}
+
+function normFieldlist($fieldarray) {
+    $newarray = Array();
+    foreach (array_keys($fieldarray) as $key)
+        $newarray[] = $fieldarray[$key];
+    return $newarray;
+}
+
+function fieldlistToCfg($fieldarray, $config) {
+    $tmpary = Array();
+    foreach ($fieldarray as $k, $v)
+        $tmpary[] = Array("name"=>$v, "order"=>$k);
+    $config->set('custom view', 'fields', $tmpary);
+}
+
 
