@@ -29,26 +29,21 @@ require("./init.php");
  */
 if ("customfields" == $_GET['action']) { // Works
     // Expecting JSON array of objects {order: X, name: Y}
-    $rv = Array();
-    // Set up default if nothing is configured
-    if (! $config->exists('custom view', 'fields')) {
-        $config->set('custom view', 'fields', [],
-            Array("name"=>"date", "order"=>0));
-        $config->save();
-    }
+    if (checkFieldsSetup($config)) $config->save();
     // Pull a data structure from the configuration
     echo json_encode($config->get('custom view', 'fields'));
     exit(0);
 } elseif ("available" == $_GET['action']) { // Works
     $q = queryAllHymns(1);
-    $rec = array_key($q->fetch(PDO::FETCH_ASSOC));
+    $record = $q->fetch(PDO::FETCH_ASSOC);
+    $rec = array_keys($record);
     $rec = array_merge($rec, Array(
         "hymn numbers",
         "hymn books",
         "hymn notes",
         "hymn locations",
         "hymn titles"));
-    echo json_encode(array_keys($rec));
+    echo json_encode($rec);
     exit(0);
 } elseif ("left" == $_GET['move-field']) {
     validateAuth(true);
@@ -106,7 +101,7 @@ if ("customfields" == $_GET['action']) { // Works
     }
     $tmpary = cfgToFieldlist($config);
     $newfields = Array();
-    foreach ($tmpary as $key, $val)
+    foreach ($tmpary as $key=>$val)
         if ($key = $newindex) {
             $newfields[$key] = $_POST['selection'];
             $newfields[$key+1] = $val;
@@ -265,10 +260,7 @@ if (! $config->exists("custom view", "end")) {
     $config->set("custom view", "end", "</table>");
     $saveconfig = true;
 }
-if (! $config->exists("custom view", "fields")) {
-    $config->set("custom view", "fields", "[]", "date");
-    $saveconfig = true;
-}
+$saveconfig = checkFieldsSetup($config) || $saveconfig;
 if ($saveconfig) $config->save();
 
 $q = queryAllHymns($limit=(int) $config->get("custom view", "limit"),
@@ -291,7 +283,8 @@ foreach ($q as $hymndata) {
 echo $config->get("custom view", "start");
 foreach ($servicelisting as $service) {
     if (! $service) continue;
-    displayService($service, $config);
+    $fieldlist = cfgToFieldlist($config);
+    displayService($service, $fieldlist);
 }
 echo $config->get("custom view", "end");
 
@@ -307,8 +300,7 @@ echo "</pre>";
 
 
 <?
-function displayService($service, $config) {
-    $fieldlist = cfgToFieldlist($config);
+function displayService($service, $fieldlist) {
     foreach ($fieldlist as $field) {
         // Special field names
         if ("hymn numbers" == $field) {
@@ -353,7 +345,7 @@ function displayService($service, $config) {
             echo $service[0][$field];
         } else {
             echo "Unknown Field: <span class=\"unknown-field\">"
-                .htmlentities($field)."</span>";
+                .$field."</span>";
         }
         echo "</td>";
     }
@@ -363,7 +355,7 @@ function displayService($service, $config) {
 function cfgToFieldlist($config) {
     $tmpary = Array();
     foreach ($config->get('custom view', 'fields') as $field)
-        $tmpary[$field['order']] = $tmpary['name'];
+        $tmpary[$field['order']] = $field['name'];
     return $tmpary;
 }
 
@@ -376,9 +368,20 @@ function normFieldlist($fieldarray) {
 
 function fieldlistToCfg($fieldarray, $config) {
     $tmpary = Array();
-    foreach ($fieldarray as $k, $v)
+    foreach ($fieldarray as $k=>$v)
         $tmpary[] = Array("name"=>$v, "order"=>$k);
     $config->set('custom view', 'fields', $tmpary);
 }
 
-
+ /**
+  * Set up default if nothing is configured, return
+  * whether or not a save is needed.
+  */
+function checkFieldsSetup($config) {
+    if (! $config->exists('custom view', 'fields')) {
+        $config->set('custom view', 'fields', '[]',
+            Array("name"=>"date", "order"=>0));
+        return true;
+    }
+    return false;
+}
