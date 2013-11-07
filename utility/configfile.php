@@ -228,14 +228,14 @@ class Configfile
     private $Sections = Array();
     private $Extensions = Array();
 
-    public function __construct($FileName, $HasSections=false) {
+    public function __construct($FileName, $HasSections=false, $RawValues=true) {
         $this->IniFile = $FileName;
         $this->HasSections = $HasSections;
         if (! file_exists($FileName)) {
             touch($FileName);
             $this->IniData = Array();
         } else {
-            $this->IniData = $this->_parse($FileName, $HasSections);
+            $this->IniData = $this->_parse($FileName, $HasSections, $RawValues);
         }
     }
 
@@ -538,8 +538,10 @@ class Configfile
     /**
      * Parse with extensions
      */
-    private function _parse($filename, $process_sections=true) {
-        $ini = parse_ini_file($filename, $process_sections);
+    private function _parse($filename, $process_sections=true,
+        $raw_values=true)
+    {
+        $ini = parse_ini_file($filename, $process_sections, $raw_values);
         if ($ini === false)
             throw new ConfigfileError('Unable to parse ini file.');
         // Process sections first
@@ -637,15 +639,7 @@ class Configfile
      * Write: Return a formatted scalar value
      */
     private function _writeVal($Val) {
-        if (is_numeric($Val)) {
-            return $Val;
-        } elseif (false === strpos($Val, '"')) {
-            return "\"{$Val}\"";
-        } elseif (false === strpos($Val, "'")) {
-            return "'{$Val}'";
-        } else {
-            return '"'.preg_replace('/"{1}/', '\"', $Val).'"';
-        }
+        return $Val;
     }
 
     /**
