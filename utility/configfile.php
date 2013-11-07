@@ -541,7 +541,9 @@ class Configfile
     private function _parse($filename, $process_sections=true,
         $raw_values=true)
     {
-        $ini = parse_ini_file($filename, $process_sections, $raw_values);
+        if ($raw_values) $rawflag = INI_SCANNER_RAW;
+        else $rawflag = INI_SCANNER_NORMAL;
+        $ini = parse_ini_file($filename, $process_sections, $rawflag);
         if ($ini === false)
             throw new ConfigfileError('Unable to parse ini file.');
         // Process sections first
