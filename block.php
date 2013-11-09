@@ -399,11 +399,15 @@ if ("blockitems" == $_GET['get'] && is_numeric($_GET['id']) && $_GET['day']) {
     $q->bindValue(":dayname", $_GET['day']);
     $q->bindValue(":block", $_GET['id']);
     if ($q->execute() && $row = $q->fetch(PDO::FETCH_ASSOC)) {
-        $rv = array("Lesson 1"=>linkbgw($row['blesson1'], $row['l1link'], true),
-            "Lesson 2"=>linkbgw($row['blesson2'], $row['l2link'], true),
-            "Gospel"=>linkbgw($row['bgospel'], $row['golink'], true),
-            "Psalm"=>linkbgw("Psalm ".$row['bpsalm'], $row['pslink'], true),
+        $cfg = getConfig();
+        $rv = array("Lesson 1"=>linkbgw($cfg, $row['blesson1'], $row['l1link'],
+                    true),
+            "Lesson 2"=>linkbgw($cfg, $row['blesson2'], $row['l2link'], true),
+            "Gospel"=>linkbgw($cfg, $row['bgospel'], $row['golink'], true),
+            "Psalm"=>linkbgw($cfg, "Psalm ".$row['bpsalm'], $row['pslink'],
+                    true),
             "Collect"=>$row['bcollect']);
+        unset($cfg);
         if ($row['notes']) $rv["Notes"] = $row['notes'];
         echo json_encode($rv);
     } else {

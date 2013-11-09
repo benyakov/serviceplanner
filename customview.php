@@ -23,6 +23,7 @@
     USA
  */
 require("./init.php");
+$config = getConfig(true);
 
 /* Note on storage in $config['custom view']:
  * FIXME

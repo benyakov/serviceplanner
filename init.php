@@ -40,8 +40,7 @@ $script_basename = basename($_SERVER['PHP_SELF'], '.php');
         header("Location: {$serverdir}/utility/setup-dbconfig.php");
         exit(0);
     } */
-$dbstate = new Configfile("./dbstate.ini", false);
-$config = new Configfile("./config.ini", true);
+$dbstate = getDBState();
 $upgradedb = false;
 if (null == $dbstate->get('dbversion')) {
     $upgradedb = true;
@@ -99,5 +98,7 @@ if ((! $dbstate->get("has-views")) or
         $dbstate->store('has-views', 1);
         $dbstate->save() or die("Problem saving dbstate file.");
 }
+
+unset($dbstate); // release file lock.
 
 ?>

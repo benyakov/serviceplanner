@@ -27,6 +27,26 @@
 
 require_once("authfunctions.php");
 
+/**
+ * Factory function for a Configfile object.
+ * Note that it blocks on the config file as long as it exists,
+ * so unset the object when it's no longer needed.
+ */
+function getDBState() {
+    $dbstate = new Configfile("./dbstate.ini", false, true);
+    return $dbstate;
+}
+
+/**
+ * Factory function for a Configfile object.
+ * Note that it blocks on the config file as long as it exists,
+ * so unset the object when it's no longer needed.
+ */
+function getConfig($writelock=true) {
+    $config = new Configfile("./config.ini", true, true, $writelock);
+    return $config;
+}
+
 function checkJsonpReq() {
     return $_GET['jsonpreq'];
 }
@@ -206,6 +226,7 @@ function display_records_table($q) {
     $rowcount = 1;
     $thesehymns = array();
     $hymnlocation = "";
+    $cfg = getConfig(false);
     while ($row = $q->fetch(PDO::FETCH_ASSOC)) {
         if (! ($row['serviceid'] == $serviceid
             && $row['location'] == $location))
@@ -251,10 +272,10 @@ function display_records_table($q) {
                         <?=translate_markup($row['bnotes'])?>
                     </div>
                     <dl class="blocklessons">
-                    <dt>Lesson 1</dt><dd><?=linkbgw($row['blesson1'], $row['l1link'])?></dd>
-                        <dt>Lesson 2</dt><dd><?=linkbgw($row['blesson2'], $row['l2link'])?></dd>
-                        <dt>Gospel</dt><dd><?=linkbgw($row['bgospel'], $row['golink'])?></dd>
-                        <dt>Psalm</dt><dd><?=linkbgw("Ps ".$row['bpsalm'], $row['pslink'])?></dd>
+                    <dt>Lesson 1</dt><dd><?=linkbgw($cfg, $row['blesson1'], $row['l1link'])?></dd>
+                        <dt>Lesson 2</dt><dd><?=linkbgw($cfg, $row['blesson2'], $row['l2link'])?></dd>
+                        <dt>Gospel</dt><dd><?=linkbgw($cfg, $row['bgospel'], $row['golink'])?></dd>
+                        <dt>Psalm</dt><dd><?=linkbgw($cfg, "Ps ".$row['bpsalm'], $row['pslink'])?></dd>
                     </dl>
                     <h5>Collect (<?=$row['bcollectclass']?>)</h5>
                     <div class="collecttext maxcolumn">
@@ -339,10 +360,10 @@ function modify_records_table($q, $action) {
                         <?=translate_markup($row['bnotes'])?>
                     </div>
                     <dl class="blocklessons">
-                        <dt>Lesson 1</dt><dd><?=linkbgw($row['blesson1'], $row['l1link'])?></dd>
-                        <dt>Lesson 2</dt><dd><?=linkbgw($row['blesson2'], $row['l2link'])?></dd>
-                        <dt>Gospel</dt><dd><?=linkbgw($row['bgospel'], $row['golink'])?></dd>
-                        <dt>Psalm</dt><dd><?=linkbgw("Ps ".$row['bpsalm'], $row['pslink'])?></dd>
+                        <dt>Lesson 1</dt><dd><?=linkbgw($cfg, $row['blesson1'], $row['l1link'])?></dd>
+                        <dt>Lesson 2</dt><dd><?=linkbgw($cfg, $row['blesson2'], $row['l2link'])?></dd>
+                        <dt>Gospel</dt><dd><?=linkbgw($cfg, $row['bgospel'], $row['golink'])?></dd>
+                        <dt>Psalm</dt><dd><?=linkbgw($cfg, "Ps ".$row['bpsalm'], $row['pslink'])?></dd>
                     </dl>
                     <h5>Collect (<?=$row['bcollectclass']?>)</h5>
                     <div class="collecttext maxcolumn">
@@ -397,14 +418,14 @@ function html_head($title) {
     return implode("\n", $rv);
 }
 
-function linkbgw($ref, $linked, $other=true) {
+function linkbgw($config, $ref, $linked, $other=true) {
     // Return a link to BibleGateway for the given reference,
     // or if the version is not set, just the ref.
     if (! $linked) {
         return $ref;
     }
-    global $config;
     $bgwversion = $config->get("biblegwversion");
+    unset($config);
     if ($other) $other = " target=\"bgmain\" ";
     else $other = "";
     if ($bgwversion) {

@@ -80,7 +80,7 @@ unlink('./test.ini');
 echo "Testing global variables...<br>\n";
 
 echo "Simple set...<br>";
-$cf = new Configfile('./test.ini', false);
+$cf = new Configfile('./test.ini', false, true);
 $cf->set('bleh', 'blue');
 $cf->save();
 $fp = fopen('./test.ini', 'rb');
@@ -91,41 +91,41 @@ if ($contents != 'bleh = "blue"'."\n")
 unset($cf);
 
 echo "Open/get, set and get...<br>";
-$cf = new Configfile('./test.ini', false);
+$cf = new Configfile('./test.ini', false, true);
 if ($cf->get('bleh') != "blue")
     error("Configfile failed: value of key 'bleh' was {$cf->get('bleh')}.");
 $cf->set('item2', 5);
 $cf->save();
 unset($cf);
-$cf = new Configfile('./test.ini', false);
+$cf = new Configfile('./test.ini', false, true);
 if ($cf->get('item2') != 5)
     error("Configfile failed: value of 'item2' was ".var_dump($cf->get('item2'))
         .".");
 
 echo "Globals as arrays...<br>";
 unlink('./test.ini');
-$cf = new Configfile('./test.ini', false);
+$cf = new Configfile('./test.ini', false, true);
 set_manipulation($cf);
 unset($cf);
-$cf = new Configfile('./test.ini', false);
+$cf = new Configfile('./test.ini', false, true);
 get_manipulation($cf);
 unset($cf);
 unlink('./test.ini');
 
 echo "Manipulating values in a section...<br>\n";
-$cf = new Configfile('./test.ini', true);
+$cf = new Configfile('./test.ini', true, true);
 set_manipulation($cf);
 $cf->save();
 get_manipulation($cf);
 echo "&nbsp;&nbsp;...after loading from file...<br>\n";
 unset($cf);
-$cf = new Configfile('./test.ini', true);
+$cf = new Configfile('./test.ini', true, true);
 get_manipulation($cf);
 unset($cf);
 unlink('./test.ini');
 
 echo "Testing section inheritance...<br>\n";
-$cf = new Configfile('./test.ini', true);
+$cf = new Configfile('./test.ini', true, true);
 set_manipulation($cf);
 set_extends_manipulation($cf);
 $cf->save();
@@ -133,11 +133,12 @@ get_manipulation($cf);
 get_extends_manipulation($cf);
 echo "&nbsp;&nbsp;...after loading from file...<br>\n";
 unset($cf);
-$cf = new Configfile('./test.ini', true);
+$cf = new Configfile('./test.ini', true, true);
 get_manipulation($cf);
 get_extends_manipulation($cf);
 unset($cf);
 //unlink('./test.ini');
+// TODO: Test file locking?
 
 echo "If you see no errors, all tests passed.<br>";
 ?>

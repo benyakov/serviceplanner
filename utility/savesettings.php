@@ -26,6 +26,7 @@
 
 chdir("..");
 require("init.php");
+$config = getConfig(true);
 
 // Check for set values and store them.
 if (array_key_exists("biblegwversion", $_POST))

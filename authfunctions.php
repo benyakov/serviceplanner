@@ -96,6 +96,7 @@ function authcookie($authorized=null) {
     global $sprefix;
     $dbh = new DBConnection();
     $dbp = $dbh->getPrefix();
+    $max_age = getAuthCookieMaxAge();
     if (! file_exists("authcookies")) mkdir("authcookies");
     if (is_null($authorized)) {
         // Check cookie
@@ -108,7 +109,7 @@ function authcookie($authorized=null) {
         while ($seriesfile = readdir($userdirp)) {
             if (in_array($seriesfile, array('.', '..'))) continue;
             if (time() - filemtime("{$userdir}/{$seriesfile}")
-                > getAuthCookieMaxAge())
+                > $max_age)
                 unlink("{$userdir}/{$seriesfile}");
         }
         closedir($userdirp);
@@ -134,24 +135,26 @@ function authcookie($authorized=null) {
             "uid"=>$row["uid"],
             "userlevel"=>$row["userlevel"],
             "authtype"=>"cookie");
-        setAuthCookie($_COOKIE['auth']['user'], $_COOKIE['auth']['series']);
+        setAuthCookie($_COOKIE['auth']['user'], $_COOKIE['auth']['series'],
+            $max_age);
         return true;
     }
     if ($authorized) {
         if ($_COOKIE['auth']['series']) $series = $_COOKIE['auth']['series'];
         else $series = genCookieAuthString();
-        setAuthCookie($_SESSION[$sprefix]["authdata"]["login"], $series);
+        setAuthCookie($_SESSION[$sprefix]["authdata"]["login"], $series,
+            $max_age);
     } else {
         delAuthCookie();
     }
     return false;
 }
 
-function setAuthCookie($user, $series) {
+function setAuthCookie($user, $series, $age) {
     if (! file_exists("authcookies/{$user}"))
         mkdir("authcookies/{$user}");
     $token = genCookieAuthString();
-    $timestamp = time()+getAuthCookieMaxAge();
+    $timestamp = time()+$age;
     setcookie('auth[series]', $series, $timestamp);
     setcookie('auth[token]', $token, $timestamp);
     setcookie('auth[user]', $user, $timestamp);
@@ -160,11 +163,12 @@ function setAuthCookie($user, $series) {
 
 function getAuthCookieMaxAge() {
     // Gets the current maximum age of an auth cookie in seconds.
-    global $authcookie_shelf_life, $config;
+    global $authcookie_shelf_life;
     $authcookie_max_age = 60*60*24*7;
     if ($authcookie_shelf_life)
         $authcookie_max_age = $authcookie_shelf_life;
-    if ($config->get('authcookie_max_age'))
+    $config = getConfig($false);
+    if ($config->exists('authcookie_max_age'))
         $authcookie_max_age = $config->get('authcookie_max_age');
     return $authcookie_max_age;
 }

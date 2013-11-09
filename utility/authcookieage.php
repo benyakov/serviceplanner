@@ -26,6 +26,7 @@
 chdir("..");
 require("./init.php");
 validateAuth($require=true);
+$config = getConfig(true);
 $config->set('authcookie_max_age', intval($_POST['cookie-age']*60*60*24));
 $config->save();
 

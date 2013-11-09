@@ -221,6 +221,8 @@ class Configsection
 
 class Configfile
 {
+    private $IniFP = NULL;
+    private $Locktype;
     private $IniFile;
     private $IniData;
     private $SectionData = Array();
@@ -228,14 +230,26 @@ class Configfile
     private $Sections = Array();
     private $Extensions = Array();
 
-    public function __construct($FileName, $HasSections=false, $RawValues=true) {
+    public function __construct($FileName, $HasSections=false, $RawValues=true,
+        $writelock=true) {
         $this->IniFile = $FileName;
         $this->HasSections = $HasSections;
+        if ($writelock)
+            $this->Locktype=LOCK_EX;
+        else
+            $this->Locktype=LOCK_SH;
         if (! file_exists($FileName)) {
             touch($FileName);
             $this->IniData = Array();
         } else {
-            $this->IniData = $this->_parse($FileName, $HasSections, $RawValues);
+            $this->IniData = $this->_parse($HasSections, $RawValues);
+        }
+    }
+
+    public function __destruct() {
+        if ($this->IniFP != NULL) {
+            flock($this->IniFP, LOCK_UN);
+            fclose($this->IniFP);
         }
     }
 
@@ -454,6 +468,8 @@ class Configfile
      * Save the file
      */
     public function save() {
+        if ($this->Locktype != LOCK_EX)
+            throw new ConfigfileError("Can't save. File lock not exclusive.");
         $out = array();
         foreach ($this->IniData as $key => $val)
             if (is_array($val)) {
@@ -538,12 +554,15 @@ class Configfile
     /**
      * Parse with extensions
      */
-    private function _parse($filename, $process_sections=true,
-        $raw_values=true)
+    private function _parse($process_sections=true, $raw_values=true)
     {
         if ($raw_values) $rawflag = INI_SCANNER_RAW;
         else $rawflag = INI_SCANNER_NORMAL;
-        $ini = parse_ini_file($filename, $process_sections, $rawflag);
+        if ($this->_openWithLock($filename)) {
+            $fstat = fstat($this->IniFP);
+            $ini = parse_ini_string($fp->read($this->IniFP, $fstat['size']),
+                $process_sections, $rawflag);
+        }
         if ($ini === false)
             throw new ConfigfileError('Unable to parse ini file.');
         // Process sections first
@@ -692,25 +711,20 @@ class Configfile
     /**
      * Write out the file with a file lock
      */
-    private function _rewriteWithLock($Contents) {
-        if ($fh = fopen($this->IniFile, 'wb')) {
-            $starttime = microtime();
-            do {
-                $writeable = flock($fh, LOCK_EX);
-                if (!$writeable) usleep(round(rand(0, 100) * 1000));
-            } while ((!$writeable) && ((microtime()-$starttime) < 1000));
-            if ($writeable) {
-                fwrite($fh, $Contents);
-                flock($fh, LOCK_UN);
-                fclose($fh);
-                return true;
-            } else {
-                fclose($fh);
-                return false;
-            }
-        } else {
-            return false;
-        }
+    private function _writeWithLock($Contents) {
+        fwrite($this->IniFP, $Contents);
+        flock($this->IniFP, LOCK_UN);
+        $this->IniFP = NULL;
+        fclose($this->IniFP);
+        $this->_parse();
+    }
+
+    private function _openWithLock($filename) {
+        $this->IniFP = fopen($this->IniFile, "r+");
+        if (flock($this->IniFP, $this->Locktype))
+            return $this->IniFP;
+        else
+            throw new ConfigfileError("Couldn't get config file lock.");
     }
 }
 

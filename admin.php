@@ -30,6 +30,7 @@ if (! $auth) {
     header('Location: index.php');
     exit(0);
 }
+$config = getConfig(false);
 ?>
 <!DOCTYPE html>
 <html lang="en">
