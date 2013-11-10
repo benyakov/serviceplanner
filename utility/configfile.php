@@ -224,7 +224,7 @@ class Configfile
     private $IniFP = NULL;
     private $Locktype;
     private $IniFile;
-    private $IniData;
+    private $IniData = Array();
     private $SectionData = Array();
     private $HasSections;
     private $Sections = Array();
@@ -240,7 +240,7 @@ class Configfile
             $this->Locktype=LOCK_SH;
         if (! file_exists($FileName)) {
             touch($FileName);
-            $this->IniData = Array();
+            $this->_openWithLock($this->IniFile);
         } else {
             $this->IniData = $this->_parse($HasSections, $RawValues);
         }
@@ -260,15 +260,19 @@ class Configfile
      */
     public function get() {
         $argcount = func_num_args();
+        $args = func_get_args();
         if ($argcount < 1)
             throw new ConfigfileError("No key supplied to get");
-        $args = func_get_args();
+        elseif ($argcount == 1) {
+            if (is_array($args[0])) // Take single array arg as address
+                return call_user_func_array(Array($this, "get"), $args[0]);
+        }
         foreach ($args as $key)
             if (! ((is_string($key) && $key!="") or is_int($key)))
                 throw new ConfigfileError("'"
                     .print_r($key, true)."' is an invalid configfile key. "
                     ."Use a non-empty string or integer.");
-        elseif ($argcount == 1) {
+        if ($argcount == 1) {
             $key = $args[0];
             if (is_array($key)) // Take single array arg as address
                 return call_user_func_array(Array($this, "get"), $key);
@@ -487,7 +491,7 @@ class Configfile
                     $this->SectionData[$section]->dump(), $section);
             }
         }
-        return $this->_rewriteWithLock(implode("\n", $out)."\n");
+        return $this->_writeWithLock(implode("\n", $out)."\n");
     }
 
     /**
@@ -558,11 +562,12 @@ class Configfile
     {
         if ($raw_values) $rawflag = INI_SCANNER_RAW;
         else $rawflag = INI_SCANNER_NORMAL;
-        if ($this->_openWithLock($filename)) {
+        if ($this->_openWithLock($this->IniFile)) {
             $fstat = fstat($this->IniFP);
-            $ini = parse_ini_string($fp->read($this->IniFP, $fstat['size']),
+            $ini = parse_ini_string(fread($this->IniFP, $fstat['size']),
                 $process_sections, $rawflag);
-        }
+        } else
+            throw new ConfigfileError("Couldn't get config file lock.");
         if ($ini === false)
             throw new ConfigfileError('Unable to parse ini file.');
         // Process sections first
@@ -714,17 +719,17 @@ class Configfile
     private function _writeWithLock($Contents) {
         fwrite($this->IniFP, $Contents);
         flock($this->IniFP, LOCK_UN);
-        $this->IniFP = NULL;
         fclose($this->IniFP);
+        $this->IniFP = NULL;
         $this->_parse();
     }
 
     private function _openWithLock($filename) {
         $this->IniFP = fopen($this->IniFile, "r+");
         if (flock($this->IniFP, $this->Locktype))
-            return $this->IniFP;
+            return true;
         else
-            throw new ConfigfileError("Couldn't get config file lock.");
+            return false;
     }
 }
 

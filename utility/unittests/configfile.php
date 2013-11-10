@@ -1,4 +1,4 @@
-<? require('../configfile.php');
+<?php require('../configfile.php');
 
 function error($msg) {
     echo "<span style=\"color: red; bgcolor: transparent\">{$msg}</span><br>\n";
@@ -86,7 +86,7 @@ $cf->save();
 $fp = fopen('./test.ini', 'rb');
 $contents = fread($fp, 1024);
 fclose($fp);
-if ($contents != 'bleh = "blue"'."\n")
+if ($contents != 'bleh = blue'."\n")
     error("Configfile failed.\n");
 unset($cf);
 
