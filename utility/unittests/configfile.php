@@ -137,8 +137,70 @@ $cf = new Configfile('./test.ini', true, true);
 get_manipulation($cf);
 get_extends_manipulation($cf);
 unset($cf);
-//unlink('./test.ini');
-// TODO: Test file locking?
+
+echo "Testing file locking...<br>\n";
+echo "&nbsp;&nbsp;&nbsp;... multiple read locks...";
+if ($child=pcntl_fork()) {
+    // Parent
+    echo "Parent(of $child) creating...";
+    $cf = new Configfile('./test.ini', true, false, false);
+    $status = 0;
+    pcntl_waitpid($child, $status);
+    if (pcntl_wifexited($status))
+        echo "Success.\n";
+    else
+        error("Child did not exit normally.");
+} else {
+    sleep(3);
+    echo "Child creating...";
+    $cf = new Configfile('./test.ini', true, false, false);
+    get_manipulation($cf);
+    exit;
+}
+echo "&nbsp;&nbsp;&nbsp;... attempt write locks over read lock...";
+if ($child=pcntl_fork()) {
+    // Parent
+    sleep(3);
+    echo "Parent(of $child) creating...";
+    $cf = new Configfile('./test.ini', true, false, true);
+    get_manipulation($cf);
+    unset($cf);
+    $status = 0;
+    pcntl_waitpid($child, $status);
+    if (pcntl_wifexited($status))
+        echo "Success.\n";
+    else
+        error("Child did not exit normally.");
+} else {
+    echo "Child creating...";
+    $cf = new Configfile('./test.ini', true, false, false);
+    get_manipulation($cf);
+    exit;
+}
+unlink('./test.ini');
+echo "&nbsp;&nbsp;&nbsp;... attempt write locks over write lock...";
+if ($child=pcntl_fork()) {
+    // Parent
+    sleep(3);
+    echo "Parent(of $child) creating...";
+    $cf = new Configfile('./test.ini', true, false, true);
+    set_extends_manipulation($cf);
+    get_extends_manipulation($cf);
+    unset($cf);
+    $status = 0;
+    pcntl_waitpid($child, $status);
+    if (pcntl_wifexited($status))
+        echo "Success.\n";
+    else
+        error("Child did not exit normally.");
+} else {
+    echo "Child creating...";
+    $cf = new Configfile('./test.ini', true, false, true);
+    set_manipulation($cf);
+    exit;
+}
+unlink('./test.ini');
+
 
 echo "If you see no errors, all tests passed.<br>";
 ?>
