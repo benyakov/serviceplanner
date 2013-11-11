@@ -33,7 +33,7 @@ require("./options.php");
 require("./setup-session.php");
 require("./functions.php");
 require("./utility/configfile.php");
-require("./dbconnection.php");
+require("./utility/dbconnection.php");
 $script_basename = basename($_SERVER['PHP_SELF'], '.php');
 /* if ((! file_exists("db-connection.php") and
     (! is_link($_SERVER['SCRIPT_FILENAME'])))) {
