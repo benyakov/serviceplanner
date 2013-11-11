@@ -717,6 +717,8 @@ class Configfile
      * Write out the file with a file lock
      */
     private function _writeWithLock($Contents) {
+        fseek($this->IniFP, 0);
+        ftruncate($this->IniFP, 0);
         fwrite($this->IniFP, $Contents);
         flock($this->IniFP, LOCK_UN);
         fclose($this->IniFP);

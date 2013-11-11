@@ -25,16 +25,16 @@
 require("./init.php");
 $config = getConfig(true);
 
-/* Note on storage in $config['custom view']:
- * FIXME
- */
-if ("customfields" == $_GET['action']) { // Works
+if ("customfields" == $_GET['action']) {
     // Expecting JSON array of objects {order: X, name: Y}
     if (checkFieldsSetup($config)) $config->save();
     // Pull a data structure from the configuration
     echo json_encode($config->get('custom view', 'fields'));
     exit(0);
-} elseif ("available" == $_GET['action']) { // Works
+} elseif ("servicelisting" == $_GET['action']) {
+    echo json_encode(showServiceListing($config));
+    exit(0);
+} elseif ("available" == $_GET['action']) {
     $q = queryAllHymns(1);
     $record = $q->fetch(PDO::FETCH_ASSOC);
     $rec = array_keys($record);
@@ -101,16 +101,8 @@ if ("customfields" == $_GET['action']) { // Works
         exit(0);
     }
     $tmpary = cfgToFieldlist($config);
-    $newfields = Array();
-    foreach ($tmpary as $key=>$val)
-        if ($key = $newindex) {
-            $newfields[$key] = $_POST['selection'];
-            $newfields[$key+1] = $val;
-        } elseif ($key > $newindex)
-            $newfields[$key+1] = $val;
-        else
-            $newfieldorder[$key] = $val;
-    fieldlistToCfg(normFieldlist($newfields), $config);
+    array_splice($tmpary, $newindex, 0, Array($_POST['selection']));
+    fieldlistToCfg($tmpary, $config);
     $config->save();
     echo json_encode(Array(1, "Success."));
     exit(0);
@@ -137,6 +129,16 @@ function fillFieldContainer(result) {
     setupFields();
 }
 
+function loadServiceListing() {
+    var xhr = $.getJSON("<?=$this_script?>",
+        { "action": "servicelisting" },
+        fillServiceListing);
+}
+
+function fillServiceListing(result) {
+    $("#servicelisting").html(result);
+}
+
 function reprField(field) {
     var rv = Array("<div class=\"customfield\" data-order=\""
         +field.order+"\" id=\"customfield-"+field.order+"\">");
@@ -156,7 +158,12 @@ function setupFields() {
         $.getJSON("<?=$this_script?>",
             { "move-field": "left",
             "index": order },
-            fillFieldContainer);
+            function(rv) {
+                if (rv[0]) {
+                    loadFieldContainer();
+                    loadServiceListing();
+                }
+            });
     });
     $("a.field-right").click(function(evt) {
         evt.preventDefault();
@@ -164,14 +171,24 @@ function setupFields() {
         $.getJSON("<?=$this_script?>",
             { "move-field": "right",
             "index": order },
-            fillFieldContainer);
+            function(rv) {
+                if (rv[0]) {
+                    loadFieldContainer();
+                    loadServiceListing();
+                }
+            });
     });
     $("a.field-delete").click(function(evt) {
         evt.preventDefault();
         var order = $(this).parent().data("order");
         $.getJSON("<?=$this_script?>",
             { "delete-field": order },
-            fillFieldContainer);
+            function(rv) {
+                if (rv[0]) {
+                    loadFieldContainer();
+                    loadServiceListing();
+                }
+            });
     });
     $("a.field-insert").click(function(evt) {
         evt.preventDefault();
@@ -201,6 +218,7 @@ function setupInsertDialog(order) {
                 rv = $.parseJSON(rv);
                 if (rv[0]) {
                     loadFieldContainer();
+                    loadServiceListing();
                 }
                 setMessage(rv[1]);
             });
@@ -264,30 +282,10 @@ if (! $config->exists("custom view", "end")) {
 $saveconfig = checkFieldsSetup($config) || $saveconfig;
 if ($saveconfig) $config->save();
 
-$q = queryAllHymns($limit=(int) $config->get("custom view", "limit"),
-    $future=(bool) $config->get("custom view", "future"));
-// Group by service
-$servicelisting = array();
-$service = array();
-$prevservice = false;
-foreach ($q as $hymndata) {
-    if ($hymndata['serviceid'] != $prevservice) {
-        $servicelisting[] = $service;
-        $service = array($hymndata);
-        $prevservice = $hymndata['serviceid'];
-    } else {
-        $service[] = $hymndata;
-    }
-}
-
 // Display the table
-echo $config->get("custom view", "start");
-foreach ($servicelisting as $service) {
-    if (! $service) continue;
-    $fieldlist = cfgToFieldlist($config);
-    displayService($service, $fieldlist);
-}
-echo $config->get("custom view", "end");
+echo "<div id=\"servicelisting\">";
+echo showServiceListing($config);
+echo "</div>";
 
 echo "<pre>";
 print_r($config->get("custom view"));
@@ -301,56 +299,84 @@ echo "</pre>";
 
 
 <?
+function showServiceListing($config) {
+    $rv = Array();
+    $q = queryAllHymns($limit=(int) $config->get("custom view", "limit"),
+        $future=(bool) $config->get("custom view", "future"));
+    // Group by service
+    $servicelisting = Array();
+    $service = Array();
+    $prevservice = false;
+    foreach ($q as $hymndata) {
+        if ($hymndata['serviceid'] != $prevservice) {
+            $servicelisting[] = $service;
+            $service = array($hymndata);
+            $prevservice = $hymndata['serviceid'];
+        } else {
+            $service[] = $hymndata;
+        }
+    }
+    $rv[] = $config->get("custom view", "start");
+    foreach ($servicelisting as $service) {
+        if (! $service) continue;
+        $fieldlist = cfgToFieldlist($config);
+        $rv[] = displayService($service, $fieldlist);
+    }
+    $rv[] = $config->get("custom view", "end");
+    return implode("\n", $rv);
+}
 function displayService($service, $fieldlist) {
+    $rv = Array();
     foreach ($fieldlist as $field) {
         // Special field names
         if ("hymn numbers" == $field) {
-            echo "<td class=\"customservice-hymnnumbers\">";
+            $rv[] = "<td class=\"customservice-hymnnumbers\">";
             foreach ($service as $hymn) {
-                echo "{$hymn["number"]}<br>";
+                $rv[] = "{$hymn["number"]}<br>";
             }
-            echo "</td>";
+            $rv[] = "</td>";
             continue;
         } elseif ("hymn books" == $field) {
-            echo "<td class=\"customservice-hymnbooks\">";
+            $rv[] = "<td class=\"customservice-hymnbooks\">";
             foreach ($service as $hymn) {
-                echo "{$hymn["book"]}<br>";
+                $rv[] = "{$hymn["book"]}<br>";
             }
-            echo "</td>";
+            $rv[] = "</td>";
             continue;
         } elseif ("hymn notes" == $field) {
-            echo "<td class=\"customservice-hymnnotes\">";
+            $rv[] = "<td class=\"customservice-hymnnotes\">";
             foreach ($service as $hymn) {
-                echo "{$hymn["note"]}<br>";
+                $rv[] = "{$hymn["note"]}<br>";
             }
-            echo "</td>";
+            $rv[] = "</td>";
             continue;
         } elseif ("hymn locations" == $field) {
-            echo "<td class=\"customservice-hymnlocation\">";
+            $rv[] = "<td class=\"customservice-hymnlocation\">";
             foreach ($service as $hymn) {
-                echo "{$hymn["location"]}<br>";
+                $rv[] = "{$hymn["location"]}<br>";
             }
-            echo "</td>";
+            $rv[] = "</td>";
             continue;
         } elseif ("hymn titles" == $field) {
-            echo "<td class=\"customservice-hymntitle\">";
+            $rv[] = "<td class=\"customservice-hymntitle\">";
             foreach ($service as $hymn) {
-                echo "{$hymn["title"]}<br>";
+                $rv[] = "{$hymn["title"]}<br>";
             }
-            echo "</td>";
+            $rv[] = "</td>";
             continue;
         }
         // DB fields
-        echo "<td class=\"customservice-dbfield\">";
+        $rv[] = "<td class=\"customservice-dbfield\">";
         if (isset($service[0][$field])) {
-            echo $service[0][$field];
+            $rv[] = $service[0][$field];
         } else {
-            echo "Unknown Field: <span class=\"unknown-field\">"
+            $rv[] = "Unknown Field: <span class=\"unknown-field\">"
                 .$field."</span>";
         }
-        echo "</td>";
+        $rv[] = "</td>";
     }
-    echo "\n</tr>";
+    $rv[] = "</tr>";
+    return implode("\n", $rv);
 }
 
 function cfgToFieldlist($config) {
@@ -360,6 +386,9 @@ function cfgToFieldlist($config) {
     return $tmpary;
 }
 
+/**
+ * Normalize array keys so they don't skip numbers
+ */
 function normFieldlist($fieldarray) {
     $newarray = Array();
     foreach (array_keys($fieldarray) as $key)
