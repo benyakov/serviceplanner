@@ -111,7 +111,7 @@ if ("customfields" == $_GET['action']) {
 ?>
 <!DOCTYPE html>
 <html lang="en">
-<?=html_head("Custom View of Service Records")?>
+<?=html_head("Custom View of Service Records", Array("customview.css"))?>
 <body>
 <script type="text/javascript">
 function loadFieldContainer() {

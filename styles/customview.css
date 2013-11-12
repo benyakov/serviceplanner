@@ -1,0 +1,43 @@
+div#fieldcontainer {
+    border: 3px solid blue;
+    color: black;
+    background-color: #DDF;
+}
+
+div.customfield {
+    display: inline-block;
+    border: 1px solid black;
+    background-color: #CCE;
+    padding: 2px;
+}
+
+div.field-left a:link,
+div.field-right a:link,
+div.field-delete a:link,
+div.field-insert a:link {
+    text-decoration: none;
+    color: red;
+    background-color: transparent;
+    font-weight: bold;
+}
+
+div#servicelisting {
+    font-size: 70%;
+    font-style: sans-serif;
+}
+
+div#servicelisting td {
+    border-bottom: 2px solid #444;
+    border-collapse: collapse;
+}
+
+td.customerservice-dbfield {
+    border-left: 1px solid black;
+    border-right: 1px solid black;
+}
+div#servicelisting td.customerservice-hymnlocation,
+div#servicelisting td.customerservice-hymnnumbers,
+div#servicelisting td.customerservice-hymntitles,
+div#servicelisting td.customerservice-hymnbooks {
+    font-size: 90%;
+}

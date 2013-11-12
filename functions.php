@@ -392,7 +392,7 @@ function modify_records_table($q, $action) {
     <?
 }
 
-function html_head($title) {
+function html_head($title, $xstylesheets=Array()) {
     $rv[] = '<meta charset="utf-8" />';
     $rv[] = "<head><title>{$title}</title>";
     if (is_link($_SERVER['SCRIPT_FILENAME']))
@@ -407,6 +407,11 @@ function html_head($title) {
     } else {
         $here = dirname($_SERVER['SCRIPT_NAME']);
         $rv[] = "<link type=\"text/css\" rel=\"stylesheet\" href=\"{$here}/styles/style.css\">";
+        if ($xstylesheets) {
+            foreach ($xstylesheets as $xstyle) {
+                $rv[] = "<link type=\"text/css\" rel=\"stylesheet\" href=\"{$here}/styles/{$xstyle}\">";
+            }
+        }
         $rv[] = "<script type=\"text/javascript\" src=\"jquery/jquery.js\"></script>";
         $rv[] = "<link href=\"jquery/jquery-ui.css\" rel=\"stylesheet\" type=\"text/css\"/>
         <script type=\"text/javascript\" src=\"modernizr/modernizr.js\"></script>
