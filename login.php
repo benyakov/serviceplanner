@@ -24,6 +24,7 @@
     USA
  */
 require("./init.php");
+$options = getOptions();
 
 if (array_key_exists('action', $_GET) && $_GET['action'] == 'logout') {
     session_destroy();
@@ -44,10 +45,10 @@ if (array_key_exists('ajax', $_POST) || array_key_exists('ajax', $_GET)) {
         unset($rv['password']);
         $rv['actions'] = getUserActions($bare=true);
         $rv['loginform'] = getLoginForm($bare=true);
-        $st = $sitetabs;
+        $st = $options->get('sitetabs');
     } else {
         $rv = array('userlevel' => 0);
-        $st = $sitetabs_anonymous;
+        $st = $options->get('anonymous sitetabs');
     }
     $stkeys = array_keys($st);
     $rv['actions'] = getUserActions($bare=true);

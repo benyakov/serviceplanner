@@ -38,13 +38,23 @@ function getDBState() {
 }
 
 /**
- * Factory function for a Configfile object.
+ * Factory functions for Configfile objects.
  * Note that it blocks on the config file as long as it exists,
  * so unset the object when it's no longer needed.
  */
 function getConfig($writelock=true) {
     $config = new Configfile("./config.ini", true, true, $writelock);
     return $config;
+}
+function getOptions($writelock=false) {
+    $options = new Configfile("./options.ini", true, true, $writelock);
+    return $options;
+}
+function makePathAbsolute($path) {
+    if (strpos($path, '/') != 0) {
+        $inpath = __DIR__ . DIRECTORY_SEPARATOR . $inpath;
+    }
+    return $path
 }
 
 function checkJsonpReq() {
@@ -474,8 +484,8 @@ function gensitetabs($sitetabs, $action, $bare=false) {
 }
 
 function translate_markup($text) {
-    global $phplibrary;
-    if (include_once($phplibrary.DIRECTORY_SEPARATOR."markdown.php"))
+    $options = getOptions();
+    if (include_once(makePathAbsolute($options->('phplibrary')).DIRECTORY_SEPARATOR."markdown.php"))
     {
         return Markdown($text);
     } else {
@@ -730,13 +740,14 @@ function pageHeader($displayonly=false) { ?>
     </header> <?
 }
 function siteTabs($auth, $basename=false, $displayonly=false) {
-    global $sitetabs, $sitetabs_anonymous, $script_basename;
+    global $script_basename;
+    $options = getOptions();
     if (! $basename) $basename=$script_basename;
     if (! $displayonly) {
         if ($auth) {
-            echo gensitetabs($sitetabs, $basename);
+            echo gensitetabs($options->get("sitetabs"), $basename);
         } else {
-            echo gensitetabs($sitetabs_anonymous, $basename);
+            echo gensitetabs($options->get("anonymous sitetabs"), $basename);
         }
     }
 }

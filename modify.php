@@ -30,8 +30,9 @@ if (! $auth) {
     exit(0);
 }
 $this_script = $_SERVER['HTTP_HOST'].$_SERVER['SCRIPT_NAME'] ;
+$options = getOptions();
 if (! array_key_exists('modifyorder', $_SESSION[$sprefix])) {
-    $_SESSION[$sprefix]['modifyorder'] = $modifyorder;
+    $_SESSION[$sprefix]['modifyorder'] = $options->get['modifyorder'];
 }
 if (array_key_exists('listinglimit', $_GET) &&
     is_numeric($_GET['listinglimit'])) {
@@ -40,8 +41,9 @@ if (array_key_exists('listinglimit', $_GET) &&
         $_SESSION[$sprefix]["modifyorder"] = $_GET['submit'];
     }
 } elseif (! array_key_exists('listinglimit', $_SESSION[$sprefix])) {
-    $_SESSION[$sprefix]['listinglimit'] = $listinglimit;
+    $_SESSION[$sprefix]['listinglimit'] = $options->get('listinglimit');
 }
+unset($options);
 ?>
 <!DOCTYPE html>
 <html lang="en">

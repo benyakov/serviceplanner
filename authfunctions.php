@@ -163,7 +163,8 @@ function setAuthCookie($user, $series, $age) {
 
 function getAuthCookieMaxAge() {
     // Gets the current maximum age of an auth cookie in seconds.
-    global $authcookie_shelf_life;
+    $options = getOptions();
+    $authcookie_shelf_life = $options->get('authcookie_shelf_life');
     $authcookie_max_age = 60*60*24*7;
     if ($authcookie_shelf_life)
         $authcookie_max_age = $authcookie_shelf_life;

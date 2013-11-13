@@ -24,6 +24,7 @@
     USA
  */
 require("./init.php");
+$options = getOptions();
 if (! $auth) {
     header("location: index.php");
     exit(0);
@@ -101,7 +102,7 @@ if (! array_key_exists("stage", $_GET))
                 </td>
                 <td>
                     <select id="book_<?=$row['hymnid']?>" name="book_<?=$row['hymnid']?>">
-                    <? foreach ($option_hymnbooks as $hymnbook) { ?>
+                    <? foreach ($options->get('hymnbooks') as $hymnbook) { ?>
                         <option <?
                             if ($hymnbook == $row['book']) echo "selected";
                                 ?>><?=$hymnbook?></option>
@@ -143,7 +144,7 @@ if (! array_key_exists("stage", $_GET))
             </td>
             <td>
                 <select id="book_new" name="book_new">
-                <? foreach ($option_hymnbooks as $hymnbook) { ?>
+                <? foreach ($options->get('hymnbooks') as $hymnbook) { ?>
                     <option><?=$hymnbook?></option>
                 <? } ?>
                 </select>

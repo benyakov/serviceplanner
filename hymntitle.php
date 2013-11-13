@@ -24,6 +24,7 @@
     USA
  */
 require("./init.php");
+$options = getOptions();
 header('Cache-Control: no-cache, must-revalidate');
 header('Expires: Mon, 01 Jan 1996 00:00:00 GMT');
 header("Content-type: application/json");
@@ -39,7 +40,7 @@ $q = $db->prepare("SELECT `names`.`title` as title,
       ON (`days`.`pkey` = `hymns`.`service`)
     WHERE `names`.`book` = :book
     AND `names`.`number` = :number
-    ORDER BY `days`.`caldate` DESC LIMIT {$option_used_history}");
+    ORDER BY `days`.`caldate` DESC LIMIT {$options->get('used_history')}");
 $q->bindParam(':book', $_GET['book']);
 $q->bindParam(':number', $_GET['number']);
 $q->execute() or die(array_pop($q->errorInfo()));

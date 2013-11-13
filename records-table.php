@@ -23,12 +23,14 @@
     The Dalles, OR 97058
     USA
  */
+$options = getOptions();
 if (array_key_exists('listinglimit', $_GET) &&
     is_numeric($_GET['listinglimit'])) {
     $_SESSION[$sprefix]["listinglimit"] = $_GET['listinglimit'];
 } elseif (! array_key_exists('listinglimit', $_SESSION[$sprefix])) {
-    $_SESSION[$sprefix]['listinglimit'] = $listinglimit;
+    $_SESSION[$sprefix]['listinglimit'] = $options->get('listinglimit');
 }
+unset($options);
 ?>
 <h1>Service Planning Records</h1>
 <form action="http://<?=$this_script?>" method="GET">

@@ -24,6 +24,7 @@
     USA
  */
 require("./init.php");
+$options = getOptions();
 if (! $auth) {
     setMessage("Access denied.  Please log in.");
     header("location: index.php");
@@ -216,11 +217,11 @@ if (array_key_exists("date", $_POST)) {
 cross-reference table.</label>
     <ol id="hymnentries">
 <?  $tabsperhymnline = 6;
-    for ($i=1; $i<=$option_hymncount; $i++) {
+    for ($i=1, $hymncount=$options->get('hymncount'); $i<=$hymncount; $i++) {
         $tabindex = $i*$tabsperhymnline + 51; ?>
     <li class="<?= $i%2==0?"even":"odd" ?>">
         <select tabindex="<?=$tabindex?>" id="book_<?=$i?>" name="book_<?=$i?>">
-        <? foreach ($option_hymnbooks as $hymnbook) { ?>
+        <? foreach ($options->get('hymnbooks') as $hymnbook) { ?>
             <option><?=$hymnbook?></option>
         <? } ?>
         </select>
