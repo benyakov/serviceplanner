@@ -373,6 +373,23 @@ class Configfile
     }
 
     /**
+     * Helper method to create a new section.
+     */
+    public function createSection($sectname) {
+        if (! $this->HasSections)
+            throw new ConfigfileError("Can't create a section in a file without them.");
+        if ($this->exists($sectname)) {
+            $tmp = $this->get($sectname);
+            $this->del($sectname);
+            $this->createSection($sectname);
+            $this->set($sectname, $tmp);
+        } else {
+            $this->set($sectname, "@@createsection@@", true);
+            $this->del($sectname, "@@createsection@@");
+        }
+    }
+
+    /**
      * Set a value, provided as the last of at least two arguments.
      * The first series of arguments are progressive keys to the structure.
      */
