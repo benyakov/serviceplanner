@@ -38,12 +38,14 @@ $options->set('hymncount', $option_hymncount);
 $options->set('used_history', $option_used_history);
 
 $sitetabs['report'] = "Report";
-$options->createSection('sitetabs');
-$options->set('sitetabs', $sitetabs);
+foreach ($sitetabs as $k=>$v) {
+    $options->set('sitetabs', $k, $v);
+}
 
 $sitetabs_anonymous['report'] = "Report";
-$options->createSection('anonymous sitetabs');
-$options->set('anonymous sitetabs', $sitetabs_anonymous);
+foreach ($sitetabs_anonymous as $k=>$v) {
+    $options->set('anonymous sitetabs', $k, $v);
+}
 
 $options->set('listinglimit', $listinglimit);
 
@@ -51,8 +53,12 @@ $options->set('modifyorder', $modifyorder);
 
 $options->set('phplibrary', $phplibrary);
 
-$options->set('authcookie_shelf_life'), $authcookie_shelf_life;
+if (! $authcookie_shelf_life) {
+    $authcookie_shelf_life = 60*60*24*7;
+}
+$options->set('authcookie_shelf_life', $authcookie_shelf_life);
 
+$options->save();
 
 $newversion = "{$version['major']}.{$version['minor']}.{$version['tick']}";
 $dbstate->store('dbversion', $newversion);

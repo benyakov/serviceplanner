@@ -281,7 +281,7 @@ class Configfile
             elseif ($this->HasSections && in_array($key, $this->Sections)) {
                 return $this->SectionData[$key]->dump();
             } else {
-                return NULL;
+                throw new ConfigfileUnknownKey(print_r($key, true));
             }
         } elseif ($this->HasSections) {
             $sectionname = array_shift($args);
@@ -581,8 +581,12 @@ class Configfile
         else $rawflag = INI_SCANNER_NORMAL;
         if ($this->_openWithLock($this->IniFile)) {
             $fstat = fstat($this->IniFP);
-            $ini = parse_ini_string(fread($this->IniFP, $fstat['size']),
-                $process_sections, $rawflag);
+            if ($fstat['size'] > 0) {
+                $ini = parse_ini_string(fread($this->IniFP, $fstat['size']),
+                    $process_sections, $rawflag);
+            } else {
+                $ini = Array();
+            }
         } else
             throw new ConfigfileError("Couldn't get config file lock.");
         if ($ini === false)
@@ -736,11 +740,12 @@ class Configfile
     private function _writeWithLock($Contents) {
         fseek($this->IniFP, 0);
         ftruncate($this->IniFP, 0);
-        fwrite($this->IniFP, $Contents);
+        $result = fwrite($this->IniFP, $Contents);
         flock($this->IniFP, LOCK_UN);
         fclose($this->IniFP);
         $this->IniFP = NULL;
         $this->_parse();
+        return $result;
     }
 
     private function _openWithLock($filename) {
