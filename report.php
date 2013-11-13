@@ -263,7 +263,7 @@ $(document).ready(function() {
 });
 </script>
 <? pageHeader();
-siteTabs($auth, "index"); ?>
+siteTabs($auth); ?>
 <div id="content-container">
 <? // Set up reasonable defaults, if necessary
 $saveconfig = false;
