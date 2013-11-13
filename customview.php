@@ -143,9 +143,9 @@ function reprField(field) {
     var rv = Array("<div class=\"customfield\" data-order=\""
         +field.order+"\" id=\"customfield-"+field.order+"\">");
     rv.push("<a href=\"javascript: void();\" class=\"field-left\">&lt;</a>&nbsp;");
-    rv.push("<a href=\"javascript: void();\" class=\"field-right\">&gt;</a>&nbsp;");
     rv.push("<a href=\"javascript: void();\" class=\"field-delete\">-</a>&nbsp;");
     rv.push("<a href=\"javascript: void();\" class=\"field-insert\">+</a><br>");
+    rv.push("<a href=\"javascript: void();\" class=\"field-right\">&gt;</a>&nbsp;");
     rv.push(field.name);
     rv.push("</div>");
     return rv.join("\n");
@@ -255,12 +255,10 @@ $(document).ready(function() {
 siteTabs($auth, "index"); ?>
 <div id="content-container">
 <? if ($auth) {
+    echo customViewConfig($config);
     echo "<div id=\"fieldcontainer\"></div>";
 }
 
-/* FIXME: Add config for custom view variables:
- * limit, future, start, end
- */
 // Set up reasonable defaults, if necessary
 $saveconfig = false;
 if (! $config->exists("custom view", "limit")) {
@@ -286,12 +284,8 @@ if ($saveconfig) $config->save();
 echo "<div id=\"servicelisting\">";
 echo showServiceListing($config);
 echo "</div>";
-
-echo "<pre>";
-print_r($config->get("custom view"));
-echo "</pre>";
-
 ?>
+
 </div>
 <div id="dialog"></div>
 </body>
@@ -299,6 +293,24 @@ echo "</pre>";
 
 
 <?
+function customViewConfig($cfg) {
+    ob_start();
+    // TODO: set $limit, $future, $starthtml, and $endhtml.
+?>
+<div id="customviewconfig">
+<form id="customviewsetup">
+Limit: <input type="number" value=<?=$limit?> min=1 required id="limit"><br>
+Future: <input type="checkbox" <?=$future?> id="future"><br>
+Start HTML: <input type="text" id="start" required value="<?=$starthtml?>"><br>
+End HTML: <input type="text" id="end" required value="<?=$endhtml?>"><br>
+<button type="submit">Set</button>
+</form>
+</div>
+<?
+// TODO: Add js, php and css (nonprint) support for this form.
+    return ob_get_clean();
+}
+
 function showServiceListing($config) {
     $rv = Array();
     $q = queryAllHymns($limit=(int) $config->get("custom view", "limit"),

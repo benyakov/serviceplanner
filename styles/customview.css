@@ -1,4 +1,5 @@
 div#fieldcontainer {
+    font-size: 60%;
     border: 3px solid blue;
     color: black;
     background-color: #DDF;
@@ -11,10 +12,10 @@ div.customfield {
     padding: 2px;
 }
 
-div.field-left a:link,
-div.field-right a:link,
-div.field-delete a:link,
-div.field-insert a:link {
+a.field-left:link,
+a.field-right:link,
+a.field-delete:link,
+a.field-insert:link {
     text-decoration: none;
     color: red;
     background-color: transparent;
@@ -40,4 +41,10 @@ div#servicelisting td.customerservice-hymnnumbers,
 div#servicelisting td.customerservice-hymntitles,
 div#servicelisting td.customerservice-hymnbooks {
     font-size: 90%;
+}
+
+@media print {
+div#fieldcontainer {
+    display: none;
+}
 }

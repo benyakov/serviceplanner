@@ -299,9 +299,11 @@ function display_records_table($q) {
     echo "</table>\n";
 }
 
+/**
+ * Show a table of the data in the query $q
+ * with links to edit each record, and checkboxes to delete records.
+ */
 function modify_records_table($q, $action) {
-    // Show a table of the data in the query $q
-  // with links to edit each record, and checkboxes to delete records.
     ?><form id="delete-service" action="<?=$action?>" method="post">
       <button class="deletesubmit" type="submit" value="Delete">Delete</button>
       <button type="reset" value="Clear">Clear</button>
@@ -314,6 +316,7 @@ function modify_records_table($q, $action) {
     $rowcount = 1;
     $thesehymns = array();
     $hymnlocation = "";
+    $cfg = getConfig(false);
     while ($row = $q->fetch(PDO::FETCH_ASSOC)) {
         if (! ($row['serviceid'] == $serviceid
             && $row['location'] == $location))
