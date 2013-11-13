@@ -44,6 +44,15 @@ div#servicelisting td.customerservice-hymnbooks {
     font-size: 90%;
 }
 
+input#start,
+input#end {
+    width: 75%;
+}
+
+input#limit {
+    width: 2em;
+}
+
 @media print {
 div#customviewconfig,
 div#fieldcontainer {

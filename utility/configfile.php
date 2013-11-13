@@ -118,7 +118,7 @@ class Configsection
         }
         if ('[]' == $args[0])
             $structure[] = $args[1];
-        elseif ($args[1] == NULL)
+        elseif ($args[1] === NULL)
             unset($structure[$args[0]]);
         else
             $structure[$args[0]] = $args[1];
@@ -418,7 +418,7 @@ class Configfile
             }
             if ('[]' == $args[0])
                 $structure[] = $args[1];
-            elseif ($args[1] == NULL)
+            elseif ($args[1] === NULL)
                 unset($structure[$args[0]]);
             else
                 $structure[$args[0]] = $args[1];

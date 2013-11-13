@@ -106,6 +106,17 @@ if ("customfields" == $_GET['action']) {
     $config->save();
     echo json_encode(Array(1, "Success."));
     exit(0);
+} elseif (isset($_POST['limit'])) {
+    if ("future" == $_POST['future'])
+        $config->set("custom view", "future", 1);
+    else
+        $config->set("custom view", "future", 0);
+    $config->set("custom view", "start", $_POST['start']);
+    $config->set("custom view", "end", $_POST['end']);
+    $config->set("custom view", "limit", $_POST['limit']);
+    $config->save();
+    echo json_encode(Array(true, "Configuration set."));
+    exit(0);
 }
 
 ?>
@@ -254,12 +265,7 @@ $(document).ready(function() {
 <? pageHeader();
 siteTabs($auth, "index"); ?>
 <div id="content-container">
-<? if ($auth) {
-    echo customViewConfig($config);
-    echo "<div id=\"fieldcontainer\"></div>";
-}
-
-// Set up reasonable defaults, if necessary
+<? // Set up reasonable defaults, if necessary
 $saveconfig = false;
 if (! $config->exists("custom view", "limit")) {
     $config->set("custom view", "limit", 100);
@@ -279,7 +285,10 @@ if (! $config->exists("custom view", "end")) {
 }
 $saveconfig = checkFieldsSetup($config) || $saveconfig;
 if ($saveconfig) $config->save();
-
+if ($auth) {
+    echo customViewConfig($config);
+    echo "<div id=\"fieldcontainer\"></div>";
+}
 // Display the table
 echo "<div id=\"servicelisting\">";
 echo showServiceListing($config);
@@ -306,14 +315,27 @@ function customViewConfig($cfg) {
 <div id="customviewconfig">
 <form id="customviewsetup">
 Limit: <input type="number" value=<?=$limit?> min=1 required id="limit"><br>
-Future: <input type="checkbox" <?=$future?> id="future"><br>
+Future: <input type="checkbox" <?=$future?> value="future" id="future"><br>
 Start HTML: <input type="text" id="start" required value="<?=$starthtml?>"><br>
 End HTML: <input type="text" id="end" required value="<?=$endhtml?>"><br>
 <button type="submit">Set</button>
 </form>
 </div>
+<script type="text/javascript">
+    $("#customviewsetup").submit(function(evt) {
+        evt.preventDefault();
+        $.post("<?=$this_script?>", { limit: $("#limit").val(),
+            future: $("#future:checked").val(),
+            start: $("#start").val(),
+            end: $("#end").val() },
+            function(rv) {
+                rv = $.parseJSON(rv);
+                setMessage(rv[1]);
+                loadServiceListing();
+            });
+    });
+</script>
 <?
-// TODO: Add js, php and css (nonprint) support for this form.
     return ob_get_clean();
 }
 
@@ -334,6 +356,10 @@ function showServiceListing($config) {
             $service[] = $hymndata;
         }
     }
+    // Delete the last service when showing past hymns to avoid
+    // confusion with an incomplete listing in that service
+    if (! $config->get("custom view", "future"))
+        unset($servicelisting[-1]);
     $rv[] = $config->get("custom view", "start");
     foreach ($servicelisting as $service) {
         if (! $service) continue;
