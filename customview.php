@@ -144,8 +144,8 @@ function reprField(field) {
         +field.order+"\" id=\"customfield-"+field.order+"\">");
     rv.push("<a href=\"javascript: void();\" class=\"field-left\">&lt;</a>&nbsp;");
     rv.push("<a href=\"javascript: void();\" class=\"field-delete\">-</a>&nbsp;");
-    rv.push("<a href=\"javascript: void();\" class=\"field-insert\">+</a><br>");
-    rv.push("<a href=\"javascript: void();\" class=\"field-right\">&gt;</a>&nbsp;");
+    rv.push("<a href=\"javascript: void();\" class=\"field-insert\">+</a>&nbsp;");
+    rv.push("<a href=\"javascript: void();\" class=\"field-right\">&gt;</a><br>");
     rv.push(field.name);
     rv.push("</div>");
     return rv.join("\n");
@@ -295,7 +295,13 @@ echo "</div>";
 <?
 function customViewConfig($cfg) {
     ob_start();
-    // TODO: set $limit, $future, $starthtml, and $endhtml.
+    $limit = $cfg->get("custom view", "limit");
+    if ((bool) $cfg->get("custom view", "future"))
+        $future = "checked";
+    else
+        $future = "";
+    $starthtml = $cfg->get("custom view", "start");
+    $endhtml = $cfg->get("custom view", "end");
 ?>
 <div id="customviewconfig">
 <form id="customviewsetup">
