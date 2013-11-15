@@ -442,15 +442,14 @@ function linkbgw($config, $ref, $linked, $other=true) {
     if (! $linked) {
         return $ref;
     }
-    $bgwversion = $config->get("biblegwversion");
-    unset($config);
-    if ($other) $other = " target=\"bgmain\" ";
-    else $other = "";
-    if ($bgwversion) {
+    try { // The config value may not be set.
+        $bgwversion = $config->get("biblegwversion");
+        if ($other) $other = " target=\"bgmain\" ";
+        else $other = "";
         return "<a href=\"http://biblegateway.com/passage?search=".
             rawurlencode($ref).
             "&version={$bgwversion}&interface=print\" ${other}>{$ref}</a>";
-    } else {
+    } catch(ConfigfileUnknownKey $e) {
         return $ref;
     }
 }
