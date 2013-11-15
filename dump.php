@@ -56,6 +56,7 @@ foreach ($tabledescfiles as $tabledescfile) {
 $tablenamelines = array_filter($tabledesclines, 'gettablename');
 $tablenames = array_map('gettablename', $tablenamelines);
 $realtablenames = array_map(adddbpfix, $tablenames);
+$dbstate = getDBState();
 $dbversion = $dbstate->get('dbversion');
 $timestamp = date("dMY-Hi");
 if ('churchyear' == $_GET['only']) {
