@@ -101,7 +101,8 @@ if ("customfields" == $_GET['action']) {
         exit(0);
     }
     $tmpary = cfgToFieldlist($config);
-    array_splice($tmpary, $newindex, 0, Array($_POST['selection']));
+    array_splice($tmpary, $newindex, 0,
+        Array(Array("name"=>$_POST['selection'], "width"=>$_POST['width'])));
     fieldlistToCfg($tmpary, $config);
     $config->save();
     echo json_encode(Array(1, "Success."));
@@ -158,6 +159,7 @@ function reprField(field) {
     rv.push("<a href=\"javascript: void();\" class=\"field-insert\">+</a>&nbsp;");
     rv.push("<a href=\"javascript: void();\" class=\"field-right\">&gt;</a><br>");
     rv.push(field.name);
+    rv.push("["+field.width+"]");
     rv.push("</div>");
     return rv.join("\n");
 }
@@ -205,9 +207,16 @@ function setupFields() {
         evt.preventDefault();
         var order = $(this).parent().data("order");
         $("#dialog").html("<form id=\"selectfieldform\">"
-            +"<select id=\"fieldselector\" name=\"fieldselector\">"
-            +generateFieldOptionList()+"</select><br>"
-            +"<button type=\"submit\">Insert Field</button>\n"
+            +"<table><tr>"
+            +"<td><label for=\"fieldselector\">Field</label></td>"
+            +"<td><select id=\"fieldselector\" name=\"fieldselector\">"
+            +generateFieldOptionList()+"</select></td></tr>"
+            +"<tr><td><label for=\"fieldwidth\">Width (m's)</label></td>"
+            +"<td><input type=\"number\" min=\"1\" id=\"fieldwidth\" "
+            +"required name=\"fieldwidth\" style=\"width: 3em\"></td></tr>"
+            +"<tr><td></td>"
+            +"<td><button type=\"submit\">Insert Field</button></td></tr>"
+            +"</table>"
             +"</form>")
             .dialog({modal: true,
                 position: "center",
@@ -223,7 +232,8 @@ function setupInsertDialog(order) {
     $("#selectfieldform").submit(function(evt) {
         evt.preventDefault();
         $.post("<?=$this_script?>?insert="+order,
-            { selection: $("#fieldselector").val() },
+            { selection: $("#fieldselector").val(),
+              width: $("#fieldwidth").val() },
             function(rv) {
                 $("#dialog").dialog("close");
                 rv = $.parseJSON(rv);
@@ -283,6 +293,7 @@ if (! $config->exists("custom view", "end")) {
     $config->set("custom view", "end", "</table>");
     $saveconfig = true;
 }
+
 $saveconfig = checkFieldsSetup($config) || $saveconfig;
 if ($saveconfig) $config->save();
 if ($auth) {
@@ -373,51 +384,61 @@ function displayService($service, $fieldlist) {
     $rv = Array();
     foreach ($fieldlist as $field) {
         // Special field names
-        if ("hymn numbers" == $field) {
+        if ("hymn numbers" == $field['name']) {
             $rv[] = "<td class=\"customservice-hymnnumbers\">";
+            $rv[] = "<div style=\"width: {$field['width']}em\">";
             foreach ($service as $hymn) {
                 $rv[] = "{$hymn["number"]}<br>";
             }
-            $rv[] = "</td>";
+            $rv[] = "</div></td>";
             continue;
-        } elseif ("hymn books" == $field) {
+        } elseif ("hymn books" == $field['name']) {
             $rv[] = "<td class=\"customservice-hymnbooks\">";
+            $rv[] = "<div style=\"width: {$field['width']}em\">";
             foreach ($service as $hymn) {
                 $rv[] = "{$hymn["book"]}<br>";
             }
-            $rv[] = "</td>";
+            $rv[] = "</div></td>";
             continue;
-        } elseif ("hymn notes" == $field) {
+        } elseif ("hymn notes" == $field['name']) {
             $rv[] = "<td class=\"customservice-hymnnotes\">";
+            $rv[] = "<div style=\"width: {$field['width']}em\">";
             foreach ($service as $hymn) {
                 $rv[] = "{$hymn["note"]}<br>";
             }
-            $rv[] = "</td>";
+            $rv[] = "</div></td>";
             continue;
-        } elseif ("hymn locations" == $field) {
+        } elseif ("hymn locations" == $field['name']) {
             $rv[] = "<td class=\"customservice-hymnlocation\">";
+            $rv[] = "<div style=\"width: {$field['width']}em\">";
             foreach ($service as $hymn) {
                 $rv[] = "{$hymn["location"]}<br>";
             }
-            $rv[] = "</td>";
+            $rv[] = "</div></td>";
             continue;
-        } elseif ("hymn titles" == $field) {
+        } elseif ("hymn titles" == $field['name']) {
             $rv[] = "<td class=\"customservice-hymntitle\">";
+            $rv[] = "<div style=\"width: {$field['width']}em\">";
             foreach ($service as $hymn) {
                 $rv[] = "{$hymn["title"]}<br>";
             }
-            $rv[] = "</td>";
+            $rv[] = "</div></td>";
             continue;
         }
         // DB fields
         $rv[] = "<td class=\"customservice-dbfield\">";
-        if (isset($service[0][$field])) {
-            $rv[] = $service[0][$field];
+        $rv[] = "<div style=\"width: {$field['width']}em\">";
+        $has_markdown = Array("bnotes", "servicenotes");
+        if (isset($service[0][$field['name']])) {
+            if (array_search($field['name'], $has_markdown) !== false)
+                $rv[] = translate_markup($service[0][$field['name']]);
+            else
+                $rv[] = $service[0][$field['name']];
         } else {
             $rv[] = "Unknown Field: <span class=\"unknown-field\">"
-                .$field."</span>";
+                .$field['name']."</span>";
         }
-        $rv[] = "</td>";
+        $rv[] = "</div></td>";
     }
     $rv[] = "</tr>";
     return implode("\n", $rv);
@@ -426,7 +447,8 @@ function displayService($service, $fieldlist) {
 function cfgToFieldlist($config) {
     $tmpary = Array();
     foreach ($config->get('custom view', 'fields') as $field)
-        $tmpary[$field['order']] = $field['name'];
+        $tmpary[$field['order']] = Array('name'=>$field['name'],
+            'width'=>$field['width']);
     return $tmpary;
 }
 
@@ -443,7 +465,8 @@ function normFieldlist($fieldarray) {
 function fieldlistToCfg($fieldarray, $config) {
     $tmpary = Array();
     foreach ($fieldarray as $k=>$v)
-        $tmpary[] = Array("name"=>$v, "order"=>$k);
+        $tmpary[] = Array("name"=>$v['name'], "width"=>$v["width"],
+            "order"=>$k);
     $config->set('custom view', 'fields', $tmpary);
 }
 
@@ -454,7 +477,7 @@ function fieldlistToCfg($fieldarray, $config) {
 function checkFieldsSetup($config) {
     if (! $config->exists('custom view', 'fields')) {
         $config->set('custom view', 'fields', '[]',
-            Array("name"=>"date", "order"=>0));
+            Array("name"=>"date", "order"=>0, "width"=>6));
         return true;
     }
     return false;
