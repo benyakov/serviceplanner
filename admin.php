@@ -58,24 +58,34 @@ $config = getConfig(false);
                 window.location.assign("churchyear.php?request=purgetables");
             }
         });
+        $("#minimizetips").click(function(evt) {
+            evt.preventDefault();
+            if ($(this).html() == "[-]") {
+                $("#integrationtips").hide();
+                $(this).html("[+]");
+            } else if ($(this).html() == "[+]") {
+                $("#integrationtips").show();
+                $(this).html("[-]");
+            } else {
+                $(this).html("[-]");
+            }
+        }).click();
     });
 </script>
     <?pageHeader();
     siteTabs($auth); ?>
     <div id="content-container">
     <h1>Housekeeping</h1>
-    <p>This page contains the links for backing up the database and restoring
-    it.  It is recommended that you back up
-    often.  You get to decide what that means.  It would also be a good idea to
-    practice restoring at least once, to make sure it works.  (If it doesn't,
-    your database may lose data.)</p>
+    <p class="explanation">Back up, restore, export, import, and configure your
+service planner here.  Keeping frequent backups is always highly
+recommended!</p>
 
-    <p>At the bottom of this page is a way to import hymn titles from
-    other installations of this web application living in the same
-    database.  All you need to know is the database prefix used in the
-    installation from which you'd like to import the hymn titles.</p>
+    <h2>Tips for Web Site Integration</h2>
 
-    <h2>Making data available elsewhere on your web site</h2>
+    <a href="javascript:void(0);" id="minimizetips">[-]</a>
+
+    <div id="integrationtips">
+    <h3>Making data available elsewhere on your web site</h3>
 
     <p>To make the information available to others in the public, it is
     recommended that you make links to the files (linked here)
@@ -98,7 +108,7 @@ $config = getConfig(false);
     create an additional layer of security for your data, in case you are
     concerned about such things.</p>
 
-    <h2>Logins allow the whole thing to be publicly available</h2>
+    <h3>Logins allow the whole thing to be publicly available</h3>
 
     <p>Since pages that modify the database are now login-restricted,
     it's also possible to allow the whole world to see the whole
@@ -106,7 +116,7 @@ $config = getConfig(false);
     may have to explain to your organist or secretary why they don't need to
     log in.</p>
 
-    <h2>Mashing up pages from here into your own web site.</h2>
+    <h3>Mashing up pages from here into your own web site.</h3>
 
     <p>One other possibility for those with their own web site elsewhere is to
     include one of the above pages in your own page via a Javascript mash-up.
@@ -157,6 +167,8 @@ $(document).ready(function(){var a="http://www.bethanythedalles.org/services-dev
     <p>Note that you can apply your own css stylesheet to the resulting
     imported information to make it look nicer in the context of your web
     site.</p>
+
+    </div>
 
     <h2>The Broom Closet</h2>
 
