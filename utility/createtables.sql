@@ -102,6 +102,7 @@ CREATE TABLE `churchyear_propers` (
     `color`     varchar(32),
     `theme`     varchar(64),
     `introit`   text,
+    `gradual`   text,
     `note`      text,
     FOREIGN KEY (`dayname`) REFERENCES `churchyear_synonyms` (`synonym`)
         ON UPDATE CASCADE

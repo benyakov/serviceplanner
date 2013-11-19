@@ -27,8 +27,9 @@ function propersForm($dayname) {
     $dbh = new DBConnection();
     $dbp = $dbh->getPrefix();
     $q = $dbh->prepare("SELECT pr.color, pr.theme, pr.introit, pr.note,
-        l.lesson1, l.lesson2, l.gospel, l.psalm, l.s2lesson, l.s2gospel,
-        l.s3lesson, l.s3gospel, l.id, l.lectionary, l.hymnabc, l.hymn
+        pr.gradual, l.lesson1, l.lesson2, l.gospel, l.psalm, l.s2lesson,
+        l.s2gospel, l.s3lesson, l.s3gospel, l.id, l.lectionary, l.hymnabc,
+        l.hymn
         FROM `{$dbp}churchyear_propers` AS pr
         LEFT OUTER JOIN `{$dbp}churchyear_lessons` AS l
             ON (pr.dayname = l.dayname)
@@ -39,7 +40,7 @@ function propersForm($dayname) {
     $q->bindValue(1, $dayname);
     if (! $q->execute()) {
         die(array_pop($q->errorInfo()));
-        $pdata = array("color"=>"", "theme"=>"", "introit"=>"",
+        $pdata = array("color"=>"", "theme"=>"", "introit"=>"", "gradual"=>"",
             "note"=>"", "lesson1"=>"", "lesson2"=>"", "gospel"=>"",
             "psalm"=>"", "s2lesson"=>"", "s2gospel"=>"", "s3lesson"=>"",
             "s3gospel"=>"", "id"=>0, "lectionary"=>"",

@@ -23,6 +23,8 @@
     The Dalles, OR 97058
     USA
  */
+$dbh = new DBConnection();
+$dbp = $dbh->getPrefix();
 $q = $dbh->exec("DROP VIEW IF EXISTS `{$dbp}synlessons`");
 $q = $dbh->prepare("CREATE VIEW `{$dbp}synlessons` AS
     SELECT s.synonym AS dayname, l.lectionary, l.lesson1, l.lesson2,
@@ -34,7 +36,7 @@ $q->execute() or die(array_pop($q->errorInfo()));
 $q = $dbh->exec("DROP VIEW IF EXISTS `{$dbp}synpropers`");
 $q = $dbh->prepare("CREATE VIEW `{$dbp}synpropers` AS
     SELECT s.synonym AS dayname, p.color, p.theme, p.introit, p.note,
-        g.gradual
+    COALESCE(p.gradual, g.gradual) AS gradual
     FROM `{$dbp}churchyear_propers` AS p
     RIGHT JOIN `{$dbp}churchyear_synonyms` AS s ON (p.dayname = s.canonical)
     LEFT JOIN `{$dbp}churchyear` AS cy ON (p.dayname = cy.dayname)

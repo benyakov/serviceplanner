@@ -1,5 +1,5 @@
-<? /* Record the version
-    Copyright (C) 2012 Jesse Jacobsen
+<? /* Upgrade from version 0.7 to 0.8
+    Copyright (C) 2013 Jesse Jacobsen
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -23,5 +23,23 @@
     The Dalles, OR 97058
     USA
  */
-$version = array('major' => 0, 'minor' => 8, 'tick' => 0);
+if (! (isset($newversion) && isset($oldversion))) {
+    echo "Error: This upgrade must be run automatically.";
+}
+if ("0.7." != substr($oldversion, 0, 4).'.') {
+    die("Can't upgrade from 0.7.x, since the current db version is {$oldversion}.");
+}
+
+$db = new DBConnection();
+$db->beginTransaction();
+$q = $db->prepare("ALTER TABLE `{$db->getPrefix()}churchyear_propers`
+    ADD COLUMN `gradual` text AFTER `introit`");
+$q->execute() or die(array_pop($q->errorInfo()));
+$db->commit();
+
+$newversion = "{$version['major']}.{$version['minor']}.{$version['tick']}";
+$dbstate->store('dbversion', $newversion);
+$dbstate->save() or die("Problem saving dbstate file.");
+$rm[] = "Upgraded to {$newversion}";
+setMessage(implode("<br />\n", $rm));
 ?>
