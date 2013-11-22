@@ -62,7 +62,7 @@ class FormImporter {
         }
     }
 
-    private function getfhandle() {
+    protected function getfhandle() {
         if (($fhandle = fopen($this->loadfile, "r")) !== false) {
             if (! $keys = fgetcsv($fhandle)) {
                 setMessage("Empty file upload.");

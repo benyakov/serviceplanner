@@ -188,8 +188,11 @@ $(document).ready(function(){var a="http://www.bethanythedalles.org/services-dev
     <li><a href="dump.php?only=churchyear">Save a Backup of Your Church Year Modifications</a>  See the note above about restoring to the same version.  Use the field above to install a backup of your church year data.</li>
     <li><form id="export-lectionary" action="export.php" method="get">
     <label for="lectionary">Export single lectionary as CSV.</label>
-    <input type="text" name="lectionary" id="lectionary" required
-        placeholder="Lectionary name">
+    <select name="lectionary" id="lectionary">
+    <? foreach (getLectionaryNames() as $lname) { ?>
+        <option name="<?=$lname?>"><?=$lname?></option>
+    <? } ?>
+    </select>
     <button type="submit" id="submit">Export Lectionary</button>
     </form></li>
     <li> <form id="import-lectionary" action="import.php" method="post"

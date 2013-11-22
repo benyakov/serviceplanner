@@ -75,14 +75,19 @@ while (($record = fgetcsv($fh)) != FALSE) {
 $fh = fopen("./utility/churchyear/propers.csv", "r");
 $headings = fgetcsv($fh);
 $qp = $db->prepare("INSERT INTO {$db->getPrefix()}churchyear_propers
-    (dayname, color, theme, introit)
-    VALUES (?, ?, ?, ?)");
+    (dayname, color, theme, introit, gradual)
+    VALUES (?, ?, ?, ?, ?)");
+$hcount = count($headings);
 while (($record = fgetcsv($fh)) != FALSE) {
+    $rcount = count($record);
+    if ($rcount < $hcount)
+        $record = array_merge($record, array_fill(0, $hcount-$rcount, NULL));
     $dict = array_combine($headings, $record);
     $qp->bindValue(1, $dict['dayname'], paramStrNull($dict['dayname']));
     $qp->bindValue(2, $dict['color'], paramStrNull($dict['color']));
     $qp->bindValue(3, $dict['theme'], paramStrNull($dict['theme']));
     $qp->bindValue(4, $dict['introit'], paramStrNull($dict['introit']));
+    $qp->bindValue(5, $dict['gradual'], paramStrNull($dict['gradual']));
     $qp->execute() or die(__FILE__.":".__LINE__.$dict['dayname'].
             array_pop($qp->errorInfo()));
 }

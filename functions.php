@@ -57,6 +57,13 @@ function makePathAbsolute($path) {
     return $path;
 }
 
+function getLectionaryNames() {
+    $db = new DBConnection();
+    $result = $db->query("SELECT DISTINCT `lectionary` FROM
+        `{$db->getPrefix()}churchyear_lessons`");
+    return $result->fetchAll(PDO::FETCH_COLUMN, 0);
+}
+
 function checkJsonpReq() {
     return $_GET['jsonpreq'];
 }

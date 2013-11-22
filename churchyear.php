@@ -27,6 +27,7 @@ require("./init.php");
 require("./churchyear/functions.php");
 $auth = auth();
 $dbp = $db->getPrefix();
+$dbstate = getDBState();
 
 /* churchyear.php?dropfunctions=1
  * Drops all the churchyear functions and sets a message about
@@ -579,10 +580,17 @@ if ($_POST['propers']) {
         exit(0);
     }
     $q = $db->prepare("UPDATE `{$dbp}churchyear_propers` SET
-        color=?, theme=?, introit=?, note=? WHERE dayname = ?");
-    if (! $q->execute(array($_POST['color'], $_POST['theme'],
-        $_POST['introit'], $_POST['note'], $_POST['propers'])))
-    {
+        color=?, theme=?, introit=?, gradual=?, note=? WHERE dayname = ?");
+    $q->bindValue(1, $_POST['color']);
+    $q->bindValue(2, $_POST['theme']);
+    $q->bindValue(3, $_POST['introit']);
+    if ($_POST['gradual'] === "") // To avoid trumping the seasonal gradual
+        $q->bindValue(4, null, PDO::PARAM_NULL);
+    else
+        $q->bindValue(4, $_POST['gradual']);
+    $q->bindValue(5, $_POST['note']);
+    $q->bindValue(6, $_POST['propers']);
+    if (! $q->execute()) {
         $rv = array(false, "Problem updating propers: ".
             array_pop($q->errorInfo()));
     } else {
@@ -722,6 +730,20 @@ pageHeader();
 siteTabs($auth);?>
 <div id="content-container">
 <h1>Church Year Configuration</h1>
+
+<p class="explanation">This page allows adjustments and customization of the
+Church Year (when the various days should fall) and the propers assigned to
+those days.  The system determines when the days fall by calculating three base
+days for a given year.  All other days are either set in relation to one of
+them, or set in the secular calendar.  Some days may be observed on a certain
+Sunday of a certain month.  To facilitate finding the desired propers, the days
+of the church year may be assigned synonyms in addition to their primary names.
+Finally, the propers for each day may be set, including collects and the texts
+in any number of lectionaries.  When the gradual is not set for a day, a
+seasonal gradual will be used.  Everything here can be restored to default
+settings on the Housekeeping tab.  Customizations may also be exported from
+there for off-site storage or transfer, and also re-imported.</p>
+
 <?=churchyear_listing(query_churchyear())?>
 </div>
 <div id="dialog"></div>

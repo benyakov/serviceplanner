@@ -92,6 +92,8 @@ function propersForm($dayname) {
     <textarea name="note"><?=$pdata[0]['note']?></textarea><br></div>
     <div class="formblock fullwidth"><label for="introit">Introit</label><br>
     <textarea name="introit"><?=$pdata[0]['introit']?></textarea></div>
+    <div class="formblock fullwidth"><label for="gradual">Gradual</label><br>
+    <textarea name="gradual"><?=$pdata[0]['gradual']?></textarea></div>
     <button type="submit">Submit</button>
     <button type="reset">Reset</button>
     </div>
