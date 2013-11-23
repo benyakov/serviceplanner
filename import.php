@@ -50,6 +50,8 @@ class FormImporter {
      * $_POST['import'] := upload file to import
      */
     private $loadfile;
+    private $fhandle = NULL;
+    private $keys;
 
     public function __construct() {
         require_once("./utility/csv.php");
@@ -62,9 +64,26 @@ class FormImporter {
         }
     }
 
-    protected function getfhandle() {
-        if (($fhandle = fopen($this->loadfile, "r")) !== false) {
-            if (! $keys = fgetcsv($fhandle)) {
+    public function getKeys() {
+        if (! $this->fhandle) $this->getFHandle();
+        return $this->keys;
+    }
+
+    public function getRecord() {
+        if (! $this->fhandle) $this->getFHandle();
+        if ($rec = fgetcsv($this->fhandle)) {
+            $rv = Array();
+            for ($i=0, $len=count($rec); $i<$len; $i++)
+                $rv[$this->keys[$i]] = $rec[$i];
+            return $rv;
+        } else {
+            return $rec;
+        }
+    }
+
+    protected function getFHandle() {
+        if (($this->fhandle = fopen($this->loadfile, "r")) !== false) {
+            if (! $this->keys = fgetcsv($this->fhandle)) {
                 setMessage("Empty file upload.");
             } else return $fhandle;
         } else setMessage("Problem opening uploaded file.");
@@ -81,7 +100,6 @@ class LectionaryImporter extends FormImporter {
 
     public function import() {
         $db = new DBConnection();
-        $fhandle = $this->getfhandle();
         $db->beginTransaction();
         // Check for existing lessons and delete, if confirmed.
         $q = $db->prepare("SELECT 1 FROM `{$db->getPrefix()}churchyear_lessons`
@@ -125,18 +143,16 @@ class LectionaryImporter extends FormImporter {
         $q->bindParam(":hymnabc", $thisrec["Week Hymn"]);
         $q->bindParam(":hymn", $thisrec["Year Hymn"]);
         // Verify that the CSV file contains the appropriate fields
-        $fieldkeys = fgetcsv($fhandle);
-        foreach ($fieldkeys as $fieldname) {
+        foreach ($this->getKeys() as $fieldname) {
             if (! array_key_exists($fieldname, $thisrec)) {
                 setMessage("CSV file contain unknown field '{$fieldname}'");
                 header("Location: admin.php");
                 exit(0);
             }
         }
-        while ($record = fgetcsv($fhandle)) {
+        while ($record = $this->getRecord()) {
             $thisrec = array_merge($thisrec, $blankrec);
-            for ($i=0, $fieldcount=count($fieldkeys); $i<$fieldcount; $i++)
-                $thisrec[$fieldkeys[$i]] = $record[$i];
+            $thisrec = array_merge($record);
             $q->execute() or die(array_pop($q->errorInfo()));
         }
         $db->commit();
@@ -153,7 +169,7 @@ class ChurchyearImporter extends FormImporter {
  */
 
     public function import() {
-        $fhandle = $this->getfhandle();
+        $fhandle = $this->getFHandle();
         setMessage("Church year data imported.");
         header("Location: admin.php");
         exit(0);
@@ -168,7 +184,7 @@ class SynonymImporter extends FileImporter {
 
     function import() {
         $db = new DBConnection();
-        $fhandle = $this->getfhandle();
+        $fhandle = $this->getFHandle();
         $db->beginTransaction();
         $canonical = ""; $synonym = "";
         // Replace using temporary tables;
