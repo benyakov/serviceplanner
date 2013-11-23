@@ -51,11 +51,11 @@ class FormImporter {
      */
     private $loadfile;
 
-    public function _construct() {
+    public function __construct() {
         require_once("./utility/csv.php");
         $db = new DBConnection();
-        $this->loadfile = "./load-{$db->connection['dbname']}.txt";
-        if (! move_uploaded_file($_FILES['import']['tmp_name'], $loadfile)) {
+        $this->loadfile = "./load-{$db->getName()}.txt";
+        if (! move_uploaded_file($_FILES['import']['tmp_name'], $this->loadfile)) {
             setMessage("Problem with file upload.");
             header("Location: admin.php");
             exit(0);
@@ -140,6 +140,7 @@ class ChurchyearImporter extends FormImporter {
  * replaceall := remove all current days in churchyear before loading
  *  Otherwise, only replace days already defined.
  */
+
     public function import() {
         $fhandle = $this->getfhandle();
         setMessage("Church year data imported.");
