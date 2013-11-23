@@ -111,6 +111,7 @@ class LectionaryImporter extends FormImporter {
             "Gospel"=>"", "Psalm"=>"", "Series 2 Lesson"=>"",
             "Series 2 Gospel"=>"", "Series 3 Lesson"=>"",
             "Series 3 Gospel"=>"", "Week Hymn"=>"", "Year Hymn"=>"");
+        $blankrec = $thisrec;
         $q->bindParam(":lectionary", $_POST['lectionary_name']);
         $q->bindParam(":dayname", $thisrec["Dayname"]);
         $q->bindParam(":lesson1", $thisrec["Lesson 1"]);
@@ -123,9 +124,19 @@ class LectionaryImporter extends FormImporter {
         $q->bindParam(":s3gospel", $thisrec["Series 3 Gospel"]);
         $q->bindParam(":hymnabc", $thisrec["Week Hymn"]);
         $q->bindParam(":hymn", $thisrec["Year Hymn"]);
+        // Verify that the CSV file contains the appropriate fields
+        $fieldkeys = fgetcsv($fhandle);
+        foreach ($fieldkeys as $fieldname) {
+            if (! array_key_exists($fieldname, $thisrec)) {
+                setMessage("CSV file contain unknown field '{$fieldname}'");
+                header("Location: admin.php");
+                exit(0);
+            }
+        }
         while ($record = fgetcsv($fhandle)) {
-            for ($i=0; $i<count($keys); $i++)
-                $thisrec[$keys[$i]] = $record[$i];
+            $thisrec = array_merge($thisrec, $blankrec);
+            for ($i=0, $fieldcount=count($fieldkeys); $i<$fieldcount; $i++)
+                $thisrec[$fieldkeys[$i]] = $record[$i];
             $q->execute() or die(array_pop($q->errorInfo()));
         }
         $db->commit();
