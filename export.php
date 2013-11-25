@@ -91,6 +91,29 @@ if ('churchyear' == $_GET['export']) {
     $csvex->export();
 }
 
+if ('churchyear-propers' == $_GET['export']) {
+    $q = $db->prepare("SELECT cp.dayname, color, theme, introit, gradual, note
+        FROM `{$db->getPrefix()}churchyear_propers` AS cp
+        JOIN `{$db->getPrefix()}churchyear` as cy
+            ON (cp.dayname = cy.dayname)
+        LEFT OUTER JOIN `{$db->getPrefix()}churchyear_order` AS cyo
+            ON (cy.season = cyo.name)
+            ORDER BY cyo.idx, cy.offset, cy.month, cy.day");
+    if (! $q->execute()) {
+        echo array_pop($q->errorInfo());
+        exit(0);
+    }
+    $q->setFetchMode(PDO::FETCH_ASSOC);
+    $csvex = new CSVExporter($q);
+    $csvex->setFileBase("churchyear_general_propers");
+    $csvex->setCharset("utf-8");
+    $csvex->setFieldnames(array("Dayname", "Color", "Theme", "Introit",
+        "Gradual", "Note"));
+    $csvex->setFieldselection(array("dayname", "color", "theme", "introit",
+        "gradual", "note"));
+    $csvex->export();
+}
+
 // Below here requires $auth
 if (! $auth) {
     setMessage("Access denied.");
@@ -111,10 +134,15 @@ if ($_GET['lectionary']) {
         header("location: admin.php");
         exit(0);
     }
-    $q = $db->prepare("SELECT `dayname`, `lesson1`, `lesson2`,
+    $q = $db->prepare("SELECT `cl`.`dayname`, `lesson1`, `lesson2`,
         `gospel`, `psalm`, `s2lesson`, `s2gospel`, `s3lesson`, `s3gospel`,
-        `hymnabc`, `hymn` FROM `{$db->getPrefix()}churchyear_lessons`
-        WHERE `lectionary` = :lect");
+        `hymnabc`, `hymn` FROM `{$db->getPrefix()}churchyear_lessons` AS cl
+        JOIN `{$db->getPrefix()}churchyear` as cy
+            ON (cl.dayname = cy.dayname)
+        LEFT OUTER JOIN `{$db->getPrefix()}churchyear_order` AS cyo
+            ON (cy.season = cyo.name)
+        WHERE `cl`.`lectionary` = :lect
+        ORDER BY cyo.idx, cy.offset, cy.month, cy.day");
     $q->bindValue(":lect", $lectname);
     $q->setFetchMode(PDO::FETCH_NUM);
     if (! $q->execute()) {

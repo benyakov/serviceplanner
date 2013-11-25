@@ -37,7 +37,7 @@ if ('dellect' == $_POST['action']) {
     $q = $db->prepare("DELETE FROM `{$db->getPrefix()}churchyear_lessons`
         WHERE `lectionary`=?");
     if ($q->execute(Array($_POST['lectionary']))) {
-        echo json_encode(Array(1, "Lectionary deleted."));
+        echo json_encode(Array(1, "Lectionary deleted.", getLectionaryNames()));
     } else {
         echo json_encode(Array(0, "Couldn't delete that lectionary"));
     }
@@ -88,8 +88,23 @@ if ('dellect' == $_POST['action']) {
             if (confirm("Really delete all data for '"+lectname+"'?")) {
                 var xhr = $.post("<?=$this_script?>", { action: "dellect",
                     lectionary: lectname}, function(rv) {
-                        setMessage(rv[1]);
-                        //FIXME: Return & Update the lectionary drop-downs
+                        rv = $.parseJSON(rv);
+                        if (rv[0]) {
+                            setMessage(rv[1]);
+                            var $dl = $("#deleted-lect");
+                            $dl.empty();
+                            var $el = $("#exported-lect");
+                            $el.empty();
+                            for (key in rv[2]) {
+                                var value = rv[2][key];
+                                $dl.append($("<option></option>")
+                                    .attr("value", value).text(value));
+                                $el.append($("<option></option>")
+                                    .attr("value", value).text(value));
+                            };
+                        } else {
+                            setMessage(rv[1]);
+                        }
                     });
             }
         });
@@ -211,7 +226,7 @@ $(document).ready(function(){var a="http://www.bethanythedalles.org/services-dev
     <li><a href="dump.php?only=churchyear">Save a Backup of Your Church Year Modifications</a>  See the note above about restoring to the same version.  Use the field above to install a backup of your church year data.</li>
     <li><form id="export-lectionary" action="export.php" method="get">
     <label for="lectionary">Export single lectionary as CSV.</label>
-    <select name="lectionary" id="lectionary">
+    <select name="lectionary" id="exported-lect">
     <? foreach (getLectionaryNames() as $lname) { ?>
         <option name="<?=$lname?>"><?=$lname?></option>
     <? } ?>
@@ -240,6 +255,17 @@ $(document).ready(function(){var a="http://www.bethanythedalles.org/services-dev
         <label for="lect_replace">Replace all existing records for this lectionary?</label><br />
         <button type="submit">Import Lectionary</button>
     </fieldset></form></li>
+    <li><a href="export.php?export=churchyear-propers">Export General Propers for the Church Year</a></li>
+    <li><form id="import-churchyear-propers" action="import.php" method="post"
+        enctype="multipart/form-data">
+        <input type="hidden" name="import" value="churchyear-propers">
+        <fieldset><legend>Import General Church Year Propers</legend>
+        <input type="file" id="churchyear_propers_file" name="import" required
+            placeholder="Select local file."><br />
+        <input type="checkbox" id="churchyear_propers_replace" name="replace">
+        <label for="churchyear_propers_replace">Replace all existing general propers?</label><br />
+        <button type="submit">Import General Propers</button>
+        </fieldset></form></li>
     <li><a href="export.php?export=synonyms">Export Synonyms for Church Year Day Names</a></li>
     <li><form id="import-synonyms" action="import.php" method="post"
             enctype="multipart/form-data">
