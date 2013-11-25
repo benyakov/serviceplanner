@@ -30,7 +30,19 @@ if (! $auth) {
     header('Location: index.php');
     exit(0);
 }
+$this_script = "http://".$_SERVER['HTTP_HOST'].$_SERVER['SCRIPT_NAME'] ;
 $config = getConfig(false);
+if ('dellect' == $_POST['action']) {
+    $db = new DBConnection();
+    $q = $db->prepare("DELETE FROM `{$db->getPrefix()}churchyear_lessons`
+        WHERE `lectionary`=?");
+    if ($q->execute(Array($_POST['lectionary']))) {
+        echo json_encode(Array(1, "Lectionary deleted."));
+    } else {
+        echo json_encode(Array(0, "Couldn't delete that lectionary"));
+    }
+    exit(0);
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -70,6 +82,17 @@ $config = getConfig(false);
                 $(this).html("[-]");
             }
         }).click();
+        $("#delete-lectionary").submit(function(evt) {
+            evt.preventDefault();
+            var lectname = $("#deleted-lect").val();
+            if (confirm("Really delete all data for '"+lectname+"'?")) {
+                var xhr = $.post("<?=$this_script?>", { action: "dellect",
+                    lectionary: lectname}, function(rv) {
+                        setMessage(rv[1]);
+                        //FIXME: Return & Update the lectionary drop-downs
+                    });
+            }
+        });
     });
 </script>
     <?pageHeader();
@@ -194,6 +217,15 @@ $(document).ready(function(){var a="http://www.bethanythedalles.org/services-dev
     <? } ?>
     </select>
     <button type="submit" id="submit">Export Lectionary</button>
+    </form></li>
+    <li><form id="delete-lectionary" action="<?=$this_script?>" method="post">
+    <label for="lectionary">Delete single lectionary (use caution).</label>
+    <select name="lectionary" id="deleted-lect">
+    <? foreach (getLectionaryNames() as $lname) { ?>
+        <option name="<?=$lname?>"><?=$lname?></option>
+    <? } ?>
+    </select>
+    <button type="submit" id="submit">Delete All Days In Lectionary</button>
     </form></li>
     <li> <form id="import-lectionary" action="import.php" method="post"
             enctype="multipart/form-data">

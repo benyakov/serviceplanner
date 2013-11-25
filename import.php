@@ -72,7 +72,8 @@ class FormImporter {
     public function getRecord() {
         if (! $this->fhandle) $this->getFHandle();
         if ($rec = fgetcsv($this->fhandle)) {
-            $rv = Array();
+            $vals = array_fill(0, count($this->keys), NULL);
+            $rv = array_combine($this->keys, $vals);
             for ($i=0, $len=count($rec); $i<$len; $i++)
                 $rv[$this->keys[$i]] = $rec[$i];
             return $rv;
@@ -125,11 +126,10 @@ class LectionaryImporter extends FormImporter {
             VALUES
             (:lectionary, :dayname, :lesson1, :lesson2, :gospel, :psalm,
             :s2lesson, :s2gospel, :s3lesson, :s3gospel, :hymnabc, :hymn)");
-        $thisrec = array("Dayname"=>"", "Lesson 1"=>"", "Lesson 2"=>"",
-            "Gospel"=>"", "Psalm"=>"", "Series 2 Lesson"=>"",
-            "Series 2 Gospel"=>"", "Series 3 Lesson"=>"",
-            "Series 3 Gospel"=>"", "Week Hymn"=>"", "Year Hymn"=>"");
-        $blankrec = $thisrec;
+        $thisrec = array("Dayname"=>NULL, "Lesson 1"=>NULL, "Lesson 2"=>NULL,
+            "Gospel"=>NULL, "Psalm"=>NULL, "Series 2 Lesson"=>NULL,
+            "Series 2 Gospel"=>NULL, "Series 3 Lesson"=>NULL,
+            "Series 3 Gospel"=>NULL, "Week Hymn"=>NULL, "Year Hymn"=>NULL);
         $q->bindParam(":lectionary", $_POST['lectionary_name']);
         $q->bindParam(":dayname", $thisrec["Dayname"]);
         $q->bindParam(":lesson1", $thisrec["Lesson 1"]);
@@ -151,9 +151,10 @@ class LectionaryImporter extends FormImporter {
             }
         }
         while ($record = $this->getRecord()) {
-            $thisrec = array_merge($thisrec, $blankrec);
-            $thisrec = array_merge($record);
-            $q->execute() or die(array_pop($q->errorInfo()));
+            foreach ($thisrec as $key=>&$value) {
+                $value = $record[$key];
+            }
+            if (! $q->execute()) die(array_pop($q->errorInfo()));
         }
         $db->commit();
         setMessage("Lectionary imported.");
