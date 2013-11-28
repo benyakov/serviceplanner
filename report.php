@@ -367,6 +367,7 @@ function showServiceListing($config) {
             $service[] = $hymndata;
         }
     }
+    $servicelisting[] = $service;
     // Delete the last service when showing past hymns to avoid
     // confusion with an incomplete listing in that service
     if (! $config->get("custom view", "future"))
