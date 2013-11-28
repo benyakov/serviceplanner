@@ -44,6 +44,9 @@ elseif ($_POST['prefix'])
 
 $importer->import();
 
+/**
+ * Base class for importing things from CSV.
+ */
 class FormImporter {
     /* Expects in $_POST:
      * import := <name of thing being imported>
@@ -177,12 +180,10 @@ class ChurchyearImporter extends FormImporter {
     }
 }
 
-class SynonymImporter extends FileImporter {
-/* For synonyms, also handle:
- * replace := replace all synonyms for the given left-hand words
- *  (Caution: synonym deletions will cascade into other tables.)
+/**
+ * Imports synonyms provided in a CSV export file
  */
-
+class SynonymImporter extends FormImporter {
     function import() {
         $db = new DBConnection();
         $fhandle = $this->getFHandle();
@@ -256,6 +257,9 @@ class SynonymImporter extends FileImporter {
     }
 }
 
+/**
+ * Imports Hymn names set in a sister installation in the same database.
+ */
 class HymnNameImporter {
     public function __construct() {
         if (! strpos($_POST['prefix'], ' ') === false)
