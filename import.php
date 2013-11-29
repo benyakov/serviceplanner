@@ -33,6 +33,8 @@ elseif ("synonyms" == $_POST['import'])
   $importer = new SynonymImporter();
 elseif ("churchyear" == $_POST['import'])
   $importer = new ChurchyearImporter();
+elseif ("churchyear-propers" == $_POST['import'])
+  $importer = new ChurchyearPropersImporter();
 elseif ($_POST['prefix'])
     try {
         $importer = new HymnNameImporter();
@@ -86,6 +88,7 @@ class FormImporter {
     }
 
     protected function getFHandle() {
+        if ($this->fhandle !== NULL) return $this->fhandle;
         if (($this->fhandle = fopen($this->loadfile, "r")) !== false) {
             if (! $this->keys = fgetcsv($this->fhandle)) {
                 setMessage("Empty file upload.");
@@ -94,8 +97,20 @@ class FormImporter {
         header("Location: admin.php");
         exit(0);
     }
+
+    protected function rewind() {
+        if ($this->fhandle === NULL) {
+            $fh = $this->getFHandle();
+            rewind($fh);
+        } else {
+            rewind($this->fhandle);
+        }
+    }
 }
 
+/**
+ * Imports a lectionary provided in a CSV export file
+ */
 class LectionaryImporter extends FormImporter {
     /* For lectionary, also handle:
      * lectionary_name
@@ -166,6 +181,9 @@ class LectionaryImporter extends FormImporter {
     }
 }
 
+/**
+ * Imports church year data provided in a CSV export file
+ */
 class ChurchyearImporter extends FormImporter {
 /* For churchyear, also handle:
  * replaceall := remove all current days in churchyear before loading
@@ -173,8 +191,62 @@ class ChurchyearImporter extends FormImporter {
  */
 
     public function import() {
-        $fhandle = $this->getFHandle();
+        $db = new DBConnection();
+        $db->beginTransaction();
+        if (isset($_POST['replaceall']) && "on" == $_POST['replaceall']) {
+            // Upload the new days
+            $db->exec("CREATE TEMPORARY TABLE `{$db->getPrefix()}newchurchyear`
+                    `dayname` varchar(255),
+                    `season` varchar(64) default "",
+                    `base` varchar(255) default NULL,
+                    `offset` smallint default 0,
+                    `month` tinyint default 0,
+                    `day`   tinyint default 0,
+                    `observed_month` tinyint default 0,
+                    `observed_sunday` tinyint default 0,
+                    PRIMARY KEY (`dayname`)
+                ) ENGINE=InnoDB DEFAULT CHARSET=utf8");
+            $q = $db->prepare("INSERT INTO `{$db->getPrefix()}newchurchyear`
+                (dayname, season, base, offset, month, day, observed_month,
+                 observed_sunday)
+                 VALUES (:dayname, :season, :base, :offset, :month, :day,
+                     :observed_month, :observed_sunday)");
+            $q->bindParam(":dayname", $dayname);
+            $q->bindParam(":season", $season);
+            $q->bindParam(":base", $base);
+            $q->bindParam(":offset", $offset);
+            $q->bindParam(":month", $month);
+            $q->bindParam(":day", $day);
+            $q->bindParam(":observed_month", $observed_month);
+            $q->bindParam(":observed_sunday", $observed_sunday);
+            while ($oneset = $this->getRecord()) {
+                // See export.php:87
+                $dayname = $oneset["Dayname"];
+                $season = $oneset["Season"];
+                $base = $oneset["Base"];
+                $offset = $oneset["Offset"];
+                $month = $oneset["Month"];
+                $day = $oneset["Day"];
+                $observed_month = $oneset["Observed Month"];
+                $observed_sunday = $oneset["Observed Sunday"];
+                $q->exec or die(array_pop($q->errorInfo()));
+            }
+            $this->rewind();
+            // TODO: Record daynames not in current db (add -see line 284)
+        }
         setMessage("Church year data imported.");
+        header("Location: admin.php");
+        exit(0);
+    }
+}
+
+/**
+ * Imports general church year propers provided in a CSV export file
+ */
+class ChurchyearPropersImporter extends FormImporter {
+
+    public function import() {
+        setMessage("Church year general propers data imported.");
         header("Location: admin.php");
         exit(0);
     }
@@ -209,7 +281,7 @@ class SynonymImporter extends FormImporter {
                }
             }
             rewind($fhandle);
-            // Add new synonyms not in current db
+            // Record synonyms not in current db (add)
             $db->exec("CREATE TEMPORARY TABLE `{$db->getPrefix()}addsynonyms`
                     `canonical` varchar(255),
                     `synonym`   varchar(255))
@@ -221,6 +293,7 @@ class SynonymImporter extends FormImporter {
                 ON (cy.`canonical` = n.`canonical`
                     AND cy.`synonym` = n.`synonym`)
                 WHERE cy.`synonym` == NULL");
+            // Add previously unknown synonyms
             $db->exec("INSERT INTO `{$db->getPrefix()}churchyear_synonyms
                 SELECT `canonical`, `synonym`
                 FROM `{$db->getPrefix()}addsynonyms`");
@@ -228,8 +301,12 @@ class SynonymImporter extends FormImporter {
             // (This will cascade into other tables.)
             $db->exec("DELETE FROM `{$db->getPrefix()}churchyear_synonyms`
                 WHERE ! `canonical` IN
-                (SELECT DISTINCT `canonical`
-                    FROM `{$db->getPrefix()}newsynonyms`)");
+                (SELECT DISTINCT cy.`canonical`
+                FROM `{$db->getPrefix()}newsynonyms` AS n
+                RIGHT JOIN `{$db->getPrefix()}churchyear_synonyms` AS cy
+                ON (n.`canonical` = cy.`canonical`
+                    AND n.`synonym` = cy.`synonym`)
+                WHERE n.`synonym` == NULL)");
         } else {
             $qexact = $db->prepare("SELECT 1
                 FROM `{$db->getPrefix()}churchyear_synonyms`
@@ -244,10 +321,11 @@ class SynonymImporter extends FormImporter {
             while (list($canonical, $synonym) = fgetcsv($fhandle)) {
                 // If the record already exists, leave it
                 $qexact->execute() or die(array_pop($qexact->errorInfo()));
-                if ($qexact->fetchValue(1)) {
+                if ($qexact->fetchValue(1))
                     continue;
-                }
-                $qinsert->execute() or die(array_pop($qinsert->errorInfo()));
+                else
+                    $qinsert->execute()
+                        or die(array_pop($qinsert->errorInfo()));
             }
         }
         $db->commit();
