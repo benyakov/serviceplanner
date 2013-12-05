@@ -196,16 +196,7 @@ class ChurchyearImporter extends FormImporter {
         if (isset($_POST['replaceall']) && "on" == $_POST['replaceall']) {
             // Upload the new days
             $db->exec("CREATE TEMPORARY TABLE `{$db->getPrefix()}newchurchyear`
-                    `dayname` varchar(255),
-                    `season` varchar(64) default "",
-                    `base` varchar(255) default NULL,
-                    `offset` smallint default 0,
-                    `month` tinyint default 0,
-                    `day`   tinyint default 0,
-                    `observed_month` tinyint default 0,
-                    `observed_sunday` tinyint default 0,
-                    PRIMARY KEY (`dayname`)
-                ) ENGINE=InnoDB DEFAULT CHARSET=utf8");
+                    LIKE `{$db->getPrefix()}churchyear`");
             $q = $db->prepare("INSERT INTO `{$db->getPrefix()}newchurchyear`
                 (dayname, season, base, offset, month, day, observed_month,
                  observed_sunday)
@@ -232,7 +223,26 @@ class ChurchyearImporter extends FormImporter {
                 $q->exec or die(array_pop($q->errorInfo()));
             }
             $this->rewind();
-            // TODO: Record daynames not in current db (add -see line 284)
+            // Record daynames not in current db
+            $q = $db->exec("CREATE TEMPORARY TABLE `{$db->getPrefix()}addchurchyear`
+                LIKE `{$db->getPrefix()}churchyear`");
+            $db->exec("INSERT INTO `{$db->getPrefix()}addchurchyear`
+                SELECT * FROM `{$db->getPrefix()}newchurchyear` AS n
+                LEFT JOIN `{$db->getPrefix()}churchyear` AS cy
+                ON (cy.dayname = n.dayname)
+                WHERE cy.dayname == NULL");
+            // Add previously unknown days
+            $db->exec("INSERT INTO `{$db->getPrefix()}churchyear`
+                SELECT * FROM `{$db->getPrefix()}addchurchyear`");
+            // Remove current churchyear days not in new list
+            $db->exec("DELETE FROM `{$db->getPrefix()}churchyear`
+                WHERE ! `dayname` IN
+                (SELECT DISTINCT cy.dayname
+                FROM `{$db->getPrefix()}newchurchyear` AS n
+                RIGHT JOIN `{$db->getPrefix()}churchyear` AS cy
+                ON (cy.dayname = n.dayname)
+                WHERE n.dayname == NULL)");
+            // TODO: Update existing daynames (see line 321)
         }
         setMessage("Church year data imported.");
         header("Location: admin.php");
@@ -307,6 +317,7 @@ class SynonymImporter extends FormImporter {
                 ON (n.`canonical` = cy.`canonical`
                     AND n.`synonym` = cy.`synonym`)
                 WHERE n.`synonym` == NULL)");
+            // TODO: Update existing synonyms (should cascade)
         } else {
             $qexact = $db->prepare("SELECT 1
                 FROM `{$db->getPrefix()}churchyear_synonyms`
