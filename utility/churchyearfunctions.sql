@@ -104,6 +104,9 @@ BEGIN
     IF base = "Easter" THEN
         RETURN `{{DBP}}easter_in_year`(p_year) + INTERVAL offset DAY;
     ELSEIF base = "Christmas 1" THEN
+        IF offset > 0 THEN
+            SET p_year = p_year - 1;
+        END IF;
         RETURN `{{DBP}}christmas1_in_year`(p_year) + INTERVAL offset DAY;
     ELSEIF base = "Michaelmas 1" THEN
         RETURN `{{DBP}}michaelmas1_in_year`(p_year) + INTERVAL offset DAY;
