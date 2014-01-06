@@ -218,10 +218,15 @@ number makes it possible.</p>
     <p>The other immediately noteworthy item, if you plan to use the block
 planning feature, is at the bottom of the page.  Here is where you set your
 preference for the Bible version in which to read the lections.  If you save an
-abbreviation like "nkjv" there, then your service listings will not only
+abbreviation like "NKJV" there, then your service listings will not only
 include the lection references in their block plan rectangles, but those
 references will be links to the texts via BibleGateway.com.  If you don't save
-an abbreviation here, then the lection references will not be links.<p>
+an abbreviation here, then the lection references will not be links.
+<b>Tip:</b> If you want to link to the Bible texts in original languages, set
+the version to something like "SBLGNT;WLC".  That will show the Greek New
+Testament in parallel with the Hebrew Old Testament.  Yes, it's technically
+impossible, but Bible Gateway will then show the text you want for every link,
+on one side or the other.<p>
 
     <h2>Usage Tips</h2>
 
