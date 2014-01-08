@@ -24,6 +24,7 @@
     USA
  */
 $thisdir = dirname(__FILE__);
+$serverdir = dirname($_SERVER['PHP_SELF']);
 chdir($thisdir);
 require("./version.php");
 if (! file_exists("options.php")) {
@@ -72,7 +73,6 @@ try {
 }
 // require("./db-connection.php");
 $db = new DBConnection();
-$serverdir = dirname($_SERVER['PHP_SELF']);
 if (! ($_GET['flag'] == "inituser"
     || array_key_exists('username', $_POST))) $auth = auth();
 if ((! $dbstate->get("churchyear-filled")) or
