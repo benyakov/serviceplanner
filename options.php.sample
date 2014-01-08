@@ -63,7 +63,7 @@ $sitetabs = array(
 $sitetabs_anonymous = array(
     "index"=>"Upcoming Hymns"
     ,"records"=>"Service Records"
-    ,"report"=>"Report
+    ,"report"=>"Report"
     ,"hymnindex"=>"Cross Ref"
 );
 
