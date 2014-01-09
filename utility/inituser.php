@@ -23,9 +23,11 @@
     The Dalles, OR 97058
     USA
  */
-require_once("./dbconnection.php");
+chdir("..");
+require_once("./utility/dbconnection.php");
 $dbh = new DBConnection();
 $dbp = $dbh->getPrefix();
+chdir("./utility");
 
 $serverdir = dirname(dirname($_SERVER['PHP_SELF']));
 // Test the existence of a table

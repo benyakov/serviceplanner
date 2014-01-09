@@ -41,9 +41,11 @@ if (array_key_exists("step", $_POST) && $_POST['step'] == '2') {
     $dbc->set("prefix", $post['dbtableprefix']);
     $dbc->save();
     chmod("../dbconnection.ini", 0600);
-    require("./dbconnection.php");
+    chdir("..");
+    require("./utility/dbconnection.php");
     $dbh = new DBConnection();
     $dbp = $dbh->getPrefix();
+    chdir("./utility");
     // Test the existence of a table
     $q = $dbh->query("SHOW TABLES LIKE '{$dbp}days'");
     if ($q->rowCount()) {
