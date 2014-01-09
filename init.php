@@ -72,14 +72,16 @@ if (! (($dbstate->exists("has-user") && $dbstate->get("has-user"))
 $db = new DBConnection();
 if (! ($_GET['flag'] == "inituser"
     || array_key_exists('username', $_POST))) $auth = auth();
-if ((! $dbstate->get("churchyear-filled")) or
+if ((! ($dbstate->exists("churchyear-filled") &&
+        $dbstate->get("churchyear-filled"))) or
     ($_GET['flag'] == 'fill-churchyear' && $auth))
 {
     require('./utility/fillservicetables.php');
     $dbstate->store("churchyear-filled", 1);
     $dbstate->save() or die("Problem saving dbstate file.");
 }
-if ((! $dbstate->get("has-churchyear-functions")) or
+if ((! ($dbstate->exists("has-churchyear-functions") &&
+        $dbstate->get("has-churchyear-functions"))) or
     ($_GET['flag'] == 'create-churchyear-functions' && $auth))
 {
     $functionsfile = "./utility/churchyearfunctions.sql";
@@ -93,7 +95,7 @@ if ((! $dbstate->get("has-churchyear-functions")) or
     $dbstate->store('has-churchyear-functions', 1);
     $dbstate->save() or die("Problem saving dbstate file.");
 }
-if ((! $dbstate->get("has-views")) or
+if ((! ($dbstate->exists("has-views") && $dbstate->get("has-views"))) or
         ($_GET['flag'] == 'create-views' && $auth))
 {
     require('./utility/createviews.php');
