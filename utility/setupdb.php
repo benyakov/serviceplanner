@@ -89,7 +89,7 @@ foreach ($queries as $query) {
 }
 $dbh->commit();
 // Write database version to dbstate file.
-require("configfile.php");
+require_once("configfile.php");
 $dbstate = new Configfile("../dbstate.ini", false);
 $dbstate->set('dbversion',
     "{$version['major']}.{$version['minor']}.{$version['tick']}");
