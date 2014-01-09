@@ -62,12 +62,9 @@ if ($upgradedb) {
     $newversion = "{$version['major']}.{$version['minor']}";
     require("./utility/upgrades/{$oldversion}to{$newversion}.php");
 }
-try {
-    if (! ($dbstate->get("has-user") || $_GET['flag'] == 'inituser')) {
-        header("Location: {$serverdir}/utility/inituser.php");
-        exit(0);
-    }
-} catch (ConfigfileUnknownKey $e) {
+if (! (($dbstate->exists("has-user") && $dbstate->get("has-user"))
+        || $_GET['flag'] == 'inituser'))
+{
     header("Location: {$serverdir}/utility/inituser.php");
     exit(0);
 }

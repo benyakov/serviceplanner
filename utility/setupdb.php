@@ -27,8 +27,11 @@ require("../options.php");
 require("../setup-session.php");
 require("../functions.php");
 validateAuth($require=false);
-require("../db-connection.php");
+require("./dbconnection.php");
 require("../version.php");
+
+$dbh = new DBConnection();
+$dbp = $dbh->getPrefix();
 
 $dumpfile="createtables.sql";
 $dumplines = file($dumpfile, FILE_IGNORE_NEW_LINES);

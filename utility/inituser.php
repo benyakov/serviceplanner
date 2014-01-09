@@ -23,7 +23,10 @@
     The Dalles, OR 97058
     USA
  */
-require("../db-connection.php");
+require_once("./dbconnection.php");
+$dbh = new DBConnection();
+$dbp = $dbh->getPrefix();
+
 $serverdir = dirname(dirname($_SERVER['PHP_SELF']));
 // Test the existence of a table
 $q = $dbh->query("SHOW TABLES LIKE '{$dbp}days'");
