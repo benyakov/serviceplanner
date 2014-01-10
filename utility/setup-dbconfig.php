@@ -23,17 +23,12 @@
     The Dalles, OR 97058
     USA
  */
-chdir("..");
-require("./setup-session.php");
-require("./functions.php");
-validateAuth($require=false);
-$serverdir = dirname(dirname($_SERVER['PHP_SELF']));
 if (array_key_exists("step", $_POST) && $_POST['step'] == '2') {
     // Process the form (second time around)
     // Escape string-ending characters to avoid PHP injection
     $post = str_replace('\\', '\\\\', $_POST);
     $post = str_replace('\'', '\\\'', $post);
-    $dbc = new Configfile("../dbconnection.ini", false, true);
+    $dbc = new Configfile("./dbconnection.ini", false, true);
     $dbc->set("dbhost", $post['dbhost']);
     $dbc->set("dbname", $post['dbname']);
     $dbc->set("dbuser", $post['dbuser']);
@@ -64,7 +59,7 @@ if (array_key_exists("step", $_POST) && $_POST['step'] == '2') {
     <body><h1>New Installation</h1>
 
     <table border=0 cellspacing=7 cellpadding=0>
-    <form name="configForm" method="POST" action="<?=$_SERVER['PHP_SELF']?>">
+    <form name="configForm" method="POST" action="<?="{$_SERVER['PHP_SELF']}?action=setup-dbconfig"?>">
         <input type="hidden" name="step" value="2"/>
         <tr>
             <td valign="top" align="right" nowrap>

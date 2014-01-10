@@ -33,6 +33,9 @@ require("./utility/configfile.php");
 require("./utility/dbconnection.php");
 $script_basename = basename($_SERVER['PHP_SELF'], '.php');
 
+if (! file_exists("./dbconnection.ini")) {
+    require("./utility/setup-dbconfig.php");
+}
 $dbstate = getDBState();
 $upgradedb = false;
 if (null == $dbstate->get('dbversion')) {
