@@ -98,7 +98,10 @@ if ((! ($dbstate->exists("has-views") && $dbstate->get("has-views"))) or
         $dbstate->store('has-views', 1);
         $dbstate->save() or die("Problem saving dbstate file.");
 }
-
 unset($dbstate); // release file lock.
+
+if (! file_exists('./options.ini'))
+    require('./utility/setup-options.php');
+
 
 ?>

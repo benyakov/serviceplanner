@@ -224,7 +224,7 @@ if ( $flag=="edit" ) {
     session_destroy();
     require("./setup-session.php");
     auth($_POST['username'], $_POST['pw']);
-    $dbstate = new Configfile("../dbstate.ini", false);
+    $dbstate = new Configfile("./dbstate.ini", false);
     $dbstate->set('has-user', 1);
     $dbstate->save() or die("Problem saving dbstate file.");
     setMessage("Initial user has been set up.");

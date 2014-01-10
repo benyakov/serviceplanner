@@ -1,4 +1,4 @@
-<? /* Options file which can be adjusted by the installer
+<? /* Set up the options to reasonable defaults
     Copyright (C) 2012 Jesse Jacobsen
 
     This program is free software; you can redistribute it and/or modify
@@ -95,5 +95,24 @@ if (strpos($phplibrary, '/') != 0) {
 // remember the logins of users past the expiration of the current session.
 // This can be customized on the Admin page.
 $authcookie_shelf_life = 60*60*24*7;  // 1 week (in seconds)
+
+$options = new Configfile("./options.ini", true, true, true);
+$options->set('hymnbooks', $option_hymnbooks);
+$options->set('hymncount', $option_hymncount);
+$options->set('used_history', $option_used_history);
+foreach ($sitetabs as $k=>$v) {
+    $options->set('sitetabs', $k, $v);
+}
+foreach ($sitetabs_anonymous as $k=>$v) {
+    $options->set('anonymous sitetabs', $k, $v);
+}
+$options->set('listinglimit', $listinglimit);
+$options->set('modifyorder', $modifyorder);
+$options->set('phplibrary', $phplibrary);
+if (! $authcookie_shelf_life) {
+    $authcookie_shelf_life = 60*60*24*7;
+}
+$options->set('authcookie_shelf_life', $authcookie_shelf_life);
+$options->save();
 
 ?>
