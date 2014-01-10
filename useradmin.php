@@ -229,6 +229,7 @@ if ( $flag=="edit" ) {
     $dbstate->save() or die("Problem saving dbstate file.");
     setMessage("Initial user has been set up.");
     header("Location: index.php");
+    exit(0);
 } elseif ($authdata['userlevel'] == 3) {
     checkPasswordAuth();
     userList();

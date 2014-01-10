@@ -23,17 +23,10 @@
     The Dalles, OR 97058
     USA
  */
-chdir("..");
-require_once("./utility/dbconnection.php");
-$dbh = new DBConnection();
-$dbp = $dbh->getPrefix();
-chdir("./utility");
-
-$serverdir = dirname(dirname($_SERVER['PHP_SELF']));
 // Test the existence of a table
-$q = $dbh->query("SHOW TABLES LIKE '{$dbp}days'");
+$q = $db->query("SHOW TABLES LIKE '{$db->getPrefix()}days'");
 if (!$q->rowCount()) {
-    header("Location: setupdb.php");
+    require("./utility/setupdb.php");
 }
 ?>
 <!DOCTYPE html>

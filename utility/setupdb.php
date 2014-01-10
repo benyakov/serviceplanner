@@ -23,18 +23,7 @@
     The Dalles, OR 97058
     USA
  */
-require("../options.php");
-require("../setup-session.php");
-require("../functions.php");
-validateAuth($require=false);
-require("../version.php");
-chdir("..");
-require("./utility/dbconnection.php");
-$dbh = new DBConnection();
-$dbp = $dbh->getPrefix();
-chdir("./utility");
-
-$dumpfile="createtables.sql";
+$dumpfile="./utility/createtables.sql";
 $dumplines = file($dumpfile, FILE_IGNORE_NEW_LINES);
 // Separate SQL statements into an array.
 $query = array();
@@ -53,27 +42,27 @@ foreach ($dumplines as $line) {
                     '/^(CREATE TABLE `)([^`]+)/',
                     '/(REFERENCES `)([^`]+)/',
                     '/(CONSTRAINT `)([^`]+)/'
-                ), "\${1}{$dbp}\${2}", $line);
+                ), "\${1}{$db->getPrefix()}\${2}", $line);
     if (strpos($line, 'CREATE TABLE') > -1) {
-        $tables[] = preg_replace('/^(CREATE TABLE `)([^`]+).*$/', "{$dbp}\\2",
-            $line);
+        $tables[] = preg_replace('/^(CREATE TABLE `)([^`]+).*$/',
+            "{$db->getPrefix()}\\2", $line);
     }
 }
 $queries[] = implode("\n", $query);
 if ($_GET['drop'] = "first") {
     $dropresults = array();
     foreach ($tables as $table) {
-        $q = $dbh->prepare("DROP TABLE `{$table}`");
+        $q = $db->prepare("DROP TABLE `{$table}`");
         if ($q->execute()) $dropresults[] = "Table `{$table}` dropped.";
         else $dropresults[] = array_pop($q->errorinfo());
     }
 }
 // Execute each SQL query.
-$dbh->beginTransaction();
+$db->beginTransaction();
 foreach ($queries as $query) {
-    $q = $dbh->prepare($query);
+    $q = $db->prepare($query);
     if (! $q->execute()) {
-        $dbh->rollback();
+        $db->rollback();
         ?>
         <!DOCTYPE html>
         <html lang="en"><head><title>Setup Failed</title></head>
@@ -87,13 +76,10 @@ foreach ($queries as $query) {
         exit(1);
     }
 }
-$dbh->commit();
+$db->commit();
 // Write database version to dbstate file.
-require_once("configfile.php");
-$dbstate = new Configfile("../dbstate.ini", false);
+$dbstate = new Configfile("./dbstate.ini", false);
 $dbstate->set('dbversion',
     "{$version['major']}.{$version['minor']}.{$version['tick']}");
 $dbstate->save();
-// Create the initial user
-require("inituser.php");
 ?>

@@ -23,9 +23,9 @@
     The Dalles, OR 97058
     USA
  */
-require("../options.php");
-require("../setup-session.php");
-require("../functions.php");
+chdir("..");
+require("./setup-session.php");
+require("./functions.php");
 validateAuth($require=false);
 $serverdir = dirname(dirname($_SERVER['PHP_SELF']));
 if (array_key_exists("step", $_POST) && $_POST['step'] == '2') {
@@ -40,18 +40,17 @@ if (array_key_exists("step", $_POST) && $_POST['step'] == '2') {
     $dbc->set("dbpassword", $post['dbpassword']);
     $dbc->set("prefix", $post['dbtableprefix']);
     $dbc->save();
-    chmod("../dbconnection.ini", 0600);
-    chdir("..");
+    unset($dbc); // Close ini file
+    chmod("./dbconnection.ini", 0600);
     require("./utility/dbconnection.php");
-    $dbh = new DBConnection();
-    $dbp = $dbh->getPrefix();
-    chdir("./utility");
+    $db = new DBConnection();
     // Test the existence of a table
-    $q = $dbh->query("SHOW TABLES LIKE '{$dbp}days'");
+    $q = $db->query("SHOW TABLES LIKE '{$db->getPrefix()}days'");
     if ($q->rowCount()) {
         header("Location: {$serverdir}/index.php");
+        exit(0);
     } else {
-        header("Location: setupdb.php");
+        require("./utility/setupdb.php");
     }
 } else {
     // Display the form (first time around)

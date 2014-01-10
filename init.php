@@ -27,10 +27,6 @@ $thisdir = dirname(__FILE__);
 $serverdir = dirname($_SERVER['PHP_SELF']);
 chdir($thisdir);
 require("./version.php");
-if (! file_exists("options.php")) {
-    copy("options.php.sample", "options.php");
-}
-require("./options.php");
 require("./setup-session.php");
 require("./functions.php");
 require("./utility/configfile.php");
@@ -61,10 +57,9 @@ if ($upgradedb) {
 if (! (($dbstate->exists("has-user") && $dbstate->get("has-user"))
         || $_GET['flag'] == 'inituser'))
 {
-    header("Location: {$serverdir}/utility/inituser.php");
+    require("./utility/inituser.php");
     exit(0);
 }
-// require("./db-connection.php");
 $db = new DBConnection();
 if (! ($_GET['flag'] == "inituser"
     || array_key_exists('username', $_POST))) $auth = auth();

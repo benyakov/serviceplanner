@@ -88,13 +88,18 @@ $phplibrary = "../../php";
 // It takes a relative $phplibrary and makes it absolute,
 // which allows the path to work even when this application is symlinked.
 if (strpos($phplibrary, '/') != 0) {
-    $phplibrary = dirname(__FILE__) . DIRECTORY_SEPARATOR . $phplibrary;
+    $phplibrary = $thisdir . DIRECTORY_SEPARATOR . $phplibrary;
 }
 
 // Default shelf-life of auth cookies, which allow the Service Planner to
 // remember the logins of users past the expiration of the current session.
 // This can be customized on the Admin page.
 $authcookie_shelf_life = 60*60*24*7;  // 1 week (in seconds)
+
+if (file_exists("./options.php")) {
+    require("./options.php");
+    unlink("./options.php");
+}
 
 $options = new Configfile("./options.ini", true, true, true);
 $options->set('hymnbooks', $option_hymnbooks);
