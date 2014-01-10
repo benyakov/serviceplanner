@@ -198,36 +198,36 @@ if ( $flag=="edit" ) {
         $q->execute();
     }
 } elseif ( $flag=="inituser") {
-        $db->beginTransaction();
-        // Check that the table is really empty.
-        $q = $db->query("SELECT `username` from `{$db->getPrefix()}users`
-                    LIMIT 1");
-        if ($q->fetch()) {
-            $db->rollBack();
-            setMessage("Access denied.  Users already exist.");
-            header("Location: index.php");
-            exit(0);
-        }
-        // Save the posted user
-        $q = $db->prepare("INSERT INTO `{$db->getPrefix()}users`
-            SET `username`=:username, `password`=:pw,
-            `fname`=:fname, `lname`=:lname,
-            `userlevel`=:ulevel, `email`=:email");
-        $q->bindParam(':username', $_POST['username']);
-        $q->bindParam(':fname', $_POST['fname']);
-        $q->bindParam(':lname', $_POST['lname']);
-        $q->bindParam(':ulevel', $_POST['ulevel']);
-        $q->bindParam(':email', $_POST['email']);
-        $q->bindParam(':pw', hashPassword($_POST['pw']));
-        $q->execute() or dieWithRollback($q);
-        $db->commit();
-        session_destroy();
-        require("./setup-session.php");
-        auth($_POST['username'], $_POST['pw']);
-        $dbstate->store('has-user', 1);
-        $dbstate->save() or die("Problem saving dbstate file.");
-        setMessage("Initial user has been set up.");
+    $db->beginTransaction();
+    // Check that the table is really empty.
+    $q = $db->query("SELECT `username` from `{$db->getPrefix()}users`
+                LIMIT 1");
+    if ($q->fetch()) {
+        $db->rollBack();
+        setMessage("Access denied.  Users already exist.");
         header("Location: index.php");
+        exit(0);
+    }
+    // Save the posted user
+    $q = $db->prepare("INSERT INTO `{$db->getPrefix()}users`
+        SET `username`=:username, `password`=:pw,
+        `fname`=:fname, `lname`=:lname,
+        `userlevel`=:ulevel, `email`=:email");
+    $q->bindParam(':username', $_POST['username']);
+    $q->bindParam(':fname', $_POST['fname']);
+    $q->bindParam(':lname', $_POST['lname']);
+    $q->bindParam(':ulevel', $_POST['ulevel']);
+    $q->bindParam(':email', $_POST['email']);
+    $q->bindParam(':pw', hashPassword($_POST['pw']));
+    $q->execute() or dieWithRollback($q);
+    $db->commit();
+    session_destroy();
+    require("./setup-session.php");
+    auth($_POST['username'], $_POST['pw']);
+    $dbstate->set('has-user', 1);
+    $dbstate->save() or die("Problem saving dbstate file.");
+    setMessage("Initial user has been set up.");
+    header("Location: index.php");
 } elseif ($authdata['userlevel'] == 3) {
     checkPasswordAuth();
     userList();

@@ -36,11 +36,7 @@ require("./functions.php");
 require("./utility/configfile.php");
 require("./utility/dbconnection.php");
 $script_basename = basename($_SERVER['PHP_SELF'], '.php');
-/* if ((! file_exists("db-connection.php") and
-    (! is_link($_SERVER['SCRIPT_FILENAME'])))) {
-        header("Location: {$serverdir}/utility/setup-dbconfig.php");
-        exit(0);
-    } */
+
 $dbstate = getDBState();
 $upgradedb = false;
 if (null == $dbstate->get('dbversion')) {
