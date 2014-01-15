@@ -1,5 +1,5 @@
-<?  /* Save settings from form on admin page.
-    Copyright (C) 2012 Jesse Jacobsen
+<?  /* Save settings provided in $_GET or $_POST
+    Copyright (C) 2014 Jesse Jacobsen
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -24,18 +24,14 @@
     USA
  */
 
-chdir("..");
-require("init.php");
 $config = getConfig(true);
-
 // Check for set values and store them.
-if (array_key_exists("biblegwversion", $_POST))
-    $config->set("biblegwversion", urlencode($_POST['biblegwversion']));
+if (array_key_exists("biblegwversion", $_POST) && $auth) {
+    $config->set("biblegwversion", $_POST['biblegwversion']);
+    setMessage("Bible Gateway version has been set.");
+}
 
 // Save the file
 $config->save();
-
-// Load the admin page
-header("Location: ../admin.php");
 
 ?>

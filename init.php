@@ -1,5 +1,5 @@
 <? /* Initialization used by all entry points
-    Copyright (C) 2012 Jesse Jacobsen
+    Copyright (C) 2014 Jesse Jacobsen
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -50,6 +50,12 @@ require("./init/checkuser.php");
 
 $db = new DBConnection();
 if (! array_key_exists('username', $_POST)) $auth = auth();
+
+// Save settings in request
+if ($_GET['flag'] == 'savesettings') {
+    require("./init/savesettings.php");
+}
+
 
 // Check churchyear data and functions
 require("./init/checkchurchyear.php");

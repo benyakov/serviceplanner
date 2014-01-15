@@ -327,7 +327,7 @@ $(document).ready(function(){var a="http://www.bethanythedalles.org/services-dev
     </ul>
 
     <h3>Config Settings</h2>
-    <form id="configsettings" action="utility/savesettings.php" method="post">
+    <form id="configsettings" action="<?=$_SERVER['SERVER_NAME'].$_SERVER['PHP_SELF']?>" method="post">
     <dl>
     <dt>Preferred Bible Abbreviation from <a href="http://www.biblegateway.com/versions/" title="BibleGateway.com">Bible Gateway</a></dt>
     <dd><input type="text" id="biblegwversion" name="biblegwversion"

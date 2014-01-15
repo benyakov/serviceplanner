@@ -450,7 +450,7 @@ function linkbgw($config, $ref, $linked, $other=true) {
         return $ref;
     }
     try { // The config value may not be set.
-        $bgwversion = $config->get("biblegwversion");
+        $bgwversion = urlencode($config->get("biblegwversion"));
         if ($other) $other = " target=\"bgmain\" ";
         else $other = "";
         return "<a href=\"http://biblegateway.com/passage?search=".
