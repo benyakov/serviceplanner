@@ -32,34 +32,16 @@ require("./functions.php");
 require("./utility/configfile.php");
 require("./utility/dbconnection.php");
 $script_basename = basename($_SERVER['PHP_SELF'], '.php');
-
 $dbstate = getDBState();
-$upgradedb = false;
-if (null == $dbstate->get('dbversion')) {
-    $upgradedb = true;
-    if (file_exists("./dbversion.txt")) {
-        $dp = fopen("./dbversion.txt", "rb");
-        $oldversion = explode('.', fread($dp, 64));
-        $oldversion = "{$oldversion[0]}.{$oldversion[1]}";
-    } else $oldversion = "";
-} else {
-    $dbcurrent = explode('.', trim($dbstate->get('dbversion')));
-    if (! ($version['major'] == $dbcurrent[0]
-        && $version['minor'] == $dbcurrent[1])) {
-        $upgradedb = true;
-        $oldversion = "{$dbcurrent[0]}.{$dbcurrent[1]}";
-    }
-}
-if ($upgradedb) {
-    $newversion = "{$version['major']}.{$version['minor']}";
-    require("./utility/upgrades/{$oldversion}to{$newversion}.php");
-}
-if (! (($dbstate->exists("has-user") && $dbstate->get("has-user"))
-        || $_GET['flag'] == 'inituser'))
-{
-    require("./utility/inituser.php");
-    exit(0);
-}
+
+//
+
+// Perform any necessary upgrades
+require("./init/upgrades.php");
+
+// Make sure a user has been configured
+require("./init/checkuser.php");
+
 $db = new DBConnection();
 if (! ($_GET['flag'] == "inituser"
     || array_key_exists('username', $_POST))) $auth = auth();

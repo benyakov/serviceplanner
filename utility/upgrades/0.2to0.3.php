@@ -172,8 +172,6 @@ if (file_exists("./has-user.txt")) {
 unlink("./dbversion.txt");
 // redirect with a message.
 setMessage(implode("<br />\n", $rv));
-$serverdir = dirname(dirname(dirname($_SERVER['PHP_SELF'])));
-header("Location: {$serverdir}");
 
 ?>
 

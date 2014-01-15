@@ -87,8 +87,6 @@ try {
     $fh = fopen("./dbversion.txt", "w");
     fwrite($fh, "0.1.0");
     fclose($fh);
-    $serverdir = dirname(dirname(dirname($_SERVER['PHP_SELF'])));
-    header("Location: {$serverdir}");
 } catch (Exception $e) {
     die(implode("\n", $rv)."\n".$e);
 }
