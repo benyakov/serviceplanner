@@ -26,9 +26,6 @@
 
 
 function needsUpgrade($dbstate) {
-    if (! file_exists("./dbconnection.ini")) {
-        require("./utility/setup-dbconfig.php");
-    }
     $oldversion = "";
     if (null == $dbstate->get('dbversion')) {
         if (file_exists("./dbversion.txt")) {
@@ -47,6 +44,9 @@ function needsUpgrade($dbstate) {
 }
 
 while ($oldversion = needsUpgrade($dbstate)) {
+    if (! file_exists("./dbconnection.ini")) {
+        require("./utility/setup-dbconfig.php");
+    }
     $finalversion = "{$version['major']}.{$version['minor']}";
     $upgradefile = "./utility/upgrades/{$oldversion}to{$newversion}.php";
     if (file_exists($upgradefile)) {

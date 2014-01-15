@@ -34,7 +34,13 @@ require("./utility/dbconnection.php");
 $script_basename = basename($_SERVER['PHP_SELF'], '.php');
 $dbstate = getDBState();
 
-//
+if ($_GET['flag'] == 'inituser') {
+    $db = new DBConnection();
+    require("./init/inituser.php");
+}
+
+// Make sure database is set up
+require("./init/dbsetup.php");
 
 // Perform any necessary upgrades
 require("./init/upgrades.php");
@@ -43,43 +49,15 @@ require("./init/upgrades.php");
 require("./init/checkuser.php");
 
 $db = new DBConnection();
+if (! array_key_exists('username', $_POST)) $auth = auth();
 
-if (! ($_GET['flag'] == "inituser"
-    || array_key_exists('username', $_POST))) $auth = auth();
-if ((! ($dbstate->exists("churchyear-filled") &&
-        $dbstate->get("churchyear-filled"))) or
-    ($_GET['flag'] == 'fill-churchyear' && $auth))
-{
-    require('./utility/fillservicetables.php');
-    $dbstate->store("churchyear-filled", 1);
-    $dbstate->save() or die("Problem saving dbstate file.");
-}
-if ((! ($dbstate->exists("has-churchyear-functions") &&
-        $dbstate->get("has-churchyear-functions"))) or
-    ($_GET['flag'] == 'create-churchyear-functions' && $auth))
-{
-    $functionsfile = "./utility/churchyearfunctions.sql";
-    $functionsfh = fopen($functionsfile, "rb");
-    $functionstext = fread($functionsfh, filesize($functionsfile));
-    fclose($functionsfh);
-    $q = $db->prepare(replaceDBP($functionstext));
-    $q->execute() or die("Problem creating functions<br>".
-        array_pop($q->errorInfo()));
-    $q->closeCursor();
-    $dbstate->store('has-churchyear-functions', 1);
-    $dbstate->save() or die("Problem saving dbstate file.");
-}
-if ((! ($dbstate->exists("has-views") && $dbstate->get("has-views"))) or
-        ($_GET['flag'] == 'create-views' && $auth))
-{
-    require('./utility/createviews.php');
-        $dbstate->store('has-views', 1);
-        $dbstate->save() or die("Problem saving dbstate file.");
-}
-unset($dbstate); // release file lock.
+// Check churchyear data and functions
+require("./init/checkchurchyear.php");
 
+// release file lock.
+unset($dbstate);
+
+// Load runtime options
 if (! file_exists('./options.ini'))
     require('./utility/setup-options.php');
-
-
 ?>

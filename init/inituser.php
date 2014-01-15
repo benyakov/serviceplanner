@@ -24,10 +24,7 @@
     USA
  */
 
-if ($_GET['flag'] == 'inituser') { # This IS the entry point, no init.php
-    require("../setup-session.php");
-    require("./dbconnection.php");
-    $db = new DBConnection("..");
+if ($_GET['flag'] == 'inituser') {
     $db->beginTransaction();
     echo "Starting process.";
     // Check that the table is really empty.

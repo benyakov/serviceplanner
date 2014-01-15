@@ -81,5 +81,6 @@ $db->commit();
 $dbstate = new Configfile("./dbstate.ini", false);
 $dbstate->set('dbversion',
     "{$version['major']}.{$version['minor']}.{$version['tick']}");
+$dbstate->set("dbsetup", 1);
 $dbstate->save();
 ?>
