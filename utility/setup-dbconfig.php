@@ -37,11 +37,23 @@ if (array_key_exists("step", $_POST) && $_POST['step'] == '2') {
     $dbc->save();
     unset($dbc); // Close ini file
     chmod("./dbconnection.ini", 0600);
-    require("./utility/dbconnection.php");
     $db = new DBConnection();
     // Test the existence of a table
     $q = $db->query("SHOW TABLES LIKE '{$db->getPrefix()}days'");
     if ($q->rowCount()) {
+        $dbs = new Configfile("./dbstate.ini", false, true);
+        if (! $dbs->exists("dbversion")) {
+            // Set as current version and cross fingers.
+            require_once("./functions.php");
+            setMessage("DB already exists; guessing version is the same ".
+                "as the current installation.  Change in dbstate.ini ".
+                "if necessary.");
+            require_once("./version.php");
+            $dbs->set('dbversion',
+                "{$version['major']}.{$version['minor']}.{$version['tick']}");
+            $dbs->save();
+            unset($dbs);
+        }
         header("Location: {$serverdir}/index.php");
         exit(0);
     } else {
@@ -94,6 +106,7 @@ if (array_key_exists("step", $_POST) && $_POST['step'] == '2') {
     </table>
     </body></html>
 <?
+    exit(0);
 }
 // vim: set tags+=../../**/tags :
 ?>

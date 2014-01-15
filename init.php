@@ -38,7 +38,7 @@ if (! file_exists("./dbconnection.ini")) {
 }
 $dbstate = getDBState();
 $upgradedb = false;
-if (null == $dbstate->get('dbversion')) {
+if (! $dbstate->exists('dbversion')) {
     $upgradedb = true;
     if (file_exists("./dbversion.txt")) {
         $dp = fopen("./dbversion.txt", "rb");
@@ -57,13 +57,13 @@ if ($upgradedb) {
     $newversion = "{$version['major']}.{$version['minor']}";
     require("./utility/upgrades/{$oldversion}to{$newversion}.php");
 }
+$db = new DBConnection();
 if (! (($dbstate->exists("has-user") && $dbstate->get("has-user"))
         || $_GET['flag'] == 'inituser'))
 {
     require("./utility/inituser.php");
     exit(0);
 }
-$db = new DBConnection();
 if (! ($_GET['flag'] == "inituser"
     || array_key_exists('username', $_POST))) $auth = auth();
 if ((! ($dbstate->exists("churchyear-filled") &&
