@@ -30,16 +30,17 @@ class DBConnection {
     private static $handle;
     public static $prefix;
 
-    public function __construct() {
+    public function __construct($pathtoroot="") {
         if (self::$instance) {
             return self::$instance;
         } else {
             self::$instance = $this;
-            $this->setupConnection();
+            $this->setupConnection($pathtoroot);
             return self::$instance;
         }
     }
-    private function setupConnection() {
+    private function setupConnection($pathtoroot) {
+        if ($pathtoroot) chdir($pathtoroot);
         require_once("./utility/configfile.php");
         $cf = new ConfigFile("dbconnection.ini");
         self::$connection = array(

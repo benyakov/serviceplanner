@@ -23,6 +23,53 @@
     The Dalles, OR 97058
     USA
  */
+
+if ($_GET['flag'] == 'inituser') { # This IS the entry point, no init.php
+    require("../setup-session.php");
+    require("./dbconnection.php");
+    $db = new DBConnection("..");
+    $db->beginTransaction();
+    echo "Starting process.";
+    // Check that the table is really empty.
+    $q = $db->query("SELECT `username` from `{$db->getPrefix()}users`
+                LIMIT 1");
+    echo "After empty table check";
+    if ($q->fetch()) {
+        echo "Check failed, rolling back.";
+        $db->rollBack();
+        die("Access denied.  Users already exist.");
+    }
+    // Save the posted user
+    $q = $db->prepare("INSERT INTO `{$db->getPrefix()}users`
+        SET `username`=:username, `password`=:pw,
+        `fname`=:fname, `lname`=:lname,
+        `userlevel`=:ulevel, `email`=:email");
+    echo "Statement prepared.";
+    $q->bindParam(':username', $_POST['username']);
+    $q->bindParam(':fname', $_POST['fname']);
+    $q->bindParam(':lname', $_POST['lname']);
+    $q->bindParam(':ulevel', $_POST['ulevel']);
+    $q->bindParam(':email', $_POST['email']);
+    $q->bindParam(':pw', hashPassword($_POST['pw']));
+    echo "Params bound";
+    $q->execute() or die(array_pop($q->errorInfo()));
+    echo "Executed user insert.";
+    $db->commit();
+    echo "Committed user to db.";
+    session_destroy();
+    require("../setup-session.php");
+    require("../authfunctions.php");
+    auth($_POST['username'], $_POST['pw']);
+    require("./configfile.php");
+    $dbstate = new Configfile("../dbstate.ini", false);
+    $dbstate->set('has-user', 1);
+    $dbstate->save() or die("Problem saving dbstate file.");
+    require("../functions.php");
+    setMessage("Initial user has been set up.");
+    header("Location: index.php");
+    exit(0);
+}
+
 ?>
 <!DOCTYPE html>
 <html lang=en>
@@ -49,7 +96,7 @@ $(document).ready(function() {
 <body>
 <h1>Set Up Initial User</h1>
 <table>
-<form action="../useradmin.php?flag=inituser" method="post">
+<form action="utility/inituser.php?flag=inituser" method="post">
         <input type="hidden" name="ulevel" value="3"/>
         <tr>
             <td nowrap valign="top" align="right" nowrap>

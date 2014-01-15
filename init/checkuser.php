@@ -1,5 +1,5 @@
-<? /* Record the version
-    Copyright (C) 2012 Jesse Jacobsen
+<? /* Make sure a user has been configured
+    Copyright (C) 2014 Jesse Jacobsen
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -23,5 +23,10 @@
     The Dalles, OR 97058
     USA
  */
-$version = array('major' => 0, 'minor' => 8, 'tick' => 16);
+
+if (! ($dbstate->exists("has-user") && $dbstate->get("has-user")) {
+    require("./init/inituser.php");
+    exit(0);
+}
+
 ?>

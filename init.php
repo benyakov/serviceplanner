@@ -43,6 +43,7 @@ require("./init/upgrades.php");
 require("./init/checkuser.php");
 
 $db = new DBConnection();
+
 if (! ($_GET['flag'] == "inituser"
     || array_key_exists('username', $_POST))) $auth = auth();
 if ((! ($dbstate->exists("churchyear-filled") &&
