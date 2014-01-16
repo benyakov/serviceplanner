@@ -37,9 +37,9 @@ $dbstate = getDBState();
 if ($_GET['flag'] == 'dbinit') {
     require("./init/dbinit.php");
 }
+$db = new DBConnection();
 
 if ($_GET['flag'] == 'inituser') {
-    $db = new DBConnection();
     require("./init/inituser.php");
 }
 
@@ -54,7 +54,6 @@ require("./init/upgrades.php");
 // Make sure a user has been configured
 require("./init/checkuser.php");
 
-$db = new DBConnection();
 if (! array_key_exists('username', $_POST)) $auth = auth();
 
 // Save settings in request
