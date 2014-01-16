@@ -31,7 +31,7 @@ if ($_GET['flag'] == 'dbinit') {
     try {
         $handle = new PDO("mysql:host={$post['dbhost']};dbname={$post['dbname']}",
             "{$post['dbuser']}", "{$post['dbpassword']}");
-        unset $handle;
+        unset($handle);
     } catch (PDOException $e) {
         header("Location: {$_SERVER['PHP_SELF']}?connectionerror=1");
         exit(0);
@@ -45,35 +45,12 @@ if ($_GET['flag'] == 'dbinit') {
     $dbc->save();
     unset($dbc); // Close ini file
     chmod("./dbconnection.ini", 0600);
-    $db = new DBConnection();
-    // Test the existence of a table
-    $q = $db->query("SHOW TABLES LIKE '{$db->getPrefix()}days'");
-    if ($q->rowCount()) {
-        $dbs = new Configfile("./dbstate.ini", false, true);
-        if (! $dbs->exists("dbversion")) {
-            // Set as current version and cross fingers.
-            require_once("./functions.php");
-            setMessage("DB already exists; guessing version is the same ".
-                "as the current installation.  Change in dbstate.ini ".
-                "if necessary.");
-            require_once("./version.php");
-            $dbs->set('dbversion',
-                "{$version['major']}.{$version['minor']}.{$version['tick']}");
-            $dbs->save();
-            unset($dbs);
-        }
-    } else {
-        require("./utility/setupdb.php");
-    }
 } else {
     // Display the form (first time around)
 ?>
 <!DOCTYPE html>
     <html lang="en">
-        <head>
-            <title>Initialize Database Connection</title>
-            <link rel="stylesheet" type="text/css" href="../styles/style.css">
-        </head>
+    <?=html_head("Initialize Database Connection")?>
     <body>
         <? if ($_GET['connectionerror']) { ?>
         <p id="message">Error: Could not connect with given settings.</p>

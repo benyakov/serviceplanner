@@ -26,21 +26,27 @@
 
 
 function needsUpgrade($dbstate) {
-    $oldversion = "";
-    if (null == $dbstate->get('dbversion')) {
+    global $version;
+    if (! $dbstate->exists('dbversion')) {
         if (file_exists("./dbversion.txt")) {
             $dp = fopen("./dbversion.txt", "rb");
             $oldversion = explode('.', fread($dp, 64));
-            $oldversion = "{$oldversion[0]}.{$oldversion[1]}";
+            return "{$oldversion[0]}.{$oldversion[1]}";
+        } else {
+            // Set to current version and cross fingers...
+            $dbstate->set('dbversion',
+                "{$version['major']}.{$version['minor']}.{$version['tick']}");
+            $dbstate->save();
+            return false;
         }
     } else {
         $dbcurrent = explode('.', trim($dbstate->get('dbversion')));
         if (! ($version['major'] == $dbcurrent[0]
-            && $version['minor'] == $dbcurrent[1])) {
-            $oldversion = "{$dbcurrent[0]}.{$dbcurrent[1]}";
-        }
+            && $version['minor'] == $dbcurrent[1]))
+            return "{$dbcurrent[0]}.{$dbcurrent[1]}";
+        else
+            return false;
     }
-    return $oldversion;
 }
 
 while ($oldversion = needsUpgrade($dbstate)) {

@@ -24,7 +24,7 @@
     USA
  */
 
-if (! ($dbstate->exists("has-user") && $dbstate->get("has-user")) {
+if (! ($dbstate->exists("has-user") && $dbstate->get("has-user"))) {
     require("./init/inituser.php");
     exit(0);
 }

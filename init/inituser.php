@@ -1,4 +1,4 @@
-<? /* Create initial user
+<?php /* Create initial user
     Copyright (C) 2014 Jesse Jacobsen
 
     This program is free software; you can redistribute it and/or modify
@@ -26,13 +26,10 @@
 
 if ($_GET['flag'] == 'inituser') {
     $db->beginTransaction();
-    echo "Starting process.";
     // Check that the table is really empty.
     $q = $db->query("SELECT `username` from `{$db->getPrefix()}users`
                 LIMIT 1");
-    echo "After empty table check";
-    if ($q->fetch()) {
-        echo "Check failed, rolling back.";
+    if ($q && $q->fetch()) {
         $db->rollBack();
         die("Access denied.  Users already exist.");
     }
@@ -41,40 +38,26 @@ if ($_GET['flag'] == 'inituser') {
         SET `username`=:username, `password`=:pw,
         `fname`=:fname, `lname`=:lname,
         `userlevel`=:ulevel, `email`=:email");
-    echo "Statement prepared.";
     $q->bindParam(':username', $_POST['username']);
     $q->bindParam(':fname', $_POST['fname']);
     $q->bindParam(':lname', $_POST['lname']);
     $q->bindParam(':ulevel', $_POST['ulevel']);
     $q->bindParam(':email', $_POST['email']);
     $q->bindParam(':pw', hashPassword($_POST['pw']));
-    echo "Params bound";
     $q->execute() or die(array_pop($q->errorInfo()));
-    echo "Executed user insert.";
     $db->commit();
-    echo "Committed user to db.";
     session_destroy();
-    require("../setup-session.php");
-    require("../authfunctions.php");
+    require("./setup-session.php");
     auth($_POST['username'], $_POST['pw']);
-    require("./configfile.php");
-    $dbstate = new Configfile("../dbstate.ini", false);
     $dbstate->set('has-user', 1);
     $dbstate->save() or die("Problem saving dbstate file.");
-    require("../functions.php");
     setMessage("Initial user has been set up.");
-    header("Location: index.php");
-    exit(0);
-}
-
+} else {
 ?>
 <!DOCTYPE html>
 <html lang=en>
-<head>
-<title>Set Up Initial User</title>
-<link rel="stylesheet" type="text/css" href="../style.css">
-<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery.min.js"></script>
-<script type="text/javascript" src="http://<?=$_SERVER['SERVER_NAME'].$serverdir?>/ecmascript.js"></script>
+<?=html_head("Initial User")?>
+<body>
 <script type="text/javascript">
 $(document).ready(function() {
     $("#formsubmit").attr('disabled', true);
@@ -89,11 +72,9 @@ $(document).ready(function() {
     });
 });
 </script>
-</head>
-<body>
 <h1>Set Up Initial User</h1>
 <table>
-<form action="utility/inituser.php?flag=inituser" method="post">
+<form action="<?=$_SERVER['PHP_SELF']?>?flag=inituser" method="post">
         <input type="hidden" name="ulevel" value="3"/>
         <tr>
             <td nowrap valign="top" align="right" nowrap>
@@ -133,3 +114,4 @@ $(document).ready(function() {
 </table>
 </body>
 </html>
+<? } ?>

@@ -37,13 +37,16 @@ $dbstate = getDBState();
 if ($_GET['flag'] == 'dbinit') {
     require("./init/dbinit.php");
 }
-$db = new DBConnection();
 
 if ($_GET['flag'] == 'inituser') {
+    $db = new DBConnection();
     require("./init/inituser.php");
 }
 
 // Make sure database connection is configured.
+if (! file_exists("./dbconnection.ini"))
+    require("./init/dbinit.php");
+$db = new DBConnection();
 
 // Make sure database is set up
 require("./init/dbsetup.php");
@@ -69,5 +72,5 @@ unset($dbstate);
 
 // Load runtime options
 if (! file_exists('./options.ini'))
-    require('./utility/setup-options.php');
+    require('./init/setupoptions.php');
 ?>

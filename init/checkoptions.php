@@ -1,5 +1,5 @@
 <? /* Set up the options to reasonable defaults
-    Copyright (C) 2012 Jesse Jacobsen
+    Copyright (C) 2014 Jesse Jacobsen
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -119,5 +119,6 @@ if (! $authcookie_shelf_life) {
 }
 $options->set('authcookie_shelf_life', $authcookie_shelf_life);
 $options->save();
+unset($options);
 
 ?>

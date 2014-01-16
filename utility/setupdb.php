@@ -65,8 +65,8 @@ foreach ($queries as $query) {
         $db->rollback();
         ?>
         <!DOCTYPE html>
-        <html lang="en"><head><title>Setup Failed</title></head>
-        <body><h1>Setup Failed</h1>
+        <html lang="en"><?=html_head("Database Setup Failed")?>
+        <body><h1>Database Setup Failed</h1>
         <p>Failed SQL Query:</p>
         <pre><?=$query?></pre>
         <h2>Description of the problem:</h2>
@@ -78,7 +78,6 @@ foreach ($queries as $query) {
 }
 $db->commit();
 // Write database version to dbstate file.
-$dbstate = new Configfile("./dbstate.ini", false);
 $dbstate->set('dbversion',
     "{$version['major']}.{$version['minor']}.{$version['tick']}");
 $dbstate->set("dbsetup", 1);
