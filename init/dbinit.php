@@ -1,4 +1,4 @@
-<? /* Set up database configuration file.
+<?php /* Make sure database connection is initialized.
     Copyright (C) 2012 Jesse Jacobsen
 
     This program is free software; you can redistribute it and/or modify
@@ -23,11 +23,19 @@
     The Dalles, OR 97058
     USA
  */
-if (array_key_exists("step", $_POST) && $_POST['step'] == '2') {
-    // Process the form (second time around)
+if ($_GET['flag'] == 'dbinit') {
     // Escape string-ending characters to avoid PHP injection
     $post = str_replace('\\', '\\\\', $_POST);
     $post = str_replace('\'', '\\\'', $post);
+    // Test connection
+    try {
+        $handle = new PDO("mysql:host={$post['dbhost']};dbname={$post['dbname']}",
+            "{$post['dbuser']}", "{$post['dbpassword']}");
+        unset $handle;
+    } catch (PDOException $e) {
+        header("Location: {$_SERVER['PHP_SELF']}?connectionerror=1");
+        exit(0);
+    }
     $dbc = new Configfile("./dbconnection.ini", false, true);
     $dbc->set("dbhost", $post['dbhost']);
     $dbc->set("dbname", $post['dbname']);
@@ -54,8 +62,6 @@ if (array_key_exists("step", $_POST) && $_POST['step'] == '2') {
             $dbs->save();
             unset($dbs);
         }
-        header("Location: {$serverdir}/index.php");
-        exit(0);
     } else {
         require("./utility/setupdb.php");
     }
@@ -65,13 +71,18 @@ if (array_key_exists("step", $_POST) && $_POST['step'] == '2') {
 <!DOCTYPE html>
     <html lang="en">
         <head>
-            <title>New Installation</title>
-            <link rel="stylesheet" type="text/css" href="../style.css">
+            <title>Initialize Database Connection</title>
+            <link rel="stylesheet" type="text/css" href="../styles/style.css">
         </head>
-    <body><h1>New Installation</h1>
+    <body>
+        <? if ($_GET['connectionerror']) { ?>
+        <p id="message">Error: Could not connect with given settings.</p>
+        <? } ?>
+
+        <h1>Initialize Database Connection</h1>
 
     <table border=0 cellspacing=7 cellpadding=0>
-    <form name="configForm" method="POST" action="<?="{$_SERVER['PHP_SELF']}?action=setup-dbconfig"?>">
+    <form name="configForm" method="POST" action="<?=$_SERVER['PHP_SELF']?>?flag=dbinit">
         <input type="hidden" name="step" value="2"/>
         <tr>
             <td valign="top" align="right" nowrap>
@@ -108,5 +119,4 @@ if (array_key_exists("step", $_POST) && $_POST['step'] == '2') {
 <?
     exit(0);
 }
-// vim: set tags+=../../**/tags :
 ?>

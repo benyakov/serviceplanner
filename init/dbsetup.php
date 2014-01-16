@@ -24,6 +24,8 @@
     USA
  */
 
+
+
 if (! ($dbstate->exists("dbsetup") && $dbstate->get("dbsetup") == 1)) {
     // Test the existence of a table
     $q = $db->query("SHOW TABLES LIKE '{$db->getPrefix()}days'");
@@ -33,3 +35,4 @@ if (! ($dbstate->exists("dbsetup") && $dbstate->get("dbsetup") == 1)) {
     } else require("./utility/setupdb.php");
 }
 
+?>

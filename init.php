@@ -34,10 +34,16 @@ require("./utility/dbconnection.php");
 $script_basename = basename($_SERVER['PHP_SELF'], '.php');
 $dbstate = getDBState();
 
+if ($_GET['flag'] == 'dbinit') {
+    require("./init/dbinit.php");
+}
+
 if ($_GET['flag'] == 'inituser') {
     $db = new DBConnection();
     require("./init/inituser.php");
 }
+
+// Make sure database connection is configured.
 
 // Make sure database is set up
 require("./init/dbsetup.php");
