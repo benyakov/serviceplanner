@@ -56,7 +56,6 @@ if ($_GET['flag'] == 'savesettings') {
     require("./init/savesettings.php");
 }
 
-
 // Check churchyear data and functions
 require("./init/checkchurchyear.php");
 

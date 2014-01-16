@@ -31,7 +31,10 @@ if (array_key_exists("biblegwversion", $_POST) && $auth) {
     setMessage("Bible Gateway version has been set.");
 }
 
-// Save the file
-$config->save();
+if (array_key_exists("cookie-age", $_POST)) && $auth) {
+    $config->set('authcookie_max_age', intval($_POST['cookie-age']*60*60*24));
+    setMessage("Set max authorization cookie age.");
+}
 
+$config->save();
 ?>

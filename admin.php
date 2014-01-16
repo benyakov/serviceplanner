@@ -310,7 +310,7 @@ $(document).ready(function(){var a="http://www.bethanythedalles.org/services-dev
         tried unless needed.</li>
     <li>Manually re-create <a href="admin.php?flag=create-views">synonym coordination views</a> in the database.  This should also happen automatically when needed.</li>
     <li><a href="hymnindex.php?drop=yes">Drop and re-create hymn cross-reference table</a>.  This is needed when the table has been changed in a new version.</li>
-    <li><form id="authcookie-age" action="utility/authcookieage.php" method="post">
+    <li><form id="authcookie-age" action="<?=$_SERVER['PHP_SELF']?>?flag=savesettings" method="post">
     <label for="cookie-age">The maximum number of days you
       wish the Service Planner to remember your login session.</label>
     <input type="number" name="cookie-age" value="<?=getAuthCookieMaxAge()/(60*60*24)?>" size="4">
@@ -327,7 +327,7 @@ $(document).ready(function(){var a="http://www.bethanythedalles.org/services-dev
     </ul>
 
     <h3>Config Settings</h2>
-    <form id="configsettings" action="<?=$_SERVER['SERVER_NAME'].$_SERVER['PHP_SELF']?>" method="post">
+    <form id="configsettings" action="<?=$_SERVER['PHP_SELF']?>?flag=savesettings" method="post">
     <dl>
     <dt>Preferred Bible Abbreviation from <a href="http://www.biblegateway.com/versions/" title="BibleGateway.com">Bible Gateway</a></dt>
     <dd><input type="text" id="biblegwversion" name="biblegwversion"
