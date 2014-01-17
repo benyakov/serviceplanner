@@ -73,7 +73,7 @@ if ((! array_key_exists("stage", $_GET)) || $ajax) {
             if ($whereclause) {
                 $q->bindValue(":location", $loc);
             }
-            $q->execute() or dieWithRollback($q, ".");
+            $q->execute();
             display_records_table($q);
         }
         $db->commit();
@@ -109,7 +109,7 @@ if ((! array_key_exists("stage", $_GET)) || $ajax) {
                 WHERE days.pkey IN({$deletions})
                   AND hymns.location = :location");
             $q->bindValue(":location", $loc);
-            $q->execute() or dieWithRollback($q, ".");
+            $q->execute();
         } else {
             // If not, delete the service (should cascade to hymns)
             $q = $db->prepare("DELETE FROM `{$db->getPrefix()}days`
