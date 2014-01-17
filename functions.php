@@ -314,6 +314,7 @@ function display_records_table($q) {
     if ($thesehymns) listthesehymns($thesehymns, $rowcount, $hymnlocation);
     echo "</article>\n";
     echo "</table>\n";
+    unset($cfg);
 }
 
 /**

@@ -399,7 +399,7 @@ if ("blockitems" == $_GET['get'] && is_numeric($_GET['id']) && $_GET['day']) {
     $q->bindValue(":dayname", $_GET['day']);
     $q->bindValue(":block", $_GET['id']);
     if ($q->execute() && $row = $q->fetch(PDO::FETCH_ASSOC)) {
-        $cfg = getConfig();
+        $cfg = getConfig(true);
         $rv = array("Lesson 1"=>linkbgw($cfg, $row['blesson1'], $row['l1link'],
                     true),
             "Lesson 2"=>linkbgw($cfg, $row['blesson2'], $row['l2link'], true),

@@ -686,7 +686,10 @@ class Configfile
      * Write: Return a formatted scalar value
      */
     private function _writeVal($Val) {
-        return $Val;
+        if (is_string($Val) && strpos($Val, ";") !== false)
+            return "\"$Val\"";
+        else
+            return $Val;
     }
 
     /**
