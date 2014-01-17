@@ -97,24 +97,25 @@ if ((! array_key_exists("stage", $_GET)) || $ajax) {
                 JOIN {$db->getPrefix()}days as days
                 ON (hymns.service = days.pkey)
                 WHERE hymns.location != :location
-                    AND days.pkey IN({$deletions})
+                    AND days.pkey IN ({$deletions})
                 LIMIT 1");
         $q->bindValue(":location", $loc);
         $q->execute();
         if ($q->fetch()) {
             // If so, delete only the hymns.
-            $q = $db->prepare("DELETE FROM {$db->getPrefix()}hymns as hymns
-                USING hymns JOIN {$db->getPrefix()}days as days
-                    ON (hymns.service = days.pkey)
-                WHERE days.pkey IN({$deletions})
-                  AND hymns.location = :location");
+            $q = $db->prepare("DELETE FROM `{$db->getPrefix()}hymns`
+                USING `{$db->getPrefix()}hymns` as hymns
+                JOIN `{$db->getPrefix()}days` as days
+                ON (hymns.service = days.pkey)
+                WHERE hymns.location = :location
+                    AND days.pkey IN ({$deletions})");
             $q->bindValue(":location", $loc);
             $q->execute();
         } else {
             // If not, delete the service (should cascade to hymns)
             $q = $db->prepare("DELETE FROM `{$db->getPrefix()}days`
                 WHERE `pkey` IN({$deletions})");
-            $q->execute() or die(array_pop($q->errorInfo()));
+            $q->execute();
         }
     }
     $db->commit();

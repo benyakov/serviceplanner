@@ -113,7 +113,7 @@ if (array_key_exists("date", $_POST)) {
             })
             .focus();
         if (! Modernizr.inputtypes.date) {
-            $("#date").datepicker({showOn:"button", numberOfMonths: [2,2],
+            $("#date").datepicker({showOn:"button", numberOfMonths: [1,2],
                 stepMonths: 4, onClose: function() {
                     $("#location").focus();
                 }})
