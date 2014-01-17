@@ -105,12 +105,10 @@ $options = new Configfile("./options.ini", true, true, true);
 $options->set('hymnbooks', $option_hymnbooks);
 $options->set('hymncount', $option_hymncount);
 $options->set('used_history', $option_used_history);
-foreach ($sitetabs as $k=>$v) {
+foreach ($sitetabs as $k=>$v)
     $options->set('sitetabs', $k, $v);
-}
-foreach ($sitetabs_anonymous as $k=>$v) {
+foreach ($sitetabs_anonymous as $k=>$v)
     $options->set('anonymous sitetabs', $k, $v);
-}
 $options->set('listinglimit', $listinglimit);
 $options->set('modifyorder', $modifyorder);
 $options->set('phplibrary', $phplibrary);

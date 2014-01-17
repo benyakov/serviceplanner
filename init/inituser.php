@@ -48,7 +48,7 @@ if ($_GET['flag'] == 'inituser') {
     $db->commit();
     session_destroy();
     require("./setup-session.php");
-    auth($_POST['username'], $_POST['pw']);
+    $auth = auth($_POST['username'], $_POST['pw']);
     $dbstate->set('has-user', 1);
     $dbstate->save() or die("Problem saving dbstate file.");
     setMessage("Initial user has been set up.");

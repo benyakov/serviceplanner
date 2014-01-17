@@ -54,6 +54,10 @@ require("./init/dbsetup.php");
 // Perform any necessary upgrades
 require("./init/upgrades.php");
 
+// Load runtime options
+if (! file_exists('./options.ini'))
+    require('./init/setupoptions.php');
+
 // Make sure a user has been configured
 require("./init/checkuser.php");
 
@@ -70,7 +74,4 @@ require("./init/checkchurchyear.php");
 // release file lock.
 unset($dbstate);
 
-// Load runtime options
-if (! file_exists('./options.ini'))
-    require('./init/setupoptions.php');
 ?>
