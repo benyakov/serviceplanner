@@ -105,6 +105,7 @@ CREATE TABLE `churchyear_propers` (
     `gradual`   text,
     `note`      text,
     FOREIGN KEY (`dayname`) REFERENCES `churchyear_synonyms` (`synonym`)
+        ON DELETE CASCADE
         ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 CREATE TABLE `churchyear_lessons` (
@@ -124,6 +125,7 @@ CREATE TABLE `churchyear_lessons` (
     UNIQUE KEY `onedayperlect` (`lectionary`, `dayname`),
     PRIMARY KEY (`id`),
     FOREIGN KEY (`dayname`) REFERENCES `churchyear_synonyms` (`synonym`)
+        ON DELETE CASCADE
         ON UPDATE CASCADE
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
 CREATE TABLE `churchyear_collects` (
@@ -140,6 +142,7 @@ CREATE TABLE `churchyear_collect_index` (
         ON DELETE CASCADE
         ON UPDATE CASCADE,
     FOREIGN KEY (`dayname`) REFERENCES `churchyear_synonyms` (`synonym`)
+        ON DELETE CASCADE
         ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 CREATE TABLE `churchyear_graduals` (

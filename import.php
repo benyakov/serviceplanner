@@ -300,7 +300,7 @@ class SynonymImporter extends FormImporter {
         $db->beginTransaction();
         $canonical = ""; $synonym = "";
         // Replace using temporary tables;
-        if (isset($_POST['replace']) && "on" == $_POST['replace']) {
+        if ("on" == $_POST['replace']) {
             // Upload the new synonyms
             $db->exec("CREATE TEMPORARY TABLE `{$db->getPrefix()}newsynonyms`
                     LIKE `{$db->getPrefix()}churchyear_synonyms`");
@@ -319,36 +319,36 @@ class SynonymImporter extends FormImporter {
             } catch (EndOfSynonymFile $e) {
                 $this->rewind();
             }
-            // Update existing canonicals with non-matching synonyms
-            $db->exec("UPDATE `{$db->getPrefix()}churchyear_synonyms` AS cy,
-                    `{$db->getPrefix()}newsynonyms`
-                SET cy.synonym = n.synonym
-                WHERE (cy.canonical = n.canonical
-                    AND cy.synonym != n.synonym)");
             // Record synonyms not in current db (add)
             $db->exec("CREATE TEMPORARY TABLE `{$db->getPrefix()}addsynonyms`
                 LIKE `{$db->getPrefix()}churchyear_synonyms`");
-            $db->exec("INSERT INTO `{$db->getPrefix()}addsynonyms`
+            $q = $db->prepare("INSERT INTO `{$db->getPrefix()}addsynonyms`
                 SELECT n.`canonical`, n.`synonym`
                 FROM `{$db->getPrefix()}newsynonyms` AS n
                 LEFT JOIN `{$db->getPrefix()}churchyear_synonyms` AS cy
                 ON (cy.`canonical` = n.`canonical`
                     AND cy.`synonym` = n.`synonym`)
-                WHERE cy.`synonym` == NULL");
+                WHERE cy.`synonym` = NULL");
+            $q->execute() or die("1 ".array_pop($q->errorInfo()));
             // Add previously unknown synonyms
-            $db->exec("INSERT INTO `{$db->getPrefix()}churchyear_synonyms
+            $q = $db->prepare("INSERT INTO `{$db->getPrefix()}churchyear_synonyms`
                 SELECT `canonical`, `synonym`
                 FROM `{$db->getPrefix()}addsynonyms`");
+            $q->execute() or die("2 ".array_pop($q->errorInfo()));
             // Remove current db canonicals not in new list
             // (This will cascade into other tables.)
-            $db->exec("DELETE FROM `{$db->getPrefix()}churchyear_synonyms`
-                WHERE ! `canonical` IN
-                (SELECT DISTINCT cy.`canonical`
-                FROM `{$db->getPrefix()}newsynonyms` AS n
-                RIGHT JOIN `{$db->getPrefix()}churchyear_synonyms` AS cy
-                ON (n.`canonical` = cy.`canonical`
-                    AND n.`synonym` = cy.`synonym`)
-                WHERE n.`synonym` == NULL)");
+            $q = $db->prepare("DELETE cy
+                FROM `{$db->getPrefix()}churchyear_synonyms` AS cy
+                WHERE cy.canonical NOT IN
+                    (SELECT DISTINCT canonical
+                    FROM `{$db->getPrefix()}newsynonyms`)");
+            $q->execute() or die("4 ".array_pop($q->errorInfo()));
+            $q = $db->prepare("DELETE cy
+                FROM `{$db->getPrefix()}newsynonyms` AS n,
+                    `{$db->getPrefix()}churchyear_synonyms` AS cy
+                WHERE (cy.canonical != n.canonical
+                    AND cy.synonym = n.synonym)");
+            $q->execute() or die("3 ".array_pop($q->errorInfo()));
         } else {
             $qexact = $db->prepare("SELECT 1
                 FROM `{$db->getPrefix()}churchyear_synonyms`
