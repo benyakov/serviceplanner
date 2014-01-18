@@ -54,12 +54,14 @@ class FormImporter {
      * import := <name of thing being imported>
      * $_POST['import'] := upload file to import
      */
-    private $loadfile;
-    private $fhandle = NULL;
-    private $keys;
+    protected $loadfile;
+    protected $fhandle = NULL;
+    protected $keys;
+    protected $usekeys;
 
-    public function __construct() {
+    public function __construct($usekeys=true) {
         require_once("./utility/csv.php");
+        $this->usekeys = $usekeys;
         $db = new DBConnection();
         $this->loadfile = "./load-{$db->getName()}.txt";
         if (! move_uploaded_file($_FILES['import']['tmp_name'], $this->loadfile)) {
@@ -70,17 +72,19 @@ class FormImporter {
     }
 
     public function getKeys() {
-        if (! $this->fhandle) $this->getFHandle();
+        if ($this->usekeys && (! $this->fhandle)) $this->getFHandle();
         return $this->keys;
     }
 
     public function getRecord() {
         if (! $this->fhandle) $this->getFHandle();
         if ($rec = fgetcsv($this->fhandle)) {
-            $vals = array_fill(0, count($this->keys), NULL);
-            $rv = array_combine($this->keys, $vals);
-            for ($i=0, $len=count($rec); $i<$len; $i++)
-                $rv[$this->keys[$i]] = $rec[$i];
+            if ($this->usekeys) {
+                $vals = array_fill(0, count($this->keys), NULL);
+                $rv = array_combine($this->keys, $vals);
+                for ($i=0, $len=count($rec); $i<$len; $i++)
+                    $rv[$this->keys[$i]] = $rec[$i];
+            } else $rv=$rec;
             return $rv;
         } else {
             return $rec;
@@ -92,7 +96,13 @@ class FormImporter {
         if (($this->fhandle = fopen($this->loadfile, "r")) !== false) {
             if (! $this->keys = fgetcsv($this->fhandle)) {
                 setMessage("Empty file upload.");
-            } else return $fhandle;
+            } else {
+                if (! $this->usekeys) {
+                    $this->keys = false;
+                    rewind($this->fhandle);
+                }
+                return $fhandle;
+            }
         } else setMessage("Problem opening uploaded file.");
         header("Location: admin.php");
         exit(0);
@@ -266,6 +276,24 @@ class ChurchyearPropersImporter extends FormImporter {
  * Imports synonyms provided in a CSV export file
  */
 class SynonymImporter extends FormImporter {
+
+    function __construct() {
+        parent::__construct(false);
+    }
+
+    /**
+     * Return the next CSV record as an array of 2-item synonym arrays
+     */
+    function nextSynonymList() {
+        if ($rec = $this->getRecord()) {
+            $rv = array();
+            foreach (array_slice($rec, 2) as $synonym) {
+                $rv[] = array($rec[0], $synonym);
+            }
+            return $rv;
+        } else throw new EndOfSynonymFile();
+    }
+
     function import() {
         $db = new DBConnection();
         $fhandle = $this->getFHandle();
@@ -275,27 +303,31 @@ class SynonymImporter extends FormImporter {
         if (isset($_POST['replace']) && "on" == $_POST['replace']) {
             // Upload the new synonyms
             $db->exec("CREATE TEMPORARY TABLE `{$db->getPrefix()}newsynonyms`
-                    `canonical` varchar(255),
-                    `synonym`   varchar(255))
-                    ENGINE=InnoDB DEFAULT CHARSET=utf8");
+                    LIKE `{$db->getPrefix()}churchyear_synonyms`");
             $q = $db->prepare("INSERT INTO `{$db->getPrefix()}newsynonyms`
                 (`canonical`, `synonym`)
                 VALUES (:canonical, :synonym)");
             $q->bindParam(":canonical", $canonical);
             $q->bindParam(":synonym", $synonym);
-            while ($oneset = fgetcsv($fhandle)) {
-               $canonical = $oneset[0];
-               for ($i=1; $i<count($oneset); $i++) {
-                   $synonym = $oneset[$i];
-                   $q->exec or die(array_pop($q->errorInfo()));
-               }
+            try {
+                while (true) {
+                    foreach($this->nextSynonymList() as $s) {
+                        list($canonical, $synonym) = $s;
+                        $q->execute() or die("Dying ".array_pop($q->errorInfo()));
+                    }
+                }
+            } catch (EndOfSynonymFile $e) {
+                $this->rewind();
             }
-            rewind($fhandle);
+            // Update existing canonicals with non-matching synonyms
+            $db->exec("UPDATE `{$db->getPrefix()}churchyear_synonyms` AS cy,
+                    `{$db->getPrefix()}newsynonyms`
+                SET cy.synonym = n.synonym
+                WHERE (cy.canonical = n.canonical
+                    AND cy.synonym != n.synonym)");
             // Record synonyms not in current db (add)
             $db->exec("CREATE TEMPORARY TABLE `{$db->getPrefix()}addsynonyms`
-                    `canonical` varchar(255),
-                    `synonym`   varchar(255))
-                    ENGINE=InnoDB DEFAULT CHARSET=utf8");
+                LIKE `{$db->getPrefix()}churchyear_synonyms`");
             $db->exec("INSERT INTO `{$db->getPrefix()}addsynonyms`
                 SELECT n.`canonical`, n.`synonym`
                 FROM `{$db->getPrefix()}newsynonyms` AS n
@@ -317,7 +349,6 @@ class SynonymImporter extends FormImporter {
                 ON (n.`canonical` = cy.`canonical`
                     AND n.`synonym` = cy.`synonym`)
                 WHERE n.`synonym` == NULL)");
-            // TODO: Update existing synonyms (should cascade)
         } else {
             $qexact = $db->prepare("SELECT 1
                 FROM `{$db->getPrefix()}churchyear_synonyms`
@@ -329,19 +360,27 @@ class SynonymImporter extends FormImporter {
             $qexact->bindParam(":synonym", $synonym);
             $qinsert->bindParam(":canonical", $canonical);
             $qinsert->bindParam(":synonym", $synonym);
-            while (list($canonical, $synonym) = fgetcsv($fhandle)) {
-                // If the record already exists, leave it
-                $qexact->execute() or die(array_pop($qexact->errorInfo()));
-                if ($qexact->fetchValue(1))
-                    continue;
-                else
-                    $qinsert->execute()
-                        or die(array_pop($qinsert->errorInfo()));
+            try {
+                while (true) {
+                    foreach ($this->nextSynonymList() as $s) {
+                        // If the record already exists, leave it
+                        list($canonical, $synonym) = $s;
+                        $qexact->execute() or die("point 1".array_pop($qexact->errorInfo()));
+                        if ($qexact->fetch()) {
+                            continue;
+                        } else {
+                            $qinsert->execute()
+                                or die("point 2".array_pop($qinsert->errorInfo()));
+                        }
+                    }
+                }
+            } catch (EndOfSynonymFile $e) {
+                $this->rewind();
             }
         }
         $db->commit();
         setMessage("Synonyms imported.");
-        header("Location: admin?flag=create-views");
+        header("Location: admin.php?flag=create-views");
         exit(0);
     }
 }
@@ -375,6 +414,7 @@ class HymnNameImporter {
 
 class HymnTableNameError extends Exception { }
 
+class EndOfSynonymFile extends Exception { }
 
 // vim: set foldmethod=indent :
 ?>

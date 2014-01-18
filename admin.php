@@ -274,7 +274,7 @@ $(document).ready(function(){var a="http://www.bethanythedalles.org/services-dev
         <input type="file" id="synonyms_file" name="import" required
             placeholder="Select local file."><br />
         <input type="checkbox" id="synonyms_replace" name="replace">
-        <label for="synonyms_replace">Replace all existing related synonyms?</label><br />
+        <label for="synonyms_replace">Replace all existing synonyms?</label><br />
         <button type="submit">Import Synonyms</button>
     </fieldset></form></li>
     <li><a href="export.php?export=churchyear">Export Church Year Configuration</a> (controlling when each day falls)</a></li>
