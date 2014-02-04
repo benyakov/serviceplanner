@@ -23,5 +23,5 @@
     The Dalles, OR 97058
     USA
  */
-$version = array('major' => 0, 'minor' => 8, 'tick' => 18);
+$version = array('major' => 0, 'minor' => 8, 'tick' => 19);
 ?>

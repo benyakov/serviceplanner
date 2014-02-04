@@ -494,8 +494,8 @@ if (! $auth) {
                 }
             })
         if (! Modernizr.inputtypes.date) {
-            $('#startdate').datepicker({showOn:"button", numberOfMonths:[2,3],
-                stepMonths: 4});
+            $('#startdate').datepicker({showOn:"button", numberOfMonths:[1,2],
+                stepMonths: 2});
         }
         $('#enddate').unbind('change')
             .bind('change', function() {
@@ -507,8 +507,8 @@ if (! $auth) {
                 }
             })
         if (! Modernizr.inputtypes.date) {
-            $('#enddate').datepicker({showOn:"button", numberOfMonths:[2,3],
-                stepMonths: 4});
+            $('#enddate').datepicker({showOn:"button", numberOfMonths:[1,2],
+                stepMonths: 2});
         }
         checkCustomPs();
         checkCustomL1();
