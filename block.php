@@ -61,6 +61,8 @@ function blockPlanForm($vals=array()) {
     else $vals['gocustom'] = "";
     if ($vals['pslect'] == 'custom') $vals['pscustom'] = $vals['psseries'];
     else $vals['pscustom'] = "";
+    if ($vals['smlect'] == 'custom') $vals['smcustom'] = $vals['smseries'];
+    else $vals['smcustom'] = "";
     $q = $dbh->prepare("SELECT lectionary FROM `{$dbp}churchyear_lessons`
         GROUP BY lectionary");
     $q->execute() or die(array_pop($q->errorInfo()));
@@ -76,6 +78,7 @@ function blockPlanForm($vals=array()) {
     if (!$vals['golect']) $vals['golect'] = 'historic';
     if (!$vals['pslect']) $vals['pslect'] = 'historic';
     if (!$vals['colect']) $vals['colect'] = 'historic';
+    if (!$vals['smlect']) $vals['smlect'] = 'historic';
 ?>
     <form id="block-plan-form" action="block.php" method="post">
     <input type="hidden" name="id" value="<?=$vals['id']?>">
@@ -153,6 +156,18 @@ function blockPlanForm($vals=array()) {
 <? } ?>
     </select></td>
     </tr>
+    <tr><td><label>Sermon</label></td>
+    <td><select name="smlect" id="smlect">
+<? foreach ($lects as $l) { ?>
+<option value="<?=$l?>" <?=$l==$vals['smlect']?"selected=\"selected\"":""?>><?=$l?></option>
+<? } ?>
+        </select></td>
+    <td><select name="smseries" id="smseries">
+<? foreach ($series as $s) { ?>
+<option value="<?=$s?>" <?=($s==$vals['smseries'])?"selected=\"selected\"":""?>><?=$s?></option>
+<? } ?>
+    </select></td>
+    <td><input name="smcustom" id="smcustom" value="<?=$vals['smcustom']?>"></td></tr>
     </table>
     </section>
     <label for="notes">Block Notes</label><br>
@@ -178,24 +193,27 @@ if ($_POST['label']) {
     if ("custom" == $_POST['l2lect']) $_POST['l2series'] = $_POST['l2custom'];
     if ("custom" == $_POST['golect']) $_POST['goseries'] = $_POST['gocustom'];
     if ("custom" == $_POST['pslect']) $_POST['psseries'] = $_POST['pscustom'];
+    if ("custom" == $_POST['smlect']) $_POST['smseries'] = $_POST['smcustom'];
     $binding = array($_POST['label'], $_POST['startdate'],
         $_POST['enddate'], $_POST['notes'], $_POST['l1lect'],
         $_POST['l1series'], $_POST['l2lect'], $_POST['l2series'],
         $_POST['golect'], $_POST['goseries'], $_POST['pslect'],
-        $_POST['psseries'], $_POST['colect'], $_POST['coclass']);
+        $_POST['psseries'], $_POST['colect'], $_POST['coclass'],
+        $_POST['smlect'], $_POST['smseries']);
     if ($_POST['id']) { // Update existing record
         array_push($binding, $_POST['id']);
         $q = $db->prepare("UPDATE `{$db->getPrefix()}blocks`
             SET label = ?, blockstart = ?, blockend = ?, notes = ?,
             l1lect = ?, l1series = ?, l2lect = ?, l2series = ?,
             golect = ?, goseries = ?, pslect = ?, psseries = ?,
-            colect = ?, coclass = ?
+            colect = ?, coclass = ?, smlect = ?, smseries = ?
             WHERE id = ?");
     } else { // Create new record
         $q = $db->prepare("INSERT INTO `{$db->getPrefix()}blocks`
             (label, blockstart, blockend, notes, l1lect, l1series, l2lect,
-            l2series, golect, goseries, pslect, psseries, colect, coclass)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+            l2series, golect, goseries, pslect, psseries, colect, coclass,
+            smlect, smseries)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
     }
     if (! $q->execute($binding)) {
         setMessage("Problem saving block:" . array_pop($q->errorInfo()));
@@ -228,7 +246,7 @@ if ($_GET['action'] == "edit" && $_GET['id']) {
         DATE_FORMAT(blockstart, '%Y-%m-%d') AS blockstart,
         DATE_FORMAT(blockend, '%Y-%m-%d') AS blockend, label, notes, l1lect,
         l1series, l2lect, l2series, golect, goseries, pslect, psseries,
-        colect, coclass, id FROM `{$db->getPrefix()}blocks`
+        colect, coclass, smlect, smseries, id FROM `{$db->getPrefix()}blocks`
         WHERE id = ?");
     if ($q->execute(array($_GET['id'])) && $row = $q->fetch(PDO::FETCH_ASSOC)) {
         blockPlanForm($row);
@@ -306,6 +324,7 @@ if ("blockitems" == $_GET['get'] && is_numeric($_GET['id']) && $_GET['day']) {
         exit(0);
     }
     // Most of this query borrowed from functions.php
+    // TODO: Update this with smlect, smseries
     $q = $db->prepare("SELECT b.notes,
         (CASE b.l1lect
             WHEN 'historic' THEN
@@ -526,6 +545,9 @@ if (! $auth) {
         $('#gocustom').change(function() {
             checkCustomGo();
         });
+        $('#smcustom').change(function() {
+            checkCustomSm(); // TODO: Write this
+        });
         checkHistoricL1();
         checkHistoricL2();
         checkHistoricGo();
@@ -538,6 +560,9 @@ if (! $auth) {
         });
         $('#golect').change(function() {
             checkHistoricGo();
+        });
+        $('#smlect').change(function() {
+            checkHistoricSm(); // TODO: Write this
         });
         $('#pslect').change(checkHistoricPs);
         checkCustomCo();
@@ -593,7 +618,7 @@ applicable block plan when they are created or edited.</p>
 $q = $db->prepare("SELECT DATE_FORMAT(blockstart, '%c/%e/%Y') AS blockstart,
     DATE_FORMAT(blockend, '%c/%e/%Y') AS blockend, label, notes, l1lect,
     l1series, l2lect, l2series, golect, goseries, pslect, psseries,
-    colect, coclass, id FROM `{$db->getPrefix()}blocks` AS b
+    colect, coclass, smlect, smseries, id FROM `{$db->getPrefix()}blocks` AS b
     ORDER BY b.blockstart DESC, b.blockend DESC");
 if ($q->execute()) {
     while ($row = $q->fetch(PDO::FETCH_ASSOC)) { ?>
@@ -610,6 +635,8 @@ if ($q->execute()) {
         <?=showLesson($row['golect'], $row['goseries'])?></td>
         <td class="pscell"><b>Psalm:</b>
         <?=showLesson($row['pslect'], $row['psseries'])?></td>
+        <td class="smcell"><b>Sermon:</b>
+        <?=showLesson($row['smlect'], $row['smseries'])?></td>
         <td class="cocell"><b>Collect:</b>
         <?=$row['colect']?>
         <? if ($row['colect'] != "custom") {?> (<?=$row['coclass']?>)<?};?>
