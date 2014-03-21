@@ -33,7 +33,11 @@ if ("0.7." != substr($oldversion, 0, 4).'.') {
 $db = new DBConnection();
 $db->beginTransaction();
 $q = $db->prepare("ALTER TABLE `{$db->getPrefix()}block`
-    ADD COLUMN `smlect` varchar(56) AFTER `coclass`");
+    ADD COLUMN `smtype` varchar(56) AFTER `coclass`");
+$q->execute() or die(array_pop($q->errorInfo()));
+
+$q = $db->prepare("ALTER TABLE `{$db->getPrefix()}block`
+    ADD COLUMN `smlect` varchar(56) AFTER `smtype`");
 $q->execute() or die(array_pop($q->errorInfo()));
 
 $q = $db->prepare("ALTER TABLE `{$db->getPrefix()}block`

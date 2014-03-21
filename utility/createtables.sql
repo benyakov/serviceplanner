@@ -164,6 +164,7 @@ CREATE TABLE `blocks` (
   `psseries` varchar(64),
   `colect` varchar(56),
   `coclass` varchar(64),
+  `smtype` varchar(56),
   `smlect` varchar(56),
   `smseries` varchar(64),
   `id` integer auto_increment,

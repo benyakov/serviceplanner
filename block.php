@@ -323,91 +323,27 @@ if ("blockitems" == $_GET['get'] && is_numeric($_GET['id']) && $_GET['day']) {
         header("location:index.php");
         exit(0);
     }
-    // Most of this query borrowed from functions.php
-    // TODO: Update this with smlect, smseries
     $q = $db->prepare("SELECT b.notes,
-        (CASE b.l1lect
-            WHEN 'historic' THEN
-            (CASE b.l1series
-                WHEN 'first' THEN
-                    (SELECT lesson1 FROM `{$db->getPrefix()}synlessons` AS cl
-                    WHERE cl.dayname=:dayname AND cl.lectionary=b.l1lect
-                    LIMIT 1)
-                WHEN 'second' THEN
-                    (SELECT s2lesson FROM `{$db->getPrefix()}synlessons` AS cl
-                    WHERE cl.dayname=:dayname AND cl.lectionary=b.l1lect
-                    LIMIT 1)
-                WHEN 'third' THEN
-                    (SELECT s3lesson FROM `{$db->getPrefix()}synlessons` AS cl
-                    WHERE cl.dayname=:dayname AND cl.lectionary=b.l1lect
-                    LIMIT 1)
-                END)
-            WHEN 'custom' THEN b.l1series
-            ELSE
-                (SELECT lesson1 FROM `{$db->getPrefix()}synlessons` AS cl
-                WHERE cl.dayname=:dayname AND cl.lectionary=b.l1lect
-                LIMIT 1)
-            END)
-            AS blesson1,
-        (CASE b.l2lect
-            WHEN 'historic' THEN
-            (CASE b.l2series
-                WHEN 'first' THEN
-                    (SELECT lesson2 FROM `{$db->getPrefix()}synlessons` AS cl
-                    WHERE cl.dayname=:dayname AND cl.lectionary=b.l2lect
-                    LIMIT 1)
-                WHEN 'second' THEN
-                    (SELECT s2lesson FROM `{$db->getPrefix()}synlessons` AS cl
-                    WHERE cl.dayname=:dayname AND cl.lectionary=b.l2lect
-                    LIMIT 1)
-                WHEN 'third' THEN
-                    (SELECT s3lesson FROM `{$db->getPrefix()}synlessons` AS cl
-                    WHERE cl.dayname=:dayname AND cl.lectionary=b.l2lect
-                    LIMIT 1)
-                END)
-            WHEN 'custom' THEN b.l2series
-            ELSE
-                (SELECT lesson2 FROM `{$db->getPrefix()}synlessons` AS cl
-                WHERE cl.dayname=:dayname AND cl.lectionary=b.l2lect
-                LIMIT 1)
-            END)
-            AS blesson2,
-        (CASE b.golect
-            WHEN 'historic' THEN
-            (CASE b.goseries
-                WHEN 'first' THEN
-                    (SELECT gospel FROM `{$db->getPrefix()}synlessons` AS cl
-                    WHERE cl.dayname=:dayname AND cl.lectionary=b.golect
-                    LIMIT 1)
-                WHEN 'second' THEN
-                    (SELECT s2gospel FROM `{$db->getPrefix()}synlessons` AS cl
-                    WHERE cl.dayname=:dayname AND cl.lectionary=b.golect
-                    LIMIT 1)
-                WHEN 'third' THEN
-                    (SELECT s3gospel FROM `{$db->getPrefix()}synlessons` AS cl
-                    WHERE cl.dayname=:dayname AND cl.lectionary=b.golect
-                    LIMIT 1)
-                END)
-            WHEN 'custom' THEN b.goseries
-            ELSE
-                (SELECT gospel FROM `{$db->getPrefix()}synlessons` AS cl
-                WHERE cl.dayname=:dayname AND cl.lectionary=b.golect
-                LIMIT 1)
-            END)
-            AS bgospel,
+        `{$db->getPrefix()}get_selected_lesson`(b.l1lect, b.l1series,
+            'lesson1', :dayname) AS blesson1,
+        `{$db->getPrefix()}get_selected_lesson`(b.l2lect, b.l2series,
+            'lesson2', :dayname) AS blesson2,
+        `{$db->getPrefix()}get_selected_lesson`(b.golect, b.goseries,
+            'gospel', :dayname) AS bgospel,
+        `{$db->getPrefix()}get_selected_lesson`(b.smlect, b.smseries,
+            b.smtype, :dayname) AS bsermon,
         (CASE b.pslect
             WHEN 'custom' THEN b.psseries
             ELSE
                 (SELECT psalm FROM `{$db->getPrefix()}synlessons` AS cl
                 WHERE cl.dayname=:dayname AND cl.lectionary=b.pslect
                 LIMIT 1)
-            END)
-            AS bpsalm,
+        END) AS bpsalm,
         (SELECT collect FROM `{$db->getPrefix()}churchyear_collects` AS cyc
-        JOIN `{$db->getPrefix()}churchyear_collect_index` AS cci
-        ON (cyc.id = cci.id)
-        WHERE cci.dayname=:dayname AND cci.lectionary=b.colect
-        AND cyc.class=b.coclass
+            JOIN `{$db->getPrefix()}churchyear_collect_index` AS cci
+            ON (cyc.id = cci.id)
+            WHERE cci.dayname=:dayname AND cci.lectionary=b.colect
+            AND cyc.class=b.coclass
         LIMIT 1) AS bcollect,
         b.l1lect != \"custom\" AS l1link,
         b.l2lect != \"custom\" AS l2link,
@@ -433,7 +369,6 @@ if ("blockitems" == $_GET['get'] && is_numeric($_GET['id']) && $_GET['day']) {
         echo array_pop($q->errorInfo());
     }
     exit(0);
-
 }
 
 // Display the block planning table
