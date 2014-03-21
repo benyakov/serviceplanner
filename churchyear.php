@@ -35,7 +35,7 @@ $dbstate = getDBState();
  */
 if ($_GET['request'] == 'dropfunctions') {
     $db->beginTransaction();
-    $db->exec("DROP FUNCTION `{$dbp}easter_in_year`;
+    $db->exec("DROP FUNCTION IF EXISTS `{$dbp}easter_in_year`;
     DROP FUNCTION IF EXISTS `{$dbp}christmas1_in_year`;
     DROP FUNCTION IF EXISTS `{$dbp}michaelmas1_in_year`;
     DROP FUNCTION IF EXISTS `{$dbp}epiphany1_in_year`;
@@ -43,10 +43,12 @@ if ($_GET['request'] == 'dropfunctions') {
     DROP FUNCTION IF EXISTS `{$dbp}date_in_year`;
     DROP FUNCTION IF EXISTS `{$dbp}calc_observed_date_in_year`;
     DROP FUNCTION IF EXISTS `{$dbp}observed_date_in_year`;
-    DROP FUNCTION IF EXISTS `{$dbp}`get_lesson`;
-    DROP PROCEDURE IF EXISTS `{$dbp}get_days_for_date`");
-    setMessage("Church year functions dropped.  To re-create them, visit"
-        ." the Church Year tab.  They will be created automatically.");
+    DROP FUNCTION IF EXISTS `{$dbp}calendar_date_in_year`;
+    DROP PROCEDURE IF EXISTS `{$dbp}get_days_for_date;
+    DROP FUNCTION IF EXISTS `{$dbp}next_in_year`;
+    DROP FUNCTION IF EXISTS `{$dbp}get_selected_lesson`");
+    setMessage("Church year functions dropped. "
+        ." they will be re-created automatically.");
     $db->commit();
     $dbstate->store("has-churchyear-functions", 0);
     $dbstate->save() or die("Problem saving dbstate file.");

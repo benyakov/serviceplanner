@@ -221,73 +221,71 @@ BEGIN
     RETURN v_result;
 END;
 
-DROP FUNCTION IF EXISTS `{{DBP}}get_selected_lesson`;
-CREATE FUNCTION `{{DBP}}get_selected_lesson`(lesson VARCHAR,
-    lect VARCHAR, series VARCHAR, ltype VARCHAR, dayname VARCHAR)
-RETURNS VARCHAR
-DETERMINISTIC
+DROP FUNCTION IF EXISTS `get_selected_lesson`;
+CREATE FUNCTION `get_selected_lesson` (
+    lect VARCHAR(56), series VARCHAR(64), ltype VARCHAR(32),
+    dayname VARCHAR(255))
+RETURNS VARCHAR(64) READS SQL DATA
 BEGIN
-    DECLARE v_result VARCHAR;
-    SET v_result = "Problem Getting Lesson";
-    SELECT
-    (CASE lect
+    DECLARE v_result VARCHAR(64) DEFAULT 'Problem Getting Lesson';
+    SELECT (CASE lect
         WHEN 'historic' THEN
         (CASE series
             WHEN 'first' THEN
                 (CASE ltype
                     WHEN 'gospel' THEN
-                    (SELECT gospel FROM `{$db->getPrefix()}synlessons` AS cl
+                    (SELECT gospel FROM `synlessons` AS cl
                     WHERE cl.dayname=dayname AND cl.lectionary=lect
                     LIMIT 1)
                     WHEN 'lesson1' THEN
-                    (SELECT lesson1 FROM `{$db->getPrefix()}synlessons` AS cl
+                    (SELECT lesson1 FROM `synlessons` AS cl
                     WHERE cl.dayname=dayname AND cl.lectionary=lect
                     LIMIT 1)
                     WHEN 'lesson2' THEN
-                    (SELECT lesson2 FROM `{$db->getPrefix()}synlessons` AS cl
+                    (SELECT lesson2 FROM `synlessons` AS cl
                     WHERE cl.dayname=dayname AND cl.lectionary=lect
                     LIMIT 1)
-                END CASE)
+                END)
             WHEN 'second' THEN
                 (CASE ltype
                     WHEN 'gospel' THEN
-                    (SELECT s2gospel FROM `{$db->getPrefix()}synlessons` AS cl
+                    (SELECT s2gospel FROM `synlessons` AS cl
                     WHERE cl.dayname=dayname AND cl.lectionary=lect
                     LIMIT 1)
                     ELSE
-                    (SELECT s2lesson FROM `{$db->getPrefix()}synlessons` AS cl
+                    (SELECT s2lesson FROM `synlessons` AS cl
                     WHERE cl.dayname=dayname AND cl.lectionary=lect
                     LIMIT 1)
-                END CASE)
+                END)
             WHEN 'third' THEN
                 (CASE ltype
                     WHEN 'gospel' THEN
-                    (SELECT s3gospel FROM `{$db->getPrefix()}synlessons` AS cl
+                    (SELECT s3gospel FROM `synlessons` AS cl
                     WHERE cl.dayname=dayname AND cl.lectionary=lect
                     LIMIT 1)
                     ELSE
-                    (SELECT s3lesson FROM `{$db->getPrefix()}synlessons` AS cl
+                    (SELECT s3lesson FROM `synlessons` AS cl
                     WHERE cl.dayname=dayname AND cl.lectionary=lect
                     LIMIT 1)
-                END CASE)
-            END CASE)
+                END)
+            END)
         WHEN 'custom' THEN series
         ELSE
             (CASE ltype
                 WHEN 'gospel' THEN
-                (SELECT gospel FROM `{$db->getPrefix()}synlessons` AS cl
+                (SELECT gospel FROM `synlessons` AS cl
                 WHERE cl.dayname=dayname AND cl.lectionary=lect
                 LIMIT 1)
                 WHEN 'lesson1' THEN
-                (SELECT lesson1 FROM `{$db->getPrefix()}synlessons` AS cl
+                (SELECT lesson1 FROM `synlessons` AS cl
                 WHERE cl.dayname=dayname AND cl.lectionary=lect
                 LIMIT 1)
                 WHEN 'lesson2' THEN
-                (SELECT lesson2 FROM `{$db->getPrefix()}synlessons` AS cl
+                (SELECT lesson2 FROM `synlessons` AS cl
                 WHERE cl.dayname=dayname AND cl.lectionary=lect
                 LIMIT 1)
-            END CASE)
-    END CASE)
+            END)
+    END)
     AS lesson INTO v_result;
     return v_result;
 END;

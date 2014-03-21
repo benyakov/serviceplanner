@@ -54,6 +54,7 @@ while ($oldversion = needsUpgrade($dbstate)) {
         require("./utility/setup-dbconfig.php");
     }
     $finalversion = "{$version['major']}.{$version['minor']}";
+    $newversion = "{$version['major']}.{$version['minor']}";
     $upgradefile = "./utility/upgrades/{$oldversion}to{$newversion}.php";
     if (file_exists($upgradefile)) {
         require($upgradefile);
