@@ -156,7 +156,12 @@ function blockPlanForm($vals=array()) {
 <? } ?>
     </select></td>
     </tr>
-    <tr><td><label>Sermon</label></td>
+    <tr><td><label>Sermon</label><br>
+        <select name="smtype" id="smtype">
+        <option value="lesson1">Lesson 1 (OT)</option>
+        <option value="lesson2">Lesson 2 (Ep)</option>
+        <option value="gospel">Gospel</option>
+        </select></td>
     <td><select name="smlect" id="smlect">
 <? foreach ($lects as $l) { ?>
 <option value="<?=$l?>" <?=$l==$vals['smlect']?"selected=\"selected\"":""?>><?=$l?></option>
@@ -199,20 +204,20 @@ if ($_POST['label']) {
         $_POST['l1series'], $_POST['l2lect'], $_POST['l2series'],
         $_POST['golect'], $_POST['goseries'], $_POST['pslect'],
         $_POST['psseries'], $_POST['colect'], $_POST['coclass'],
-        $_POST['smlect'], $_POST['smseries']);
+        $_POST['smtype'], $_POST['smlect'], $_POST['smseries']);
     if ($_POST['id']) { // Update existing record
         array_push($binding, $_POST['id']);
         $q = $db->prepare("UPDATE `{$db->getPrefix()}blocks`
             SET label = ?, blockstart = ?, blockend = ?, notes = ?,
             l1lect = ?, l1series = ?, l2lect = ?, l2series = ?,
             golect = ?, goseries = ?, pslect = ?, psseries = ?,
-            colect = ?, coclass = ?, smlect = ?, smseries = ?
+            colect = ?, coclass = ?, smtype = ?, smlect = ?, smseries = ?
             WHERE id = ?");
     } else { // Create new record
         $q = $db->prepare("INSERT INTO `{$db->getPrefix()}blocks`
             (label, blockstart, blockend, notes, l1lect, l1series, l2lect,
             l2series, golect, goseries, pslect, psseries, colect, coclass,
-            smlect, smseries)
+            smtype, smlect, smseries)
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
     }
     if (! $q->execute($binding)) {
@@ -417,6 +422,8 @@ if (! $auth) {
     var checkHistoricGo = gencheckHistoric("go");
     var checkCustomPs = gencheckCustom("ps");
     var checkHistoricPs = gencheckHistoric("ps");
+    var checkCustomSm = gencheckCustom("sm");
+    var checkHistoricSm = gencheckHistoric("sm");
     var checkCustomCo = function() {
         if ($('#colect').val() == 'custom') {
             $('#coclass').hide();
@@ -468,6 +475,7 @@ if (! $auth) {
         checkCustomL1();
         checkCustomL2();
         checkCustomGo();
+        checkCustomSm();
         $('#pscustom').change(function() {
             checkCustomPs();
         });
@@ -481,12 +489,13 @@ if (! $auth) {
             checkCustomGo();
         });
         $('#smcustom').change(function() {
-            checkCustomSm(); // TODO: Write this
+            checkCustomSm();
         });
         checkHistoricL1();
         checkHistoricL2();
         checkHistoricGo();
         checkHistoricPs();
+        checkHistoricSm();
         $('#l1lect').change(function() {
             checkHistoricL1();
         });
@@ -497,7 +506,7 @@ if (! $auth) {
             checkHistoricGo();
         });
         $('#smlect').change(function() {
-            checkHistoricSm(); // TODO: Write this
+            checkHistoricSm();
         });
         $('#pslect').change(checkHistoricPs);
         checkCustomCo();
@@ -553,15 +562,19 @@ applicable block plan when they are created or edited.</p>
 $q = $db->prepare("SELECT DATE_FORMAT(blockstart, '%c/%e/%Y') AS blockstart,
     DATE_FORMAT(blockend, '%c/%e/%Y') AS blockend, label, notes, l1lect,
     l1series, l2lect, l2series, golect, goseries, pslect, psseries,
-    colect, coclass, smlect, smseries, id FROM `{$db->getPrefix()}blocks` AS b
+    colect, coclass, smtype, smlect, smseries, id
+    FROM `{$db->getPrefix()}blocks` AS b
     ORDER BY b.blockstart DESC, b.blockend DESC");
+$sermon_types = array("lesson1"=>"Lesson 1 (OT)",
+    "lesson2"=>"Lesson 2 (Ep)",
+    "gospel"=>"Gospel");
 if ($q->execute()) {
     while ($row = $q->fetch(PDO::FETCH_ASSOC)) { ?>
     <tr class="heading">
         <td colspan="2"><?=$row['blockstart']?> to <?=$row['blockend']?></td>
         <td colspan="3"><?=$row['label']?>
         <div class="quicklinks"><a title="edit" href="" data-id="<?=$row['id']?>" class="edit">Edit</a>
-        <a title="delete" href="" data-label="<?=$row['label']?>" data-id="<?=$row['id']?>" class="delete">Delete</a></div></td></tr>
+        <a title="delete" href="" data-label="<?=$row['label']?>" data-id="<?=$row['id']?>" class="delete">Delete</a></div></td><td></td></tr>
     <tr><td class="otcell"><b>Lesson 1:</b>
         <?=showLesson($row['l1lect'], $row['l1series'])?></td>
         <td class="epcell"><b>Lesson 2:</b>
@@ -571,7 +584,8 @@ if ($q->execute()) {
         <td class="pscell"><b>Psalm:</b>
         <?=showLesson($row['pslect'], $row['psseries'])?></td>
         <td class="smcell"><b>Sermon:</b>
-        <?=showLesson($row['smlect'], $row['smseries'])?></td>
+        <?=showLesson($row['smlect'], $row['smseries'])?>
+        <?=$sermon_types[$row['smtype']]?></td>
         <td class="cocell"><b>Collect:</b>
         <?=$row['colect']?>
         <? if ($row['colect'] != "custom") {?> (<?=$row['coclass']?>)<?};?>

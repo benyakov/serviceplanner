@@ -96,75 +96,14 @@ function queryAllHymns($limit=0, $future=false, $id="") {
     b.label AS blabel, b.notes AS bnotes,
     cyp.color AS color, cyp.theme AS theme, cyp.introit AS introit,
     cyp.gradual AS gradual, cyp.note AS propersnote,
-    (CASE b.l1lect
-        WHEN 'historic' THEN
-        (CASE b.l1series
-            WHEN 'first' THEN
-                (SELECT lesson1 FROM `{$dbp}synlessons` AS cl
-                WHERE cl.dayname=d.name AND cl.lectionary=b.l1lect
-                LIMIT 1)
-            WHEN 'second' THEN
-                (SELECT s2lesson FROM `{$dbp}synlessons` AS cl
-                WHERE cl.dayname=d.name AND cl.lectionary=b.l1lect
-                LIMIT 1)
-            WHEN 'third' THEN
-                (SELECT s3lesson FROM `{$dbp}synlessons` AS cl
-                WHERE cl.dayname=d.name AND cl.lectionary=b.l1lect
-                LIMIT 1)
-            END)
-        WHEN 'custom' THEN b.l1series
-        ELSE
-            (SELECT lesson1 FROM `{$dbp}synlessons` AS cl
-            WHERE cl.dayname=d.name AND cl.lectionary=b.l1lect
-            LIMIT 1)
-        END)
+    `{$dbp}get_selected_lesson`(b.l1lect, b.l1series, 'lesson1', dayname)
         AS blesson1,
-    (CASE b.l2lect
-        WHEN 'historic' THEN
-        (CASE b.l2series
-            WHEN 'first' THEN
-                (SELECT lesson2 FROM `{$dbp}synlessons` AS cl
-                WHERE cl.dayname=d.name AND cl.lectionary=b.l2lect
-                LIMIT 1)
-            WHEN 'second' THEN
-                (SELECT s2lesson FROM `{$dbp}synlessons` AS cl
-                WHERE cl.dayname=d.name AND cl.lectionary=b.l2lect
-                LIMIT 1)
-            WHEN 'third' THEN
-                (SELECT s3lesson FROM `{$dbp}synlessons` AS cl
-                WHERE cl.dayname=d.name AND cl.lectionary=b.l2lect
-                LIMIT 1)
-            END)
-        WHEN 'custom' THEN b.l2series
-        ELSE
-            (SELECT lesson2 FROM `{$dbp}synlessons` AS cl
-            WHERE cl.dayname=d.name AND cl.lectionary=b.l2lect
-            LIMIT 1)
-        END)
+    `{$dbp}get_selected_lesson`(b.l2lect, b.l2series, 'lesson2', dayname)
         AS blesson2,
-    (CASE b.golect
-        WHEN 'historic' THEN
-        (CASE b.goseries
-            WHEN 'first' THEN
-                (SELECT gospel FROM `{$dbp}synlessons` AS cl
-                WHERE cl.dayname=d.name AND cl.lectionary=b.golect
-                LIMIT 1)
-            WHEN 'second' THEN
-                (SELECT s2gospel FROM `{$dbp}synlessons` AS cl
-                WHERE cl.dayname=d.name AND cl.lectionary=b.golect
-                LIMIT 1)
-            WHEN 'third' THEN
-                (SELECT s3gospel FROM `{$dbp}synlessons` AS cl
-                WHERE cl.dayname=d.name AND cl.lectionary=b.golect
-                LIMIT 1)
-            END)
-        WHEN 'custom' THEN b.goseries
-        ELSE
-            (SELECT gospel FROM `{$dbp}synlessons` AS cl
-            WHERE cl.dayname=d.name AND cl.lectionary=b.golect
-            LIMIT 1)
-        END)
+    `{$dbp}get_selected_lesson`(b.golect, b.goseries, 'gospel', dayname)
         AS bgospel,
+    `{$dbp}get_selected_lesson`(b.smlect, b.smseries, b.smtype, dayname)
+        AS bsermon,
     (CASE b.pslect
         WHEN 'custom' THEN b.psseries
         ELSE
@@ -173,10 +112,11 @@ function queryAllHymns($limit=0, $future=false, $id="") {
             LIMIT 1)
         END)
         AS bpsalm,
-    b.l1lect != \"custom\" AS l1link,
-    b.l2lect != \"custom\" AS l2link,
-    b.golect != \"custom\" AS golink,
-    b.pslect != \"custom\" AS pslink,
+    b.l1lect != 'custom' AS l1link,
+    b.l2lect != 'custom' AS l2link,
+    b.golect != 'custom' AS golink,
+    b.pslect != 'custom' AS pslink,
+    b.smlect != 'custom' AS smlink,
     b.coclass AS bcollectclass,
     (SELECT collect FROM `{$dbp}churchyear_collects` AS cyc
     JOIN `{$dbp}churchyear_collect_index` AS cci
@@ -290,9 +230,10 @@ function display_records_table($q) {
                     </div>
                     <dl class="blocklessons">
                     <dt>Lesson 1</dt><dd><?=linkbgw($cfg, $row['blesson1'], $row['l1link'])?></dd>
-                        <dt>Lesson 2</dt><dd><?=linkbgw($cfg, $row['blesson2'], $row['l2link'])?></dd>
-                        <dt>Gospel</dt><dd><?=linkbgw($cfg, $row['bgospel'], $row['golink'])?></dd>
-                        <dt>Psalm</dt><dd><?=linkbgw($cfg, "Ps ".$row['bpsalm'], $row['pslink'])?></dd>
+                    <dt>Lesson 2</dt><dd><?=linkbgw($cfg, $row['blesson2'], $row['l2link'])?></dd>
+                    <dt>Gospel</dt><dd><?=linkbgw($cfg, $row['bgospel'], $row['golink'])?></dd>
+                    <dt>Psalm</dt><dd><?=linkbgw($cfg, "Ps ".$row['bpsalm'], $row['pslink'])?></dd>
+                    <dt>Sermon</dt><dd><?=linkbgw($cfg, $row['bsermon'], $row['smlink'])?></dd>
                     </dl>
                     <h5>Collect (<?=$row['bcollectclass']?>)</h5>
                     <div class="collecttext maxcolumn">
@@ -381,10 +322,11 @@ function modify_records_table($q, $action) {
                         <?=translate_markup($row['bnotes'])?>
                     </div>
                     <dl class="blocklessons">
-                        <dt>Lesson 1</dt><dd><?=linkbgw($cfg, $row['blesson1'], $row['l1link'])?></dd>
-                        <dt>Lesson 2</dt><dd><?=linkbgw($cfg, $row['blesson2'], $row['l2link'])?></dd>
-                        <dt>Gospel</dt><dd><?=linkbgw($cfg, $row['bgospel'], $row['golink'])?></dd>
-                        <dt>Psalm</dt><dd><?=linkbgw($cfg, "Ps ".$row['bpsalm'], $row['pslink'])?></dd>
+                    <dt>Lesson 1</dt><dd><?=linkbgw($cfg, $row['blesson1'], $row['l1link'])?></dd>
+                    <dt>Lesson 2</dt><dd><?=linkbgw($cfg, $row['blesson2'], $row['l2link'])?></dd>
+                    <dt>Gospel</dt><dd><?=linkbgw($cfg, $row['bgospel'], $row['golink'])?></dd>
+                    <dt>Psalm</dt><dd><?=linkbgw($cfg, "Ps ".$row['bpsalm'], $row['pslink'])?></dd>
+                    <dt>Sermon</dt><dd><?=linkbgw($cfg, $row['bsermon'], $row['smlink'])?></dd>
                     </dl>
                     <h5>Collect (<?=$row['bcollectclass']?>)</h5>
                     <div class="collecttext maxcolumn">
