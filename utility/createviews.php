@@ -42,37 +42,88 @@ $q = $dbh->prepare("CREATE VIEW `{$dbp}synpropers` AS
     LEFT JOIN `{$dbp}churchyear` AS cy ON (p.dayname = cy.dayname)
     LEFT JOIN `{$dbp}churchyear_graduals` AS g ON (g.season = cy.season)");
 $q->execute() or die(array_pop($q->errorInfo()));;
+/****
+ * The following views rearrange synlessons data for easier access
+ */
 $q = $dbh->exec("DROP VIEW IF EXISTS `{$dbp}lesson1selections`");
 $q = $dbh->prepare("CREATE VIEW `{$dbp}lesson1selections` AS
-    SELECT DISTINCT b.l1lect, b.l1series, d.name AS dayname, s.lesson1
-    FROM `{$dbp}days` AS d
-    JOIN `{$dbp}blocks` AS b ON (b.id = d.block)
-    JOIN `{$dbp}synlessons` AS s
-        ON (d.name = s.dayname AND b.l1lect=s.lectionary)");
+    SELECT DISTINCT b.l1lect, b.l1series, s.dayname,
+    (CASE b.l1lect
+     WHEN 'historic' THEN
+      (CASE b.l1series
+       WHEN 'first' THEN s.lesson1
+       WHEN 'second' THEN s.s2lesson
+       WHEN 'third' THEN s.s3lesson
+      END)
+     ELSE s.lesson1
+    END) AS lesson1
+    FROM `{$dbp}blocks` AS b
+    JOIN `{$dbp}synlessons` AS s ON (b.l1lect=s.lectionary)");
 $q->execute() or die(array_pop($q->errorInfo()));;
 $q = $dbh->exec("DROP VIEW IF EXISTS `{$dbp}lesson2selections`");
 $q = $dbh->prepare("CREATE VIEW `{$dbp}lesson2selections` AS
-    SELECT DISTINCT b.l2lect, b.l2series, d.name AS dayname, s.lesson2
-    FROM `{$dbp}days` AS d
-    JOIN `{$dbp}blocks` AS b ON (b.id = d.block)
-    JOIN `{$dbp}synlessons` AS s
-        ON (d.name = s.dayname AND b.l2lect=s.lectionary)");
+    SELECT DISTINCT b.l2lect, b.l2series, s.dayname,
+    (CASE b.l2lect
+     WHEN 'historic' THEN
+      (CASE b.l2series
+       WHEN 'first' THEN s.lesson2
+       WHEN 'second' THEN s.s2lesson
+       WHEN 'third' THEN s.s3lesson
+      END)
+     ELSE s.lesson2
+    END) AS lesson2
+    FROM `{$dbp}blocks` AS b
+    JOIN `{$dbp}synlessons` AS s ON (b.l2lect=s.lectionary)");
 $q->execute() or die(array_pop($q->errorInfo()));;
 $q = $dbh->exec("DROP VIEW IF EXISTS `{$dbp}gospelselections`");
 $q = $dbh->prepare("CREATE VIEW `{$dbp}gospelselections` AS
-    SELECT DISTINCT b.golect, b.goseries, d.name AS dayname, s.gospel
-    FROM `{$dbp}days` AS d
-    JOIN `{$dbp}blocks` AS b ON (b.id = d.block)
-    JOIN `{$dbp}synlessons` AS s
-        ON (d.name = s.dayname AND b.golect=s.lectionary)");
+    SELECT DISTINCT b.golect, b.goseries, s.dayname,
+    (CASE b.golect
+     WHEN 'historic' THEN
+      (CASE b.goseries
+       WHEN 'first' THEN s.gospel
+       WHEN 'second' THEN s.s2gospel
+       WHEN 'third' THEN s.s3gospel
+      END)
+     ELSE s.gospel
+    END) AS gospel
+    FROM `{$dbp}blocks` AS b
+    JOIN `{$dbp}synlessons` AS s ON (b.golect=s.lectionary)");
 $q->execute() or die(array_pop($q->errorInfo()));;
 $q = $dbh->exec("DROP VIEW IF EXISTS `{$dbp}sermonselections`");
 $q = $dbh->prepare("CREATE VIEW `{$dbp}sermonselections` AS
-    SELECT DISTINCT b.smlect, b.smseries, d.name AS dayname, s.gospel,
-    s.lesson1, s.lesson2
-    FROM `{$dbp}days` AS d
-    JOIN `{$dbp}blocks` AS b ON (b.id = d.block)
-    JOIN `{$dbp}synlessons` AS s
-        ON (d.name = s.dayname AND b.smlect=s.lectionary)");
+    SELECT DISTINCT b.smlect, b.smseries, s.dayname,
+    (CASE b.smlect
+     WHEN 'historic' THEN
+      (CASE b.smseries
+       WHEN 'first' THEN s.gospel
+       WHEN 'second' THEN s.s2gospel
+       WHEN 'third' THEN s.s3gospel
+      END)
+     ELSE s.gospel
+    END) AS gospel,
+
+    (CASE b.smlect
+     WHEN 'historic' THEN
+      (CASE b.smseries
+       WHEN 'first' THEN s.lesson1
+       WHEN 'second' THEN s.s2lesson
+       WHEN 'third' THEN s.s3lesson
+      END)
+     ELSE s.lesson1
+    END) AS lesson1,
+
+    (CASE b.smlect
+     WHEN 'historic' THEN
+      (CASE b.smseries
+       WHEN 'first' THEN s.lesson2
+       WHEN 'second' THEN s.s2lesson
+       WHEN 'third' THEN s.s3lesson
+      END)
+     ELSE s.lesson2
+    END) AS lesson2
+
+    FROM `{$dbp}blocks` AS b
+    JOIN `{$dbp}synlessons` AS s ON (b.smlect=s.lectionary)");
 $q->execute() or die(array_pop($q->errorInfo()));;
 ?>
