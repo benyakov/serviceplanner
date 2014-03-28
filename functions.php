@@ -96,14 +96,14 @@ function queryAllHymns($limit=0, $future=false, $id="") {
     b.label AS blabel, b.notes AS bnotes,
     cyp.color AS color, cyp.theme AS theme, cyp.introit AS introit,
     cyp.gradual AS gradual, cyp.note AS propersnote,
-    `{$dbp}get_selected_lesson`(b.l1lect, b.l1series, 'lesson1', dayname)
-        AS blesson1,
-    `{$dbp}get_selected_lesson`(b.l2lect, b.l2series, 'lesson2', dayname)
-        AS blesson2,
-    `{$dbp}get_selected_lesson`(b.golect, b.goseries, 'gospel', dayname)
-        AS bgospel,
-    `{$dbp}get_selected_lesson`(b.smlect, b.smseries, b.smtype, dayname)
-        AS bsermon,
+    COALESCE(l1s.lesson1, l1s.l1series) AS blesson1,
+    COALESCE(l2s.lesson2, l2s.l2series) AS blesson2,
+    COALESCE(gos.gospel, gos.goseries) AS bgospel,
+    COALESCE((CASE b.smtype
+              WHEN 'gospel' THEN sms.gospel
+              WHEN 'lesson1' THEN sms.lesson1
+              WHEN 'lesson2' THEN sms.lesson2
+             END), sms.smseries) AS bsermon,
     (CASE b.pslect
         WHEN 'custom' THEN b.psseries
         ELSE
@@ -130,6 +130,14 @@ function queryAllHymns($limit=0, $future=false, $id="") {
         AND (h.book = n.book)
     LEFT OUTER JOIN `{$dbp}blocks` AS b ON (b.id = d.block)
     LEFT OUTER JOIN `{$dbp}synpropers` AS cyp ON (cyp.dayname = d.name)
+    LEFT JOIN `{$dbp}lesson1selections` AS l1s
+    ON (l1s.l1lect=b.l1lect AND l1s.l1series=b.l1series AND l1s.dayname=d.name)
+    LEFT JOIN `{$dbp}lesson2selections` AS l2s
+    ON (l2s.l2lect=b.l2lect AND l2s.l2series=b.l2series AND l2s.dayname=d.name)
+    LEFT JOIN `{$dbp}gospelselections` AS gos
+    ON (gos.golect=b.golect AND gos.goseries=b.goseries AND gos.dayname=d.name)
+    LEFT JOIN `{$dbp}sermonselections` AS sms
+    ON (sms.smlect=b.smlect AND sms.smseries=b.smseries AND sms.dayname=d.name)
     {$where}
     ORDER BY d.caldate {$order}, h.service {$order},
         h.location, h.sequence {$limitstr}");

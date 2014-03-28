@@ -42,4 +42,37 @@ $q = $dbh->prepare("CREATE VIEW `{$dbp}synpropers` AS
     LEFT JOIN `{$dbp}churchyear` AS cy ON (p.dayname = cy.dayname)
     LEFT JOIN `{$dbp}churchyear_graduals` AS g ON (g.season = cy.season)");
 $q->execute() or die(array_pop($q->errorInfo()));;
+$q = $dbh->exec("DROP VIEW IF EXISTS `{$dbp}lesson1selections`");
+$q = $dbh->prepare("CREATE VIEW `{$dbp}lesson1selections` AS
+    SELECT b.l1lect, b.l1series, d.name AS dayname, s.lesson1
+    FROM `{$dbp}days` AS d
+    JOIN `{$dbp}blocks` AS b ON (b.id = d.block)
+    JOIN `{$dbp}synlessons` AS s
+        ON (d.name = s.dayname AND b.l1lect=s.lectionary)");
+$q->execute() or die(array_pop($q->errorInfo()));;
+$q = $dbh->exec("DROP VIEW IF EXISTS `{$dbp}lesson2selections`");
+$q = $dbh->prepare("CREATE VIEW `{$dbp}lesson2selections` AS
+    SELECT b.l2lect, b.l2series, d.name AS dayname, s.lesson2
+    FROM `{$dbp}days` AS d
+    JOIN `{$dbp}blocks` AS b ON (b.id = d.block)
+    JOIN `{$dbp}synlessons` AS s
+        ON (d.name = s.dayname AND b.l2lect=s.lectionary)");
+$q->execute() or die(array_pop($q->errorInfo()));;
+$q = $dbh->exec("DROP VIEW IF EXISTS `{$dbp}gospelselections`");
+$q = $dbh->prepare("CREATE VIEW `{$dbp}gospelselections` AS
+    SELECT b.golect, b.goseries, d.name AS dayname, s.gospel
+    FROM `{$dbp}days` AS d
+    JOIN `{$dbp}blocks` AS b ON (b.id = d.block)
+    JOIN `{$dbp}synlessons` AS s
+        ON (d.name = s.dayname AND b.golect=s.lectionary)");
+$q->execute() or die(array_pop($q->errorInfo()));;
+$q = $dbh->exec("DROP VIEW IF EXISTS `{$dbp}sermonselections`");
+$q = $dbh->prepare("CREATE VIEW `{$dbp}sermonselections` AS
+    SELECT b.smlect, b.smseries, d.name AS dayname, s.gospel,
+    s.lesson1, s.lesson2
+    FROM `{$dbp}days` AS d
+    JOIN `{$dbp}blocks` AS b ON (b.id = d.block)
+    JOIN `{$dbp}synlessons` AS s
+        ON (d.name = s.dayname AND b.smlect=s.lectionary)");
+$q->execute() or die(array_pop($q->errorInfo()));;
 ?>
