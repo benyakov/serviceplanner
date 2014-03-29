@@ -34,7 +34,32 @@ $options = getOptions();
 if (! array_key_exists('modifyorder', $_SESSION[$sprefix])) {
     $_SESSION[$sprefix]['modifyorder'] = $options->get['modifyorder'];
 }
-if (array_key_exists('listinglimit', $_GET) &&
+if (array_key_exists('allfuture', $_GET)) {
+    $allfuture = $_GET['allfuture'];
+    $_SESSION[$sprefix]["allfuture"] = $allfuture;
+} elseif (!$_SESSION[$sprefix]["allfuture"]) {
+    $allfuture = "checked";
+    $_SESSION[$sprefix]["allfuture"] = $allfuture;
+} else $allfuture = $_SESSION[$sprefix]["allfuture"];
+
+if (array_key_exists('lowdate', $_GET)) {
+    $lowdate = new DateTime($_GET['lowdate']);
+    $_SESSION[$sprefix]["lowdate"] = $lowdate->format("Y-m-d");
+} elseif (!$_SESSION[$sprefix]["lowdate"]) {
+    $lowdate = new DateTime();
+    $lowdate->sub(new DateInterval("P1M");
+    $_SESSION[$sprefix]["lowdate"] = $lowdate->format("Y-m-d");
+} else $lowdate = $_SESSION[$sprefix]['lowdate'];
+
+if (array_key_exists('highdate', $_GET)) {
+    $highdate = new DateTime($_GET['highdate']);
+    $_SESSION[$sprefix]["highdate"] = $highdate->format("Y-m-d");
+} elseif (!$_SESSION[$sprefix]["highdate"]) {
+    $highdate = new DateTime();
+    $_SESSION[$sprefix]["highdate"] = $highdate->format("Y-m-d");
+} else $lowdate = $_SESSION[$sprefix]['lowdate'];
+
+
     is_numeric($_GET['listinglimit'])) {
     $_SESSION[$sprefix]["listinglimit"] = $_GET['listinglimit'];
     if ("Apply" != $_GET['submit']) {
@@ -146,9 +171,14 @@ services, with all associated hymns at that location. To delete only certain
 hymns, edit the service using the "Edit" link.  To create or edit a sermon plan
 for that service, use the "Sermon" link.</p>
 <form action="http://<?=$this_script?>" method="GET">
-<label for="listinglimit">Listing Limit (0 for None):</label>
-<input type="text" id="listinglimit" name="listinglimit"
-    value="<?=$_SESSION[$sprefix]["listinglimit"]?>">
+<label for="allfuture">Include all future services.</label>
+<input type="checkbox" id="allfuture" name="allfuture" <?=$allfuture?>>
+<label for="lowdate">From</label>
+<input type="date" id="lowdate" name="lowdate"
+    value="<?=$lowdate?>">
+<label for="highdate">To</label>
+<input type="date" id="highdate" name="highdate"
+    value="<?=$highdate?>">
 <button type="submit" name="submit" value="Apply">Apply</button>
 <?
     $disabled = "";
@@ -164,7 +194,7 @@ for that service, use the "Sermon" link.</p>
 <?
 if ("Future" == $_SESSION[$sprefix]['modifyorder']) $future = true;
 else $future = false;
-$q = queryAllHymns($_SESSION[$sprefix]['listinglimit'], $future);
+$q = queryAllHymns($lowdate, $highdate, (bool)$allfuture, $future);
 modify_records_table($q, "delete.php");
 ?>
 </div>

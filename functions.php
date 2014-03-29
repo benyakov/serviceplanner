@@ -73,22 +73,30 @@ function checkContentReq() {
 }
 
 function queryService($id) {
-    return queryAllHymns(0, false, $id);
+    return queryAllHymns('', '', true, 0, false, $id);
 }
 
-function queryAllHymns($limit=0, $future=false, $id="") {
+function queryAllHymns($lowdate="", $highdate="", $allfuture=true, $future=false, $id="", $limit=0) {
     $dbh = new DBConnection();
     $dbp = $dbh->getPrefix();
-    if ($id) $where = "WHERE d.pkey = ?";
+    $where = array();
+    if ($limit && is_numeric($limit)) $limitstr = " LIMIT {$limit} ";
+    else $limitstr = "";
+    if ($id) $where[] = "d.pkey = ?";
     elseif ($future) {
-        $where = "WHERE d.caldate >= CURDATE()";
+        $where[] = "d.caldate >= CURDATE()";
         $order = "";
     } else {
-        $where = "";
         $order = "DESC";
     }
-    if ($limit > 0) $limitstr = " LIMIT {$limit}";
-    else $limitstr = "";
+    if ($lowdate)
+        $where[] = "date > :lowdate";
+    if ($highdate && ! $allfuture)
+        $where[] = "date < :highdate";
+    if ($where)
+        $wherestr = " WHERE ".implode(" AND ", $where);
+    else
+        $wherestr = "";
     $q = $dbh->prepare("SELECT d.pkey AS serviceid,
     DATE_FORMAT(d.caldate, '%c/%e/%Y') AS date,
     h.book, h.number, h.note, h.location, d.name AS dayname, d.rite,
@@ -138,7 +146,7 @@ function queryAllHymns($limit=0, $future=false, $id="") {
     ON (gos.golect=b.golect AND gos.goseries=b.goseries AND gos.dayname=d.name)
     LEFT JOIN `{$dbp}sermonselections` AS sms
     ON (sms.smlect=b.smlect AND sms.smseries=b.smseries AND sms.dayname=d.name)
-    {$where}
+    {$wherestr}
     ORDER BY d.caldate {$order}, h.service {$order},
         h.location, h.sequence {$limitstr}");
     if ($id) {

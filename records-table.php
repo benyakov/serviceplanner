@@ -24,22 +24,46 @@
     USA
  */
 $options = getOptions();
-if (array_key_exists('listinglimit', $_GET) &&
-    is_numeric($_GET['listinglimit'])) {
-    $_SESSION[$sprefix]["listinglimit"] = $_GET['listinglimit'];
-} elseif (! array_key_exists('listinglimit', $_SESSION[$sprefix])) {
-    $_SESSION[$sprefix]['listinglimit'] = $options->get('listinglimit');
-}
 unset($options);
+if (array_key_exists('allfuture', $_GET)) {
+    $allfuture = $_GET['allfuture'];
+    $_SESSION[$sprefix]["allfuture"] = $allfuture;
+} elseif (!$_SESSION[$sprefix]["allfuture"]) {
+    $allfuture = "checked";
+    $_SESSION[$sprefix]["allfuture"] = $allfuture;
+} else $allfuture = $_SESSION[$sprefix]["allfuture"];
+
+if (array_key_exists('lowdate', $_GET)) {
+    $lowdate = new DateTime($_GET['lowdate']);
+    $_SESSION[$sprefix]["lowdate"] = $lowdate->format("Y-m-d");
+} elseif (!$_SESSION[$sprefix]["lowdate"]) {
+    $lowdate = new DateTime();
+    $lowdate->sub(new DateInterval("P1M");
+    $_SESSION[$sprefix]["lowdate"] = $lowdate->format("Y-m-d");
+} else $lowdate = $_SESSION[$sprefix]['lowdate'];
+
+if (array_key_exists('highdate', $_GET)) {
+    $highdate = new DateTime($_GET['highdate']);
+    $_SESSION[$sprefix]["highdate"] = $highdate->format("Y-m-d");
+} elseif (!$_SESSION[$sprefix]["highdate"]) {
+    $highdate = new DateTime();
+    $_SESSION[$sprefix]["highdate"] = $highdate->format("Y-m-d");
+} else $lowdate = $_SESSION[$sprefix]['lowdate'];
+
 ?>
 <h1>Service Planning Records</h1>
 <form action="http://<?=$this_script?>" method="GET">
-<label for="listinglimit">Listing Limit (0 for None):</label>
-<input type="text" id="listinglimit" name="listinglimit"
-    value="<?=$_SESSION[$sprefix]["listinglimit"]?>">
+<label for="allfuture">Include all future services.</label>
+<input type="checkbox" id="allfuture" name="allfuture" <?=$allfuture?>>
+<label for="lowdate">From</label>
+<input type="date" id="lowdate" name="lowdate"
+    value="<?=$lowdate?>">
+<label for="highdate">To</label>
+<input type="date" id="highdate" name="highdate"
+    value="<?=$highdate?>">
 <button type="submit" value="Apply">Apply</button>
 </form>
 <?php
-$q = queryAllHymns($_SESSION[$sprefix]['listinglimit']);
+$q = queryAllHymns($lowdate, $highdate, (bool)$allfuture);
 display_records_table($q);
 ?>

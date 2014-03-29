@@ -35,7 +35,7 @@ if ("customfields" == $_GET['action']) {
     echo json_encode(showServiceListing($config));
     exit(0);
 } elseif ("available" == $_GET['action']) {
-    $q = queryAllHymns(1);
+    $q = queryAllHymns($limit=1);
     $record = $q->fetch(PDO::FETCH_ASSOC);
     $rec = array_keys($record);
     $rec = array_merge($rec, Array(
@@ -353,6 +353,7 @@ End HTML: <input type="text" id="end" required value="<?=$endhtml?>"><br>
 function showServiceListing($config) {
     $rv = Array();
     $q = queryAllHymns($limit=(int) $config->get("custom view", "limit"),
+        $allfuture=true,
         $future=(bool) $config->get("custom view", "future"));
     // Group by service
     $servicelisting = Array();
