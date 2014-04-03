@@ -326,6 +326,23 @@ class Configfile
     }
 
     /**
+     * Return a value like get, using the second+ arguments,
+     * but if the value does not exist,
+     * return the value of the first argument as default
+     */
+    public function getDefault() {
+        $argcount = func_num_args();
+        $args = func_get_args();
+        if ($argcount < 2)
+            throw new ConfigfileError("Insufficient argcount for getDefault");
+        $default = array_shift($args);
+        if (call_user_func_array(Array($this, "exists"), $args))
+            return call_user_func_array(Array($this, "get"), $args);
+        else
+            return $default;
+    }
+
+    /**
      * Return a section
      */
     public function getSection($Key) {

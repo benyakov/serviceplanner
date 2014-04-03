@@ -331,7 +331,7 @@ $(document).ready(function(){var a="http://www.bethanythedalles.org/services-dev
     <dl>
     <dt>Preferred Bible Abbreviation from <a href="http://www.biblegateway.com/versions/" title="BibleGateway.com">Bible Gateway</a></dt>
     <dd><input type="text" id="biblegwversion" name="biblegwversion"
-        value="<?=$config->get('biblegwversion')?>" placeholder="Unset">
+        value="<?=$config->getDefault("", "biblegwversion")?>" placeholder="Unset">
     </dl>
     <button type="submit">Submit</button><button type="reset">Reset</button>
     </form>
