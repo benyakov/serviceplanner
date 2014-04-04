@@ -352,9 +352,9 @@ End HTML: <input type="text" id="end" required value="<?=$endhtml?>"><br>
 
 function showServiceListing($config) {
     $rv = Array();
-    $q = queryAllHymns($limit=(int) $config->get("custom view", "limit"),
-        $allfuture=true,
-        $future=(bool) $config->get("custom view", "future"));
+    $q = queryAllHymns("", "", $allfuture=true,
+        $future=(bool) $config->get("custom view", "future"), "",
+        $limit=(int) $config->get("custom view", "limit"));
     // Group by service
     $servicelisting = Array();
     $service = Array();
