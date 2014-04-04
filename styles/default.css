@@ -598,6 +598,10 @@ input#rite {
     width: 10em;
 }
 
+#block-series label {
+    color: black;
+}
+
 form#block-plan-form #label {
     width: 30em;
 }

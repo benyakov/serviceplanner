@@ -218,7 +218,7 @@ if ($_POST['label']) {
             (label, blockstart, blockend, notes, l1lect, l1series, l2lect,
             l2series, golect, goseries, pslect, psseries, colect, coclass,
             smtype, smlect, smseries)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
     }
     if (! $q->execute($binding)) {
         setMessage("Problem saving block:" . array_pop($q->errorInfo()));
