@@ -53,7 +53,7 @@ if ((! ($dbstate->exists("has-churchyear-functions") &&
 
 // Churchyear table views
 if ((! ($dbstate->exists("has-views") && $dbstate->get("has-views"))) or
-        ($_GET['flag'] == 'create-views' && $auth))
+        ($_GET['flag'] == 'create-views'))
 {
     require('./utility/createviews.php');
         $dbstate->store('has-views', 1);
