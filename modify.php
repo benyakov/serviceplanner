@@ -35,10 +35,6 @@ unset($_SESSION[$sprefix]["highdate"]);
 unset($_SESSION[$sprefix]["allfuture"]);
  */
 $this_script = $_SERVER['HTTP_HOST'].$_SERVER['SCRIPT_NAME'] ;
-$options = getOptions();
-if (! array_key_exists('modifyorder', $_SESSION[$sprefix])) {
-    $_SESSION[$sprefix]['modifyorder'] = $options->get['modifyorder'];
-}
 if ($_GET['submit'] == "Apply") {
     if ($_GET['allfuture']) {
         $allfuture = "checked";
@@ -64,6 +60,17 @@ if (array_key_exists('highdate', $_GET)) {
     $highdate = new DateTime();
     $_SESSION[$sprefix]["highdate"] = $highdate;
 } else $highdate = $_SESSION[$sprefix]['highdate'];
+
+if ($_GET['submit'] == "All")
+    $_SESSION[$sprefix]['modifyorder'] = "All";
+elseif ($_GET['submit'] == "Future")
+    $_SESSION[$sprefix]['modifyorder'] = "Future";
+$options = getOptions(true);
+if (! array_key_exists('modifyorder', $_SESSION[$sprefix]))
+    $_SESSION[$sprefix]['modifyorder'] =
+        $options->getDefault('All', 'modifyorder');
+else
+    $options->set('modifyorder', $_SESSION[$sprefix]['modifyorder']);
 unset($options);
 ?>
 <!DOCTYPE html>
@@ -196,10 +203,11 @@ for that service, use the "Sermon" link.</p>
 ?>
 <button id="allbutton" type="submit" name="submit" value="All" <?=$disabled?>>Show All (Rev. Chron.)</button>
 </form>
+<hr>
 <?
-if ("Future" == $_SESSION[$sprefix]['modifyorder']) $future = true;
-else $future = false;
-$q = queryAllHymns($lowdate, $highdate, (bool)$allfuture, $future);
+if ("Future" == $_SESSION[$sprefix]['modifyorder']) $order = "ASC";
+else $order = "DESC";
+$q = queryServiceDateRange($lowdate, $highdate, (bool)$allfuture, $order);
 modify_records_table($q, "delete.php");
 ?>
 </div>

@@ -64,6 +64,6 @@ if (array_key_exists('highdate', $_GET)) {
 <button type="submit" value="Apply">Apply</button>
 </form>
 <?php
-$q = queryAllHymns($lowdate, $highdate, (bool)$allfuture);
+$q = queryServiceDateRange($lowdate, $highdate, (bool)$allfuture);
 display_records_table($q);
 ?>

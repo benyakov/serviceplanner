@@ -35,7 +35,7 @@ if ("customfields" == $_GET['action']) {
     echo json_encode(showServiceListing($config));
     exit(0);
 } elseif ("available" == $_GET['action']) {
-    $q = queryAllHymns($limit=1);
+    $q = querySomeHymns(1);
     $record = $q->fetch(PDO::FETCH_ASSOC);
     $rec = array_keys($record);
     $rec = array_merge($rec, Array(
@@ -352,9 +352,16 @@ End HTML: <input type="text" id="end" required value="<?=$endhtml?>"><br>
 
 function showServiceListing($config) {
     $rv = Array();
-    $q = queryAllHymns("", "", $allfuture=true,
-        $future=(bool) $config->get("custom view", "future"), "",
-        $limit=(int) $config->get("custom view", "limit"));
+    if ($config->get("custom view", "future")) {
+        $where = array("d.caldate >= CURDATE()");
+        $order = "ASC";
+    } else {
+        $where = array();
+        $order = "DESC";
+    }
+    $q = rawQuery($where, $order, $config->get("custom view", "limit"));
+    if (! $q->execute())
+        die("<p>".array_pop($q->errorInfo()).'</p><p style="white-space: pre;">'.$q->queryString."</p>");
     // Group by service
     $servicelisting = Array();
     $service = Array();

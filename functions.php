@@ -73,36 +73,43 @@ function checkContentReq() {
 }
 
 function queryService($id) {
-    return queryAllHymns('', '', true, 0, false, $id);
+    $q = rawQuery(array("d.key = :id"));
+    if ($id) $q->bindParam(":id", $id);
+    if (! $q->execute())
+        die("<p>".array_pop($q->errorInfo()).'</p><p style="white-space: pre;">'.$q->queryString."</p>");
+    return $q;
 }
 
 function queryFutureHymns() {
-    return queryAllHymns('', '', true, true);
+    $q = rawQuery(array("d.caldate >= CURDATE()"));
+    if (! $q->execute())
+        die("<p>".array_pop($q->errorInfo()).'</p><p style="white-space: pre;">'.$q->queryString."</p>");
+    return $q;
 }
 
-function queryAllHymns($lowdate="", $highdate="", $allfuture=true, $future=false, $id="", $limit=0) {
-    if (is_object($lowdate)) $lowdate = $lowdate->format("Y-m-d");
-    if (is_object($highdate)) $highdate = $highdate->format("Y-m-d");
+function querySomeHymns($limit) {
+    $q = rawQuery(array(), "DESC", $limit);
+    if (! $q->execute())
+        die("<p>".array_pop($q->errorInfo()).'</p><p style="white-space: pre;">'.$q->queryString."</p>");
+    return $q;
+}
+
+function queryServiceDateRange($lowdate, $highdate, $allfuture=false, $order="DESC") {
+    $where = array("d.caldate > :lowdate");
+    if (! $allfuture) $where[] = "d.caldate < :highdate";
+    $q = rawQuery($where, $order);
+    $q->bindParam(":lowdate", $lowdate->format("Y-m-d"));
+    if (! $allfuture) $q->bindParam(":highdate", $highdate->format("Y-m-d"));
+    if (! $q->execute())
+        die("<p>".array_pop($q->errorInfo()).'</p><p style="white-space: pre;">'.$q->queryString."</p>");
+    return $q;
+}
+
+function rawQuery($where=array(), $order="", $limit="") {
+    if ($where) $wherestr = "WHERE ".implode(" AND ", $where);
+    if ($limit) $limitstr = "LIMIT {$limit}";
     $dbh = new DBConnection();
     $dbp = $dbh->getPrefix();
-    $where = array();
-    if ($limit && is_numeric($limit)) $limitstr = " LIMIT {$limit} ";
-    else $limitstr = "";
-    if ($id) $where[] = "d.pkey = :id";
-    elseif ($future) {
-        $where[] = "d.caldate >= CURDATE()";
-        $order = "";
-    } else {
-        $order = "DESC";
-    }
-    if ($lowdate)
-        $where[] = "d.caldate > :lowdate";
-    if ($highdate && ! $allfuture)
-        $where[] = "d.caldate < :highdate";
-    if ($where)
-        $wherestr = " WHERE ".implode(" AND ", $where);
-    else
-        $wherestr = "";
     $q = $dbh->prepare("SELECT d.pkey AS serviceid,
     DATE_FORMAT(d.caldate, '%c/%e/%Y') AS date,
     h.book, h.number, h.note, h.location, d.name AS dayname, d.rite,
@@ -155,12 +162,6 @@ function queryAllHymns($lowdate="", $highdate="", $allfuture=true, $future=false
     {$wherestr}
     ORDER BY d.caldate {$order}, h.service {$order},
         h.location, h.sequence {$limitstr}");
-    if ($id) $q->bindParam(":id", $id);
-    if ($lowdate) $q->bindParam(":lowdate", $lowdate);
-    if ($highdate && ! $allfuture) $q->bindParam(":highdate", $highdate);
-    if (! $q->execute()) {
-        die("<p>".array_pop($q->errorInfo()).'</p><p style="white-space: pre;">'.$q->queryString."</p>");
-    }
     return $q;
 }
 
@@ -437,7 +438,7 @@ function gensitetabs($sitetabs, $action, $bare=false) {
     $rv = "";
     if (!$bare) {
         $rv .= "<nav><div id=\"sitetabs-background\">";
-        $rv .= "<ul id=\"sitetabs\">\n";
+        $rv .= "<ul id=\"sitetabs\">";
     }
     foreach ($tabs as $name => $activated) {
         if ($activated) {
@@ -446,7 +447,7 @@ function gensitetabs($sitetabs, $action, $bare=false) {
             $class = "";
         }
         $tabtext = $sitetabs[$name];
-        $rv .= "<li{$class}><a href=\"{$name}.php\">{$tabtext}</a></li>\n";
+        $rv .= "<li{$class}><a href=\"{$name}.php\">{$tabtext}</a></li>";
     }
     if (!$bare) {
         $rv .= "</ul></div></nav>\n";
