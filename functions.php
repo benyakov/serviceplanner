@@ -73,7 +73,7 @@ function checkContentReq() {
 }
 
 function queryService($id) {
-    $q = rawQuery(array("d.key = :id"));
+    $q = rawQuery(array("d.pkey = :id"));
     if ($id) $q->bindParam(":id", $id);
     if (! $q->execute())
         die("<p>".array_pop($q->errorInfo()).'</p><p style="white-space: pre;">'.$q->queryString."</p>");

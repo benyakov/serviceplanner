@@ -1,4 +1,4 @@
-<? /* Interface for editing a sermon
+<?php /* Interface for editing a sermon
     Copyright (C) 2012 Jesse Jacobsen
 
     This program is free software; you can redistribute it and/or modify
@@ -56,7 +56,7 @@ if (! array_key_exists('stage', $_GET)) {
     }
     ?><!DOCTYPE html>
     <html lang="en">
-    <?=html_head("Edit a Sermon Plan")?>
+    <?=html_head("Edit a Sermon Plan", array("smaller-records-listing.css"))?>
     <body>
     <script type="text/javascript">
         $(document).ready(function() {
@@ -80,9 +80,6 @@ if (! array_key_exists('stage', $_GET)) {
     particular service.  The service is displayed below.  You can also store
     your sermon manuscript file in the system, from this page.</p>
     <?
-    $q = queryService($id);
-    display_records_table($q, "delete.php");
-
     $q = $db->prepare("SELECT bibletext, outline, notes, mstype
         FROM `{$db->getPrefix()}sermons` WHERE service=:id");
     $q->bindParam(":id", $id);
@@ -116,6 +113,10 @@ if (! array_key_exists('stage', $_GET)) {
         <button type="reset">Reset</button>
         </form>
         </div>
+    <?
+    $q = queryService($id);
+    display_records_table($q, "delete.php");
+    ?>
     </div>
     </body>
     </html>

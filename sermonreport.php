@@ -42,7 +42,7 @@ if (! $auth) {
     <?
         $q = $db->prepare("SELECT s.bibletext, s.outline,
             s.notes, DATE_FORMAT(d.caldate, '%e %b %Y') as date,
-            d.name, d.rite
+            d.name AS day, d.rite
             FROM `{$db->getPrefix()}sermons` AS s
             JOIN `{$db->getPrefix()}days` AS d ON (s.service=d.pkey)
             WHERE service=:id");
