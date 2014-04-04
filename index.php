@@ -36,7 +36,7 @@ ob_start();
 ?>
 <h1>Upcoming Hymns</h1>
 <?php
-$q = queryAllHymns($future=true);
+$q = queryFutureHymns();
 display_records_table($q);
 $rawcontent = ob_get_clean();
 // Check for a content-only request.

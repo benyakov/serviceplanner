@@ -76,6 +76,10 @@ function queryService($id) {
     return queryAllHymns('', '', true, 0, false, $id);
 }
 
+function queryFutureHymns() {
+    return queryAllHymns('', '', true, true);
+}
+
 function queryAllHymns($lowdate="", $highdate="", $allfuture=true, $future=false, $id="", $limit=0) {
     if (is_object($lowdate)) $lowdate = $lowdate->format("Y-m-d");
     if (is_object($highdate)) $highdate = $highdate->format("Y-m-d");
