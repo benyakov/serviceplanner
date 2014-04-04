@@ -29,45 +29,41 @@ if (! $auth) {
     header("location: index.php");
     exit(0);
 }
+/** For debugging
+unset($_SESSION[$sprefix]["lowdate"]);
+unset($_SESSION[$sprefix]["highdate"]);
+unset($_SESSION[$sprefix]["allfuture"]);
+ */
 $this_script = $_SERVER['HTTP_HOST'].$_SERVER['SCRIPT_NAME'] ;
 $options = getOptions();
 if (! array_key_exists('modifyorder', $_SESSION[$sprefix])) {
     $_SESSION[$sprefix]['modifyorder'] = $options->get['modifyorder'];
 }
-if (array_key_exists('allfuture', $_GET)) {
-    $allfuture = $_GET['allfuture'];
-    $_SESSION[$sprefix]["allfuture"] = $allfuture;
-} elseif (!$_SESSION[$sprefix]["allfuture"]) {
-    $allfuture = "checked";
-    $_SESSION[$sprefix]["allfuture"] = $allfuture;
+if ($_GET['submit'] == "Apply") {
+    if ($_GET['allfuture']) {
+        $allfuture = "checked";
+        $_SESSION[$sprefix]["allfuture"] = $allfuture;
+    } else {
+        $allfuture = "";
+        $_SESSION[$sprefix]["allfuture"] = $allfuture;
+    }
 } else $allfuture = $_SESSION[$sprefix]["allfuture"];
-
 if (array_key_exists('lowdate', $_GET)) {
     $lowdate = new DateTime($_GET['lowdate']);
-    $_SESSION[$sprefix]["lowdate"] = $lowdate->format("Y-m-d");
+    $_SESSION[$sprefix]["lowdate"] = $lowdate;
 } elseif (!$_SESSION[$sprefix]["lowdate"]) {
     $lowdate = new DateTime();
-    $lowdate->sub(new DateInterval("P1M");
-    $_SESSION[$sprefix]["lowdate"] = $lowdate->format("Y-m-d");
+    $lowdate->sub(new DateInterval("P1M"));
+    $_SESSION[$sprefix]["lowdate"] = $lowdate;
 } else $lowdate = $_SESSION[$sprefix]['lowdate'];
 
 if (array_key_exists('highdate', $_GET)) {
     $highdate = new DateTime($_GET['highdate']);
-    $_SESSION[$sprefix]["highdate"] = $highdate->format("Y-m-d");
+    $_SESSION[$sprefix]["highdate"] = $highdate;
 } elseif (!$_SESSION[$sprefix]["highdate"]) {
     $highdate = new DateTime();
-    $_SESSION[$sprefix]["highdate"] = $highdate->format("Y-m-d");
-} else $lowdate = $_SESSION[$sprefix]['lowdate'];
-
-
-    is_numeric($_GET['listinglimit'])) {
-    $_SESSION[$sprefix]["listinglimit"] = $_GET['listinglimit'];
-    if ("Apply" != $_GET['submit']) {
-        $_SESSION[$sprefix]["modifyorder"] = $_GET['submit'];
-    }
-} elseif (! array_key_exists('listinglimit', $_SESSION[$sprefix])) {
-    $_SESSION[$sprefix]['listinglimit'] = $options->get('listinglimit');
-}
+    $_SESSION[$sprefix]["highdate"] = $highdate;
+} else $highdate = $_SESSION[$sprefix]['highdate'];
 unset($options);
 ?>
 <!DOCTYPE html>
@@ -158,6 +154,14 @@ unset($options);
                 var dest1 = $("html").scrollTop();
                 $("html").scrollTop(dest1-75);
             });
+            if (! Modernizr.inputtypes.date) {
+                $("#lowdate").datepicker({showOn:"both",
+                    numberOfMonths: [1,2],
+                    stepMonths: 2});
+                $("#highdate").datepicker({showOn:"both",
+                    numberOfMonths: [1,2],
+                    stepMonths: 2});
+            };
         });
     </script>
     <? pageHeader();
@@ -171,15 +175,16 @@ services, with all associated hymns at that location. To delete only certain
 hymns, edit the service using the "Edit" link.  To create or edit a sermon plan
 for that service, use the "Sermon" link.</p>
 <form action="http://<?=$this_script?>" method="GET">
+<input type="checkbox" id="allfuture" name="allfuture" value="checked" <?=$allfuture?>>
 <label for="allfuture">Include all future services.</label>
-<input type="checkbox" id="allfuture" name="allfuture" <?=$allfuture?>>
 <label for="lowdate">From</label>
 <input type="date" id="lowdate" name="lowdate"
-    value="<?=$lowdate?>">
+    value="<?=$lowdate->format("Y-m-d")?>">
 <label for="highdate">To</label>
 <input type="date" id="highdate" name="highdate"
-    value="<?=$highdate?>">
+    value="<?=$highdate->format("Y-m-d")?>">
 <button type="submit" name="submit" value="Apply">Apply</button>
+<br>
 <?
     $disabled = "";
     if ("Future" == $_SESSION[$sprefix]['modifyorder']) $disabled = "disabled";

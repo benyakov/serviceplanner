@@ -77,12 +77,14 @@ function queryService($id) {
 }
 
 function queryAllHymns($lowdate="", $highdate="", $allfuture=true, $future=false, $id="", $limit=0) {
+    if (is_object($lowdate)) $lowdate = $lowdate->format("Y-m-d");
+    if (is_object($highdate)) $highdate = $highdate->format("Y-m-d");
     $dbh = new DBConnection();
     $dbp = $dbh->getPrefix();
     $where = array();
     if ($limit && is_numeric($limit)) $limitstr = " LIMIT {$limit} ";
     else $limitstr = "";
-    if ($id) $where[] = "d.pkey = ?";
+    if ($id) $where[] = "d.pkey = :id";
     elseif ($future) {
         $where[] = "d.caldate >= CURDATE()";
         $order = "";
@@ -90,9 +92,9 @@ function queryAllHymns($lowdate="", $highdate="", $allfuture=true, $future=false
         $order = "DESC";
     }
     if ($lowdate)
-        $where[] = "date > :lowdate";
+        $where[] = "d.caldate > :lowdate";
     if ($highdate && ! $allfuture)
-        $where[] = "date < :highdate";
+        $where[] = "d.caldate < :highdate";
     if ($where)
         $wherestr = " WHERE ".implode(" AND ", $where);
     else
@@ -149,9 +151,9 @@ function queryAllHymns($lowdate="", $highdate="", $allfuture=true, $future=false
     {$wherestr}
     ORDER BY d.caldate {$order}, h.service {$order},
         h.location, h.sequence {$limitstr}");
-    if ($id) {
-        $q->bindParam(1, $id);
-    }
+    if ($id) $q->bindParam(":id", $id);
+    if ($lowdate) $q->bindParam(":lowdate", $lowdate);
+    if ($highdate && ! $allfuture) $q->bindParam(":highdate", $highdate);
     if (! $q->execute()) {
         die("<p>".array_pop($q->errorInfo()).'</p><p style="white-space: pre;">'.$q->queryString."</p>");
     }
