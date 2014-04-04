@@ -50,6 +50,6 @@ $dbstate->store('dbversion', $newversion);
 $dbstate->save() or die("Problem saving dbstate file.");
 $rm[] = "Upgraded to {$newversion}";
 setMessage(implode("<br />\n", $rm));
-header("Location: churchyear.php?request=dropfunctions");
+header("Location: churchyear.php?request=dropfunctions&flag=create-views");
 exit(0);
 ?>
