@@ -104,6 +104,7 @@ CREATE TABLE `churchyear_propers` (
     `introit`   text,
     `gradual`   text,
     `note`      text,
+    UNIQUE KEY `onedayeach` (`dayname`),
     FOREIGN KEY (`dayname`) REFERENCES `churchyear_synonyms` (`synonym`)
         ON DELETE CASCADE
         ON UPDATE CASCADE

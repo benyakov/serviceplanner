@@ -26,22 +26,14 @@
 if (! (isset($newversion) && isset($oldversion))) {
     echo "Error: This upgrade must be run automatically.";
 }
-if ("0.8." != substr($oldversion, 0, 4).'.') {
-    die("Can't upgrade from 0.8.x, since the current db version is {$oldversion}.");
+if ("0.9." != substr($oldversion, 0, 4).'.') {
+    die("Can't upgrade from 0.9.x, since the current db version is {$oldversion}.");
 }
 
 $db = new DBConnection();
 $db->beginTransaction();
-$q = $db->prepare("ALTER TABLE `{$db->getPrefix()}blocks`
-    ADD COLUMN `smtype` varchar(56) AFTER `coclass`");
-$q->execute() or die(array_pop($q->errorInfo()));
-
-$q = $db->prepare("ALTER TABLE `{$db->getPrefix()}blocks`
-    ADD COLUMN `smlect` varchar(56) AFTER `smtype`");
-$q->execute() or die(array_pop($q->errorInfo()));
-
-$q = $db->prepare("ALTER TABLE `{$db->getPrefix()}blocks`
-    ADD COLUMN `smseries` varchar(64) AFTER `smlect`");
+$q = $db->prepare("ALTER TABLE `{$db->getPrefix()}churchyear_propers`
+    ADD CONSTRAINT `onedayeach` UNIQUE KEY (`dayname`)");
 $q->execute() or die(array_pop($q->errorInfo()));
 $db->commit();
 
