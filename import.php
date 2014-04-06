@@ -179,7 +179,6 @@ class LectionaryImporter extends FormImporter {
             }
         }
         while ($record = $this->getRecord()) {
-            // TODO: Reset $thisrec to nulls ??
             foreach ($thisrec as $key=>&$value) {
                 $value = $record[$key];
             }
@@ -196,11 +195,6 @@ class LectionaryImporter extends FormImporter {
  * Imports church year data provided in a CSV export file
  */
 class ChurchyearImporter extends FormImporter {
-/* For churchyear, also handle:
- * replaceall := remove all current days in churchyear before loading
- *  Otherwise, only replace days already defined.
- */
-
     public function import() {
         $db = new DBConnection();
         $db->beginTransaction();
@@ -263,7 +257,6 @@ class ChurchyearImporter extends FormImporter {
         $db->exec("INSERT INTO `{$db->getPrefix()}churchyear`
             SELECT * FROM `{$db->getPrefix()}addchurchyear`");
         $db->commit();
-        }
         setMessage("Church year data imported.");
         header("Location: admin.php");
         exit(0);
@@ -274,7 +267,6 @@ class ChurchyearImporter extends FormImporter {
  * Imports general church year propers provided in a CSV export file
  */
 class ChurchyearPropersImporter extends FormImporter {
-
     public function import() {
         $db = new DBConnection();
         $db->beginTransaction();
@@ -285,8 +277,8 @@ class ChurchyearPropersImporter extends FormImporter {
                 `{$db->getPrefix()}churchyear_propers` AS cp
                 (dayname, color, theme, introit, gradual, note)
                 VALUES (:dayname, :color, :theme, :introit, :gradual, :note)");
-        $oneset = array("dayname"=NULL, "color"=NULL, "theme"=NULL,
-            "introit"=NULL, "gradual"=NULL, "note"=NULL);
+        $oneset = array("dayname"=>NULL, "color"=>NULL, "theme"=>NULL,
+            "introit"=>NULL, "gradual"=>NULL, "note"=>NULL);
         $q->bindParam(":dayname", $oneset["dayname"]);
         $q->bindParam(":color", $oneset["color"]);
         $q->bindParam(":theme", $oneset["theme"]);
