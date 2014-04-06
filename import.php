@@ -257,7 +257,6 @@ class ChurchyearImporter extends FormImporter {
         $db->exec("INSERT INTO `{$db->getPrefix()}churchyear`
             SELECT * FROM `{$db->getPrefix()}addchurchyear`");
         $db->commit();
-        }
         setMessage("Church year data imported.");
         header("Location: admin.php");
         exit(0);
@@ -278,8 +277,8 @@ class ChurchyearPropersImporter extends FormImporter {
                 `{$db->getPrefix()}churchyear_propers` AS cp
                 (dayname, color, theme, introit, gradual, note)
                 VALUES (:dayname, :color, :theme, :introit, :gradual, :note)");
-        $oneset = array("dayname"=NULL, "color"=NULL, "theme"=NULL,
-            "introit"=NULL, "gradual"=NULL, "note"=NULL);
+        $oneset = array("dayname"=>NULL, "color"=>NULL, "theme"=>NULL,
+            "introit"=>NULL, "gradual"=>NULL, "note"=>NULL);
         $q->bindParam(":dayname", $oneset["dayname"]);
         $q->bindParam(":color", $oneset["color"]);
         $q->bindParam(":theme", $oneset["theme"]);
