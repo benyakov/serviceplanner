@@ -52,7 +52,7 @@ $importer->import();
 class FormImporter {
     /* Expects in $_POST:
      * import := <name of thing being imported>
-     * $_POST['import'] := upload file to import
+     * $_POST['import-file'] := upload file to import
      */
     protected $loadfile;
     protected $fhandle = NULL;
@@ -64,7 +64,7 @@ class FormImporter {
         $this->usekeys = $usekeys;
         $db = new DBConnection();
         $this->loadfile = "./load-{$db->getName()}.txt";
-        if (! move_uploaded_file($_FILES['import']['tmp_name'], $this->loadfile)) {
+        if (! move_uploaded_file($_FILES['import-file']['tmp_name'], $this->loadfile)) {
             setMessage("Problem with file upload.");
             header("Location: admin.php");
             exit(0);

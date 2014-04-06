@@ -246,7 +246,7 @@ $(document).ready(function(){var a="http://www.bethanythedalles.org/services-dev
             enctype="multipart/form-data">
         <input type="hidden" name="import" value="lectionary">
         <fieldset><legend>Import Lectionary</legend>
-        <input type="file" id="lectionary_file" name="import" required
+        <input type="file" id="lectionary_file" name="import-file" required
             placeholder="Select local file."><br />
         <label for="lectionary_name">Name for imported lectionary</label>
         <input type="text" id="lectionary_name" name="lectionary_name"
@@ -260,7 +260,7 @@ $(document).ready(function(){var a="http://www.bethanythedalles.org/services-dev
         enctype="multipart/form-data">
         <input type="hidden" name="import" value="churchyear-propers">
         <fieldset><legend>Import General Church Year Propers</legend>
-        <input type="file" id="churchyear_propers_file" name="import" required
+        <input type="file" id="churchyear_propers_file" name="import-file" required
             placeholder="Select local file."><br />
         <input type="checkbox" id="churchyear_propers_replace" name="replace">
         <label for="churchyear_propers_replace">Replace all existing general propers?</label><br />
@@ -271,7 +271,7 @@ $(document).ready(function(){var a="http://www.bethanythedalles.org/services-dev
             enctype="multipart/form-data">
         <input type="hidden" name="import" value="synonyms">
         <fieldset><legend>Import Synonyms</legend>
-        <input type="file" id="synonyms_file" name="import" required
+        <input type="file" id="synonyms_file" name="import-file" required
             placeholder="Select local file."><br />
         <input type="checkbox" id="synonyms_replace" name="replace">
         <label for="synonyms_replace">Replace all existing synonyms?</label><br />
@@ -282,7 +282,7 @@ $(document).ready(function(){var a="http://www.bethanythedalles.org/services-dev
             enctype="multipart/form-data">
         <input type="hidden" name="import" value="churchyear">
         <fieldset><legend>Import Church Year</legend>
-        <input type="file" id="churchyear_file" name="import" required
+        <input type="file" id="churchyear_file" name="import-file" required
             placeholder="Select local file."><br />
         <input type="checkbox" id="churchyear_replace" name="replaceall">
         <label for="churchyear_replace">Replace all existing church year data?</label><br />
