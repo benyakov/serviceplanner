@@ -179,7 +179,6 @@ class LectionaryImporter extends FormImporter {
             }
         }
         while ($record = $this->getRecord()) {
-            // TODO: Reset $thisrec to nulls ??
             foreach ($thisrec as $key=>&$value) {
                 $value = $record[$key];
             }
@@ -196,11 +195,6 @@ class LectionaryImporter extends FormImporter {
  * Imports church year data provided in a CSV export file
  */
 class ChurchyearImporter extends FormImporter {
-/* For churchyear, also handle:
- * replaceall := remove all current days in churchyear before loading
- *  Otherwise, only replace days already defined.
- */
-
     public function import() {
         $db = new DBConnection();
         $db->beginTransaction();
@@ -274,7 +268,6 @@ class ChurchyearImporter extends FormImporter {
  * Imports general church year propers provided in a CSV export file
  */
 class ChurchyearPropersImporter extends FormImporter {
-
     public function import() {
         $db = new DBConnection();
         $db->beginTransaction();

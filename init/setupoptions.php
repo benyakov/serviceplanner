@@ -48,6 +48,7 @@ $option_used_history = 5;
 // the text displayed on the tabs.
 $sitetabs = array(
     "index"=>"Upcoming Hymns"
+    ,"records"=>"Service Records"
     ,"modify"=>"Modify Services"
     ,"block"=>"Block Plans"
     ,"sermons"=>"Sermon Plans"

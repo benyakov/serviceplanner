@@ -31,7 +31,6 @@ if (! $auth) {
     exit(0);
 }
 $this_script = "http://".$_SERVER['HTTP_HOST'].$_SERVER['SCRIPT_NAME'] ;
-$config = getConfig(false);
 if ('dellect' == $_POST['action']) {
     $db = new DBConnection();
     $q = $db->prepare("DELETE FROM `{$db->getPrefix()}churchyear_lessons`
@@ -326,13 +325,25 @@ $(document).ready(function(){var a="http://www.bethanythedalles.org/services-dev
     </li>
     </ul>
 
-    <h3>Config Settings</h2>
+    <h3>Config Settings</h2><? $config = getConfig(false); ?>
     <form id="configsettings" action="<?=$_SERVER['PHP_SELF']?>?flag=savesettings" method="post">
     <dl>
     <dt>Preferred Bible Abbreviation from <a href="http://www.biblegateway.com/versions/" title="BibleGateway.com">Bible Gateway</a></dt>
     <dd><input type="text" id="biblegwversion" name="biblegwversion"
         value="<?=$config->getDefault("", "biblegwversion")?>" placeholder="Unset">
     </dl>
+    <dt>Site Tab Selection & Order</dt>
+    <dd><textarea id="sitetabs-config" class="sitetabsconfig"
+        name="sitetabs-config"><?
+    foreach ($config->getDefault(array(), "sitetabs") as $k=>$v)
+        echo "$k:$v";
+    ?></textarea></dd>
+    <dt>Anonymous Site Tab Selection & Order</dt>
+    <dd><textarea id="sitetabs-config-anon" class="sitetabsconfig"
+        name="sitetabs-config-anon"><?
+    foreach ($config->getDefault(array(), "anonymous sitetabs") as $k=>$v)
+        echo "$k:$v";
+    ?></textarea></dd>
     <button type="submit">Submit</button><button type="reset">Reset</button>
     </form>
     </div>
