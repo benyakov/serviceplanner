@@ -246,12 +246,12 @@ $(document).ready(function(){var a="http://www.bethanythedalles.org/services-dev
         <input type="hidden" name="import" value="lectionary">
         <fieldset><legend>Import Lectionary</legend>
         <input type="file" id="lectionary_file" name="import-file" required
-            placeholder="Select local file."><br />
+            placeholder="Select local file."><br>
         <label for="lectionary_name">Name for imported lectionary</label>
         <input type="text" id="lectionary_name" name="lectionary_name"
-            required placeholder="Enter name."><br />
+            required placeholder="Enter name."><br>
         <input type="checkbox" id="lect_replace" name="replace">
-        <label for="lect_replace">Replace all existing records for this lectionary?</label><br />
+        <label for="lect_replace">Replace all existing records for this lectionary?</label><br>
         <button type="submit">Import Lectionary</button>
     </fieldset></form></li>
     <li><a href="export.php?export=churchyear-propers">Export General Propers for the Church Year</a></li>
@@ -260,9 +260,9 @@ $(document).ready(function(){var a="http://www.bethanythedalles.org/services-dev
         <input type="hidden" name="import" value="churchyear-propers">
         <fieldset><legend>Import General Church Year Propers</legend>
         <input type="file" id="churchyear_propers_file" name="import-file" required
-            placeholder="Select local file."><br />
+            placeholder="Select local file."><br>
         <input type="checkbox" id="churchyear_propers_replace" name="replace">
-        <label for="churchyear_propers_replace">Replace all existing general propers?</label><br />
+        <label for="churchyear_propers_replace">Replace all existing general propers?</label><br>
         <button type="submit">Import General Propers</button>
         </fieldset></form></li>
     <li><a href="export.php?export=synonyms">Export Synonyms for Church Year Day Names</a></li>
@@ -271,22 +271,36 @@ $(document).ready(function(){var a="http://www.bethanythedalles.org/services-dev
         <input type="hidden" name="import" value="synonyms">
         <fieldset><legend>Import Synonyms</legend>
         <input type="file" id="synonyms_file" name="import-file" required
-            placeholder="Select local file."><br />
+            placeholder="Select local file."><br>
         <input type="checkbox" id="synonyms_replace" name="replace">
-        <label for="synonyms_replace">Replace all existing synonyms?</label><br />
+        <label for="synonyms_replace">Replace all existing synonyms?</label><br>
         <button type="submit">Import Synonyms</button>
     </fieldset></form></li>
-    <li><a href="export.php?export=churchyear">Export Church Year Configuration</a> (controlling when each day falls)</a></li>
+    <li><a href="export.php?export=churchyear">Export Church Year Configuration</a> (controlling when each day falls)</li>
     <li><form id="import-churchyear" action="import.php" method="post"
             enctype="multipart/form-data">
         <input type="hidden" name="import" value="churchyear">
         <fieldset><legend>Import Church Year</legend>
         <input type="file" id="churchyear_file" name="import-file" required
-            placeholder="Select local file."><br />
+            placeholder="Select local file."><br>
         <input type="checkbox" id="churchyear_replace" name="replaceall">
-        <label for="churchyear_replace">Replace all existing church year data?</label><br />
+        <label for="churchyear_replace">Replace all existing church year data?</label><br>
         <input type="checkbox" id="churchyear_delete" name="deletemissing">
-        <label for="churchyear_delete">Delete days not in imported data?</label><br />
+        <label for="churchyear_delete">Delete days not in imported data?</label><br>
+        <button type="submit">Import Church Year Data</button>
+    </fieldset></form></li>
+    <li>TODO: <a href="export.php?export=collects">Export a Series of Collects</a></li>
+    <li><form id="import-collects" action="import.php" method="post"
+            enctype="multipart/form-data">
+        <input type="hidden" name="import" value="churchear-collects">
+        <fieldset><legend>Import Collects</legend>
+        <input type="file" id="collects_file" name="import-file" required
+            placeholder="Select local file."><br>
+        <label for="collect_series">Name for imported series of collects</label>
+        <input type="text" id="collect_series" name="collect-series"
+            placeholder="Enter name" required>
+        <input type="checkbox" id="collects_replace" name="replace">
+        <label for="collects_replace">Replace all collects in this series</label><br>
         <button type="submit">Import Church Year Data</button>
     </fieldset></form></li>
     </ul>
