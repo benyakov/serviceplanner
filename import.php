@@ -224,38 +224,19 @@ class ChurchyearImporter extends FormImporter {
             $day = $oneset["Day"];
             $observed_month = $oneset["Observed Month"];
             $observed_sunday = $oneset["Observed Sunday"];
-            $q->exec or die(array_pop($q->errorInfo()));
+            $q->execute() or die(array_pop($q->errorInfo()));
         }
-        $this->rewind();
-        // Record daynames not in current db
-        $q = $db->exec("CREATE TEMPORARY TABLE `{$db->getPrefix()}addchurchyear`
-            LIKE `{$db->getPrefix()}churchyear`");
-        $db->exec("INSERT INTO `{$db->getPrefix()}addchurchyear`
-            SELECT * FROM `{$db->getPrefix()}newchurchyear` AS n
-            LEFT OUTER JOIN `{$db->getPrefix()}churchyear` AS cy
-            ON (cy.dayname = n.dayname)
-            WHERE cy.dayname == NULL");
-        // Remove current churchyear days not in new list
-        $db->exec("DELETE FROM `{$db->getPrefix()}churchyear`
-            WHERE ! `dayname` IN
-            (SELECT DISTINCT cy.dayname
-            FROM `{$db->getPrefix()}newchurchyear` AS n
-            RIGHT OUTER JOIN `{$db->getPrefix()}churchyear` AS cy
-            ON (cy.dayname = n.dayname)
-            WHERE n.dayname == NULL)");
         if (isset($_POST['replaceall']) && "on" == $_POST['replaceall']) {
-            // Update all daynames
-            $db->exec("UPDATE `{$db->getPrefix()}churchyear` AS cy,
-                `{$db->getPrefix()}newchurchyear` AS n
-                SET cy.season=n.season, cy.base=n.base, cy.offset=n.offset,
-                cy.month=n.month, cy.day=n.day,
-                cy.observed_month=n.observed_month,
-                cy.observed_sunday=n.observed_sunday
-                WHERE cy.dayname=n.dayname");
-        }
+            $action = "REPLACE ";
+            // Remove current churchyear days not in new list
+            $q = $db->prepare("DELETE FROM `{$db->getPrefix()}churchyear`
+                WHERE `dayname` NOT IN
+                (SELECT dayname FROM `{$db->getPrefix()}newchurchyear`)");
+            $q->execute() or die(array_pop($q->errorInfo()));
+        } else $action = "INSERT IGNORE ";
         // Add previously unknown days
-        $db->exec("INSERT INTO `{$db->getPrefix()}churchyear`
-            SELECT * FROM `{$db->getPrefix()}addchurchyear`");
+        $db->exec("$action INTO `{$db->getPrefix()}churchyear`
+            SELECT * FROM `{$db->getPrefix()}newchurchyear`");
         $db->commit();
         setMessage("Church year data imported.");
         header("Location: admin.php");
