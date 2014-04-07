@@ -273,8 +273,8 @@ class ChurchyearPropersImporter extends FormImporter {
         if (isset($_POST['replace']) && "on" == $_POST['replace']) {
             $db->query("DELETE FROM `{$db->getPrefix()}churchyear_propers`");
         }
-        $q = $db->prepare("REPLACE INTO
-                `{$db->getPrefix()}churchyear_propers` AS cp
+        $q = $db->prepare("INSERT IGNORE INTO
+                `{$db->getPrefix()}churchyear_propers`
                 (dayname, color, theme, introit, gradual, note)
                 VALUES (:dayname, :color, :theme, :introit, :gradual, :note)");
         $oneset = array("dayname"=>NULL, "color"=>NULL, "theme"=>NULL,
@@ -289,8 +289,9 @@ class ChurchyearPropersImporter extends FormImporter {
             foreach (array_keys($oneset) as $key) {
                 $oneset[$key] = $record[$key];
             }
-            $q->execute or die(array_pop($q->errorInfo()));
+            $q->execute() or die(array_pop($q->errorInfo()));
         }
+        $db->commit();
         setMessage("Church year general propers data imported.");
         header("Location: admin.php");
         exit(0);

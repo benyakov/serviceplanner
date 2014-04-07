@@ -30,11 +30,13 @@ function propersForm($dayname) {
         pr.gradual, l.lesson1, l.lesson2, l.gospel, l.psalm, l.s2lesson,
         l.s2gospel, l.s3lesson, l.s3gospel, l.id, l.lectionary, l.hymnabc,
         l.hymn
-        FROM `{$dbp}churchyear_propers` AS pr
+        FROM `{$dbp}churchyear` AS cy
+        LEFT OUTER JOIN `{$dbp}churchyear_propers` AS pr
+            ON (cy.dayname = pr.dayname)
         LEFT OUTER JOIN `{$dbp}churchyear_lessons` AS l
-            ON (pr.dayname = l.dayname)
+            ON (cy.dayname = l.dayname)
         LEFT OUTER JOIN `{$dbp}churchyear_synonyms` AS s
-            ON (pr.dayname = s.synonym)
+            ON (cy.dayname = s.synonym)
         WHERE s.canonical = ?
         ORDER BY l.lectionary");
     $q->bindValue(1, $dayname);
