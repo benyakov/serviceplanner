@@ -277,14 +277,14 @@ class ChurchyearPropersImporter extends FormImporter {
                 `{$db->getPrefix()}churchyear_propers`
                 (dayname, color, theme, introit, gradual, note)
                 VALUES (:dayname, :color, :theme, :introit, :gradual, :note)");
-        $oneset = array("dayname"=>NULL, "color"=>NULL, "theme"=>NULL,
-            "introit"=>NULL, "gradual"=>NULL, "note"=>NULL);
-        $q->bindParam(":dayname", $oneset["dayname"]);
-        $q->bindParam(":color", $oneset["color"]);
-        $q->bindParam(":theme", $oneset["theme"]);
-        $q->bindParam(":introit", $oneset["introit"]);
-        $q->bindParam(":gradual", $oneset["gradual"]);
-        $q->bindParam(":note", $oneset["note"]);
+        $oneset = array("Dayname"=>NULL, "Color"=>NULL, "Theme"=>NULL,
+            "Introit"=>NULL, "Gradual"=>NULL, "Note"=>NULL);
+        $q->bindParam(":dayname", $oneset["Dayname"]);
+        $q->bindParam(":color", $oneset["Color"]);
+        $q->bindParam(":theme", $oneset["Theme"]);
+        $q->bindParam(":introit", $oneset["Introit"]);
+        $q->bindParam(":gradual", $oneset["Gradual"]);
+        $q->bindParam(":note", $oneset["Note"]);
         while ($record = $this->getRecord()) {
             foreach (array_keys($oneset) as $key) {
                 $oneset[$key] = $record[$key];
