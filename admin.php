@@ -285,6 +285,8 @@ $(document).ready(function(){var a="http://www.bethanythedalles.org/services-dev
             placeholder="Select local file."><br />
         <input type="checkbox" id="churchyear_replace" name="replaceall">
         <label for="churchyear_replace">Replace all existing church year data?</label><br />
+        <input type="checkbox" id="churchyear_delete" name="deletemissing">
+        <label for="churchyear_delete">Delete days not in imported data?</label><br />
         <button type="submit">Import Church Year Data</button>
     </fieldset></form></li>
     </ul>

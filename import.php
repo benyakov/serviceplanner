@@ -226,16 +226,24 @@ class ChurchyearImporter extends FormImporter {
             $observed_sunday = $oneset["Observed Sunday"];
             $q->execute() or die(array_pop($q->errorInfo()));
         }
-        if (isset($_POST['replaceall']) && "on" == $_POST['replaceall']) {
-            $action = "REPLACE ";
+        if ("on" == $_POST['replaceall']) {
+            $q = $db->prepare("UPDATE `{$db->getPrefix()}churchyear` AS cy,
+                `{$db->getPrefix()}newchurchyear` AS ncy
+                SET cy.season=ncy.season, cy.base=ncy.base,
+                cy.offset=ncy.offset, cy.month=ncy.month, cy.day=ncy.day,
+                cy.observed_month=ncy.observed_month,
+                cy.observed_sunday=ncy.observed_sunday
+                WHERE cy.dayname=ncy.dayname");
+            $q->execute() or die(array_pop($q->errorInfo()));
+        }
+        if ("on" == $_POST['deletemissing']) {
             // Remove current churchyear days not in new list
-            $q = $db->prepare("DELETE FROM `{$db->getPrefix()}churchyear`
+            $db->exec("DELETE FROM `{$db->getPrefix()}churchyear`
                 WHERE `dayname` NOT IN
                 (SELECT dayname FROM `{$db->getPrefix()}newchurchyear`)");
-            $q->execute() or die(array_pop($q->errorInfo()));
-        } else $action = "INSERT IGNORE ";
+        }
         // Add previously unknown days
-        $db->exec("$action INTO `{$db->getPrefix()}churchyear`
+        $db->exec("INSERT IGNORE INTO `{$db->getPrefix()}churchyear`
             SELECT * FROM `{$db->getPrefix()}newchurchyear`");
         $db->commit();
         setMessage("Church year data imported.");
