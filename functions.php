@@ -64,6 +64,13 @@ function getLectionaryNames() {
     return $result->fetchAll(PDO::FETCH_COLUMN, 0);
 }
 
+function getCollectClasses() {
+    $db = new DBConnection();
+    $result = $db->query("SELECT DISTINCT `class` FROM
+        `{$db->getPrefix()}churchyear_collects`");
+    return $result->fetchAll(PDO::FETCH_COLUMN, 0);
+}
+
 function checkJsonpReq() {
     return $_GET['jsonpreq'];
 }

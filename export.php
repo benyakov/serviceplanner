@@ -99,10 +99,7 @@ if ('churchyear-propers' == $_GET['export']) {
         LEFT OUTER JOIN `{$db->getPrefix()}churchyear_order` AS cyo
             ON (cy.season = cyo.name)
             ORDER BY cyo.idx, cy.offset, cy.month, cy.day");
-    if (! $q->execute()) {
-        echo array_pop($q->errorInfo());
-        exit(0);
-    }
+    $q->execute() or die(array_pop($q->errorInfo()));
     $q->setFetchMode(PDO::FETCH_ASSOC);
     $csvex = new CSVExporter($q);
     $csvex->setFileBase("churchyear_general_propers");
@@ -111,6 +108,32 @@ if ('churchyear-propers' == $_GET['export']) {
         "Gradual", "Note"));
     $csvex->setFieldselection(array("dayname", "color", "theme", "introit",
         "gradual", "note"));
+    $csvex->export();
+}
+
+// TODO: replace the following with an exporter for only one class
+if ('collects' == $_GET['export']) {
+    $q = $db->prepare("SELECT id, class, collect
+        FROM `{$db->getPrefix()}churchyear_collects` ORDER BY id");
+    $q->execute() or die(array_pop($q->errorInfo()));
+    $csvex = new CSVExporter($q);
+    $csvex->setFileBase("churchyear_collects");
+    $csvex->setCharset("utf-8");
+    $csvex->setFieldnames(array("ID", "Class", "Collect"));
+    $csvex->setFieldselection(array("id", "class", "collect"));
+    $csvex->export();
+}
+
+if ('collectassignments' == $_GET['export']) {
+    $q = $db->prepare("SELECT id, lectionary, dayname
+        FROM `{$db->getPrefix()}churchyear_collect_index`
+        ORDER BY lectionary, id");
+    $q->execute() or die(array_pop($q->errorInfo()));
+    $csvex = new CSVExporter($q);
+    $csvex->setFileBase("churchyear_collects_assignments");
+    $csvex->setCharset("utf-8");
+    $csvex->setFieldnames(array("ID", "Lectionary", "Dayname"));
+    $csvex->setFieldselection(array("id", "lectionary", "dayname"));
     $csvex->export();
 }
 

@@ -211,7 +211,7 @@ $(document).ready(function(){var a="http://www.bethanythedalles.org/services-dev
 
     <h3>Backups and Exports</h3>
 
-    <ul>
+    <ol>
     <li><a href="dump.php">Save a Backup of the Database</a>
         When restoring, be sure to restore into a Services installation
         with the same version listed below.</li>
@@ -289,24 +289,52 @@ $(document).ready(function(){var a="http://www.bethanythedalles.org/services-dev
         <label for="churchyear_delete">Delete days not in imported data?</label><br>
         <button type="submit">Import Church Year Data</button>
     </fieldset></form></li>
-    <li>TODO: <a href="export.php?export=collects">Export a Series of Collects</a></li>
+    <li><form id="export-collect-series" action="export.php" method="get">
+        <input type="hidden" name="export" value="collects">
+        <fieldset><legend>Export A Series of Collects</legend>
+        <label for="export-collect-class">Class of Collects to Export:</label>
+        <select name="class" id="export-collect-class">
+        <? foreach (getCollectClasses() as $cname) { ?>
+            <option name="<?=$cname?>"><?=$cname?></option>
+        <? } ?>
+        </select><br>
+        <button type="submit">Export</button>
+        </fieldset>
+    </form></li>
+    <li><form id="export-collect-assignments" action="export.php" method="get">
+        <input type="hidden" name="export" value="collectassignments">
+        <fieldset><legend>Export Collect Class Day Assignments</legend>
+        <label for="export-assignments-class">Class of Collect Assignments to Export:</label>
+        <select name="class" id="export-assignments-class">
+        <? foreach (getCollectClasses() as $cname) { ?>
+            <option name="<?=$cname?>"><?=$cname?></option>
+        <? } ?>
+        </select><br>
+        <button type="submit">Export</button>
+        </fieldset>
+    </form></li>
     <li><form id="import-collects" action="import.php" method="post"
             enctype="multipart/form-data">
         <input type="hidden" name="import" value="churchear-collects">
         <fieldset><legend>Import Collects</legend>
+        <label for="collects_file">Collect Series Data File</label>
         <input type="file" id="collects_file" name="import-file" required
-            placeholder="Select local file."><br>
-        <label for="collect_series">Name for imported series of collects</label>
+            placeholder="Select collects file."><br>
+        <label for="collect_assignments_file">Collect Series Assignments File</label>
+        <input type="file" id="collect_assignments_file"
+            name="import-assignments-file" required
+            placeholder="Select assignments file."><br>
+        <label for="collect_series">New name for imported series of collects</label>
         <input type="text" id="collect_series" name="collect-series"
-            placeholder="Enter name" required>
+            placeholder="Enter name">
         <input type="checkbox" id="collects_replace" name="replace">
         <label for="collects_replace">Replace all collects in this series</label><br>
         <button type="submit">Import Church Year Data</button>
     </fieldset></form></li>
-    </ul>
+    </ol>
 
     <h3>Tweaking Your Installation</h3>
-    <ul>
+    <ol>
     <li><form id="import-hymns" action="importhymns.php" method="post">
     <label for="prefix">Merge hymn titles from a co-installation.</label>
     <input type="text" name="prefix" pattern="[\w\d]+" id="prefix"
@@ -339,7 +367,7 @@ $(document).ready(function(){var a="http://www.bethanythedalles.org/services-dev
     <?=$_SERVER['SERVER_NAME'].$_SERVER['PHP_SELF']?> when writing bug reports.  You may send them via
     email to <a href="mailto: jmatjac@gmail.com">the author</a>.
     </li>
-    </ul>
+    </ol>
 
     <h3>Config Settings</h2><? $config = getConfig(false); ?>
     <form id="configsettings" action="<?=$_SERVER['PHP_SELF']?>?flag=savesettings" method="post">
