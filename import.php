@@ -56,29 +56,27 @@ class FormImporter {
      * import := <name of thing being imported>
      * $_POST['import-file'] := upload file to import
      */
-    protected $loadfile;
     private $loadindex = 0;
     protected $loadfiles = array();
-    protected $fhandle = NULL;
-    protected $keys;
-    protected $usekeys;
+    protected $fhandle = array();
+    protected $keys = array();
+    protected $usekeys = array();
 
     private function addLoadFile($name) {
         $db = new DBConnection();
-        $loadfile = "./load-".$db->getName().$this->loadindex++.".txt";
+        $loadfile = "./load-".$db->getName().$this->loadindex++.".csv";
         $this->loadfiles[$name] = $loadfile;
         return $loadfile;
     }
 
-    public function __construct($usekeys=true, $extrafiles=array()) {
-        // TODO: Set up default $_FILES["import-file"], when present
-        for ($extrafiles as $ef)
+    public function __construct($extrafiles=array()) {
+        if ((! $extrafiles) && array_key_exists('import-file', $_FILES)) {
+            $extrafiles['import-file'] = true;
+        }
+        for ($extrafiles as $ef=>$usekeys)
             $this->addLoadFile("import-$ef");
-        $args = func_get_args();
+            $this->usekeys[] = $usekeys;
         require_once("./utility/csv.php");
-        $this->usekeys = $usekeys;
-        $db = new DBConnection();
-        $loadindex = 0;
         for ($this->loadfiles as $loadname=>$loadfile)
             if (! move_uploaded_file($_FILES[$loadname]['tmp_name'], $loadfile))
             {
@@ -88,19 +86,27 @@ class FormImporter {
             }
     }
 
-    public function getKeys() {
-        if ($this->usekeys && (! $this->fhandle)) $this->getFHandle();
-        return $this->keys;
+    public function __destruct() {
+        for ($this->loadfiles as $loadname=>$loadfile)
+            unlink($loadfile);
+        for ($this->fhandle as $fh)
+            fclose($fh);
     }
 
-    public function getRecord() {
-        if (! $this->fhandle) $this->getFHandle();
-        if ($rec = fgetcsv($this->fhandle)) {
-            if ($this->usekeys) {
-                $vals = array_fill(0, count($this->keys), NULL);
-                $rv = array_combine($this->keys, $vals);
+    public function getKeys($name='import-file') {
+        if ($this->usekeys[$name] && (! $this->fhandle[$name]))
+            $this->getFHandle($name);
+        return $this->keys[$name];
+    }
+
+    public function getRecord($name='import-file') {
+        if (! $this->fhandle[$name]) $this->getFHandle($name);
+        if ($rec = fgetcsv($this->fhandle[$name])) {
+            if ($this->usekeys[$name]) {
+                $vals = array_fill(0, count($this->keys[$name]), NULL);
+                $rv = array_combine($this->keys[$name], $vals);
                 for ($i=0, $len=count($rec); $i<$len; $i++)
-                    $rv[$this->keys[$i]] = $rec[$i];
+                    $rv[$this->keys[$name][$i]] = $rec[$i];
             } else $rv=$rec;
             return $rv;
         } else {
@@ -108,15 +114,17 @@ class FormImporter {
         }
     }
 
-    protected function getFHandle() {
-        if ($this->fhandle !== NULL) return $this->fhandle;
-        if (($this->fhandle = fopen($this->loadfile, "r")) !== false) {
-            if (! $this->keys = fgetcsv($this->fhandle)) {
+    protected function getFHandle($name='import-file') {
+        if (isset($this->fhandle[$name])) return $this->fhandle[$name];
+        if (($this->fhandle[$name] = fopen($this->loadfiles[$name], "r"))
+            !== false)
+        {
+            if (! $this->keys[$name] = fgetcsv($this->fhandle[$name])) {
                 setMessage("Empty file upload.");
             } else {
-                if (! $this->usekeys) {
-                    $this->keys = false;
-                    rewind($this->fhandle);
+                if (! $this->usekeys[$name]) {
+                    $this->keys[$name] = false;
+                    rewind($this->fhandle[$name]);
                 }
                 return $fhandle;
             }
@@ -125,12 +133,12 @@ class FormImporter {
         exit(0);
     }
 
-    protected function rewind() {
-        if ($this->fhandle === NULL) {
-            $fh = $this->getFHandle();
+    protected function rewind($name='import-file') {
+        if ($this->fhandle[$name] === NULL) {
+            $fh = $this->getFHandle($name);
             rewind($fh);
         } else {
-            rewind($this->fhandle);
+            rewind($this->fhandle[$name]);
         }
     }
 }
