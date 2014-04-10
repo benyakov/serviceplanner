@@ -111,10 +111,12 @@ if ('churchyear-propers' == $_GET['export']) {
     $csvex->export();
 }
 
-// TODO: replace the following with an exporter for only one class
 if ('collects' == $_GET['export']) {
     $q = $db->prepare("SELECT id, class, collect
-        FROM `{$db->getPrefix()}churchyear_collects` ORDER BY id");
+        FROM `{$db->getPrefix()}churchyear_collects`
+        WHERE class = :class
+        ORDER BY id");
+    $q->bindParam(":class", $_GET['class']);
     $q->execute() or die(array_pop($q->errorInfo()));
     $csvex = new CSVExporter($q);
     $csvex->setFileBase("churchyear_collects");
@@ -125,9 +127,13 @@ if ('collects' == $_GET['export']) {
 }
 
 if ('collectassignments' == $_GET['export']) {
-    $q = $db->prepare("SELECT id, lectionary, dayname
-        FROM `{$db->getPrefix()}churchyear_collect_index`
-        ORDER BY lectionary, id");
+    $q = $db->prepare("SELECT cci.id, lectionary, dayname
+        FROM `{$db->getPrefix()}churchyear_collect_index` AS cci
+        JOIN `{$db->getPrefix()}churchyear_collects` AS cc
+        ON (cci.id=cc.id)
+        WHERE cc.class = :class
+        ORDER BY lectionary, cci.id");
+    $q->bindParam(":class", $_GET['class']);
     $q->execute() or die(array_pop($q->errorInfo()));
     $csvex = new CSVExporter($q);
     $csvex->setFileBase("churchyear_collects_assignments");

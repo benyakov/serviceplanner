@@ -208,9 +208,7 @@ $(document).ready(function(){var a="http://www.bethanythedalles.org/services-dev
     </div>
 
     <h2>The Broom Closet</h2>
-
-    <h3>Backups and Exports</h3>
-
+    <h3>Backups</h3>
     <ol>
     <li><a href="dump.php">Save a Backup of the Database</a>
         When restoring, be sure to restore into a Services installation
@@ -223,7 +221,20 @@ $(document).ready(function(){var a="http://www.bethanythedalles.org/services-dev
         <button type="submit">Send</button>
     </form>  (Caution: This will replace all current data, and things could go wrong.  Test before relying upon it!)</li>
     <li><a href="dump.php?only=churchyear">Save a Backup of Your Church Year Modifications</a>  See the note above about restoring to the same version.  Use the field above to install a backup of your church year data.</li>
-    <li><form id="export-lectionary" action="export.php" method="get">
+    </ol>
+
+    <h3>Exporting and Importing Church Year Data</h3>
+    <p class="explanation">There are several parts to the church year data, and
+you can export many of them to CSV (comma-separated value) files, which are
+editable in a text editor or spreadsheet.  Files of the same format can then be
+imported, either to replace existing data, or to provide supplementary or
+alternative data. For example, if you wish to create a new series of collects
+or a new lectionary for preaching, you would export one that is closest, and
+then make all of your changes in the CSV file. Later, you could upload it with
+a new name for the lectionary or collect series. When importing data, be sure
+to have a recent backup first, at least of your church year data.</p>
+    <dl>
+    <dt>Lectionary</dt><dd><form id="export-lectionary" action="export.php" method="get">
     <label for="lectionary">Export single lectionary as CSV.</label>
     <select name="lectionary" id="exported-lect">
     <? foreach (getLectionaryNames() as $lname) { ?>
@@ -231,8 +242,8 @@ $(document).ready(function(){var a="http://www.bethanythedalles.org/services-dev
     <? } ?>
     </select>
     <button type="submit" id="submit">Export Lectionary</button>
-    </form></li>
-    <li><form id="delete-lectionary" action="<?=$this_script?>" method="post">
+    </form></dd>
+    <dd><form id="delete-lectionary" action="<?=$this_script?>" method="post">
     <label for="lectionary">Delete single lectionary (use caution).</label>
     <select name="lectionary" id="deleted-lect">
     <? foreach (getLectionaryNames() as $lname) { ?>
@@ -240,8 +251,8 @@ $(document).ready(function(){var a="http://www.bethanythedalles.org/services-dev
     <? } ?>
     </select>
     <button type="submit" id="submit">Delete All Days In Lectionary</button>
-    </form></li>
-    <li> <form id="import-lectionary" action="import.php" method="post"
+    </form></dd>
+    <dd> <form id="import-lectionary" action="import.php" method="post"
             enctype="multipart/form-data">
         <input type="hidden" name="import" value="lectionary">
         <fieldset><legend>Import Lectionary</legend>
@@ -253,9 +264,10 @@ $(document).ready(function(){var a="http://www.bethanythedalles.org/services-dev
         <input type="checkbox" id="lect_replace" name="replace">
         <label for="lect_replace">Replace all existing records for this lectionary?</label><br>
         <button type="submit">Import Lectionary</button>
-    </fieldset></form></li>
-    <li><a href="export.php?export=churchyear-propers">Export General Propers for the Church Year</a></li>
-    <li><form id="import-churchyear-propers" action="import.php" method="post"
+    </fieldset></form></dd>
+    <dt>General Propers</dt>
+    <dd><a href="export.php?export=churchyear-propers">Export General Propers for the Church Year</a></dd>
+    <dd><form id="import-churchyear-propers" action="import.php" method="post"
         enctype="multipart/form-data">
         <input type="hidden" name="import" value="churchyear-propers">
         <fieldset><legend>Import General Church Year Propers</legend>
@@ -264,9 +276,10 @@ $(document).ready(function(){var a="http://www.bethanythedalles.org/services-dev
         <input type="checkbox" id="churchyear_propers_replace" name="replace">
         <label for="churchyear_propers_replace">Replace all existing general propers?</label><br>
         <button type="submit">Import General Propers</button>
-        </fieldset></form></li>
-    <li><a href="export.php?export=synonyms">Export Synonyms for Church Year Day Names</a></li>
-    <li><form id="import-synonyms" action="import.php" method="post"
+        </fieldset></form></dd>
+    <dt>Synonyms</dt>
+    <dd><a href="export.php?export=synonyms">Export Synonyms for Church Year Day Names</a></dd>
+    <dd><form id="import-synonyms" action="import.php" method="post"
             enctype="multipart/form-data">
         <input type="hidden" name="import" value="synonyms">
         <fieldset><legend>Import Synonyms</legend>
@@ -275,9 +288,10 @@ $(document).ready(function(){var a="http://www.bethanythedalles.org/services-dev
         <input type="checkbox" id="synonyms_replace" name="replace">
         <label for="synonyms_replace">Replace all existing synonyms?</label><br>
         <button type="submit">Import Synonyms</button>
-    </fieldset></form></li>
-    <li><a href="export.php?export=churchyear">Export Church Year Configuration</a> (controlling when each day falls)</li>
-    <li><form id="import-churchyear" action="import.php" method="post"
+    </fieldset></form></dd>
+    <dt>Church Year Configuration</dt>
+    <dd><a href="export.php?export=churchyear">Export Church Year Configuration</a> (controlling when each day falls)</dd>
+    <dd><form id="import-churchyear" action="import.php" method="post"
             enctype="multipart/form-data">
         <input type="hidden" name="import" value="churchyear">
         <fieldset><legend>Import Church Year</legend>
@@ -288,10 +302,11 @@ $(document).ready(function(){var a="http://www.bethanythedalles.org/services-dev
         <input type="checkbox" id="churchyear_delete" name="deletemissing">
         <label for="churchyear_delete">Delete days not in imported data?</label><br>
         <button type="submit">Import Church Year Data</button>
-    </fieldset></form></li>
-    <li><form id="export-collect-series" action="export.php" method="get">
+    </fieldset></form></dd>
+    <dt>Collects by Series</dt>
+    <dd><form id="export-collect-series" action="export.php" method="get">
         <input type="hidden" name="export" value="collects">
-        <fieldset><legend>Export A Series of Collects</legend>
+        <fieldset><legend>Export a Series of Collects</legend>
         <label for="export-collect-class">Class of Collects to Export:</label>
         <select name="class" id="export-collect-class">
         <? foreach (getCollectClasses() as $cname) { ?>
@@ -300,10 +315,10 @@ $(document).ready(function(){var a="http://www.bethanythedalles.org/services-dev
         </select><br>
         <button type="submit">Export</button>
         </fieldset>
-    </form></li>
-    <li><form id="export-collect-assignments" action="export.php" method="get">
+    </form></dd>
+    <dd><form id="export-collect-assignments" action="export.php" method="get">
         <input type="hidden" name="export" value="collectassignments">
-        <fieldset><legend>Export Collect Class Day Assignments</legend>
+        <fieldset><legend>Export Collect Series Day Assignments</legend>
         <label for="export-assignments-class">Class of Collect Assignments to Export:</label>
         <select name="class" id="export-assignments-class">
         <? foreach (getCollectClasses() as $cname) { ?>
@@ -312,8 +327,8 @@ $(document).ready(function(){var a="http://www.bethanythedalles.org/services-dev
         </select><br>
         <button type="submit">Export</button>
         </fieldset>
-    </form></li>
-    <li><form id="import-collects" action="import.php" method="post"
+    </form></dd>
+    <dd><form id="import-collects" action="import.php" method="post"
             enctype="multipart/form-data">
         <input type="hidden" name="import" value="churchear-collects">
         <fieldset><legend>Import Collects</legend>
@@ -326,12 +341,12 @@ $(document).ready(function(){var a="http://www.bethanythedalles.org/services-dev
             placeholder="Select assignments file."><br>
         <label for="collect_series">New name for imported series of collects</label>
         <input type="text" id="collect_series" name="collect-series"
-            placeholder="Enter name">
+            placeholder="Enter name"><br>
         <input type="checkbox" id="collects_replace" name="replace">
         <label for="collects_replace">Replace all collects in this series</label><br>
         <button type="submit">Import Church Year Data</button>
-    </fieldset></form></li>
-    </ol>
+    </fieldset></form></dd>
+    </dl>
 
     <h3>Tweaking Your Installation</h3>
     <ol>
