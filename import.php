@@ -63,27 +63,29 @@ class FormImporter {
     protected $keys;
     protected $usekeys;
 
-    private function addLoadFile() {
+    private function addLoadFile($name) {
         $db = new DBConnection();
         $loadfile = "./load-".$db->getName().$this->loadindex++.".txt";
-        $this->loadfiles[] = $loadfile;
+        $this->loadfiles[$name] = $loadfile;
         return $loadfile;
     }
 
-    public function __construct($usekeys=true) {
-        if (1 < func_num_args()) {} // TODO: Modify for multiple file uploads
-
+    public function __construct($usekeys=true, $extrafiles=array()) {
+        // TODO: Set up default $_FILES["import-file"], when present
+        for ($extrafiles as $ef)
+            $this->addLoadFile("import-$ef");
         $args = func_get_args();
         require_once("./utility/csv.php");
         $this->usekeys = $usekeys;
         $db = new DBConnection();
         $loadindex = 0;
-        $this->loadfiles[] = "./load-".$db->getName().$loadindex++.".txt";
-        if (! move_uploaded_file($_FILES['import-file']['tmp_name'], $this->loadfile)) {
-            setMessage("Problem with file upload.");
-            header("Location: admin.php");
-            exit(0);
-        }
+        for ($this->loadfiles as $loadname=>$loadfile)
+            if (! move_uploaded_file($_FILES[$loadname]['tmp_name'], $loadfile))
+            {
+                setMessage("Problem with file upload.");
+                header("Location: admin.php");
+                exit(0);
+            }
     }
 
     public function getKeys() {
