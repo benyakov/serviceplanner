@@ -35,6 +35,8 @@ elseif ("churchyear" == $_POST['import'])
   $importer = new ChurchyearImporter();
 elseif ("churchyear-propers" == $_POST['import'])
   $importer = new ChurchyearPropersImporter();
+elseif ("churchyear-collects" == $_POST['import'])
+  $importer = new CollectSeriesImporter();
 elseif ($_POST['prefix'])
     try {
         $importer = new HymnNameImporter();
@@ -55,15 +57,28 @@ class FormImporter {
      * $_POST['import-file'] := upload file to import
      */
     protected $loadfile;
+    private $loadindex = 0;
+    protected $loadfiles = array();
     protected $fhandle = NULL;
     protected $keys;
     protected $usekeys;
 
+    private function addLoadFile() {
+        $db = new DBConnection();
+        $loadfile = "./load-".$db->getName().$this->loadindex++.".txt";
+        $this->loadfiles[] = $loadfile;
+        return $loadfile;
+    }
+
     public function __construct($usekeys=true) {
+        if (1 < func_num_args()) {} // TODO: Modify for multiple file uploads
+
+        $args = func_get_args();
         require_once("./utility/csv.php");
         $this->usekeys = $usekeys;
         $db = new DBConnection();
-        $this->loadfile = "./load-{$db->getName()}.txt";
+        $loadindex = 0;
+        $this->loadfiles[] = "./load-".$db->getName().$loadindex++.".txt";
         if (! move_uploaded_file($_FILES['import-file']['tmp_name'], $this->loadfile)) {
             setMessage("Problem with file upload.");
             header("Location: admin.php");
@@ -286,6 +301,42 @@ class ChurchyearPropersImporter extends FormImporter {
         exit(0);
     }
 }
+
+/**
+ * Imports a series of collects provided in a 2 CSV export files.
+ */
+class CollectSeriesImporter extends FormImporter {
+    public function import() {
+        $db = new DBConnection();
+        $db->beginTransaction();
+        if (isset($_POST['replace']) && "on" == $_POST['replace']) {
+            $db->query("DELETE FROM `{$db->getPrefix()}churchyear_propers`");
+        }
+        $q = $db->prepare("INSERT IGNORE INTO
+                `{$db->getPrefix()}churchyear_propers`
+                (dayname, color, theme, introit, gradual, note)
+                VALUES (:dayname, :color, :theme, :introit, :gradual, :note)");
+        $oneset = array("Dayname"=>NULL, "Color"=>NULL, "Theme"=>NULL,
+            "Introit"=>NULL, "Gradual"=>NULL, "Note"=>NULL);
+        $q->bindParam(":dayname", $oneset["Dayname"]);
+        $q->bindParam(":color", $oneset["Color"]);
+        $q->bindParam(":theme", $oneset["Theme"]);
+        $q->bindParam(":introit", $oneset["Introit"]);
+        $q->bindParam(":gradual", $oneset["Gradual"]);
+        $q->bindParam(":note", $oneset["Note"]);
+        while ($record = $this->getRecord()) {
+            foreach (array_keys($oneset) as $key) {
+                $oneset[$key] = $record[$key];
+            }
+            $q->execute() or die(array_pop($q->errorInfo()));
+        }
+        $db->commit();
+        setMessage("Church year general propers data imported.");
+        header("Location: admin.php");
+        exit(0);
+    }
+}
+
 
 /**
  * Imports synonyms provided in a CSV export file
