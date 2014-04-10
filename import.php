@@ -28,15 +28,17 @@ require("./init.php");
 requireAuth("admin.php");
 
 if ("lectionary" == $_POST['import'])
-  $importer = new LectionaryImporter();
+    $importer = new LectionaryImporter();
 elseif ("synonyms" == $_POST['import'])
-  $importer = new SynonymImporter();
+    $importer = new SynonymImporter();
 elseif ("churchyear" == $_POST['import'])
-  $importer = new ChurchyearImporter();
+    $importer = new ChurchyearImporter();
 elseif ("churchyear-propers" == $_POST['import'])
-  $importer = new ChurchyearPropersImporter();
+    $importer = new ChurchyearPropersImporter();
 elseif ("churchyear-collects" == $_POST['import'])
-  $importer = new CollectSeriesImporter();
+    $importer = new CollectSeriesImporter(array(
+        "import-file"=>true,
+        "import-assignments-file"=>true));
 elseif ($_POST['prefix'])
     try {
         $importer = new HymnNameImporter();
@@ -320,15 +322,19 @@ class CollectSeriesImporter extends FormImporter {
         $db = new DBConnection();
         $db->beginTransaction();
         if (isset($_POST['replace']) && "on" == $_POST['replace']) {
-            $db->query("DELETE FROM `{$db->getPrefix()}churchyear_propers`");
+            // Deletes cascade into churchyear_collect_index
+            $q = $db->prepare("DELETE FROM
+                `{$db->getPrefix()}churchyear_collects`
+                WHERE class = :class");
+            $q->bindParam(":class", $_POST['collect-series']);
+            $q->execute or die(array_pop($q->errorInfo()));
         }
-        $q = $db->prepare("INSERT IGNORE INTO
-                `{$db->getPrefix()}churchyear_propers`
-                (dayname, color, theme, introit, gradual, note)
-                VALUES (:dayname, :color, :theme, :introit, :gradual, :note)");
-        $oneset = array("Dayname"=>NULL, "Color"=>NULL, "Theme"=>NULL,
-            "Introit"=>NULL, "Gradual"=>NULL, "Note"=>NULL);
-        $q->bindParam(":dayname", $oneset["Dayname"]);
+        $q = $db->prepare("REPLACE INTO
+                `{$db->getPrefix()}churchyear_collects`
+                (id, class, collect)
+                VALUES (:id, :class, :collect)");
+        $oneset = array("ID"=>NULL, "Class"=>NULL, "Collect"=>NULL);
+        $q->bindParam(":id", $oneset["Dayname"]);
         $q->bindParam(":color", $oneset["Color"]);
         $q->bindParam(":theme", $oneset["Theme"]);
         $q->bindParam(":introit", $oneset["Introit"]);
