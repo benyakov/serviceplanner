@@ -331,19 +331,22 @@ class CollectSeriesImporter extends FormImporter {
                 $q->bindParam(":class", $_POST['collect-series']);
                 $q->execute or die(array_pop($q->errorInfo()));
             } else {
+                $class = $collect = $dayname = $lectionary = $id = 0;
+                // Is this possible without ambiguity?
+                // Maybe we should just always replace any existing series
                 $qu = $db->prepare("UPDATE
                     `{$db->getPrefix()}churchyear_collects` AS cc,
                         `{$db->getPrefix()}churchyear_collect_index` AS ci
                         SET cc.collect = :collect,
-                        ci.lectionary = :lectionary
-                        WHERE cc.class = :class
-                        AND cc.dayname = :dayname");
+                        WHERE cc.id = ci.id
+                        AND cc.class = :class
+                        AND cc.dayname = :dayname
+                        AND ci.lectionary = :lectionary");
                 $qu->bindParam(":collect", $collect);
                 $qu->bindParam(":lectionary", $lectionary);
                 $qu->bindParam(":class", $class);
                 $qu->bindParam(":dayname", $dayname);
                 if (! $q->rowCount()) {
-                    $class = $collect = $dayname = $lectionary = $id = 0;
                     // Nothing to update, so insert instead
                     $qic = $db->prepare("
                         INSERT INTO `{$db->getPrefix()}churchyear_collects`
