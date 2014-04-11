@@ -321,19 +321,46 @@ class CollectSeriesImporter extends FormImporter {
     public function import() {
         $db = new DBConnection();
         $db->beginTransaction();
-        if (isset($_POST['replace']) && "on" == $_POST['replace']) {
-            // Deletes cascade into churchyear_collect_index
-            $q = $db->prepare("DELETE FROM
-                `{$db->getPrefix()}churchyear_collects`
-                WHERE class = :class");
-            $q->bindParam(":class", $_POST['collect-series']);
-            $q->execute or die(array_pop($q->errorInfo()));
-        }
-        $q = $db->prepare("REPLACE INTO
-                `{$db->getPrefix()}churchyear_collects`
-                (id, class, collect)
-                VALUES (:id, :class, :collect)");
-        $oneset = array("ID"=>NULL, "Class"=>NULL, "Collect"=>NULL);
+        if (isset($_POST['collect-series'])) {
+            if (isset($_POST['replace']) && "on" == $_POST['replace']
+            {
+                // Deletes cascade into churchyear_collect_index
+                $q = $db->prepare("DELETE FROM
+                    `{$db->getPrefix()}churchyear_collects`
+                    WHERE class = :class");
+                $q->bindParam(":class", $_POST['collect-series']);
+                $q->execute or die(array_pop($q->errorInfo()));
+            } else {
+                $qu = $db->prepare("UPDATE
+                    `{$db->getPrefix()}churchyear_collects` AS cc,
+                        `{$db->getPrefix()}churchyear_collect_index` AS ci
+                        SET cc.collect = :collect,
+                        ci.lectionary = :lectionary
+                        WHERE cc.class = :class
+                        AND cc.dayname = :dayname");
+                $qu->bindParam(":collect", $collect);
+                $qu->bindParam(":lectionary", $lectionary);
+                $qu->bindParam(":class", $class);
+                $qu->bindParam(":dayname", $dayname);
+                if (! $q->rowCount()) {
+                    $class = $collect = $dayname = $lectionary = $id = 0;
+                    // Nothing to update, so insert instead
+                    $qic = $db->prepare("
+                        INSERT INTO `{$db->getPrefix()}churchyear_collects`
+                        (class, collect) VALUES (:class, :collect)");
+                    $qic->bindParam(":class", $class);
+                    $qic->bindParam(":collect", $collect);
+                    $qii = $db->prepare("
+                        INSERT INTO `{$db->getPrefix()}churchyear_collect_index`
+                        (dayname, lectionary, id)
+                        VALUES (:dayname, :lectionary, :id)");
+                    $qii->bindParam(":dayname", $dayname);
+                    $qii->bindParam(":lectionary", $lectionary);
+                    $qii->bindParam(":id", $id);
+
+                $qid = $db->query("SELECT LAST_INSERT_ID()");
+                $id = $qid->fetchColumn(0);
+
         $q->bindParam(":id", $oneset["Dayname"]);
         $q->bindParam(":color", $oneset["Color"]);
         $q->bindParam(":theme", $oneset["Theme"]);
