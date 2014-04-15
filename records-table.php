@@ -23,47 +23,78 @@
     The Dalles, OR 97058
     USA
  */
-$options = getOptions();
-unset($options);
-if (array_key_exists('allfuture', $_GET)) {
-    $allfuture = $_GET['allfuture'];
-    $_SESSION[$sprefix]["allfuture"] = $allfuture;
-} elseif (!$_SESSION[$sprefix]["allfuture"]) {
-    $allfuture = "checked";
-    $_SESSION[$sprefix]["allfuture"] = $allfuture;
-} else $allfuture = $_SESSION[$sprefix]["allfuture"];
-
+/** For debugging
+unset($_SESSION[$sprefix]["lowdate"]);
+unset($_SESSION[$sprefix]["highdate"]);
+unset($_SESSION[$sprefix]["allfuture"]);
+ */
+$this_script = $_SERVER['HTTP_HOST'].$_SERVER['SCRIPT_NAME'] ;
+if ($_GET['submit'] == "Apply") {
+    if ($_GET['allfuture']) {
+        $allfuture = "checked";
+        $_SESSION[$sprefix]["allfuture"] = $allfuture;
+    } else {
+        $allfuture = "";
+        $_SESSION[$sprefix]["allfuture"] = $allfuture;
+    }
+} elseif (isset($_SESSION[$sprefix]["allfuture"]))
+    $allfuture = $_SESSION[$sprefix]["allfuture"];
+else $allfuture = "checked";
 if (array_key_exists('lowdate', $_GET)) {
     $lowdate = new DateTime($_GET['lowdate']);
-    $_SESSION[$sprefix]["lowdate"] = $lowdate->format("Y-m-d");
+    $_SESSION[$sprefix]["lowdate"] = $lowdate;
 } elseif (!$_SESSION[$sprefix]["lowdate"]) {
     $lowdate = new DateTime();
-    $lowdate->sub(new DateInterval("P1M");
-    $_SESSION[$sprefix]["lowdate"] = $lowdate->format("Y-m-d");
+    $lowdate->sub(new DateInterval("P1M"));
+    $_SESSION[$sprefix]["lowdate"] = $lowdate;
 } else $lowdate = $_SESSION[$sprefix]['lowdate'];
 
 if (array_key_exists('highdate', $_GET)) {
     $highdate = new DateTime($_GET['highdate']);
-    $_SESSION[$sprefix]["highdate"] = $highdate->format("Y-m-d");
+    $_SESSION[$sprefix]["highdate"] = $highdate;
 } elseif (!$_SESSION[$sprefix]["highdate"]) {
     $highdate = new DateTime();
-    $_SESSION[$sprefix]["highdate"] = $highdate->format("Y-m-d");
-} else $lowdate = $_SESSION[$sprefix]['lowdate'];
+    $_SESSION[$sprefix]["highdate"] = $highdate;
+} else $highdate = $_SESSION[$sprefix]['highdate'];
 
+if ($_GET['submit'] == "All")
+    $_SESSION[$sprefix]['modifyorder'] = "All";
+elseif ($_GET['submit'] == "Future")
+    $_SESSION[$sprefix]['modifyorder'] = "Future";
+$options = getOptions(true);
+if (! array_key_exists('modifyorder', $_SESSION[$sprefix]))
+    $_SESSION[$sprefix]['modifyorder'] =
+        $options->getDefault('All', 'modifyorder');
+else
+    $options->set('modifyorder', $_SESSION[$sprefix]['modifyorder']);
+unset($options);
 ?>
 <h1>Service Planning Records</h1>
 <form action="http://<?=$this_script?>" method="GET">
-<label for="allfuture">Include all future services.</label>
+<label for="allfuture">Include all future services:</label>
 <input type="checkbox" id="allfuture" name="allfuture" <?=$allfuture?>>
 <label for="lowdate">From</label>
 <input type="date" id="lowdate" name="lowdate"
-    value="<?=$lowdate?>">
+    value="<?=$lowdate->format("Y-m-d")?>">
 <label for="highdate">To</label>
 <input type="date" id="highdate" name="highdate"
-    value="<?=$highdate?>">
-<button type="submit" value="Apply">Apply</button>
+    value="<?=$highdate->format("Y-m-d")?>">
+<button type="submit" name="submit" value="Apply">Apply</button>
+<br>
+<?
+    $disabled = "";
+    if ("Future" == $_SESSION[$sprefix]['modifyorder']) $disabled = "disabled";
+?>
+<button id="futurebutton" type="submit" name="submit" value="Future" <?=$disabled?>>Show Future Only (Chron.)</button>
+<?
+    $disabled = "";
+    if ("All" == $_SESSION[$sprefix]['modifyorder']) $disabled = "disabled";
+?>
+<button id="allbutton" type="submit" name="submit" value="All" <?=$disabled?>>Show All (Rev. Chron.)</button>
 </form>
 <?php
-$q = queryServiceDateRange($lowdate, $highdate, (bool)$allfuture);
+if ("Future" == $_SESSION[$sprefix]['modifyorder']) $order = "ASC";
+else $order = "DESC";
+$q = queryServiceDateRange($lowdate, $highdate, (bool)$allfuture, $order);
 display_records_table($q);
 ?>
