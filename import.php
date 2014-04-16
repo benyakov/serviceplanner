@@ -39,7 +39,7 @@ elseif ("churchyear-collects" == $_POST['import'])
     $importer = new CollectSeriesImporter(array(
         "import-file"=>true,
         "import-assignments-file"=>true));
-elseif ($_POST['prefix'])
+elseif ("hymnnames" == $_POST['import'])
     try {
         $importer = new HymnNameImporter();
     } catch (HymnTableNameError $e) {
@@ -321,63 +321,36 @@ class CollectSeriesImporter extends FormImporter {
     public function import() {
         $db = new DBConnection();
         $db->beginTransaction();
-        if (isset($_POST['collect-series'])) {
-            if (isset($_POST['replace']) && "on" == $_POST['replace']
-            {
-                // Deletes cascade into churchyear_collect_index
-                $q = $db->prepare("DELETE FROM
-                    `{$db->getPrefix()}churchyear_collects`
-                    WHERE class = :class");
-                $q->bindParam(":class", $_POST['collect-series']);
-                $q->execute or die(array_pop($q->errorInfo()));
-            } else {
-                $class = $collect = $dayname = $lectionary = $id = 0;
-                // Is this possible without ambiguity?
-                // Maybe we should just always replace any existing series
-                $qu = $db->prepare("UPDATE
-                    `{$db->getPrefix()}churchyear_collects` AS cc,
-                        `{$db->getPrefix()}churchyear_collect_index` AS ci
-                        SET cc.collect = :collect,
-                        WHERE cc.id = ci.id
-                        AND cc.class = :class
-                        AND cc.dayname = :dayname
-                        AND ci.lectionary = :lectionary");
-                $qu->bindParam(":collect", $collect);
-                $qu->bindParam(":lectionary", $lectionary);
-                $qu->bindParam(":class", $class);
-                $qu->bindParam(":dayname", $dayname);
-                if (! $q->rowCount()) {
-                    // Nothing to update, so insert instead
-                    $qic = $db->prepare("
-                        INSERT INTO `{$db->getPrefix()}churchyear_collects`
-                        (class, collect) VALUES (:class, :collect)");
-                    $qic->bindParam(":class", $class);
-                    $qic->bindParam(":collect", $collect);
-                    $qii = $db->prepare("
-                        INSERT INTO `{$db->getPrefix()}churchyear_collect_index`
-                        (dayname, lectionary, id)
-                        VALUES (:dayname, :lectionary, :id)");
-                    $qii->bindParam(":dayname", $dayname);
-                    $qii->bindParam(":lectionary", $lectionary);
-                    $qii->bindParam(":id", $id);
-
-                $qid = $db->query("SELECT LAST_INSERT_ID()");
-                $id = $qid->fetchColumn(0);
-
-        $q->bindParam(":id", $oneset["Dayname"]);
-        $q->bindParam(":color", $oneset["Color"]);
-        $q->bindParam(":theme", $oneset["Theme"]);
-        $q->bindParam(":introit", $oneset["Introit"]);
-        $q->bindParam(":gradual", $oneset["Gradual"]);
-        $q->bindParam(":note", $oneset["Note"]);
-        while ($record = $this->getRecord()) {
-            foreach (array_keys($oneset) as $key) {
-                $oneset[$key] = $record[$key];
-            }
+        // Deletes cascade into churchyear_collect_index
+        $q = $db->prepare("DELETE FROM
+            `{$db->getPrefix()}churchyear_collects`
+            WHERE class = :class");
+        $q->bindParam(":class", $_POST['collect-series']);
+        $q->execute or die(array_pop($q->errorInfo()));
+        $newids = array();
+        while ($record = $this->getRecord('import-file')) {
+            $q = $db->prepare("
+              INSERT INTO `{$db->getPrefix()}churchyear_collects`
+              (class, collect) VALUES (:class, :collect)");
+            $q->bindParam(":class", $_POST['collect-series']);
+            $q->bindParam(":collect", $record['Collect']);
+            $q->execute() or die(array_pop($q->errorInfo()));
+            $qid = $db->query("SELECT LAST_INSERT_ID()");
+            $id = $qid->fetchColumn(0);
+            $newids[$record['ID']] = $id;
+        }
+        while ($record = $this->getRecord('import-assignments-file')) {
+            $q = $db->prepare("
+              INSERT INTO `{$db->getPrefix()}churchyear_collect_index`
+              (dayname, lectionary, id)
+              VALUES (:dayname, :lectionary, :id)");
+            $q->bindParam(":dayname", $record['Dayname']);
+            $q->bindParam(":lectionary", $record['Lectionary']);
+            $q->bindParam(":id", $newids[$record['ID']]);
             $q->execute() or die(array_pop($q->errorInfo()));
         }
         $db->commit();
-        setMessage("Church year general propers data imported.");
+        setMessage("Collect series imported.");
         header("Location: admin.php");
         exit(0);
     }

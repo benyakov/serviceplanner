@@ -341,16 +341,16 @@ to have a recent backup first, at least of your church year data.</p>
             placeholder="Select assignments file."><br>
         <label for="collect_series">New name for imported series of collects</label>
         <input type="text" id="collect_series" name="collect-series"
-            placeholder="Enter name"><br>
-        <input type="checkbox" id="collects_replace" name="replace">
-        <label for="collects_replace">Replace all collects in this series</label><br>
-        <button type="submit">Import Church Year Data</button>
+            placeholder="Enter name" required><br>
+        <p>This will replace any existing series with the same name.</p>
+        <button type="submit">Import Collects Series</button>
     </fieldset></form></dd>
     </dl>
 
     <h3>Tweaking Your Installation</h3>
     <ol>
-    <li><form id="import-hymns" action="importhymns.php" method="post">
+    <li><form id="import-hymns" action="import.php" method="post">
+    <input type="hidden" name="import" value="hymnnames">
     <label for="prefix">Merge hymn titles from a co-installation.</label>
     <input type="text" name="prefix" pattern="[\w\d]+" id="prefix"
         required placeholder="Database Prefix of Source Installation">
