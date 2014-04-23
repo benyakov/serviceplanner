@@ -395,7 +395,7 @@ to have a recent backup first, at least of your church year data.</p>
     <dd><textarea id="sitetabs-config" class="sitetabsconfig"
         name="sitetabs-config"><?
     foreach ($config->getDefault(array(), "sitetabs") as $k=>$v)
-        echo "$k:$v";
+        echo "$k:$v\n";
     ?></textarea></dd>
     <dt>Anonymous Site Tab Selection & Order</dt>
     <dd><textarea id="sitetabs-config-anon" class="sitetabsconfig"

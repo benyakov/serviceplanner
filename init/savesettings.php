@@ -26,14 +26,28 @@
 
 $config = getConfig(true);
 // Check for set values and store them.
-if (array_key_exists("biblegwversion", $_POST) && $auth) {
+if (isset($_POST["biblegwversion"]) && $auth) {
     $config->set("biblegwversion", $_POST['biblegwversion']);
     setMessage("Bible Gateway version has been set.");
 }
 
-if (array_key_exists("cookie-age", $_POST) && $auth) {
+if (isset($_POST["cookie-age"]) && $auth) {
     $config->set('authcookie_max_age', intval($_POST['cookie-age']*60*60*24));
     setMessage("Set max authorization cookie age.");
+}
+
+if (isset($_POST['sitetabs-config']) && $auth) {
+    $error = false;
+    foreach (explode("\n", $_POST['sitetabs-config']) as $line) {
+        if (! $line) continue;
+        $eline = explode(":", $line);
+        if (count($eline) < 2) {
+            setMessage("Malformed Sitetabs Line: ".htmlspecialchars($line));
+        } else {
+            $config->set('sitetabs', $eline[0], $eline[1]);
+        }
+    }
+    setMessage("Set Sitetabs");
 }
 
 $config->save();
