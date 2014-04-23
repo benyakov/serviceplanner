@@ -75,38 +75,41 @@ class FormImporter {
         if ((! $extrafiles) && array_key_exists('import-file', $_FILES)) {
             $extrafiles['import-file'] = true;
         }
-        for ($extrafiles as $ef=>$usekeys)
-            $this->addLoadFile("import-$ef");
-            $this->usekeys[] = $usekeys;
+        foreach ($extrafiles as $ef=>$usekeys) {
+            $this->addLoadFile($ef);
+            $this->usekeys[$ef] = $usekeys;
+        }
         require_once("./utility/csv.php");
-        for ($this->loadfiles as $loadname=>$loadfile)
+        foreach ($this->loadfiles as $loadname=>$loadfile)
             if (! move_uploaded_file($_FILES[$loadname]['tmp_name'], $loadfile))
             {
-                setMessage("Problem with file upload.");
+                setMessage("Problem with file upload:$loadname->".$_FILES[$loadname]['tmp_name']);
                 header("Location: admin.php");
                 exit(0);
             }
     }
 
     public function __destruct() {
-        for ($this->loadfiles as $loadname=>$loadfile)
+        foreach ($this->loadfiles as $loadname=>$loadfile)
             unlink($loadfile);
-        for ($this->fhandle as $fh)
+        foreach ($this->fhandle as $fh)
             fclose($fh);
     }
 
     public function getKeys($name='import-file') {
-        if ($this->usekeys[$name] && (! $this->fhandle[$name]))
-            $this->getFHandle($name);
-        return $this->keys[$name];
+        if (!$this->usekeys[$name]) return array();
+        if (! isset($this->fhandle[$name])) {
+            $this->getFHandle($name); // populates $this->keys
+            return $this->keys[$name];
+        } else return $this->keys[$name];
     }
 
     public function getRecord($name='import-file') {
         if (! $this->fhandle[$name]) $this->getFHandle($name);
         if ($rec = fgetcsv($this->fhandle[$name])) {
             if ($this->usekeys[$name]) {
-                $vals = array_fill(0, count($this->keys[$name]), NULL);
-                $rv = array_combine($this->keys[$name], $vals);
+                $vals = array_fill(0, count($this->getKeys($name)), NULL);
+                $rv = array_combine($this->getKeys($name), $vals);
                 for ($i=0, $len=count($rec); $i<$len; $i++)
                     $rv[$this->keys[$name][$i]] = $rec[$i];
             } else $rv=$rec;
@@ -128,11 +131,13 @@ class FormImporter {
                     $this->keys[$name] = false;
                     rewind($this->fhandle[$name]);
                 }
-                return $fhandle;
+                return $this->fhandle[$name];
             }
-        } else setMessage("Problem opening uploaded file.");
-        header("Location: admin.php");
-        exit(0);
+        } else {
+            setMessage("Problem opening uploaded file.");
+            header("Location: admin.php");
+            exit(0);
+        }
     }
 
     protected function rewind($name='import-file') {
@@ -200,7 +205,7 @@ class LectionaryImporter extends FormImporter {
         // Verify that the CSV file contains the appropriate fields
         foreach ($this->getKeys() as $fieldname) {
             if (! array_key_exists($fieldname, $thisrec)) {
-                setMessage("CSV file contain unknown field '{$fieldname}'");
+                setMessage("CSV file contains unknown field '{$fieldname}'");
                 header("Location: admin.php");
                 exit(0);
             }
