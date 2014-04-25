@@ -120,6 +120,31 @@ if ("customfields" == $_GET['action']) {
     exit(0);
 }
 
+ // Set up reasonable defaults, if necessary
+$saveconfig = false;
+if (! $config->exists("custom view", "limit")) {
+    $config->set("custom view", "limit", 100);
+    $saveconfig = true;
+}
+if (! $config->exists("custom view", "future")) {
+    $config->set("custom view", "future", 1);
+    $saveconfig = true;
+}
+if (! $config->exists("custom view", "start")) {
+    $config->set("custom view", "start", "<table>");
+    $saveconfig = true;
+}
+if (! $config->exists("custom view", "end")) {
+    $config->set("custom view", "end", "</table>");
+    $saveconfig = true;
+}
+
+$saveconfig = checkFieldsSetup($config) || $saveconfig;
+if ($saveconfig) $config->save();
+
+// Release write lock.
+unset($config);
+
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -275,27 +300,8 @@ $(document).ready(function() {
 <? pageHeader();
 siteTabs($auth); ?>
 <div id="content-container">
-<? // Set up reasonable defaults, if necessary
-$saveconfig = false;
-if (! $config->exists("custom view", "limit")) {
-    $config->set("custom view", "limit", 100);
-    $saveconfig = true;
-}
-if (! $config->exists("custom view", "future")) {
-    $config->set("custom view", "future", 1);
-    $saveconfig = true;
-}
-if (! $config->exists("custom view", "start")) {
-    $config->set("custom view", "start", "<table>");
-    $saveconfig = true;
-}
-if (! $config->exists("custom view", "end")) {
-    $config->set("custom view", "end", "</table>");
-    $saveconfig = true;
-}
-
-$saveconfig = checkFieldsSetup($config) || $saveconfig;
-if ($saveconfig) $config->save();
+<?
+$config = getConfig();
 if ($auth) {
     echo customViewConfig($config);
     echo "<div id=\"fieldcontainer\"></div>";
