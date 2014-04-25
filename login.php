@@ -24,7 +24,6 @@
     USA
  */
 require("./init.php");
-$options = getOptions();
 
 if (array_key_exists('action', $_GET) && $_GET['action'] == 'logout') {
     session_destroy();
@@ -40,20 +39,28 @@ if (array_key_exists('ajax', $_POST) || array_key_exists('ajax', $_GET)) {
     header('Cache-Control: no-cache, must-revalidate');
     header('Expires: Mon, 01 Jan 1996 00:00:00 GMT');
     header("Content-type: application/json");
+    $config = getConfig();
+    $options = getOptions();
     if (array_key_exists('authdata', $_SESSION[$sprefix])) {
         $rv = $_SESSION[$sprefix]['authdata'];
         unset($rv['password']);
         $rv['actions'] = getUserActions($bare=true);
         $rv['loginform'] = getLoginForm($bare=true);
-        $st = $options->get('sitetabs');
+        $st = $config->getDefault($options->get('sitetabs'), 'sitetabs');
     } else {
         $rv = array('userlevel' => 0);
-        $st = $options->get('anonymous sitetabs');
+        $st = $config->getDefault($options->get('anonymous sitetabs'),
+            'anonymous sitetabs');
     }
     $stkeys = array_keys($st);
+    $activated = $stkeys[0];
+    if ($_POST['activated']) {
+        if ($_POST['activated'] == "records") $_POST['activated'] = "modify";
+        $activated = $_POST['activated'];
+    }
     $rv['actions'] = getUserActions($bare=true);
     $rv['loginform'] = getLoginForm($bare=true);
-    $rv['sitetabs'] = gensitetabs($st, $stkeys[0], $bare=true);
+    $rv['sitetabs'] = gensitetabs($st, $activated, $bare=true);
     echo json_encode($rv);
 } else {
     $redirect = $_SESSION['HTTP_REFERER']?

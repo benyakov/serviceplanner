@@ -23,16 +23,19 @@
     USA
  */
 require("./init.php");
-$config = getConfig(true);
 
 if ("customfields" == $_GET['action']) {
     // Expecting JSON array of objects {order: X, name: Y}
+    $config = getConfig(true);
     if (checkFieldsSetup($config)) $config->save();
     // Pull a data structure from the configuration
     echo json_encode($config->get('custom view', 'fields'));
+    unset($config);
     exit(0);
 } elseif ("servicelisting" == $_GET['action']) {
+    $config = getConfig();
     echo json_encode(showServiceListing($config));
+    unset($config);
     exit(0);
 } elseif ("available" == $_GET['action']) {
     $q = querySomeHymns(1);
@@ -53,16 +56,19 @@ if ("customfields" == $_GET['action']) {
         exit(0);
     }
     $currentloc = (int) $_GET['index'];
+    $config = getConfig(true);
     $tmpary = cfgToFieldlist($config);
     $tmpval = $tmpary[$currentloc];
     $tmpary[$currentloc] = $tmpary[$currentloc-1];
     $tmpary[$currentloc-1] = $tmpval;
     fieldlistToCfg(normFieldlist($tmpary), $config);
     $config->save();
+    unset($config);
     echo json_encode(Array(1, "Success."));
     exit(0);
 } elseif ("right" == $_GET['move-field']) {
     validateAuth(true);
+    $config = getConfig(true);
     if ((count($config->get('custom view', 'fields'))-2)<$_GET['index']) {
         echo json_encode(Array(0, "Can't move after the end."));
         exit(0);
@@ -74,10 +80,12 @@ if ("customfields" == $_GET['action']) {
     $tmpary[$currentloc+1] = $tmpval;
     fieldlistToCfg(normFieldlist($tmpary), $config);
     $config->save();
+    unset($config);
     echo json_encode(Array(1, "Success."));
     exit(0);
 } elseif (isset($_GET['delete-field'])) {
     validateAuth(true);
+    $config = getConfig(true);
     if (0 > $_GET['delete-field'] or
         count($config->get('custom view','fields')) <=
         $_GET['delete-field'])
@@ -90,11 +98,13 @@ if ("customfields" == $_GET['action']) {
     unset($tmpary[$delloc]);
     fieldlistToCfg(normFieldlist($tmpary), $config);
     $config->save();
+    unset($config);
     echo json_encode(Array(1, "Success."));
     exit(0);
 } elseif (isset($_GET['insert'])) {
     validateAuth(true);
     $newindex = (int) $_GET['insert'];
+    $config = getConfig(true);
     $newslot = count($config->get('custom view', 'fields'));
     if (0 > $newindex or $newslot < $newindex) {
         echo json_encode(Array(0, "Can't insert beyond the end."));
@@ -105,9 +115,11 @@ if ("customfields" == $_GET['action']) {
         Array(Array("name"=>$_POST['selection'], "width"=>$_POST['width'])));
     fieldlistToCfg($tmpary, $config);
     $config->save();
+    unset($config);
     echo json_encode(Array(1, "Success."));
     exit(0);
 } elseif (isset($_POST['limit'])) {
+    $config = getConfig(true);
     if ("future" == $_POST['future'])
         $config->set("custom view", "future", 1);
     else
@@ -116,10 +128,12 @@ if ("customfields" == $_GET['action']) {
     $config->set("custom view", "end", $_POST['end']);
     $config->set("custom view", "limit", $_POST['limit']);
     $config->save();
+    unset($config);
     echo json_encode(Array(true, "Configuration set."));
     exit(0);
 }
 
+$config = getConfig(true);
  // Set up reasonable defaults, if necessary
 $saveconfig = false;
 if (! $config->exists("custom view", "limit")) {
@@ -141,8 +155,6 @@ if (! $config->exists("custom view", "end")) {
 
 $saveconfig = checkFieldsSetup($config) || $saveconfig;
 if ($saveconfig) $config->save();
-
-// Release write lock.
 unset($config);
 
 ?>

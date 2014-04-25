@@ -241,7 +241,8 @@ function submitLogin() {
     var jqxhr = $.post("login.php", {
         ajax: "ajax",
         username: $("#username").val(),
-        password: $("#password").val() },
+        password: $("#password").val(),
+        activated: $("#sitetabs>li.activated").data("name") },
         function(result) {
             setupLogin(result);
             if (result['userlevel']) {

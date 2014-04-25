@@ -42,7 +42,7 @@ function getDBState() {
  * Note that it blocks on the config file as long as it exists,
  * so unset the object when it's no longer needed.
  */
-function getConfig($writelock=true) {
+function getConfig($writelock=false) {
     $config = new Configfile("./config.ini", true, true, $writelock);
     return $config;
 }
@@ -454,7 +454,7 @@ function gensitetabs($sitetabs, $action, $bare=false) {
             $class = "";
         }
         $tabtext = $sitetabs[$name];
-        $rv .= "<li{$class}><a href=\"{$name}.php\">{$tabtext}</a></li>";
+        $rv .= "<li{$class} data-name='{$name}'><a href=\"{$name}.php\">{$tabtext}</a></li>";
     }
     if (!$bare) {
         $rv .= "</ul></div></nav>\n";
