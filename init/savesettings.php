@@ -37,17 +37,43 @@ if (isset($_POST["cookie-age"]) && $auth) {
 }
 
 if (isset($_POST['sitetabs-config']) && $auth) {
-    $error = false;
-    foreach (explode("\n", $_POST['sitetabs-config']) as $line) {
-        if (! $line) continue;
-        $eline = explode(":", $line);
-        if (count($eline) < 2) {
-            setMessage("Malformed Sitetabs Line: ".htmlspecialchars($line));
-        } else {
-            $config->set('sitetabs', $eline[0], $eline[1]);
+    if (! $_POST['sitetabs-config']) {
+        $config->del("sitetabs");
+        setMessage("Deleted Sitetabs");
+    } else {
+        $newsitetabs = array();
+        foreach (explode("\n", $_POST['sitetabs-config']) as $line) {
+            if (! $line) continue;
+            $eline = explode(":", $line);
+            if (count($eline) < 2) {
+                setMessage("Malformed Sitetabs Line: ".htmlspecialchars($line));
+            } else {
+                $newsitetabs[$eline[0]] = trim($eline[1]);
+            }
         }
+        $config->set('sitetabs', $newsitetabs);
+        setMessage("Set Sitetabs");
     }
-    setMessage("Set Sitetabs");
+}
+
+if (isset($_POST['sitetabs-config-anon']) && $auth) {
+    if (! $_POST['sitetabs-config-anon']) {
+        $config->del("anonymous sitetabs");
+        setMessage("Deleted Anonymous Sitetabs");
+    } else {
+        $newsitetabs = array();
+        foreach (explode("\n", $_POST['sitetabs-config-anon']) as $line) {
+            if (! $line) continue;
+            $eline = explode(":", $line);
+            if (count($eline) < 2) {
+                setMessage("Malformed Anonymous Sitetabs Line: ".htmlspecialchars($line));
+            } else {
+                $newsitetabs[$eline[0]] = trim($eline[1]);
+            }
+        }
+        $config->set('anonymous sitetabs', $newsitetabs);
+        setMessage("Set Anonymous Sitetabs");
+    }
 }
 
 $config->save();

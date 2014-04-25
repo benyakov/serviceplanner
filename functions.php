@@ -722,12 +722,18 @@ function pageHeader($displayonly=false) { ?>
 function siteTabs($auth, $basename=false, $displayonly=false) {
     global $script_basename;
     $options = getOptions();
+    $config = getConfig(false);
     if (! $basename) $basename=$script_basename;
     if (! $displayonly) {
         if ($auth) {
-            echo gensitetabs($options->get("sitetabs"), $basename);
+            echo gensitetabs(
+                $config->getDefault($options->get("sitetabs"), "sitetabs"),
+                $basename);
         } else {
-            echo gensitetabs($options->get("anonymous sitetabs"), $basename);
+            echo gensitetabs(
+                $config->getDefault($options->get("anonymous sitetabs"),
+                    "anonymous sitetabs"),
+                    $basename);
         }
     }
 }

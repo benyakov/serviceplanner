@@ -425,6 +425,10 @@ div#sitetabs-background {
     top: 24pt; left: 0; width: 100%; height: 12pt;
     z-index: 4;
 }
+#sitetabs-config, #sitetabs-config-anon {
+    width: 25em;
+    height: 8em;
+}
 div.quicklinks {
     float: right;
 }
