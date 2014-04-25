@@ -353,6 +353,18 @@ class Configfile
     }
 
     /**
+     * Remove a section
+     */
+    public function delSection($Key) {
+        if (in_array($Key, $this->Sections)) {
+            unset($this->SectionData[$Key]);
+            array_splice($this->Sections,
+                array_search($Key, $this->Sections), 1);
+        } else
+            throw new ConfigfileError("Unknown section: {$Key}");
+    }
+
+    /**
      * Force a value onto the top level of the structure
      */
     public function store($Key, $Value) {
@@ -367,9 +379,14 @@ class Configfile
     public function del() {
         if (func_num_args() < 1)
             throw new ConfigfileError("del needs at least 1 arg.");
-        $args = func_get_args();
-        $args[] = NULL;
-        call_user_func_array(Array($this, "set"), $args);
+        elseif (func_num_args() == 1 && $this->HasSections
+            && in_array(func_get_arg(0), $this->Sections))
+            $this->delSection(func_get_arg(0));
+        else {
+            $args = func_get_args();
+            $args[] = NULL;
+            call_user_func_array(Array($this, "set"), $args);
+        }
     }
 
 
@@ -407,6 +424,15 @@ class Configfile
     }
 
     /**
+     * Add a section at $k with $data
+     */
+    private function _addSection($k, $data) {
+        $this->SectionData[$k] = new Configsection($k, $data);
+        if (! in_array($k, $this->Sections))
+            $this->Sections[] = $k;
+    }
+
+    /**
      * Set a value, provided as the last of at least two arguments.
      * The first series of arguments are progressive keys to the structure.
      */
@@ -418,17 +444,21 @@ class Configfile
                 return call_user_func_array(Array($this, "set"), $args[0]);
             else
                 throw new ConfigfileError("Set needs at least 2 args.");
-        if ($this->HasSections && $argcount > 2) {
-           if (in_array($args[0], $this->Sections)) {
+        if ($this->HasSections &&
+            ($argcount > 2 || ($argcount == 2 && is_array($args[1]))))
+        {
+           if (in_array($args[0], $this->Sections) && $argcount > 2) {
                // Set in the configsection object
                call_user_func_array(Array($this->SectionData[$args[0]], 'set'),
                     array_slice($args, 1));
            } else {
                // Create a new configsection object.
                $k = array_shift($args);
-               $args = $this->_deepCreate($args);
-               $this->SectionData[$k] = new Configsection($k, $args);
-               $this->Sections[] = $k;
+               if (is_array($args[0]))
+                   $args = $args[0];
+               else
+                   $args = $this->_deepCreate($args);
+               $this->_addSection($k, $args);
            }
         } else {
             $structure = &$this->IniData;
@@ -718,7 +748,7 @@ class Configfile
 
     /**
      * Make section into a string for saving and return it.
-     * The optional $section argument will allow trimming
+     * TODO: The optional $section argument will allow trimming
      * overlap already included in extended sections.
      */
     private function _serializeSection($sectdata, $section="") {

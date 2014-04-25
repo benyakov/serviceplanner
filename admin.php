@@ -394,14 +394,18 @@ to have a recent backup first, at least of your church year data.</p>
     <dt>Site Tab Selection & Order</dt>
     <dd><textarea id="sitetabs-config" class="sitetabsconfig"
         name="sitetabs-config"><?
-    foreach ($config->getDefault(array(), "sitetabs") as $k=>$v)
+    $options = getOptions();
+    foreach ($config->getDefault($options->get("sitetabs"),
+        "sitetabs") as $k=>$v)
         echo "$k:$v\n";
     ?></textarea></dd>
     <dt>Anonymous Site Tab Selection & Order</dt>
     <dd><textarea id="sitetabs-config-anon" class="sitetabsconfig"
         name="sitetabs-config-anon"><?
-    foreach ($config->getDefault(array(), "anonymous sitetabs") as $k=>$v)
-        echo "$k:$v";
+    foreach ($config->getDefault($options->get("anonymous sitetabs"),
+        "anonymous sitetabs") as $k=>$v)
+        echo "$k:$v\n";
+    unset($options);
     ?></textarea></dd>
     <button type="submit">Submit</button><button type="reset">Reset</button>
     </form>
