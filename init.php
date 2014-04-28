@@ -32,7 +32,6 @@ require("./functions.php");
 require("./utility/configfile.php");
 require("./utility/dbconnection.php");
 $script_basename = basename($_SERVER['PHP_SELF'], '.php');
-$dbstate = getDBState();
 
 if ($_GET['flag'] == 'dbinit') {
     require("./init/dbinit.php");
@@ -70,8 +69,5 @@ if ($_GET['flag'] == 'savesettings') {
 
 // Check churchyear data and functions
 require("./init/checkchurchyear.php");
-
-// release file lock.
-unset($dbstate);
 
 ?>

@@ -25,8 +25,9 @@
  */
 
 
-function needsUpgrade($dbstate) {
+function needsUpgrade() {
     global $version;
+    $dbstate = getDBState();
     if (! $dbstate->exists('dbversion')) {
         if (file_exists("./dbversion.txt")) {
             $dp = fopen("./dbversion.txt", "rb");
@@ -47,9 +48,10 @@ function needsUpgrade($dbstate) {
         else
             return false;
     }
+    unset($dbstate);
 }
 
-while ($oldversion = needsUpgrade($dbstate)) {
+while ($oldversion = needsUpgrade()) {
     if (! file_exists("./dbconnection.ini")) {
         require("./utility/setup-dbconfig.php");
     }

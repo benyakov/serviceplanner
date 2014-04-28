@@ -24,7 +24,10 @@
     USA
  */
 
-if (! ($dbstate->exists("has-user") && $dbstate->get("has-user"))) {
+$dbstate = getDBState();
+$has_user = $dbstate->getDefault(false, "has-user");
+unset($dbstate);
+if (! $has_user) {
     require("./init/inituser.php");
     exit(0);
 }

@@ -75,7 +75,7 @@ if ($_GET['request'] == 'purgetables') {
     }
     $db->beginTransaction();
     $db->exec("DELETE FROM `{$dbp}churchyear_graduals`");
-    $db->exec("DELETE FROM `{$dbp}churchyear_collects_index`");
+    $db->exec("DELETE FROM `{$dbp}churchyear_collect_index`");
     $db->exec("DELETE FROM `{$dbp}churchyear_collects`");
     $db->exec("DELETE FROM `{$dbp}churchyear_synonyms`");
     $db->exec("DELETE FROM `{$dbp}churchyear_lessons`");

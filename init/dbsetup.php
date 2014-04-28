@@ -25,8 +25,8 @@
  */
 
 
-
-if (! ($dbstate->exists("dbsetup") && $dbstate->get("dbsetup") == 1)) {
+$dbstate = getDBState();
+if (! ($dbstate->getDefault(false, "dbsetup"))) {
     // Test the existence of a table
     $q = $db->query("SHOW TABLES LIKE '{$db->getPrefix()}days'");
     if ($q->rowCount()) {
@@ -34,5 +34,6 @@ if (! ($dbstate->exists("dbsetup") && $dbstate->get("dbsetup") == 1)) {
         $dbstate->save();
     } else require("./utility/setupdb.php");
 }
+unset($dbstate);
 
 ?>

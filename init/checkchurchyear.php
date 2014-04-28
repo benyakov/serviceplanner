@@ -24,9 +24,9 @@
     USA
  */
 
+$dbstate = getDBState();
 // Churchyear data
-if ((! ($dbstate->exists("churchyear-filled") &&
-        $dbstate->get("churchyear-filled"))) or
+if ((! $dbstate->getDefault(false, "churchyear-filled")) or
     ($_GET['flag'] == 'fill-churchyear' && $auth))
 {
     require('./utility/fillservicetables.php');
@@ -35,8 +35,7 @@ if ((! ($dbstate->exists("churchyear-filled") &&
 }
 
 // Churchyear db functions
-if ((! ($dbstate->exists("has-churchyear-functions") &&
-        $dbstate->get("has-churchyear-functions"))) or
+if ((! $dbstate->getDefault(false, "has-churchyear-functions")) or
     ($_GET['flag'] == 'create-churchyear-functions' && $auth))
 {
     $functionsfile = "./utility/churchyearfunctions.sql";
@@ -52,10 +51,11 @@ if ((! ($dbstate->exists("has-churchyear-functions") &&
 }
 
 // Churchyear table views
-if ((! ($dbstate->exists("has-views") && $dbstate->get("has-views"))) or
+if ((! $dbstate->getDefault(false, "has-views")) or
         ($_GET['flag'] == 'create-views'))
 {
     require('./utility/createviews.php');
         $dbstate->store('has-views', 1);
         $dbstate->save() or die("Problem saving dbstate file.");
 }
+unset($dbstate);
