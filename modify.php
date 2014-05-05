@@ -43,7 +43,9 @@ if ($_GET['submit'] == "Apply") {
         $allfuture = "";
         $_SESSION[$sprefix]["allfuture"] = $allfuture;
     }
-} else $allfuture = $_SESSION[$sprefix]["allfuture"];
+} elseif (isset($_SESSION[$sprefix]["allfuture"]))
+    $allfuture = $_SESSION[$sprefix]["allfuture"];
+else $allfuture = "checked";
 if (array_key_exists('lowdate', $_GET)) {
     $lowdate = new DateTime($_GET['lowdate']);
     $_SESSION[$sprefix]["lowdate"] = $lowdate;
