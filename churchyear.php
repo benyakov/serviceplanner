@@ -27,7 +27,6 @@ require("./init.php");
 require("./churchyear/functions.php");
 $auth = auth();
 $dbp = $db->getPrefix();
-$dbstate = getDBState();
 
 /* churchyear.php?dropfunctions=1
  * Drops all the churchyear functions and sets a message about
@@ -50,8 +49,10 @@ if ($_GET['request'] == 'dropfunctions') {
     setMessage("Church year functions dropped. "
         ." they will be re-created automatically.");
     $db->commit();
+    $dbstate = getDBState();
     $dbstate->store("has-churchyear-functions", 0);
     $dbstate->save() or die("Problem saving dbstate file.");
+    unset($dbstate);
     header("location: index.php");
     exit(0);
 }
@@ -82,16 +83,14 @@ if ($_GET['request'] == 'purgetables') {
     $db->exec("DELETE FROM `{$dbp}churchyear_propers`");
     $db->exec("DELETE FROM `{$dbp}churchyear_order`");
     $db->exec("DELETE FROM `{$dbp}churchyear`");
-    if ($dbstate->save()) {
-        setMessage("Church year tables purged.  They should be re-populated "
-            ."by the time you see this message.");
-        $db->commit();
-        $dbstate->store("churchyear-filled", 0);
-        $dbstate->save();
-    } else {
-        setMessage("Problem saving dbstate config file.  Tables not purged.");
-        $db->rollback();
-    }
+    $dbstate = getDBState();
+    die("here");
+    setMessage("Church year tables purged.  They should be re-populated "
+        ."by the time you see this message.");
+    $db->commit();
+    $dbstate->set("churchyear-filled", 0);
+    $dbstate->save();
+    unset($dbstate);
     header("location: churchyear.php");
     exit(0);
 }

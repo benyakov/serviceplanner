@@ -30,7 +30,7 @@ if ((! $dbstate->getDefault(false, "churchyear-filled")) or
     ($_GET['flag'] == 'fill-churchyear' && $auth))
 {
     require('./utility/fillservicetables.php');
-    $dbstate->store("churchyear-filled", 1);
+    $dbstate->set("churchyear-filled", 1);
     $dbstate->save() or die("Problem saving dbstate file.");
 }
 
@@ -46,7 +46,7 @@ if ((! $dbstate->getDefault(false, "has-churchyear-functions")) or
     $q->execute() or die("Problem creating functions<br>".
         array_pop($q->errorInfo()));
     $q->closeCursor();
-    $dbstate->store('has-churchyear-functions', 1);
+    $dbstate->set('has-churchyear-functions', 1);
     $dbstate->save() or die("Problem saving dbstate file.");
 }
 
@@ -55,7 +55,7 @@ if ((! $dbstate->getDefault(false, "has-views")) or
         ($_GET['flag'] == 'create-views'))
 {
     require('./utility/createviews.php');
-        $dbstate->store('has-views', 1);
+        $dbstate->set('has-views', 1);
         $dbstate->save() or die("Problem saving dbstate file.");
 }
 unset($dbstate);

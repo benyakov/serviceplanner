@@ -358,7 +358,7 @@ to have a recent backup first, at least of your church year data.</p>
     </form></li>
     <li>Restore church year to default:
     <a href="" id="purge-churchyear"
-        title="Purge Church Year Tables">Days in Church Year</a> or
+        title="Purge Church Year Tables">Church Year Data</a> or
     <a href="churchyear.php?request=dropfunctions"
         title="Drop Church Year Functions">Church Year Functions</a></li>
     <li>Manually repopulate empty
