@@ -32,16 +32,17 @@
  */
 
 if (! isset($selective) && $selective) {
-    historic($db);
-    order($db);
-    synonyms($db);
-    propers($db);
-    lessons($db);
-    collects($db);
-    graduals($db);
+    fill_historic($db);
+    fill_order($db);
+    fill_synonyms($db);
+    fill_propers($db);
+    fill_lessons($db);
+    fill_collect_texts($db);
+    fill_collect_indexes($db);
+    fill_graduals($db);
 }
 
-function historic($db) {
+function fill_historic($db) {
     $fh = fopen("./utility/churchyear/historictable.csv", "r");
     $headings = fgetcsv($fh);
     $q = $db->prepare("INSERT INTO {$db->getPrefix()}churchyear
@@ -61,7 +62,7 @@ function historic($db) {
     fclose($fh);
 }
 
-function order($db) {
+function fill_order($db) {
     // Make sure it's empty.
     $db->exec("DELETE FROM `{$db->getPrefix()}churchyear_order`");
     $q = $db->prepare("INSERT INTO `{$db->getPrefix()}churchyear_order`
@@ -80,7 +81,7 @@ function order($db) {
         array_pop($q->errorInfo()));
 }
 
-function synonyms($db) {
+function fill_synonyms($db) {
     $fh = fopen("./utility/churchyear/synonyms.csv", "r");
     $qs = $db->prepare("INSERT INTO `{$db->getPrefix()}churchyear_synonyms`
         (canonical, synonym) VALUES (:canonical, :synonym)");
@@ -96,7 +97,7 @@ function synonyms($db) {
     fclose($fh);
 }
 
-function propers($db) {
+function fill_propers($db) {
     $fh = fopen("./utility/churchyear/propers.csv", "r");
     $headings = fgetcsv($fh);
     $qp = $db->prepare("INSERT INTO {$db->getPrefix()}churchyear_propers
@@ -119,7 +120,7 @@ function propers($db) {
     fclose($fh);
 }
 
-function lessons($db) {
+function fill_lessons($db) {
     $fh = fopen("./utility/churchyear/lessons.csv", "r");
     $headings = fgetcsv($fh);
     $ql = $db->prepare("INSERT INTO {$db->getPrefix()}churchyear_lessons
@@ -145,8 +146,7 @@ function lessons($db) {
     fclose($fh);
 }
 
-function collects($db) {
-    // Texts
+function fill_collect_texts($db) {
     $fh = fopen("./utility/churchyear/collecttext.csv", "r");
     $headings = fgetcsv($fh);
     $ql = $db->prepare("INSERT INTO {$db->getPrefix()}churchyear_collects
@@ -161,8 +161,9 @@ function collects($db) {
         $ql->execute() or die(__FILE__.":".__LINE__.$dict['dayname']);
     }
     fclose($fh);
+}
 
-    // Indexes
+function fill_collect_indexes($db) {
     $fh = fopen("./utility/churchyear/collectindex.csv", "r");
     $headings = fgetcsv($fh);
     $ql = $db->prepare("INSERT INTO `{$db->getPrefix()}churchyear_collect_index`
@@ -179,7 +180,7 @@ function collects($db) {
     fclose($fh);
 }
 
-function graduals($db) {
+function fill_graduals($db) {
     $fh = fopen("./utility/churchyear/graduals.csv", "r");
     $headings = fgetcsv($fh);
     $ql = $db->prepare("INSERT INTO `{$db->getPrefix()}churchyear_graduals`

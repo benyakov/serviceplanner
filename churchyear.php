@@ -730,14 +730,26 @@ if (! $auth) {
             function(rv) {
                 setMessage(rv);
                 $.getJSON("dbadmin.php", {action: "churchyeartables-2"},
-                    function(rv) {
-                        setMessage(rv);
-                        $.getJSON("dbadmin.php", {action: "churchyeartables-3"},
-                            function(rv) {
-                                setMessage(rv);
-                                window.location.reload();
-                            });
-                    });
+            function(rv) {
+                setMessage(rv);
+                $.getJSON("dbadmin.php", {action: "churchyeartables-3"},
+            function(rv) {
+                setMessage(rv);
+                $.getJSON("dbadmin.php", {action: "churchyeartables-4"},
+            function(rv) {
+                setMessage(rv);
+                $.getJSON("dbadmin.php", {action: "churchyeartables-5"},
+            function(rv) {
+                setMessage(rv);
+                $.getJSON("dbadmin.php", {action: "churchyeartables-6"},
+            function(rv) {
+                setMessage(rv);
+                window.location="admin.php";
+            });
+            });
+            });
+            });
+            });
             });
     });
 </script>
