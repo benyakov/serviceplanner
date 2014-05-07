@@ -791,6 +791,7 @@ class Configfile
         fseek($this->IniFP, 0);
         ftruncate($this->IniFP, 0);
         $result = fwrite($this->IniFP, $Contents);
+        // Close (to allow others to open) and reopen
         flock($this->IniFP, LOCK_UN);
         fclose($this->IniFP);
         $this->IniFP = NULL;

@@ -32,8 +32,8 @@ require_once("authfunctions.php");
  * Note that it blocks on the config file as long as it exists,
  * so unset the object when it's no longer needed.
  */
-function getDBState() {
-    $dbstate = new Configfile("./dbstate.ini", false, true);
+function getDBState($writelock=false) {
+    $dbstate = new Configfile("./dbstate.ini", false, $writelock);
     return $dbstate;
 }
 

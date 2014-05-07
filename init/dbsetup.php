@@ -25,7 +25,7 @@
  */
 
 
-$dbstate = getDBState();
+$dbstate = getDBState(true);
 if (! ($dbstate->getDefault(false, "dbsetup"))) {
     // Test the existence of a table
     $q = $db->query("SHOW TABLES LIKE '{$db->getPrefix()}days'");

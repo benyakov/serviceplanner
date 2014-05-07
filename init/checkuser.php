@@ -24,7 +24,7 @@
     USA
  */
 
-$dbstate = getDBState();
+$dbstate = getDBState(false);
 $has_user = $dbstate->getDefault(false, "has-user");
 unset($dbstate);
 if (! $has_user) {

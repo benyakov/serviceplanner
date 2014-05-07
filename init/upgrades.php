@@ -27,7 +27,7 @@
 
 function needsUpgrade() {
     global $version;
-    $dbstate = getDBState();
+    $dbstate = getDBState(true);
     if (! $dbstate->exists('dbversion')) {
         if (file_exists("./dbversion.txt")) {
             $dp = fopen("./dbversion.txt", "rb");

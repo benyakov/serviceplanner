@@ -49,8 +49,8 @@ if ($_GET['request'] == 'dropfunctions') {
     setMessage("Church year functions dropped. "
         ." they will be re-created automatically.");
     $db->commit();
-    $dbstate = getDBState();
-    $dbstate->store("has-churchyear-functions", 0);
+    $dbstate = getDBState(true);
+    $dbstate->set("has-churchyear-functions", 0);
     $dbstate->save() or die("Problem saving dbstate file.");
     unset($dbstate);
     header("location: index.php");
@@ -83,16 +83,12 @@ if ($_GET['request'] == 'purgetables') {
     $db->exec("DELETE FROM `{$dbp}churchyear_propers`");
     $db->exec("DELETE FROM `{$dbp}churchyear_order`");
     $db->exec("DELETE FROM `{$dbp}churchyear`");
-    $dbstate = getDBState();
-    die("here");
-    setMessage("Church year tables purged.  They should be re-populated "
-        ."by the time you see this message.");
+    $dbstate = getDBState(true);
+    setMessage("Church year tables purged.  Repopulating...");
     $db->commit();
     $dbstate->set("churchyear-filled", 0);
     $dbstate->save();
     unset($dbstate);
-    header("location: churchyear.php");
-    exit(0);
 }
 
 /* churchyear.php?daysfordate=date
@@ -726,6 +722,31 @@ if (! $auth) {
 <script type="text/javascript">
     <? require("./churchyear/ecmascript.js"); ?>
 </script>
+
+<?  if ($_GET['request'] == 'purgetables') { ?>
+<script type="text/javascript">
+    $(document).ready(function() {
+        $.getJSON("dbadmin.php", {action: "churchyeartables-1"},
+            function(rv) {
+                setMessage(rv);
+            });
+        setTimeout(function() {
+            $.getJSON("dbadmin.php", {action: "churchyeartables-2"},
+                function(rv) {
+                    setMessage(rv);
+                });
+        }, 15000);
+        siteTimeout(function() {
+            $.getJSON("dbadmin.php", {action: "churchyeartables-3"},
+                function(rv) {
+                    setMessage(rv);
+                    window.location.reload();
+                });
+        }, 30000);
+    });
+</script>
+<?}?>
+
 <?
 pageHeader();
 siteTabs($auth);?>
