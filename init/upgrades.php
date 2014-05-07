@@ -27,7 +27,7 @@
 
 function needsUpgrade() {
     global $version;
-    $dbstate = getDBState();
+    $dbstate = getDBState(true);
     if (! $dbstate->exists('dbversion')) {
         if (file_exists("./dbversion.txt")) {
             $dp = fopen("./dbversion.txt", "rb");
@@ -38,6 +38,7 @@ function needsUpgrade() {
             $dbstate->set('dbversion',
                 "{$version['major']}.{$version['minor']}.{$version['tick']}");
             $dbstate->save();
+            unset($dbstate);
             return false;
         }
     } else {

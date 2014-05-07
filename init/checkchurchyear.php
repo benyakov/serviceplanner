@@ -24,7 +24,7 @@
     USA
  */
 
-$dbstate = getDBState();
+$dbstate = getDBState(true);
 // Churchyear data
 if ((! $dbstate->getDefault(false, "churchyear-filled")) or
     ($_GET['flag'] == 'fill-churchyear' && $auth))

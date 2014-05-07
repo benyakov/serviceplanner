@@ -49,8 +49,8 @@ if ($_GET['request'] == 'dropfunctions') {
     setMessage("Church year functions dropped. "
         ." they will be re-created automatically.");
     $db->commit();
-    $dbstate = getDBState();
-    $dbstate->store("has-churchyear-functions", 0);
+    $dbstate = getDBState(true);
+    $dbstate->set("has-churchyear-functions", 0);
     $dbstate->save() or die("Problem saving dbstate file.");
     unset($dbstate);
     header("location: index.php");
@@ -83,8 +83,7 @@ if ($_GET['request'] == 'purgetables') {
     $db->exec("DELETE FROM `{$dbp}churchyear_propers`");
     $db->exec("DELETE FROM `{$dbp}churchyear_order`");
     $db->exec("DELETE FROM `{$dbp}churchyear`");
-    $dbstate = getDBState();
-    die("here");
+    $dbstate = getDBState(true);
     setMessage("Church year tables purged.  They should be re-populated "
         ."by the time you see this message.");
     $db->commit();
