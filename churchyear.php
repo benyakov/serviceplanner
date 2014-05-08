@@ -724,8 +724,13 @@ if (! $auth) {
 </script>
 
 <?  if ($_GET['request'] == 'purgetables') { ?>
+<script type="text/javascript" src="spin/spin.min.js"></script>
 <script type="text/javascript">
     $(document).ready(function() {
+        var spinopts = { // See http://fgnass.github.io/spin.js/
+            speed: 0.25, corners: 0};
+        var target = document.getElementById('content-container');
+        var spinner = new Spinner(spinopts).spin(target);
         $.getJSON("dbadmin.php", {action: "churchyeartables-1"},
             function(rv) {
                 setMessage(rv);
@@ -744,6 +749,7 @@ if (! $auth) {
                 $.getJSON("dbadmin.php", {action: "churchyeartables-6"},
             function(rv) {
                 setMessage(rv);
+                spinner.stop();
                 window.location="admin.php";
             });
             });
