@@ -402,6 +402,7 @@ class SynonymImporter extends FormImporter {
             try {
                 while (true) {
                     foreach($this->nextSynonymList() as $s) {
+                        print_r($s);
                         list($canonical, $synonym) = $s;
                         $q->execute()
                             or die("Dying ".array_pop($q->errorInfo()));
