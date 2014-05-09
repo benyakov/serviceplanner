@@ -368,7 +368,7 @@ class CollectSeriesImporter extends FormImporter {
 class SynonymImporter extends FormImporter {
 
     function __construct() {
-        parent::__construct(false);
+        parent::__construct(array("import-file"=>false));
     }
 
     /**
@@ -377,7 +377,7 @@ class SynonymImporter extends FormImporter {
     function nextSynonymList() {
         if ($rec = $this->getRecord()) {
             $rv = array();
-            foreach (array_slice($rec, 2) as $synonym) {
+            foreach (array_slice($rec, 1) as $synonym) {
                 $rv[] = array($rec[0], $synonym);
             }
             return $rv;
@@ -402,7 +402,6 @@ class SynonymImporter extends FormImporter {
             try {
                 while (true) {
                     foreach($this->nextSynonymList() as $s) {
-                        print_r($s);
                         list($canonical, $synonym) = $s;
                         $q->execute()
                             or die("Dying ".array_pop($q->errorInfo()));
