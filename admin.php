@@ -279,7 +279,15 @@ to have a recent backup first, at least of your church year data.</p>
         </fieldset></form></dd>
     <dt>Synonyms</dt>
     <dd><a href="export.php?export=synonyms">Export Synonyms for Church Year Day Names</a></dd>
-    <dd><form id="import-synonyms" action="import.php" method="post"
+    <dd><p>If a canonical
+        name does not already exist in the church year when you try to
+        import a set of synonyms for it, the import process will create one
+        with only a name. You must finish setting it up later.</p>
+        <p>Replacing all existing synonyms can result in the deletion of some
+        existing synonyms. When a synonym is deleted, all propers related to
+        it will be deleted as well. You may want to back up your propers
+        first.</p>
+        <form id="import-synonyms" action="import.php" method="post"
             enctype="multipart/form-data">
         <input type="hidden" name="import" value="synonyms">
         <fieldset><legend>Import Synonyms</legend>

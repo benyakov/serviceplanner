@@ -404,7 +404,7 @@ class SynonymImporter extends FormImporter {
                     foreach($this->nextSynonymList() as $s) {
                         list($canonical, $synonym) = $s;
                         $q->execute()
-                            or die("Dying ".array_pop($q->errorInfo()));
+                            or die("2 ".array_pop($q->errorInfo()));
                     }
                 }
             } catch (EndOfSynonymFile $e) {
@@ -428,12 +428,43 @@ class SynonymImporter extends FormImporter {
                 WHERE (cy.canonical != n.canonical
                     AND cy.synonym = n.synonym)");
             $q->execute() or die("4 ".array_pop($q->errorInfo()));
+            // Remove existing matches from new list
+            $q = $db->prepare("DELETE n
+                FROM `{$db->getPrefix()}newsynonyms` as n,
+                    `{$db->getPrefix()}churchyear_synonyms` AS cy
+                WHERE (cy.canonical = n.canonical
+                    AND cy.synonym = n.synonym)");
+            $q->execute() or die("5 ".array_pop($q->errorInfo()));
             // Add previously unknown synonyms
-            $q = $db->prepare("REPLACE INTO `{$db->getPrefix()}churchyear_synonyms`
+            //   ... first, adding unknown daynames to the churchyear...
+            $q = $db->prepare("SELECT DISTINCT canonical
+                FROM `{$db->getPrefix()}newsynonyms`
+                WHERE canonical NOT IN
+                    (SELECT dayname FROM `{$db->getPrefix()}churchyear`)");
+            $q->execute() or die("6 ".array_pop($q->errorInfo()));
+            $newdays = $q->fetchall();
+            if ($newdays) {
+                $q = $db->prepare("INSERT INTO `{$db->getPrefix()}churchyear`
+                    (dayname) VALUES (:dayname)");
+                $dayname = "";
+                $q->bindParam(":dayname", $dayname);
+                foreach ($newdays as $rec) {
+                    $dayname = $rec[0];
+                    $q->execute() or die("7 ".array_pop($q->errorInfo()));
+                }
+            }
+            //   ... then, inserting as synonyms
+            $q = $db->prepare("INSERT INTO
+                `{$db->getPrefix()}churchyear_synonyms`
                 SELECT `canonical`, `synonym`
                 FROM `{$db->getPrefix()}newsynonyms`");
-            $q->execute() or die("2 ".array_pop($q->errorInfo()));
+            $q->execute() or die("8 ".array_pop($q->errorInfo()));
         } else {
+            $qcheckchurchyear = $db->prepare("SELECT 1
+                FROM `{$db->getPrefix()}churchyear`
+                WHERE dayname = ?");
+            $qaddtochurchyear = $db->prepare("INSERT INTO
+                `{$db->getPrefix()}churchyear` (dayname) VALUES (?)");
             $qexact = $db->prepare("SELECT 1
                 FROM `{$db->getPrefix()}churchyear_synonyms`
                 WHERE `canonical` = :canonical
@@ -453,8 +484,14 @@ class SynonymImporter extends FormImporter {
                         if ($qexact->fetch()) {
                             continue;
                         } else {
-                            $qinsert->execute()
+                            $qcheckchurchyear->execute(array($canonical))
                                 or die("point 2".array_pop($qinsert->errorInfo()));
+                            if (! $qcheckchurchyear->fetch()) {
+                                $qaddtochurchyear->execute(array($canonical))
+                                or die("point 3".array_pop($qinsert->errorInfo()));
+                            }
+                            $qinsert->execute()
+                                or die("point 4".array_pop($qinsert->errorInfo()));
                         }
                     }
                 }
