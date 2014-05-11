@@ -279,14 +279,15 @@ to have a recent backup first, at least of your church year data.</p>
         </fieldset></form></dd>
     <dt>Synonyms</dt>
     <dd><a href="export.php?export=synonyms">Export Synonyms for Church Year Day Names</a></dd>
-    <dd><p>If a canonical
+    <dd class="explanation"><p>If a canonical
         name does not already exist in the church year when you try to
         import a set of synonyms for it, the import process will create one
         with only a name. You must finish setting it up later.</p>
         <p>Replacing all existing synonyms can result in the deletion of some
         existing synonyms. When a synonym is deleted, all propers related to
         it will be deleted as well. You may want to back up your propers
-        first.</p>
+        first.</p></dd>
+    <dd>
         <form id="import-synonyms" action="import.php" method="post"
             enctype="multipart/form-data">
         <input type="hidden" name="import" value="synonyms">
@@ -338,7 +339,7 @@ to have a recent backup first, at least of your church year data.</p>
     </form></dd>
     <dd><form id="import-collects" action="import.php" method="post"
             enctype="multipart/form-data">
-        <input type="hidden" name="import" value="churchear-collects">
+        <input type="hidden" name="import" value="churchyear-collects">
         <fieldset><legend>Import Collects</legend>
         <label for="collects_file">Collect Series Data File</label>
         <input type="file" id="collects_file" name="import-file" required
@@ -396,10 +397,18 @@ to have a recent backup first, at least of your church year data.</p>
     <form id="configsettings" action="<?=$_SERVER['PHP_SELF']?>?flag=savesettings" method="post">
     <dl>
     <dt>Preferred Bible Abbreviation from <a href="http://www.biblegateway.com/versions/" title="BibleGateway.com">Bible Gateway</a></dt>
+    <dd class="explanation">All-caps version abbreviations as used by the Bible Gateway web site.
+Multiple abbreviations may be separated by a semicolon, like "SBLGNT;WLC;NKJV",
+which gives a 3-column Greek/Hebrew/English interlinear.</dd>
     <dd><input type="text" id="biblegwversion" name="biblegwversion"
         value="<?=$config->getDefault("", "biblegwversion")?>" placeholder="Unset">
     </dl>
     <dt>Site Tab Selection & Order</dt>
+    <dd class="explanation">Each line represents a single navigation tab. Each tab contains the tab
+name, followed by a colon (:), followed by a label for the tab. Tab names may
+include "index", "report", "modify", "block", "sermons", "hymnindex",
+"churchyear", "admin".  The tabs will appear left-to-right in the same order
+they appear here.</dd>
     <dd><textarea id="sitetabs-config" class="sitetabsconfig"
         name="sitetabs-config"><?
     $options = getOptions();
@@ -408,6 +417,9 @@ to have a recent backup first, at least of your church year data.</p>
         echo "$k:$v\n";
     ?></textarea></dd>
     <dt>Anonymous Site Tab Selection & Order</dt>
+    <dd class="explanation">Site tabs that appear for anonymous users.  See the explanation above.
+The only tabs accessible to anonymous users are "index", "records",
+"hymnindex", and "report".</dd>
     <dd><textarea id="sitetabs-config-anon" class="sitetabsconfig"
         name="sitetabs-config-anon"><?
     foreach ($config->getDefault($options->get("anonymous sitetabs"),

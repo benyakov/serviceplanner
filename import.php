@@ -331,7 +331,7 @@ class CollectSeriesImporter extends FormImporter {
             `{$db->getPrefix()}churchyear_collects`
             WHERE class = :class");
         $q->bindParam(":class", $_POST['collect-series']);
-        $q->execute or die(array_pop($q->errorInfo()));
+        $q->execute() or die(array_pop($q->errorInfo()));
         $newids = array();
         while ($record = $this->getRecord('import-file')) {
             $q = $db->prepare("
@@ -428,13 +428,14 @@ class SynonymImporter extends FormImporter {
                 WHERE (cy.canonical != n.canonical
                     AND cy.synonym = n.synonym)");
             $q->execute() or die("4 ".array_pop($q->errorInfo()));
-            // Remove existing matches from new list
+            /* Remove existing matches from new list (could use INSERT IGNORE)
             $q = $db->prepare("DELETE n
                 FROM `{$db->getPrefix()}newsynonyms` as n,
                     `{$db->getPrefix()}churchyear_synonyms` AS cy
                 WHERE (cy.canonical = n.canonical
                     AND cy.synonym = n.synonym)");
             $q->execute() or die("5 ".array_pop($q->errorInfo()));
+             */
             // Add previously unknown synonyms
             //   ... first, adding unknown daynames to the churchyear...
             $q = $db->prepare("SELECT DISTINCT canonical
@@ -454,7 +455,7 @@ class SynonymImporter extends FormImporter {
                 }
             }
             //   ... then, inserting as synonyms
-            $q = $db->prepare("INSERT INTO
+            $q = $db->prepare("INSERT IGNORE INTO
                 `{$db->getPrefix()}churchyear_synonyms`
                 SELECT `canonical`, `synonym`
                 FROM `{$db->getPrefix()}newsynonyms`");
