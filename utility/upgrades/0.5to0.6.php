@@ -40,9 +40,10 @@ $db->exec("DELETE FROM `{$db->getPrefix()}churchyear_lessons`");
 $db->exec("DELETE FROM `{$db->getPrefix()}churchyear_propers`");
 $db->exec("DELETE FROM `{$db->getPrefix()}churchyear_order`");
 $db->exec("DELETE FROM `{$db->getPrefix()}churchyear`");
-if ($dbstate->save()) {
+$dbstate = getDBState(true);
+if (is_object($dbstate)) {
     $rm[] = "Deleting churchyear data (will restore defaults)";
-    $dbstate->store("churchyear-filled", 0);
+    $dbstate->set("churchyear-filled", 0);
     $dbstate->save();
 } else {
     $rm[] = "Problem saving dbstate config file.  Aborting upgrade.";
@@ -63,8 +64,9 @@ if (! $q->execute())
 $rm[] = "Done.  Writing new dbversion to dbstate file.";
 $db->commit();
 $newversion = "{$version['major']}.{$version['minor']}.{$version['tick']}";
-$dbstate->store('dbversion', $newversion);
+$dbstate->set('dbversion', $newversion);
 $dbstate->save() or die("Problem saving dbstate file.");
+unset($dbstate);
 $rm[] = "Upgraded to {$newversion}";
 setMessage(implode("<br />\n", $rm));
 ?>
