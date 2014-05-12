@@ -30,7 +30,19 @@ $db = new DBConnection();
 $db->beginTransaction();
 $q = $db->prepare("ALTER TABLE `{$db->getPrefix()}churchyear_propers`
     ADD COLUMN `gradual` text AFTER `introit`");
-$q->execute() or die(array_pop($q->errorInfo()));
+$q->execute();
+
+$q = $db->prepare("ALTER TABLE `{$db->getPrefix()}blocks`
+    ADD COLUMN `smtype` varchar(56) AFTER `coclass`");
+$q->execute();
+
+$q = $db->prepare("ALTER TABLE `{$db->getPrefix()}blocks`
+    ADD COLUMN `smlect` varchar(56) AFTER `smtype`");
+$q->execute();
+
+$q = $db->prepare("ALTER TABLE `{$db->getPrefix()}blocks`
+    ADD COLUMN `smseries` varchar(64) AFTER `smlect`");
+$q->execute();
 $db->commit();
 
 echo "Done.";
