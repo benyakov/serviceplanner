@@ -377,14 +377,6 @@ to have a recent backup first, at least of your church year data.</p>
         tried unless needed.</li>
     <li>Manually re-create <a href="admin.php?flag=create-views">synonym coordination views</a> in the database.  This should also happen automatically when needed.</li>
     <li><a href="hymnindex.php?drop=yes">Drop and re-create hymn cross-reference table</a>.  This is needed when the table has been changed in a new version.</li>
-    <li><form id="authcookie-age" action="<?=$_SERVER['PHP_SELF']?>?flag=savesettings" method="post">
-    <label for="cookie-age">The maximum number of days you
-      wish the Service Planner to remember your login session.</label>
-    <input type="number" name="cookie-age" value="<?=getAuthCookieMaxAge()/(60*60*24)?>" size="4">
-    <button type="submit" id="submit">Set login limit</button>
-    This extends your normal login session, which expires after a few hours,
-    usually just before you submit a meticulously-prepared service.
-    </form></li>
     <li>You are using Services version <?
         echo "{$version['major']}.{$version['minor']}.{$version['tick']}";
 ?>.  Refer to this version number, and include the address
@@ -393,11 +385,12 @@ to have a recent backup first, at least of your church year data.</p>
     </li>
     </ol>
 
+    <?$akmax = getAuthCookieMaxAge(); // Use standard lookup function ?>
     <h3>Config Settings</h2><? $config = getConfig(false); ?>
     <form id="configsettings" action="<?=$_SERVER['PHP_SELF']?>?flag=savesettings" method="post">
     <dl>
     <dt>Preferred Bible Abbreviation from <a href="http://www.biblegateway.com/versions/" title="BibleGateway.com">Bible Gateway</a></dt>
-    <dd class="explanation">All-caps version abbreviations as used by the Bible Gateway web site.
+    <dd class="explanation">All-caps version abbreviations as used by the Bible Gateway web site. This is used to generate links for lectionary texts.
 Multiple abbreviations may be separated by a semicolon, like "SBLGNT;WLC;NKJV",
 which gives a 3-column Greek/Hebrew/English interlinear.</dd>
     <dd><input type="text" id="biblegwversion" name="biblegwversion"
@@ -425,8 +418,47 @@ The only tabs accessible to anonymous users are "index", "records",
     foreach ($config->getDefault($options->get("anonymous sitetabs"),
         "anonymous sitetabs") as $k=>$v)
         echo "$k:$v\n";
-    unset($options);
     ?></textarea></dd>
+    <dt>Maximum Auth Cookie Age</dt>
+    <dd class="explanation">The maximum number of days you
+      wish the Service Planner to remember your login session.
+      This extends your normal login session, which expires after a few hours,
+      usually just before you submit a meticulously-prepared service.</dd>
+    <dd><input type="number" name="cookie-age"
+         value="<?=$akmax/(60*60*24)?>" size="4"></dd>
+    <dt>Hymnbooks Available</dt>
+    <dd class="explanation">List of hymnbook abbreviations that will be
+available for specifying hymns. The first will be the default book.</dd>
+    <dd><textarea id="hymnbooks-option" class="hymnbooksconfig"
+        name="hymnbooks-option"><?
+    foreach ($options->get('hymnbooks') as $book) echo "$book\n";
+    ?></textarea></dd>
+    <dt>Hymn Count</dt>
+    <dd class="explanation">The number of hymn slots available when entering a
+    service</dd>
+    <dd><input type="number" id="hymncount-option" name="hymncount-option"
+         value="<?=$options->get('hymncount')?>"></dd>
+    <dt>Hymn Last Used Count</dt>
+    <dd class="explanation">When entering or adding to a service, typing a hymn
+    number automatically displays the last few dates that particular hymn has
+    been used, and where. This is the number of prior dates that will be
+    listed.</dd>
+    <dd><input type="number" id="usedhistory-option" name="usedhistory-option"
+        value="<?=$options->get('used_history')?>"></dd>
+    <dt>Default Modify Tab Mode</dt>
+    <dd class="explanation">The "modify" tab can show the listing of hymns and
+    services in two ways: "future services only," which lists them in
+    chronological order, or "all," which lists them in reverse chronological
+    order.  It can be changed on the page itself; this just sets the
+    default behavior.</dd>
+    <dd><select id="modifyorder-option" name="modifyorder-option">
+    <?foreach (array("Future", "All") as $moopt) {
+        if ($moopt == $options->get('modifyorder')) $selected = " selected";
+        else $selected = "";
+        echo "<option name='$moopt'$selected>$moopt</option>\n";
+    }?>
+        </select></dd>
+    </dl>
     <button type="submit">Submit</button><button type="reset">Reset</button>
     </form>
     </div>

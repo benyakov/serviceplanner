@@ -48,7 +48,7 @@ $option_used_history = 5;
 // the text displayed on the tabs.
 $sitetabs = array(
     "index"=>"Upcoming Hymns"
-    ,"records"=>"Service Records"
+    ,"report"=>"Report"
     ,"modify"=>"Modify Services"
     ,"block"=>"Block Plans"
     ,"sermons"=>"Sermon Plans"
@@ -68,29 +68,9 @@ $sitetabs_anonymous = array(
     ,"hymnindex"=>"Cross Ref"
 );
 
-// Default limit for the comprehensive (not future) service listings.
-// When this has not been manually set by the user, this will be the number
-// of hymns included in the list.
-$listinglimit = 200;
-
 // Default order for the presentation of hymns and services on the Modify tab.
 // May be "Future" or "All".
 $modifyorder = "All";
-
-// Location of a PHP "library" directory on the web server where you might
-// have e.g. markup-processing packages installed.
-// For example, If you download Markdown
-// (http://michelf.com/projects/php-markdown/) and place markdown.php or
-// a link to it in a specific directory, you can point to that directory
-// with $phplibrary.  Then, sermon notes will automatically be formatted
-// using Markdown when displayed.
-$phplibrary = "../../php";
-// Do not change this unless you know what you're doing.
-// It takes a relative $phplibrary and makes it absolute,
-// which allows the path to work even when this application is symlinked.
-if (strpos($phplibrary, '/') != 0) {
-    $phplibrary = $thisdir . DIRECTORY_SEPARATOR . $phplibrary;
-}
 
 // Default shelf-life of auth cookies, which allow the Service Planner to
 // remember the logins of users past the expiration of the current session.
@@ -110,9 +90,7 @@ foreach ($sitetabs as $k=>$v)
     $options->set('sitetabs', $k, $v);
 foreach ($sitetabs_anonymous as $k=>$v)
     $options->set('anonymous sitetabs', $k, $v);
-$options->set('listinglimit', $listinglimit);
 $options->set('modifyorder', $modifyorder);
-$options->set('phplibrary', $phplibrary);
 if (! $authcookie_shelf_life) {
     $authcookie_shelf_life = 60*60*24*7;
 }
