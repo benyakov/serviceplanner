@@ -60,9 +60,11 @@ $options->set('authcookie_shelf_life', $authcookie_shelf_life);
 
 $options->save();
 
+$dbstate = getDBState(true);
 $newversion = "{$version['major']}.{$version['minor']}.{$version['tick']}";
 $dbstate->store('dbversion', $newversion);
 $dbstate->save() or die("Problem saving dbstate file.");
+unset($dbstate);
 $rm[] = "Upgraded to {$newversion}";
 setMessage(implode("<br />\n", $rm));
 ?>

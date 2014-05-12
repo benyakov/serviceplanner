@@ -45,9 +45,11 @@ $q = $db->prepare("ALTER TABLE `{$db->getPrefix()}blocks`
 $q->execute() or die(array_pop($q->errorInfo()));
 $db->commit();
 
+$dbstate = getDBState(true);
 $newversion = "{$version['major']}.{$version['minor']}.{$version['tick']}";
 $dbstate->store('dbversion', $newversion);
 $dbstate->save() or die("Problem saving dbstate file.");
+unset($dbstate);
 $rm[] = "Upgraded to {$newversion}";
 setMessage(implode("<br />\n", $rm));
 header("Location: churchyear.php?request=dropfunctions&flag=create-views");
