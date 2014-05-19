@@ -387,7 +387,7 @@ function modify_records_table($q, $action) {
 
 function html_head($title, $xstylesheets=Array()) {
     global $AddToHeader;
-    $rv[] = '<meta charset="utf-8" />';
+    $rv[] = '<meta charset="utf-8">';
     $rv[] = "<head><title>{$title}</title>";
     if (is_link($_SERVER['SCRIPT_FILENAME']))
     {   // Find the installation for css and other links
@@ -415,7 +415,7 @@ function html_head($title, $xstylesheets=Array()) {
     }
     echo "<!-- AddToHeader Section -->";
     if ($AddToHeader) {
-        foreach ($AddToHeader as $content) echo $content;
+        foreach ($AddToHeader as $content) $rv[] = $content;
     }
     $rv[] = "</head>";
     return implode("\n", $rv);
@@ -757,33 +757,20 @@ function fillServiceTables() {
             speed: 0.25, corners: 0};
         var target = document.getElementById(\'content-container\');
         var spinner = new Spinner(spinopts).spin(target);
-        $.getJSON("dbadmin.php", {action: "churchyeartables-1"},
-            function(rv) {
-                setMessage(rv);
-                $.getJSON("dbadmin.php", {action: "churchyeartables-2"},
-            function(rv) {
-                setMessage(rv);
-                $.getJSON("dbadmin.php", {action: "churchyeartables-3"},
-            function(rv) {
-                setMessage(rv);
-                $.getJSON("dbadmin.php", {action: "churchyeartables-4"},
-            function(rv) {
-                setMessage(rv);
-                $.getJSON("dbadmin.php", {action: "churchyeartables-5"},
-            function(rv) {
-                setMessage(rv);
-                $.getJSON("dbadmin.php", {action: "churchyeartables-6"},
-            function(rv) {
-                setMessage(rv);
-                spinner.stop();
-                window.location="admin.php";
-            });
-            });
-            });
-            });
-            });
-            });
+        churchYearTables();
     });
+    function churchYearTables() {
+        $.getJSON("dbadmin.php", {action: "churchyeartables"},
+            function(rv) {
+                setMessage(rv[1]);
+                if (6 == Number(rv[0])) {
+                    spinner.stop();
+                    window.location="admin.php";
+                } else {
+                    churchYearTables();
+                }
+            });
+    }
 </script>';
 }
 

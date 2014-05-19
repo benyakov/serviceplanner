@@ -25,8 +25,8 @@
  */
 
 $dbstate = getDBState(true);
-// Churchyear data
-if ((! $dbstate->getDefault(false, "churchyear-filled")) or
+// Churchyear data; holds the fill-step completed (of 6)
+if (($dbstate->getDefault(0, "churchyear-filled") < 6) or
     ($_GET['flag'] == 'fill-churchyear' && $auth))
 {
     fillServiceTables();

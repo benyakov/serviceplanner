@@ -29,48 +29,43 @@
  * A Series of steps taken in sequence via Javascript, to populate
  * the church year tables with default data.
  */
-if ("churchyeartables-1" == $_GET['action'] ) {
-    $selective = true;
-    require("./init.php");
-    require_once("./utility/fillservicetables.php");
-    fill_historic($db);
-    fill_order($db);
-    fill_synonyms($db);
-    echo json_encode("First group of tables repopulated.");
-}
-if ("churchyeartables-2" == $_GET['action'] ) {
-    $selective = true;
-    require("./init.php");
-    require_once("./utility/fillservicetables.php");
-    fill_propers($db);
-    echo json_encode("Second group of tables repopulated.");
-}
-if ("churchyeartables-3" == $_GET['action'] ) {
-    $selective = true;
-    require("./init.php");
-    require_once("./utility/fillservicetables.php");
-    fill_lessons($db);
-    echo json_encode("Third group of tables repopulated.");
-}
-if ("churchyeartables-4" == $_GET['action'] ) {
-    $selective = true;
-    require("./init.php");
-    require_once("./utility/fillservicetables.php");
-    fill_collect_texts($db);
-    echo json_encode("Fourth group of tables repopulated.");
-}
-if ("churchyeartables-5" == $_GET['action'] ) {
-    $selective = true;
-    require("./init.php");
-    require_once("./utility/fillservicetables.php");
-    fill_collect_indexes($db);
-    echo json_encode("Fifth group of tables repopulated.");
-}
-if ("churchyeartables-6" == $_GET['action'] ) {
-    $selective = true;
-    require("./init.php");
-    require_once("./utility/fillservicetables.php");
-    fill_graduals($db);
-    echo json_encode("Sixth group of tables repopulated.");
+if ("churchyeartables" == $_GET['action'] ) {
+    require_once("./init.php");
+    $dbstate = getDBState(true);
+    $cfilled = $dbstate->getDefault(0, "churchyear-filled");
+    if ($cfilled < 6) {
+        $selective = true;
+        require_once("./utility/fillservicetables.php");
+        if (0 == $cfilled) {
+            fill_historic($db);
+            fill_order($db);
+            fill_synonyms($db);
+            $dbstate->set("churchyear-filled", 1);
+            echo json_encode(array(1, "First group of tables repopulated."));
+        } elseif (1 == $cfilled) {
+            fill_propers($db);
+            $dbstate->set("churchyear-filled", 2);
+            echo json_encode(array(2, "Second group of tables repopulated."));
+        } elseif (2 == $cfilled) {
+            fill_lessons($db);
+            $dbstate->set("churchyear-filled", 3);
+            echo json_encode(array(3, "Third group of tables repopulated."));
+        } elseif (3 == $cfilled) {
+            fill_collect_texts($db);
+            $dbstate->set("churchyear-filled", 4);
+            echo json_encode(array(4, "Fourth group of tables repopulated."));
+        } elseif (4 == $cfilled) {
+            fill_collect_indexes($db);
+            $dbstate->set("churchyear-filled", 5);
+            echo json_encode(array(5, "Fifth group of tables repopulated."));
+        } elseif (5 == $cfilled) {
+            fill_graduals($db);
+            $dbstate->set("churchyear-filled", 6);
+            echo json_encode(array(6, "Sixth group of tables repopulated."));
+        }
+    } else echo json_encode(array(6, "All churchyear tables filled."));
+    $dbstate->save();
+    unset($dbstate);
+    exit(0);
 }
 ?>
