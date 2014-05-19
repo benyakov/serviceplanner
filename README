@@ -8,10 +8,9 @@ Installation and Use
 1. Note that there is no guarantee.  Make backups.  See COPYING.
 2. Procure a webserver with PHP and mysql database access.
 3. Upload and extract the application files to their own directory
-4. Copy options.php.sample to options.php and edit.  Docs inside.
-5. Point your web browser to the installation and configure.
-6. Enjoy.  Be sure to check the Housekeeping page.
-7. Email the author at jmatjac /at/ gmail -dot- com with your feedback.
+4. Point your web browser to the installation and configure.
+5. Enjoy.  Be sure to check the Housekeeping page.
+6. Email the author at jmatjac /at/ gmail -dot- com with your feedback.
 
 Notes
 -----

@@ -29,9 +29,7 @@ $dbstate = getDBState(true);
 if ((! $dbstate->getDefault(false, "churchyear-filled")) or
     ($_GET['flag'] == 'fill-churchyear' && $auth))
 {
-    require('./utility/fillservicetables.php');
-    $dbstate->set("churchyear-filled", 1);
-    $dbstate->save() or die("Problem saving dbstate file.");
+    fillServiceTables();
 }
 
 // Churchyear db functions

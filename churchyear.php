@@ -714,6 +714,8 @@ if (! $auth) {
     exit(0);
 }
 
+if ($_GET['request'] == 'purgetables') fillServiceTables();
+
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -722,44 +724,6 @@ if (! $auth) {
 <script type="text/javascript">
     <? require("./churchyear/ecmascript.js"); ?>
 </script>
-
-<?  if ($_GET['request'] == 'purgetables') { ?>
-<script type="text/javascript" src="spin/spin.min.js"></script>
-<script type="text/javascript">
-    $(document).ready(function() {
-        var spinopts = { // See http://fgnass.github.io/spin.js/
-            speed: 0.25, corners: 0};
-        var target = document.getElementById('content-container');
-        var spinner = new Spinner(spinopts).spin(target);
-        $.getJSON("dbadmin.php", {action: "churchyeartables-1"},
-            function(rv) {
-                setMessage(rv);
-                $.getJSON("dbadmin.php", {action: "churchyeartables-2"},
-            function(rv) {
-                setMessage(rv);
-                $.getJSON("dbadmin.php", {action: "churchyeartables-3"},
-            function(rv) {
-                setMessage(rv);
-                $.getJSON("dbadmin.php", {action: "churchyeartables-4"},
-            function(rv) {
-                setMessage(rv);
-                $.getJSON("dbadmin.php", {action: "churchyeartables-5"},
-            function(rv) {
-                setMessage(rv);
-                $.getJSON("dbadmin.php", {action: "churchyeartables-6"},
-            function(rv) {
-                setMessage(rv);
-                spinner.stop();
-                window.location="admin.php";
-            });
-            });
-            });
-            });
-            });
-            });
-    });
-</script>
-<?}?>
 
 <?
 pageHeader();

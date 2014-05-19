@@ -163,8 +163,7 @@ if (array_key_exists("date", $_POST)) {
     <h1>Service Entry Form</h1>
     <p class="explanation">This form allows you to enter a new service,
     or to add hymns to an existing service.
-    The available hymnbooks can be configured in the
-    file "options.php" on the webserver.
+    The available hymnbooks can be configured on the Housekeeping page.
     You can use <a href="http://michelf.com/projects/php-markdown/concepts/">Markdown syntax</a>
     to format the service notes.</p>
     </header>

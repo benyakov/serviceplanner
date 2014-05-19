@@ -386,6 +386,7 @@ function modify_records_table($q, $action) {
 }
 
 function html_head($title, $xstylesheets=Array()) {
+    global $AddToHeader;
     $rv[] = '<meta charset="utf-8" />';
     $rv[] = "<head><title>{$title}</title>";
     if (is_link($_SERVER['SCRIPT_FILENAME']))
@@ -411,6 +412,10 @@ function html_head($title, $xstylesheets=Array()) {
         <script type=\"text/javascript\" src=\"jquery/jquery-ui.js\"></script>
         <script type=\"text/javascript\" src=\"jquery/jquery.ba-dotimeout.min.js\"></script>";
         $rv[] = "<script type=\"text/javascript\" src=\"{$here}/ecmascript.js.php\"></script>";
+    }
+    echo "<!-- AddToHeader Section -->";
+    if ($AddToHeader) {
+        foreach ($AddToHeader as $content) echo $content;
     }
     $rv[] = "</head>";
     return implode("\n", $rv);
@@ -736,6 +741,50 @@ function siteTabs($auth, $basename=false, $displayonly=false) {
                     $basename);
         }
     }
+}
+
+/**
+ * Set up to fill the service tables incrementally via js rpc calls.
+ */
+function fillServiceTables() {
+    global $AddToHeader;
+
+    $AddToHeader[] = '
+<script type="text/javascript" src="spin/spin.min.js"></script>
+<script type="text/javascript">
+    $(document).ready(function() {
+        var spinopts = { // See http://fgnass.github.io/spin.js/
+            speed: 0.25, corners: 0};
+        var target = document.getElementById(\'content-container\');
+        var spinner = new Spinner(spinopts).spin(target);
+        $.getJSON("dbadmin.php", {action: "churchyeartables-1"},
+            function(rv) {
+                setMessage(rv);
+                $.getJSON("dbadmin.php", {action: "churchyeartables-2"},
+            function(rv) {
+                setMessage(rv);
+                $.getJSON("dbadmin.php", {action: "churchyeartables-3"},
+            function(rv) {
+                setMessage(rv);
+                $.getJSON("dbadmin.php", {action: "churchyeartables-4"},
+            function(rv) {
+                setMessage(rv);
+                $.getJSON("dbadmin.php", {action: "churchyeartables-5"},
+            function(rv) {
+                setMessage(rv);
+                $.getJSON("dbadmin.php", {action: "churchyeartables-6"},
+            function(rv) {
+                setMessage(rv);
+                spinner.stop();
+                window.location="admin.php";
+            });
+            });
+            });
+            });
+            });
+            });
+    });
+</script>';
 }
 
 // vim: set foldmethod=indent :
