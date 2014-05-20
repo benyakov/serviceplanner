@@ -42,7 +42,8 @@ if (! $auth) {
     <p>To return to the regular Housekeeping tab, just click on it.</p>
     <h2>Introductory Tour</h2>
     <ol>
-    <li><a href="#anonymous_tabs">Anonymous Access Tabs</a> (Upcoming Hymns, Service Records, and Cross Ref)</li>
+    <li><a href="#anonymous_tabs">Anonymous Access Tabs</a> (Upcoming Hymns, Service Records, Cross Ref, and Report)</li>
+    <li><a href="#report">Report</a></li>
     <li><a href="#modify_services">Modify Services</a></li>
     <li><a href="#block_plans">Block Plans</a></li>
     <li><a href="#sermon_plans">Sermon Plans</a></li>
@@ -78,12 +79,13 @@ planner beside this introduction, so you can try things yourself as you
 read.</p>
 
     <p>The pages of the service planner are arranged in a series of tabs
-accessible across the top of the window.  Anyone can use the service
-planner, but unless you log in, you will only see a limited number of tabs.
-Login links and related information are at the very top of the page on the
-left side.  Privileged users will also see a "User Administration" link at
-the center of the very top when they are logged in.  That's where you
-manage other users, if you need any.</p>
+accessible across the top of the window.  They are independent of one another,
+and you need to save any changes there may be in one tab before switching to
+another.  Anyone can use the service planner, but unless you log in, you will
+only see a limited number of tabs.  Login links and related information are at
+the very top of the page on the left side.  Privileged users will also see a
+"User Administration" link at the center of the very top when they are logged
+in.  That's where you manage other users, if you need any.</p>
 
     <p>On the right of the very top is an Adjust Styles link, which opens a
 dialog box on the screen allowing you to make some adjustments to the
@@ -95,15 +97,18 @@ clicking it again will make the style adjuster dialog disappear again.</p>
 
     <h3><a name="anonymous_tabs">Anonymous Access Tabs</a></h3>
 
-    <p>There are three tabs available to anonymous (not logged-in) users:
-Upcoming Hymns, Service Records, and Cross Ref.  The first simply
+    <p>There are four tabs available to anonymous (not logged-in) users:
+Upcoming Hymns, Service Records, Cross Ref, and Report.  The first simply
 lists all hymns in their services from this day forward, in chronological
 order.  The very next service is at the top of the list.  "Service Records"
 is similar, but it shows <em>all</em> services that have been planned, with
 the latest (farthest in the future) at the top of the list.  The Cross Ref
 tab displays a cross-reference table of hymn numbers from various books.
 Clicking on a blue heading causes the page to reload, sorted on that
-column.</p>
+column. The Report tab shows a simple listing of services and hymns that
+may be customized by privileged users. It's available for those who need
+to print a simpler sheet of information, or one showing custom
+fields.</p>
 
     <p>On the Service Records page (and the soon-to-be-introduced Modify
 Services page), for your convenience, there is a <a name="thisweek">Jump to
@@ -111,20 +116,54 @@ This Week</a> link-button at the top right of the page, which will scroll the
 page to contemporary planned services.  (That's different from planned
 contemporary services, which the service planner does not support.)</p>
 
-    <p>Under the main heading is an adjustable Listing Limit, which allows
-you to specify how many hymns should be listed on the page.  When you get a
-lot of hymns in the service planner, and you load all of them, the page
-refresh can get a mite slow.</p>
+    <p>Under the main heading is a form allowing you to adjust the time
+window for which services will be displayed.  Two buttons below that
+switch the display mode from showing only future services (like the
+Upcoming Hymns tab) and showing all services (the default behavior).</p>
 
     <h3><a name="user_tabs">User Access Tabs</a></h3>
 
+    <h4><a name="report">Report</h4>
+
+    <p>While the Report tab is available to anonymous users, it must be
+configured by a privileged user before it will show anything.
+Privileged users can configure the display using the blue form that
+appears on that page.</p>
+
+    <p>Instead of a time span, this tab will list only up to a certain
+number of hymns, regardless of their assignment to services. The Limit
+setting controls this, but when set to zero, the limit is disabled.</p>
+
+    <p>Checking the Future box configures the page to show Future hymns,
+in chronological order, instead of all planned hymns in
+reverse-chronological order.</p>
+
+    <p>The Start HTML and End HTML text boxes allow privileged users to
+modify the way the list is displayed.  If you would like a certain kind
+of heading, for example, you could put <pre><h1>Hymns at St. Peter
+Lutheran Church</h1></pre> at the beginning of the Start HTML field. You
+may wish to consult a reference on simple HTML markup, but be cautious
+about pasting bits of code in there from the Internet, unless you know
+what you are doing. Some code can be malicious.</p>
+
+    <p>A line showing currently-selected fields appears below the
+configuration form. Each field is configured with a name and a width for
+display purposes. The red characters are links for moving fields
+relative to each other (&lt; and &gt;), for deleting fields (-), and for
+adding new fields (+).  The fields configured there will appear in the
+Report tab listing.  Please note that you will need at least one service
+planned before you can add fields to the Report tab.</p>
+
     <h4><a name="modify_services">Modify Services</a></h4>
 
-    <p>When you log in, the Service Records page is replaced with the much more
-powerful Modify Services page.  This is where you add new services or change
-ones you've already planned.  Two more buttons behind the Listing Limit allow
-you to list only future hymns (like the Upcoming Hymns page) or show all hymns
-(like the Service Records page).</p>
+    <p>When you log in, the Service Records page is replaced with the
+much more powerful Modify Services page. This is where you add new
+services or change ones you've already planned.</p>
+
+    <h5><a name="service_format">Standard Service Format</h5>
+
+    <p>The Upcoming Hymns, Service Records, and Modify Services tabs
+share the same basic format for displaying each service.</p>
 
     <p>Each service is listed under its own heading line containing the date
 and location of the service and liturgical day name.  Below that line appear
@@ -136,18 +175,24 @@ hymnbook, the number, any notes for that hymn (verse/stanza numbers, etc.), and
 the title.</p>
 
     <p>Between the heading line and the list of hymns, there is service
-information, including any special notes about that service, the Introit, and
-the gradual.  Some services may be assigned to named blocks (introduced below)
-for planning purposes.  Those associated with blocks also contain a rectangle
-with a heading inside that says "Block: " and the name of the block to which
-the service belongs.  The block specifies which propers will be used for that
-service, and they are automatically looked up and displayed in the block
-rectangle.</p>
+information, including any special notes about that service, the
+Introit, and the gradual. Some services may be assigned to named blocks
+(introduced below) for planning purposes. Those associated with blocks
+also contain a rectangle with a heading inside that says "Block: " and
+the name of the block to which the service belongs. The block specifies
+which propers will be used for that service, and they are automatically
+looked up and displayed within the block rectangle.</p>
 
-    <p>Each heading line also contains buttons for adding more hymns to a
-service (possibly in a different location), editing the service as it is
-currently entered, adding a sermon, or printing just that one service with its
-hymns (handy for organists!).</p>
+    <h5>Buttons For Each Service</h5>
+
+    <p>On the Modify Service page, each heading line also contains
+buttons for adding more hymns to a service (possibly in a different
+location), editing the service as it is currently entered, adding a
+sermon, or printing just that one service with its hymns (handy for
+organists!). A checkbox appears to the left of the date in each service
+heading line, for the purpose of deleting whole services, with all their
+hymn selections. The checkboxes are used in conjunction with the Delete
+button above or below the service listing.</p>
 
     <h4><a name="block_plans">Block Plans</a></h4>
 
@@ -170,14 +215,14 @@ can always add blocks later.</p>
 
     <h4><a name="sermon_plans">Sermon Plans</a></h4>
 
-    <p>The Sermon Plans tab is where you will find plans for sermons
-(shocking!), once you have created them.  The Service Planner is organized
-around the whole service, so in order to create a sermon plan, you will have to
-have a service already in the system for that particular day.  It need not have
-any hymns, but it must exist.  Then, on the <a href="#modify_services">Modify
-Services</a> page, where the service is listed, you can add a sermon by
-clicking the (... wait for it ...) Sermon link in the heading for that
-service.</p>
+    <p>The Sermon Plans tab is where you will find plans for sermons,
+once you have created them. The Service Planner is organized around
+the whole service, so in order to create a sermon plan, you will
+need to have a service already in the system for that particular
+day. It need not have any hymns, but it must exist. Then, on the <a
+href="#modify_services">Modify Services</a> page, where the service is
+listed, you can add a sermon by clicking the Sermon link in the heading
+for that service.</p>
 
     <p>The only thing that may not be obvious here is that when a manuscript
 file has been uploaded and saved in the Service planner, a link with the
@@ -186,7 +231,7 @@ Clicking that link will download the saved file.</p>
 
     <h4><a name="church_year">Church Year</a></h4>
 
-    <p>The Church Year tab is magical.  Figuratively, that is.  This is where
+    <p>The Church Year tab is magical (figuratively).  This is where
 you can alter the Service Planner's knowledge of the church year and the
 propers assigned to each day.  I wouldn't advise changing anything here until
 you're pretty sure you understand what you want to do and how to do it.  Not
@@ -203,30 +248,27 @@ of Lent 2 next time around, just find that row on the Church Year tab.</p>
 
     <h4><a name="housekeeping">Housekeeping</a></h4>
 
-    <p>This is where you can perform maintenance and get some extra
-information about the Service Planner.  The page is mostly
-self-documented, but it contains some advanced concepts.  You can safely
-ignore what you don't understand.  One item that you should not ignore
-is toward the bottom under the heading "The Broom Closet."  The very
-first item there under "Backups and Exports" contains a link you should
-use periodically to download a backup of all your data.  You should use
-the suggested filename, because it contains the version of the Service
-Planner you are backing up.  If you ever need to restore that data, you
-will need a compatible installation of the software, and that version
-number makes it possible.</p>
+    <p>This is where you can perform maintenance and get some
+extra information about the Service Planner. The page is mostly
+self-documented, but it contains some advanced concepts. You can safely
+ignore what you don't understand. One item that you should not ignore
+is under the heading "The Broom Closet," and the subheading "Backups."
+You should use the database backup link periodically to download a
+backup file containing all of your data. You should use the suggested
+filename, because it contains the version of the Service Planner you
+are backing up. If you ever need to restore that data, you will need a
+compatible installation of the software, and that version number makes
+it possible.</p>
 
-    <p>The other immediately noteworthy item, if you plan to use the block
-planning feature, is at the bottom of the page.  Here is where you set your
-preference for the Bible version in which to read the lections.  If you save an
-abbreviation like "NKJV" there, then your service listings will not only
-include the lection references in their block plan rectangles, but those
-references will be links to the texts via BibleGateway.com.  If you don't save
-an abbreviation here, then the lection references will not be links.
-<b>Tip:</b> If you want to link to the Bible texts in original languages, set
-the version to something like "SBLGNT;WLC".  That will show the Greek New
-Testament in parallel with the Hebrew Old Testament.  Yes, it's technically
-impossible, but Bible Gateway will then show the text you want for every link,
-on one side or the other.<p>
+    <p>The other immediately noteworthy item, if you plan to use the
+block planning feature, is farther down, under "Config Settings." The
+setting entitled "Preferred Bible Abbreviation from Bible Gateway" is
+where you set your preference for the Bible version in which to read
+the lections. If you save an abbreviation like "NKJV" there, then your
+service listings will not only include the lection references in their
+block plan rectangles, but those references will be links to the texts
+via BibleGateway.com. If you don't save an abbreviation here, then the
+lection references will not be links.<p>
 
     <h2>Usage Tips</h2>
 
@@ -244,15 +286,12 @@ on the Block Plans tab.</p>
     <li>Fill out the form, beginning with the date of the service.  When you
 choose the date, the Service Planner will automatically check to see if it
 matches with one of the days in the Church Year.  If it does, then all matches
-will be placed automatically into the Liturgical Name field.</li> <li>Since the
-author plans the same service for two different locations,
-the location field is used.  If you have only one location, you can ignore
-it.  The location really applies to the hymns that are chosen.  Hymns from
-multiple locations may be associated with the same service, since one service
-may be repeated at multiple places.</li>
+will be placed automatically into the Liturgical Name field.</li>
+    <li>Hymns from multiple locations may be associated with the same
+service, since one service may be repeated at multiple places.</li>
     <li>If no matches were found for the date, perhaps because it's an
 occasional service, I will put the occasion into the Liturgical Name field.  If
-multiple matches were found, I choose only one and delete the rest.  Anything
+multiple matches were found, choose only one and delete the rest.  Anything
 could be written in this field, but the Service Planner uses it to find propers
 automatically for this service.  If the field does not contain a recognized
 liturgical name, then no propers will be found. (You can add new liturgical
@@ -267,24 +306,25 @@ location, they should all be specified here.</li>
 that block plan will be available as a choice in the Block Plan drop-down
 control.  Choosing one is optional, but they are useful for displaying propers
 in the hymn listing that are associated with the block of services.</li>
-    <li><a name="unknownhymns">If</a> you haven't saved many verified hymn
-titles, you may want to check
-the "Attempt to provide unknown titles..." box.  The cross-reference tab
-contains a table of hymns, including titles, which come from another source.
-When you enter a hymn number, if this checkbox is activated, the Service
-Planner will automatically pick one of the titles listed on that table for the
-chosen hymn number, and include it in this form.  There is no way to guarantee
-that the title will be accurate, but they often are.  You can fix it, if
-necessary.  On the other hand, the titles chosen when you submit this form are
-considered to be reliable.  If one of those has already been entered into the
-system, it will be preferred over the cross-reference table's title for the
-purpose of automatically filling out this form.  If no title is found, then a
-blank field will appear for you to enter the hymn title by hand.</li>
-    <li>Each hymn you enter can have a note associated with it.  This is where
-you record which verses/stanzas you want to sing.  You could also include other
-information, like whether it's a communion distribution hymn.  (I may add a
-separate field for the use/role of each hymn, if it doesn't complicate the
-whole thing too much.)</li>
+    <li><a name="unknownhymns">If</a> you haven't saved many verified
+hymn titles, you may want to check the "Attempt to provide unknown
+titles..." box. The cross-reference tab contains a table of hymns,
+including titles, which come from another source. When you enter a
+hymn number, if this checkbox is activated, the Service Planner will
+automatically pick one of the titles listed on that table for the chosen
+hymn number, and include it in this form. There is no way to guarantee
+that the title will be accurate, but they often are. You can fix it, if
+necessary. On the other hand, the titles chosen when you submit this
+form are reliable. If one of those has already been entered into the
+system, it will be preferred over the cross-reference table's title
+for the purpose of automatically filling out this form. If no title is
+found, then a blank field will appear for you to enter the hymn title by
+hand.</li>
+    <li>Each hymn you enter can have a note associated with it. This is
+where you record which verses/stanzas you want to sing. You could also
+include other information, like whether it's a communion distribution
+hymn. (A future version may add a separate field for the use/role of
+each hymn, if it doesn't complicate the whole thing too much.)</li>
     <li>If you wish to avoid confusing your organists and others by including
 an entry for <em>every</em> possible hymn location in your service, even when
 you don't wish to sing a hymn at that point, then a good practice is to use
@@ -322,7 +362,7 @@ entering new hymns.  See below.)</p>
     <h3><a name="changing_service">Changing a Service</a></h3>
 
     <p>To edit an existing service, click the Edit button in the heading line
-fo the service you want to edit.  The resulting form will allow you to change
+for the service you want to edit.  The resulting form will allow you to change
 any of the service information, including hymns.  It will include <em>all</em>
 hymns for that service, no matter what location is associated with them.  The
 form will also allow you to change the sequence of the hymns by changing the
@@ -352,10 +392,11 @@ service planner, and maybe even performing a restore to make sure it works.
 The author trusts the database system, but backs up his own service planner
 after every planning session.</p>
 
-    <p>On the <a href="#housekeeping">Housekeeping</a> tab, scroll to the Broom
-Closet heading, and click the first link, "Save a Backup of the Database."  The
-system will dump out the database to a file and send it to your browser.  Save
-it somewhere for safekeeping, using the suggested filename.<p>
+    <p>On the <a href="#housekeeping">Housekeeping</a> tab, scroll to
+the Broom Closet heading, and click the first link under Backups, "Save
+a Backup of the Database." The system will dump out the database to a
+file and send it to your browser. Save it somewhere for safekeeping,
+using the suggested filename.<p>
 
     <p>To restore from a backup file, use the very next item in the Broom
 Closet.  Click the Browse button and select your backup file.  Then, click the
@@ -375,7 +416,8 @@ in order to restore an outdated backup file, nobody likes extra work.</p>
 
     <h1>Advanced Features</h1>
 
-    <h2><a name="coinstallation">Populating Hymn Titles from a Co-installation</a></h2>
+    <h2><a name="coinstallation">Populating Hymn Titles from a
+Co-installation</a></h2>
 
     <p>The service planner automatically fills in hymn titles for you as you
 enter the hymns for a service.  The reliable titles are the ones for hymns you
@@ -419,39 +461,41 @@ To revoke the authorization, simply remove the address from this box and click
 
     <h2><a name="restoring_defaults">Restoring Sanity to the Church Year (and other things)</a></h2>
 
-    <p>If you have been experimenting with the data saved on the Church Year
-tab, and you have broken something, it's possible to restore all of those
-values to their defaults by clicking the first link on the fourth item in the
-Broom Closet, the link that says "Days in Church Year."  <b>Please note that this will lose any custom lectionaries or other changes you have made.</b></p>
+    <p>If you have been experimenting with the data saved on the Church
+Year tab, and you have broken something, it's possible to restore all of
+those values to their defaults by clicking the first link on number 2
+under "Tweaking Your Installation." <b>Please note that this will lose
+any custom lectionaries or other changes you have made.</b></p>
 
     <p>The other link, which says "Church Year Functions," is probably
-something you won't ever need, but I'll explain it anyway.  The Service Planner
-does some of its computing on the web server, some in your browser, and some in
-the database itself.  Clicking this link will remove the Service Planner's
-computing instructions from the database and restore them to their default.
-It's probably only needed by developers when they are working on the
-database.</p>
+something you won't ever need, but I'll explain it anyway. The Service
+Planner does some of its computing on the web server, some in your
+browser, and some in the database itself. Clicking this link will remove
+the Service Planner's computing instructions from the database and
+restore them to their default. It's probably only needed by developers
+when they are working on the database.</p>
 
     <p>For the curious, the next two items in the Broom Closet are for
-situations when something has gotten out of whack.  This doesn't usually
-happen, and never in normal usage.  But sometimes it can get tricky to work out
-bugs in the database upgrade process, and these links allow a graceful recovery
-from some of the problems that may arise.</p>
+situations when something has gotten out of whack. This doesn't usually
+happen, and never in normal usage. But sometimes it can get tricky to
+work out bugs in the database upgrade process, and these links allow a
+graceful recovery from some of the problems that may arise.</p>
 
     <h2><a name="bug_reporting">Bug Reporting</a></h2>
 
-    <p>When something doesn't work right, that's a bug.  Bug reports are
-welcome and appreciated.  You can submit bugs in <a
-href="http://code.google.com/p/service-planner/issues/list">the issue tracker
-at Google Code</a>, or by emailing me using the link provided at the bottom of
-the Housekeeping tab.  Please be as descriptive as possible, saying what you
-expected and how that's different from what actually happened.  Also, please
-include the version number of your Service Planner, which can be found at the
-bottom of the Housekeeping tab.</p>
+    <p>When something doesn't work right, that's a bug. Bug
+reports are welcome and appreciated. You can submit bugs in <a
+href="http://code.google.com/p/service-planner/issues/list">the issue
+tracker at Google Code</a>, or by emailing me using the link provided
+at the bottom of the Housekeeping tab. Please be as descriptive as
+possible, saying what you expected and how that's different from what
+actually happened. Also, please include the version number of your
+Service Planner, which can be found at the bottom of the Housekeeping
+tab.</p>
 
-    <p>Some "bugs" are not really problems, but feature requests.  Those are
-welcome too.  With those too, please be as descriptive as possible and include
-the version number of your Service Planner.</p>
+    <p>Some "bugs" are not really problems, but feature requests. Those
+are welcome too. With those too, please be as descriptive as possible
+and include the version number of your Service Planner.</p>
 
     </div>
     </div>
