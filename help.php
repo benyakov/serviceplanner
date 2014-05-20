@@ -121,7 +121,7 @@ window for which services will be displayed.  Two buttons below that
 switch the display mode from showing only future services (like the
 Upcoming Hymns tab) and showing all services (the default behavior).</p>
 
-    <h3><a name="user_tabs">User Access Tabs</a></h3>
+    <h3><a name="user_tabs">Privileged User Tabs</a></h3>
 
     <h4><a name="report">Report</h4>
 
@@ -138,13 +138,13 @@ setting controls this, but when set to zero, the limit is disabled.</p>
 in chronological order, instead of all planned hymns in
 reverse-chronological order.</p>
 
-    <p>The Start HTML and End HTML text boxes allow privileged users to
-modify the way the list is displayed.  If you would like a certain kind
-of heading, for example, you could put <pre><h1>Hymns at St. Peter
-Lutheran Church</h1></pre> at the beginning of the Start HTML field. You
-may wish to consult a reference on simple HTML markup, but be cautious
-about pasting bits of code in there from the Internet, unless you know
-what you are doing. Some code can be malicious.</p>
+    <p>The Start HTML and End HTML text boxes allow privileged
+users to modify the way the list is displayed. If you would
+like a certain kind of heading, for example, you could put
+<pre><?=htmlspecialchars("<h1>Hymns at St. Peter Lutheran Church</h1>")?></pre> at the beginning of the Start HTML field. You may
+wish to consult a reference on simple HTML markup, but be cautious about
+pasting bits of code in there from the Internet, unless you know what
+you are doing. Some code can be malicious.</p>
 
     <p>A line showing currently-selected fields appears below the
 configuration form. Each field is configured with a name and a width for
