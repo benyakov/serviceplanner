@@ -469,8 +469,7 @@ function gensitetabs($sitetabs, $action, $bare=false) {
 
 function translate_markup($text) {
     $options = getOptions();
-    if (include_once(makePathAbsolute($options->get('phplibrary'))
-        .DIRECTORY_SEPARATOR."markdown.php"))
+    if (include_once(__DIR__.DIRECTORY_SEPARATOR."markdown.php"))
     {
         return Markdown($text);
     } else {
