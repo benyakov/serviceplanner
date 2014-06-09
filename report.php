@@ -343,7 +343,7 @@ function customViewConfig($cfg) {
 ?>
 <div id="customviewconfig">
 <form id="customviewsetup">
-Limit: <input type="number" value=<?=$limit?> min=1 required id="limit"><br>
+Limit: <input type="number" value="<?=$limit?>" min=1 required id="limit"><br>
 Future: <input type="checkbox" <?=$future?> value="future" id="future"><br>
 Start HTML: <input type="text" id="start" required value="<?=$starthtml?>"><br>
 End HTML: <input type="text" id="end" required value="<?=$endhtml?>"><br>
