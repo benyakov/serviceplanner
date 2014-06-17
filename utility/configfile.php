@@ -285,8 +285,11 @@ class Configfile
             }
         } elseif ($this->HasSections) {
             $sectionname = array_shift($args);
-            return call_user_func_array(Array($this->SectionData[$sectionname],
-                "get"), $args);
+            if (isset($this->SectionData[$sectionname]))
+                return call_user_func_array(
+                    Array($this->SectionData[$sectionname], "get"), $args);
+            else
+                throw new ConfigfileUnknownKey(print_r($sectionname, true));
         } else {
             $data = $this->IniData;
             $used = Array();

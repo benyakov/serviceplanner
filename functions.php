@@ -468,13 +468,8 @@ function gensitetabs($sitetabs, $action, $bare=false) {
 }
 
 function translate_markup($text) {
-    $options = getOptions();
-    if (include_once(__DIR__.DIRECTORY_SEPARATOR."markdown.php"))
-    {
-        return Markdown($text);
-    } else {
-        return $text;
-    }
+    require_once('markdown/Michelf/MarkdownExtra.inc.php');
+    return \Michelf\MarkdownExtra::defaultTransform($text);
 }
 
 function is_within_week($dbdate) {

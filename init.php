@@ -23,7 +23,7 @@
     The Dalles, OR 97058
     USA
  */
-$thisdir = dirname(__FILE__);
+$thisdir = __DIR__;
 $serverdir = dirname($_SERVER['PHP_SELF']);
 chdir($thisdir);
 require("./version.php");
