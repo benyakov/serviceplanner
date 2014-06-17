@@ -311,7 +311,6 @@ function modify_records_table($q, $action) {
             && $row['location'] == $location))
         {
             $rowcount += listthesehymns($thesehymns, $rowcount, $hymnlocation);
-            // Display the heading line
             if (is_within_week($row['date'])) {
                 $datetext = "<a name=\"now\">{$row['date']}</a>";
             } else {
@@ -320,13 +319,18 @@ function modify_records_table($q, $action) {
             $urldate=urlencode($row['date']);
             echo "<tr data-loc=\"{$row['location']}\" class=\"heading servicehead\"><td>
             <input form=\"delete-service\" type=\"checkbox\" name=\"{$row['serviceid']}_{$row['location']}\" id=\"check_{$row['serviceid']}_{$row['location']}\">
-            <span class=\"heavy\">{$datetext}</span>
+            <span class=\"heavy\">{$datetext} {$row['location']}</span>
+            <div class=\"menublock\">
             <a class=\"menulink\" href=\"enter.php?date={$urldate}\" title=\"Add another service or hymns on {$row['date']}.\">Add</a>
-            <span class=\"heavy\">{$row['location']}</span></td>
-            <td colspan=2><a href=\"#\" class=\"edit-service menulink\" data-id=\"{$row['serviceid']}\">Edit</a>
-            <a class=\"menulink\" href=\"sermon.php?id={$row['serviceid']}\">Sermon</a>
-            <a class=\"menulink\" href=\"print.php?id={$row['serviceid']}\" title=\"print\">Print</a>
-            <a name=\"service_{$row['serviceid']}\">{$row['dayname']}</a>: {$row['rite']}</td></tr>\n";
+            <a class=\"menulink\" href=\"copy.php?id={$serviceid}\" title=\"Copy this to another date.\">Copy</a>
+            <a href=\"#\" class=\"edit-service menulink\" title=\"Edit this service.\" data-id=\"{$row['serviceid']}\">Edit</a>
+            <a class=\"menulink\" href=\"print.php?id={$row['serviceid']}\" title=\"Show a printable format of this service.\">Print</a>
+            <a class=\"menulink\" title=\"See or edit sermon plans for this service.\" href=\"sermon.php?id={$row['serviceid']}\">Sermon</a>
+            </div>
+            </td>
+            <td colspan=2>
+            <a name=\"service_{$row['serviceid']}\">{$row['dayname']}</a>: {$row['rite']}
+            </td></tr>\n";
             echo "<tr data-loc=\"{$row['location']}\" class=\"heading\"><td colspan=3 class=\"propers\">\n";
             echo "<table><tr><td class=\"heavy smaller\">{$row['theme']}</td>";
             echo "<td colspan=2>{$row['color']}</td></tr>";
