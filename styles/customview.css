@@ -50,7 +50,7 @@ input#end {
 }
 
 input#limit {
-    width: 2em;
+    width: 4em;
 }
 
 @media print {
