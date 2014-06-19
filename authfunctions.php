@@ -97,7 +97,7 @@ function authcookie($authorized=null) {
     $dbh = new DBConnection();
     $dbp = $dbh->getPrefix();
     $max_age = getAuthCookieMaxAge();
-    if (! file_exists("authcookies")) mkdir("authcookies");
+    checkAuthCookiesDir();
     if (is_null($authorized)) {
         // Check cookie
         if (! (isset($_COOKIE['auth']) &&
@@ -150,9 +150,17 @@ function authcookie($authorized=null) {
     return false;
 }
 
+function checkAuthCookiesDir($user="") {
+    if ($user) $user = DIRECTORY_SEPARATOR . $user;
+    if (! file_exists("authcookies{$user}"))
+        mkdir("authcookies{$user}");
+    if (! $user)
+        file_put_contents("authcookies".DIRECTORY_SEPARATOR.".htaccess",
+            "Order Deny,Allow\nDeny from all\n");
+}
+
 function setAuthCookie($user, $series, $age) {
-    if (! file_exists("authcookies/{$user}"))
-        mkdir("authcookies/{$user}");
+    checkAuthCookiesDir($user);
     $token = genCookieAuthString();
     $timestamp = time()+$age;
     setcookie('auth[series]', $series, $timestamp);
