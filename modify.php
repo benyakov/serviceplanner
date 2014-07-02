@@ -147,7 +147,6 @@ unset($options);
                     .load(encodeURI("edit.php?id="+$(this).attr('data-id')),
                     function() {
                     $("#dialog").dialog({modal: true,
-                                position: "center",
                                 title: "Edit a Service",
                                 width: $(window).width()*0.98,
                                 maxHeight: $(window).height()*0.98,
@@ -157,6 +156,37 @@ unset($options);
 
 
             });
+            $('.copy-service').click(function(evt) {
+                evt.preventDefault();
+                var id = $(this).data("id");
+                $("#dialog")
+                    .html('<form id="choosedate">'+
+                    '<input type="date" id="chosendate" placeholder="date">'+
+                    '<button type="submit">Make Copy</button>'+
+                    '</form>\n')
+                    .dialog({modal: true,
+                        position: {my:"left top", at:"bottom", of:this},
+                        close: function() { $("#dialog").empty(); }});
+                if (! Modernizr.inputtypes.date) {
+                    $("#chosendate").datepicker({showOn: "button",
+                        numberOfMonths: [1,2], stepMonths: 2});
+                }
+                $("#choosedate").submit(function(evt) {
+                    evt.preventDefault();
+                    var chosendate = $("#chosendate").val();
+                    $("#dialog").dialog("close");
+                    var xhr = $.getJSON("copy.php",
+                            { id: id, chosendate: chosendate },
+                            function(result) {
+                                if (result[0]) {
+                                    setMessage(result[1]);
+                                } else {
+                                    setMessage("Copy failed.");
+                                }
+                            });
+                });
+            });
+
             $('#thisweek').click(function(evt) {
                 evt.preventDefault();
                 scrollTarget("now");

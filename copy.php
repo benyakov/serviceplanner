@@ -36,8 +36,8 @@ $q = $dbh->prepare("INSERT INTO `{$dbp}days`
     (caldate, name, rite, servicenotes, block)
     SELECT :date, name, rite, servicenotes, block
     FROM `{$dbp}days` WHERE pkey = :id");
-$q->bindParam(':date', $_POST['date']);
-$q->bindParam(':id', $_POST['id']);
+$q->bindParam(':date', $_GET['chosendate']);
+$q->bindParam(':id', $_GET['id']);
 $q->execute() or die(json_encode(array(False, array_pop($q->errorInfo()))));
 $q = $dbh->prepare("SELECT LAST_INSERT_ID()");
 $q->execute() or die(json_encode(array(False, array_pop($q->errorInfo()))));
@@ -49,7 +49,7 @@ $q = $dbh->prepare("INSERT INTO `{$dbp}hymns`
     FROM `{$dbp}hymns`
     WHERE service = :id");
 $q->bindParam(":service", $serviceid);
-$q->bindParam(":id", $_POST['id']);
+$q->bindParam(":id", $_GET['id']);
 $q->execute() or die(json_encode(array(False, array_pop($q->errorInfo()))));
 $q = $dbh->prepare("INSERT INTO `{$dbp}sermons`
     (bibletext, outline, notes, manuscript, mstype, service)
@@ -57,8 +57,9 @@ $q = $dbh->prepare("INSERT INTO `{$dbp}sermons`
     FROM `{$dbp}sermons`
     WHERE service = :id");
 $q->bindParam(":service", $serviceid);
-$q->bindParam(":id", $_POST['id']);
+$q->bindParam(":id", $_GET['id']);
 $q->execute() or die(json_encode(array(False, array_pop($q->errorInfo()))));
+$dbh->commit();
 echo json_encode(array(True, "Service copied."));
 exit(0);
 

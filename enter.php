@@ -122,7 +122,7 @@ if (array_key_exists("date", $_POST)) {
             $("#date").datepicker({showOn:"button", numberOfMonths: [1,2],
                 stepMonths: 2, onClose: function() {
                     $("#location").focus();
-                }})
+                }});
         }
         updateFromDate($("#date"));
         $(".edit-number").keyup(function(evt){
