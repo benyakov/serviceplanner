@@ -74,6 +74,19 @@ if (! array_key_exists('modifyorder', $_SESSION[$sprefix]))
 else
     $options->set('modifyorder', $_SESSION[$sprefix]['modifyorder']);
 unset($options);
+
+if ("Future" == $_SESSION[$sprefix]['modifyorder']) $order = "ASC";
+else $order = "DESC";
+$q = queryServiceDateRange($lowdate, $highdate, (bool)$allfuture, $order);
+ob_start();
+modify_records_table($q, "delete.php");
+$refreshable = ob_get_clean();
+// Check for a content-only request.
+if (checkContentReq()) {
+    echo json_encode($refreshable);
+    exit(0);
+}
+
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -122,7 +135,16 @@ unset($options);
             $(".edit-number").each(fetchHymnTitle);
             updateBlocksAvailable($("#date").val());
         }
-        $(document).ready(function() {
+        function refreshContent() {
+            var xhr = $.getJSON("modify.php", {contentonly: "t"},
+                function(rv) {
+                    $("#refreshable").html(rv);
+                    setCSSTweaks();
+                    setupStyleAdjusterLocs();
+                    setupButtons();
+                });
+        }
+        function setupButtons() {
             $("button.deletesubmit").click(function(evt) {
                 evt.preventDefault();
                 var submitData = $("#delete-service").serialize();
@@ -136,7 +158,7 @@ unset($options);
                                     width: $(window).width()*0.7,
                                     maxHeight: $(window).height()*0.7,
                                     close: function() {
-                                        setMessage("Deletion cancelled.");
+                                        $("#dialog").empty();
                                     }});
                     });
                 }
@@ -148,8 +170,8 @@ unset($options);
                     function() {
                     $("#dialog").dialog({modal: true,
                                 title: "Edit a Service",
-                                width: $(window).width()*0.98,
                                 maxHeight: $(window).height()*0.98,
+                                width: $(window).width()*0.85,
                                 open: function() { setupEditDialog(); },
                                 close: function() { $("#dialog").empty(); }});
                 });
@@ -161,11 +183,12 @@ unset($options);
                 var id = $(this).data("id");
                 $("#dialog")
                     .html('<form id="choosedate">'+
-                    '<input type="date" id="chosendate" placeholder="date">'+
+                    '<input type="date" id="chosendate" placeholder="Enter date">'+
                     '<button type="submit">Make Copy</button>'+
                     '</form>\n')
                     .dialog({modal: true,
                         position: {my:"left top", at:"bottom", of:this},
+                        width: $(window).width()*0.4,
                         close: function() { $("#dialog").empty(); }});
                 if (! Modernizr.inputtypes.date) {
                     $("#chosendate").datepicker({showOn: "button",
@@ -174,19 +197,33 @@ unset($options);
                 $("#choosedate").submit(function(evt) {
                     evt.preventDefault();
                     var chosendate = $("#chosendate").val();
+                    if (! (Modernizr.inputtypes.date
+                        || chosendate.match(/\d{4}-\d{1,2}-\d{1,2}/)))
+                    {
+                        if (chosendate.match(/\d{1,2}\/\d{1,2}\/\d{4}/)) {
+                            var d = new Date(chosendate);
+                            d = d.toJSON();
+                            chosendate = d.substring(0,10);
+                        } else {
+                            setMessage("Please use mm/dd/yyyy format.");
+                            return;
+                        }
+                    }
                     $("#dialog").dialog("close");
                     var xhr = $.getJSON("copy.php",
                             { id: id, chosendate: chosendate },
                             function(result) {
                                 if (result[0]) {
                                     setMessage(result[1]);
+                                    refreshContent();
                                 } else {
                                     setMessage("Copy failed.");
                                 }
                             });
                 });
             });
-
+        }
+        function setupMasterButtons() {
             $('#thisweek').click(function(evt) {
                 evt.preventDefault();
                 scrollTarget("now");
@@ -201,6 +238,10 @@ unset($options);
                     numberOfMonths: [1,2],
                     stepMonths: 2});
             };
+        }
+        $(document).ready(function() {
+            refreshContent();
+            setupMasterButtons();
         });
     </script>
     <? pageHeader();
@@ -236,12 +277,8 @@ for that service, use the "Sermon" link.</p>
 <button id="allbutton" type="submit" name="submit" value="All" <?=$disabled?>>Show All (Rev. Chron.)</button>
 </form>
 <hr>
-<?
-if ("Future" == $_SESSION[$sprefix]['modifyorder']) $order = "ASC";
-else $order = "DESC";
-$q = queryServiceDateRange($lowdate, $highdate, (bool)$allfuture, $order);
-modify_records_table($q, "delete.php");
-?>
+<div id="refreshable">
+</div>
 </div>
 <div id="dialog"></div>
 </body>
