@@ -119,6 +119,7 @@ function rawQuery($where=array(), $order="", $limit="") {
     $dbp = $dbh->getPrefix();
     $q = $dbh->prepare("SELECT d.pkey AS serviceid,
     DATE_FORMAT(d.caldate, '%c/%e/%Y') AS date,
+    DATE_FORMAT(d.caldate, '%Y-%m-%d') AS browserdate,
     h.book, h.number, h.note, h.location, d.name AS dayname, d.rite,
     d.servicenotes, n.title, d.block,
     b.label AS blabel, b.notes AS bnotes,
@@ -316,13 +317,13 @@ function modify_records_table($q, $action) {
             } else {
                 $datetext = $row['date'];
             }
-            $urldate=urlencode($row['date']);
+            $urldate=urlencode($row['browserdate']);
             echo "<tr data-loc=\"{$row['location']}\" class=\"heading servicehead\"><td>
             <input form=\"delete-service\" type=\"checkbox\" name=\"{$row['serviceid']}_{$row['location']}\" id=\"check_{$row['serviceid']}_{$row['location']}\">
             <span class=\"heavy\">{$datetext} {$row['location']}</span>
             <div class=\"menublock\">
             <a class=\"menulink\" href=\"enter.php?date={$urldate}\" title=\"Add another service or hymns on {$row['date']}.\">Add</a>
-            <a class=\"menulink\" href=\"copy.php?id={$serviceid}\" title=\"Copy this to another date.\">Copy</a>
+            <a class=\"menulink\" href=\"copy.php?id={$row['serviceid']}\" title=\"Copy this to another date.\">Copy</a>
             <a href=\"#\" class=\"edit-service menulink\" title=\"Edit this service.\" data-id=\"{$row['serviceid']}\">Edit</a>
             <a class=\"menulink\" href=\"print.php?id={$row['serviceid']}\" title=\"Show a printable format of this service.\">Print</a>
             <a class=\"menulink\" title=\"See or edit sermon plans for this service.\" href=\"sermon.php?id={$row['serviceid']}\">Sermon</a>

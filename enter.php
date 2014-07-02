@@ -51,6 +51,12 @@ if (array_key_exists("date", $_POST)) {
     function updateFromDate(dateitem) {
         var dateval = $(dateitem).val();
         if (dateval) {
+            if (Modernizr.inputtypes.date
+                || dateval.match(/\d{4}-\d{1,2}-\d{1,2}/))
+            {
+                var dvparts = dateval.split("-");
+                dateval = dvparts[1]+'/'+dvparts[2]+'/'+dvparts[0];
+            }
             getDayFor(dateval, $("#liturgicalname"));
             updateExisting(dateval);
             updateBlocksAvailable(dateval);
@@ -261,7 +267,7 @@ function processFormData() {
         $serviceid = false;
     }
     if (! $serviceid) { // Create a new service
-        $q = $dbh->prepare("INSERT INTO {$dbp}days
+        $q = $dbh->prepare("INSERT INTO `{$dbp}days`
             (caldate, name, rite, servicenotes, block)
             VALUES (:date, :dayname, :rite, :servicenotes, :block)");
         $q->bindParam(':date', $date);
@@ -273,11 +279,11 @@ function processFormData() {
         } else {
             $q->bindValue(':block', NULL);
         }
-        $q->execute() or dieWithRollback($q, ".");
+        $q->execute() or die(array_pop($q->errorInfo()));
         // Grab the pkey of the newly inserted row.
         $q = $dbh->prepare("SELECT LAST_INSERT_ID()");
-        $q->execute() or dieWithRollback($q, ".");
-        $row = $q->fetch($result);
+        $q->execute() or die(array_pop($q->errorInfo()));
+        $row = $q->fetch();
         $serviceid = $row[0];
         $feedback .= "<li>Saved a new service on '{$date}' for
             '{$_POST['liturgicalname']}'.</li>";
