@@ -135,6 +135,9 @@ input:focus {
 input.entryline {
     margin: 1ex;
 }
+input.edit-sequence {
+    width: 4em;
+}
 input.edit-number {
     width: 3em;
 }
