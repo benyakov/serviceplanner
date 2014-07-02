@@ -163,7 +163,7 @@ input.edit-location {
 }
 input#lowdate,
 input#highdate {
-    width: 6em;
+    width: 10em;
 }
 .hidden {
     display: none;
