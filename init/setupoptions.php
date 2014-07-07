@@ -72,11 +72,6 @@ $sitetabs_anonymous = array(
 // May be "Future" or "All".
 $modifyorder = "All";
 
-// Default shelf-life of auth cookies, which allow the Service Planner to
-// remember the logins of users past the expiration of the current session.
-// This can be customized on the Admin page.
-$authcookie_shelf_life = 60*60*24*7;  // 1 week (in seconds)
-
 if (file_exists("./options.php")) {
     require("./options.php");
     unlink("./options.php");
@@ -91,10 +86,6 @@ foreach ($sitetabs as $k=>$v)
 foreach ($sitetabs_anonymous as $k=>$v)
     $options->set('anonymous sitetabs', $k, $v);
 $options->set('modifyorder', $modifyorder);
-if (! $authcookie_shelf_life) {
-    $authcookie_shelf_life = 60*60*24*7;
-}
-$options->set('authcookie_shelf_life', $authcookie_shelf_life);
 $options->save();
 unset($options);
 

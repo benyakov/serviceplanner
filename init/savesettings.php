@@ -28,54 +28,80 @@ $config = getConfig(true);
 // Check for set values and store them.
 if (isset($_POST["biblegwversion"]) && $auth) {
     $config->set("biblegwversion", $_POST['biblegwversion']);
-    setMessage("Bible Gateway version has been set.");
-}
-
-if (isset($_POST["cookie-age"]) && $auth) {
-    $config->set('authcookie_max_age', intval($_POST['cookie-age']*60*60*24));
-    setMessage("Set max authorization cookie age.");
+    setMessage("Config: Bible Gateway version has been set.");
 }
 
 if (isset($_POST['sitetabs-config']) && $auth) {
     if (! $_POST['sitetabs-config']) {
         $config->del("sitetabs");
-        setMessage("Deleted Sitetabs");
+        setMessage("Config: Deleted Sitetabs");
     } else {
         $newsitetabs = array();
         foreach (explode("\n", $_POST['sitetabs-config']) as $line) {
             if (! $line) continue;
             $eline = explode(":", $line);
             if (count($eline) < 2) {
-                setMessage("Malformed Sitetabs Line: ".htmlspecialchars($line));
+                setMessage("Config: Malformed Sitetabs Line: ".htmlspecialchars($line));
             } else {
                 $newsitetabs[$eline[0]] = trim($eline[1]);
             }
         }
         $config->set('sitetabs', $newsitetabs);
-        setMessage("Set Sitetabs");
+        setMessage("Config: Set Sitetabs");
     }
 }
 
 if (isset($_POST['sitetabs-config-anon']) && $auth) {
     if (! $_POST['sitetabs-config-anon']) {
         $config->del("anonymous sitetabs");
-        setMessage("Deleted Anonymous Sitetabs");
+        setMessage("Config: Deleted Anonymous Sitetabs");
     } else {
         $newsitetabs = array();
         foreach (explode("\n", $_POST['sitetabs-config-anon']) as $line) {
             if (! $line) continue;
             $eline = explode(":", $line);
             if (count($eline) < 2) {
-                setMessage("Malformed Anonymous Sitetabs Line: ".htmlspecialchars($line));
+                setMessage("Config: Malformed Anonymous Sitetabs Line: ".htmlspecialchars($line));
             } else {
                 $newsitetabs[$eline[0]] = trim($eline[1]);
             }
         }
         $config->set('anonymous sitetabs', $newsitetabs);
-        setMessage("Set Anonymous Sitetabs");
+        setMessage("Config: Set Anonymous Sitetabs");
     }
+}
+
+if (isset($_POST["cookie-age"]) && $auth) {
+    $config->set('authcookie_max_age', intval($_POST['cookie-age']*60*60*24));
+    setMessage("Config: Set max authorization cookie age.");
 }
 
 $config->save();
 unset($config);
+
+$options = getOptions(True);
+
+if (isset($_POST['hymnbooks-option']) && $auth) {
+    $options->set('hymnbooks', explode("\n", $_POST['hymnbooks-option']));
+    setMessage("Hymnbooks available option has been set.");
+}
+
+if (isset($_POST['hymncount-option']) && $auth) {
+    $options->set('hymncount', (int) $_POST['hymncount-option']);
+    setMessage("Hymn count option has been set.");
+}
+
+if (isset($_POST['usedhistory-option']) && $auth) {
+    $options->set('used_history', (int) $_POST['usedhistory-option']);
+    setMessage("Hymn-last-used count option has been set.");
+}
+
+if (isset($_POST['modifyorder-option']) && $auth) {
+    $options->set('modifyorder', $_POST['modifyorder']);
+    setMessage("Modify Tab default order option has been set.");
+}
+
+$options->save();
+unset($options);
+
 ?>

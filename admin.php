@@ -385,7 +385,8 @@ to have a recent backup first, at least of your church year data.</p>
     </li>
     </ol>
 
-    <?$akmax = getAuthCookieMaxAge(); // Use standard lookup function ?>
+    <? // Use standard lookup function, providing default and returning seconds
+    $akmax = getAuthCookieMaxAge()/(24*60*60);  ?>
     <h3>Config Settings</h2><? $config = getConfig(false); ?>
     <form id="configsettings" action="<?=$_SERVER['PHP_SELF']?>?flag=savesettings" method="post">
     <dl>
@@ -453,7 +454,7 @@ available for specifying hymns. The first will be the default book.</dd>
     default behavior.</dd>
     <dd><select id="modifyorder-option" name="modifyorder-option">
     <?foreach (array("Future", "All") as $moopt) {
-        if ($moopt == $options->get('modifyorder')) $selected = " selected";
+        if ($moopt == $options->getDefault('All', 'modifyorder')) $selected = " selected";
         else $selected = "";
         echo "<option name='$moopt'$selected>$moopt</option>\n";
     }?>
