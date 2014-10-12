@@ -28,10 +28,10 @@ body {
     padding-top: 0;
     background-color: black;
     color: white;
+    font-family: sans-serif;
 }
 
 #pageheader {
-    font-family: sans-serif;
     font-size: small;
     position: fixed;
     top: 0px; left: 0px; width: 100%;
@@ -152,7 +152,6 @@ input.data-saved {
     border: 2px solid green;
 }
 a.command-link {
-    font-family: sans-serif;
     font-weight: bold;
     font-size: small;
 }
@@ -183,7 +182,6 @@ input#highdate {
 div.hymn-past {
     width: 50em;
     display: none;
-    font-family: sans-serif;
     font-size: smaller;
     color: black;
     background-color: inherit;
@@ -246,7 +244,6 @@ table#print-hymns-table td {
 }
 table#print-hymns-table th {
     font-weight: bold;
-    font-family: sans-serif;
     padding: 1ex 0;
 }
 
@@ -272,7 +269,6 @@ tr.servicehead {
 tr.table-topline td {
     border-top: 2px solid #BBB;
     background-color: #E2E2E2;
-    font-family: sans-serif;
 }
 .table-leftborder {
     border-left: 3px solid #88B;
@@ -286,7 +282,6 @@ tr.table-topline td {
 }
 
 table.hymn-listing {
-    font-family: sans-serif;
 }
 
 th.hymn-number,
@@ -307,7 +302,7 @@ td.title {
 }
 
 td.controls {
-    font: bold 50% sans-serif;
+    font: bold 50%;
 }
 #dialog {
     font-size: 85%;
@@ -363,7 +358,6 @@ div.propersbox {
 table#userlist {
     margin: 1em;
     background-color: #999;
-    font-family: sans-serif;
 }
 
 table#userlist td {
@@ -389,13 +383,12 @@ tr.heading>td {
 }
 dt {
     font-weight: bold;
-    font-family: sans-serif;
 }
 
 /**** site tabs ****/
 
 ul#sitetabs {
-    font-size: 10pt; font-family: sans-serif;
+    font-size: 10pt;
     font-weight: bold;
     margin: 0 7pt; padding: 0;
     background-color: black;
@@ -441,7 +434,6 @@ div.quicklinks {
 }
 div.quicklinks a,
 a.menulink {
-    font-family: sans-serif;
     font-weight: bold;
     font-size: 90%;
     color: inherit;
@@ -571,7 +563,6 @@ section#service-items li {
 
 section#service-items label {
     font-weight: bold;
-    font-family: sans-serif;
 }
 
 input#location,
@@ -646,7 +637,6 @@ dl.blocklessons dd {
     display: inline;
     margin: 0 .25em 0 .25em;
     font-weight: bold;
-    font-family: sans-serif;
 }
 
 dl.blocklessons dt {

@@ -72,7 +72,7 @@ if (! $auth) {
     <p>So you have your own installation of the service planner, and now
 you'd like to know how to use it.  This introduction should help.  I'll
 try to keep it brief, at the risk of leaving out some important or
-advanced things.</p>
+advanced things.  Feel free to skim to the part(s) you want to read.</p>
 
     <p>It will help to have a web browser window open to the service
 planner beside this introduction, so you can try things yourself as you
@@ -285,18 +285,26 @@ on the Block Plans tab.</p>
     <li>Click the New Service button at the top.</li>
     <li>Fill out the form, beginning with the date of the service.  When you
 choose the date, the Service Planner will automatically check to see if it
-matches with one of the days in the Church Year.  If it does, then all matches
-will be placed automatically into the Liturgical Name field.</li>
+matches with one of the days in the Church Year.  If it does, then <em>all</em>
+matches will be placed automatically into the Liturgical Name field.</li>
+    <ol>
+    <li>Caution: If you press Enter or Return in a data field, your browser
+will submit the form as it stands. If the service is incomplete, you can then
+delete it and start over, or edit the incomplete service to finish it.</li>
     <li>Hymns from multiple locations may be associated with the same
 service, since one service may be repeated at multiple places.</li>
-    <li>If no matches were found for the date, perhaps because it's an
-occasional service, I will put the occasion into the Liturgical Name field.  If
-multiple matches were found, choose only one and delete the rest.  Anything
-could be written in this field, but the Service Planner uses it to find propers
-automatically for this service.  If the field does not contain a recognized
-liturgical name, then no propers will be found. (You can add new liturgical
-days or adjust their names on the <a href="#church_year">Church Year</a>
-tab.)</li>
+    <li>Even if you generally plan services for only one location, it's a good
+idea to have something in the location field, even if it's cryptic, like
+GLC.</li>
+    </ol>
+    <li>If no "Liturgical Name" matches were found for the date, perhaps
+because it's an occasional service, I will put the occasion into the Liturgical
+Name field.  If multiple "Liturgical Name" matches were found, choose only one
+and delete the rest.  Anything could be written in this field, but the Service
+Planner uses it to find propers automatically for this service.  If the field
+does not contain a recognized liturgical name, then no propers will be found.
+(You can add new liturgical days or adjust their names on the <a
+href="#church_year">Church Year</a> tab.)</li>
     <li>Each service can have its own notes, which may contain anything you
 like.  This would be a good place to note deviations from the printed
 liturgical rite, plan for extra things like choir pieces, or include the name
