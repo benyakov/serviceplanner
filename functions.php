@@ -125,10 +125,12 @@ function rawQuery($where=array(), $order="", $limit="") {
     b.label AS blabel, b.notes AS bnotes,
     cyp.color AS color, cyp.theme AS theme, cyp.introit AS introit,
     cyp.gradual AS gradual, cyp.note AS propersnote,
+    (smr.bibletext IS NOT NULL) AS has_sermon,
     COALESCE(l1s.lesson1, l1s.l1series) AS blesson1,
     COALESCE(l2s.lesson2, l2s.l2series) AS blesson2,
     COALESCE(gos.gospel, gos.goseries) AS bgospel,
-    COALESCE((CASE b.smtype
+    COALESCE(smr.bibletext,
+             (CASE b.smtype
               WHEN 'gospel' THEN sms.gospel
               WHEN 'lesson1' THEN sms.lesson1
               WHEN 'lesson2' THEN sms.lesson2
@@ -155,6 +157,7 @@ function rawQuery($where=array(), $order="", $limit="") {
     LIMIT 1) AS bcollect
     FROM `{$dbp}hymns` AS h
     RIGHT OUTER JOIN `{$dbp}days` AS d ON (h.service = d.pkey)
+    LEFT OUTER JOIN `{$dbp}sermons` AS smr ON (h.service = smr.service)
     LEFT OUTER JOIN `{$dbp}names` AS n ON (h.number = n.number)
         AND (h.book = n.book)
     LEFT OUTER JOIN `{$dbp}blocks` AS b ON (b.id = d.block)
@@ -206,9 +209,7 @@ function listthesehymns(&$thesehymns, $rowcount, $location=false) {
 function display_records_table($q) {
     global $auth;
     // Show a table of the data in the query $result
-    ?><table id="records-listing">
-        <tr><th>Date &amp; Location</th><th colspan=2>Liturgical Day Name: Service/Rite</th></tr>
-    <?
+    ?><table id="records-listing"><?
     $serviceid = "";
     $location = "";
     $rowcount = 1;
@@ -264,7 +265,7 @@ function display_records_table($q) {
                     <dt>Lesson 2</dt><dd><?=linkbgw($cfg, $row['blesson2'], $row['l2link'])?></dd>
                     <dt>Gospel</dt><dd><?=linkbgw($cfg, $row['bgospel'], $row['golink'])?></dd>
                     <dt>Psalm</dt><dd><?=linkbgw($cfg, "Ps ".$row['bpsalm'], $row['pslink'])?></dd>
-                    <dt>Sermon</dt><dd><?=linkbgw($cfg, $row['bsermon'], $row['smlink'])?></dd>
+                    <dt>Sermon<?=$row['has_sermon']?'*':''?></dt><dd><?=linkbgw($cfg, $row['bsermon'], $row['smlink'])?></dd>
                     </dl>
                     <h5>Collect (<?=$row['bcollectclass']?>)</h5>
                     <div class="collecttext maxcolumn">
@@ -299,7 +300,6 @@ function modify_records_table($q, $action) {
       <button type="reset" value="Clear">Clear</button>
       </form>
       <table id="modify-listing">
-        <tr><th>Date &amp; Location</th><th colspan=2>Liturgical Day Name: Service/Rite</th></tr>
     <?
     $serviceid = "";
     $location = "";
@@ -361,7 +361,7 @@ function modify_records_table($q, $action) {
                     <dt>Lesson 2</dt><dd><?=linkbgw($cfg, $row['blesson2'], $row['l2link'])?></dd>
                     <dt>Gospel</dt><dd><?=linkbgw($cfg, $row['bgospel'], $row['golink'])?></dd>
                     <dt>Psalm</dt><dd><?=linkbgw($cfg, "Ps ".$row['bpsalm'], $row['pslink'])?></dd>
-                    <dt>Sermon</dt><dd><?=linkbgw($cfg, $row['bsermon'], $row['smlink'])?></dd>
+                    <dt>Sermon<?=$row['has_sermon']?'*':''?></dt><dd><?=linkbgw($cfg, $row['bsermon'], $row['smlink'])?></dd>
                     </dl>
                     <h5>Collect (<?=$row['bcollectclass']?>)</h5>
                     <div class="collecttext maxcolumn">
