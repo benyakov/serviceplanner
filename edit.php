@@ -41,7 +41,7 @@ if (! array_key_exists("stage", $_GET))
             hymns.pkey as hymnid, hymns.location,
             hymns.sequence, days.name as dayname, days.rite, days.block,
             days.servicenotes
-            FROM `${dbp}hymns` AS hymns
+            FROM `${db->getPrefix()}hymns` AS hymns
             RIGHT OUTER JOIN `{$db->getPrefix()}days` AS days ON (hymns.service=days.pkey)
             WHERE days.pkey = ?
             ORDER BY days.caldate DESC, hymns.location, hymns.sequence");
