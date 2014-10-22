@@ -260,6 +260,14 @@ function display_records_table($q) {
                     <div class="blocknotes maxcolumn">
                         <?=translate_markup($row['bnotes'])?>
                     </div>
+<?
+            if (! ($row['blesson1'] || $row['blesson2'] || $row['bgospel']
+                || $row['bpsalm'] || $row['bsermon'] || $row['bcollect']) )
+            {
+                echo "No block data found. "
+                ."Is the liturgical day name set to a single day?";
+            }
+?>
                     <dl class="blocklessons">
                     <dt>Lesson 1</dt><dd><?=linkbgw($cfg, $row['blesson1'], $row['l1link'])?></dd>
                     <dt>Lesson 2</dt><dd><?=linkbgw($cfg, $row['blesson2'], $row['l2link'])?></dd>
@@ -356,6 +364,15 @@ function modify_records_table($q, $action) {
                     <div class="blocknotes">
                         <?=translate_markup($row['bnotes'])?>
                     </div>
+<?
+            if (! ($row['blesson1'] || $row['blesson2'] || $row['bgospel']
+                || $row['bpsalm'] || $row['bsermon'] || $row['bcollect']) )
+            {
+                echo "No block data found. "
+                ."Is the liturgical day name set to a single day?";
+            }
+?>
+
                     <dl class="blocklessons">
                     <dt>Lesson 1</dt><dd><?=linkbgw($cfg, $row['blesson1'], $row['l1link'])?></dd>
                     <dt>Lesson 2</dt><dd><?=linkbgw($cfg, $row['blesson2'], $row['l2link'])?></dd>
