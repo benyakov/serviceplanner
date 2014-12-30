@@ -138,7 +138,7 @@ while ($row = $q->fetch(PDO::FETCH_ASSOC)) {
     if ($rownum++ % 2 == 0) $sortrowbg = ' class="even"';
     else $sortrowbg = ' class="odd"';
     echo "<tr${sortrowbg}>
-        <td class=\"title\">${r['title']}</td>
+        <td class=\"title\">{$r['title']}</td>
         <td class=\"text\">{$r['text']}</td>
         <td class=\"elh\">{$r['elh']}</td>
         <td class=\"tlh\">{$r['tlh']}</td>
