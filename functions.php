@@ -163,13 +163,13 @@ function rawQuery($where=array(), $order="", $limit="") {
     LEFT OUTER JOIN `{$dbp}blocks` AS b ON (b.id = d.block)
     LEFT OUTER JOIN `{$dbp}synpropers` AS cyp ON (cyp.dayname = d.name)
     LEFT JOIN `{$dbp}lesson1selections` AS l1s
-    ON (l1s.l1lect=b.l1lect AND l1s.l1series=b.l1series AND l1s.dayname=d.name)
+    ON (l1s.l1lect=b.l1lect AND l1s.l1series<=>b.l1series AND l1s.dayname=d.name)
     LEFT JOIN `{$dbp}lesson2selections` AS l2s
-    ON (l2s.l2lect=b.l2lect AND l2s.l2series=b.l2series AND l2s.dayname=d.name)
+    ON (l2s.l2lect=b.l2lect AND l2s.l2series<=>b.l2series AND l2s.dayname=d.name)
     LEFT JOIN `{$dbp}gospelselections` AS gos
-    ON (gos.golect=b.golect AND gos.goseries=b.goseries AND gos.dayname=d.name)
+    ON (gos.golect=b.golect AND gos.goseries<=>b.goseries AND gos.dayname=d.name)
     LEFT JOIN `{$dbp}sermonselections` AS sms
-    ON (sms.smlect=b.smlect AND sms.smseries=b.smseries AND sms.dayname=d.name)
+    ON (sms.smlect=b.smlect AND sms.smseries<=>b.smseries AND sms.dayname=d.name)
     {$wherestr}
     ORDER BY d.caldate {$order}, h.service {$order},
         h.location, h.sequence {$limitstr}");

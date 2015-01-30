@@ -662,7 +662,9 @@ if ($_POST['lessons'] == "New") {
         $_POST['hymn'])))
     {
         $rv = array(false,
-            "Problem saving new lessons: ".array_pop($q->errorInfo()));
+            "Problem saving new lessons.  "
+            ."Does {$_POST['dayname']} have synonyms set?");
+            //.array_pop($q->errorInfo()));
     } else {
         require("./churchyear/get_propersform.php");
         $rv = array(true,
