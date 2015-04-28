@@ -360,7 +360,8 @@ if ("blockitems" == $_GET['get'] && is_numeric($_GET['id']) && $_GET['day']) {
         b.l1lect != \"custom\" AS l1link,
         b.l2lect != \"custom\" AS l2link,
         b.golect != \"custom\" AS golink,
-        b.pslect != \"custom\" AS pslink
+        b.pslect != \"custom\" AS pslink,
+        b.smlect != \"custom\" AS smlink
         FROM `{$db->getPrefix()}blocks` as b
         WHERE id = :block");
     $q->bindValue(":dayname", $_GET['day']);
@@ -374,9 +375,12 @@ if ("blockitems" == $_GET['get'] && is_numeric($_GET['id']) && $_GET['day']) {
             linkbgw($cfg, $row['blesson2'], $row['l2link'], true)),
         "Gospel"=>bibleLinkOrHelp($row['bgospel'],
             linkbgw($cfg, $row['bgospel'], $row['golink'], true)),
+        "Sermon"=>bibleLinkOrHelp($row['bsermon'],
+            linkbgw($cfg, $row['bsermon'], $row['smlink'], true)),
         "Psalm"=>bibleLinkOrHelp($row['bpsalm'],
             linkbgw($cfg, "Psalm ".$row['bpsalm'], $row['pslink'], true)),
-        "Collect"=>bibleLinkOrHelp($row['bcollect'], $row['bcollect']));
+        "Collect"=>bibleLinkOrHelp($row['bcollect'], $row['bcollect'])
+    );
         unset($cfg);
         if ($row['notes']) $rv["Notes"] = $row['notes'];
         echo json_encode($rv);
