@@ -25,6 +25,14 @@
     USA
  */
 
+/*** Handy for debugging
+* $logfile = fopen("somefile.log", "a+");
+* function _log($text) {
+*     global $logfile;
+*     fwrite($logfile, "(cf) ".$text."\n");
+* }
+***/
+
 class ConfigfileError extends Exception { }
 class ConfigfileUnknownKey extends ConfigfileError { }
 
@@ -224,16 +232,28 @@ class Configfile
     private $IniFP = NULL;
     private $Locktype;
     private $IniFile;
-    private $IniData = Array();
-    private $SectionData = Array();
+    private $IniData = array();
+    private $SectionData = array();
     private $HasSections;
-    private $Sections = Array();
-    private $Extensions = Array();
+    private $RawValues;
+    private $Sections = array();
+    private $Extensions = array();
+
+    /*** Handy for debugging with object members
+    * private function _chk($txt) {
+    *     if (count($this->Sections) > 2) {
+    *         _log($txt.print_r($this->Sections, true));
+    *     } else {
+    *         _log("Normal!".print_r($this->Sections, true));
+    *     }
+    * }
+    ***/
 
     public function __construct($FileName, $HasSections=false, $RawValues=true,
         $writelock=true) {
         $this->IniFile = $FileName;
         $this->HasSections = $HasSections;
+        $this->RawValues = $RawValues;
         if ($writelock)
             $this->Locktype=LOCK_EX;
         else
@@ -242,7 +262,7 @@ class Configfile
             touch($FileName);
             $this->_openWithLock($this->IniFile);
         } else {
-            $this->IniData = $this->_parse($HasSections, $RawValues);
+            $this->IniData = $this->_parse();
         }
     }
 
@@ -555,7 +575,7 @@ class Configfile
                     $extension = "";
                 $out[] = "[{$section}{$extension}]";
                 $out[] = $this->_serializeSection(
-                    $this->SectionData[$section]->dump(), $section);
+                    $this->SectionData[$section]->dump());
             }
         }
         return $this->_writeWithLock(implode("\n", $out)."\n");
@@ -625,15 +645,19 @@ class Configfile
     /**
      * Parse with extensions
      */
-    private function _parse($process_sections=true, $raw_values=true)
+    private function _parse()
     {
-        if ($raw_values) $rawflag = INI_SCANNER_RAW;
+        $this->Sections = array();
+        $this->SectionData = array();
+        $this->Extensions = array();
+        $this->IniData = array();
+        if ($this->RawValues) $rawflag = INI_SCANNER_RAW;
         else $rawflag = INI_SCANNER_NORMAL;
         if ($this->_openWithLock($this->IniFile)) {
             $fstat = fstat($this->IniFP);
             if ($fstat['size'] > 0) {
                 $ini = parse_ini_string(fread($this->IniFP, $fstat['size']),
-                    $process_sections, $rawflag);
+                    $this->HasSections, $rawflag);
             } else {
                 $ini = Array();
             }
@@ -754,7 +778,7 @@ class Configfile
      * TODO: The optional $section argument will allow trimming
      * overlap already included in extended sections.
      */
-    private function _serializeSection($sectdata, $section="") {
+    private function _serializeSection($sectdata) {
         $out = Array();
         foreach ($sectdata as $key => $val)
             if (is_array($val))
