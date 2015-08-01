@@ -303,6 +303,7 @@ function display_records_table($q) {
  * with links to edit each record, and checkboxes to delete records.
  */
 function modify_records_table($q, $action) {
+    global $auth;
     ?><form id="delete-service" action="<?=$action?>" method="post">
       <button class="deletesubmit" type="submit" value="Delete">Delete</button>
       <button type="reset" value="Clear">Clear</button>

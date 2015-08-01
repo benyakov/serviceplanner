@@ -497,6 +497,25 @@ function ServiceHandlers() {
 
 var svch = new ServiceHandlers();
 
+function setupSortableList() {
+    $("#sortablelist").sortable({
+        items: "tr[class!='heading']",
+        update: function(event, ui) {
+            var ids = $(this).sortable("toArray");
+            ids = $.grep(ids, function(e, i){ // Remove empties
+                return e != "";
+            });
+            ids = $.map(ids, function(o, i) { // Turn into id selectors
+                return "#"+o;
+            });
+            var jqObj = $(ids.join()); // Default separator is a comma
+            jqObj.filter(":visible").each(function(i) {
+                $(this).find(".edit-sequence").val(i+1);
+            });
+        }
+    });
+}
+
 $(document).ready(function() {
     $("#loginform").submit(function(evt) {
         evt.preventDefault();

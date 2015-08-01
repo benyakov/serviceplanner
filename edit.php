@@ -80,8 +80,8 @@ if (! array_key_exists("stage", $_GET))
                 </select>
             </dd>
         </dl>
-        <table id="hymnentries"><tbody>
-        <tr class="heading"><th>Del</th><th>Seq</th><th>Book</th><th>#</th><th>Note</th>
+        <table id="hymnentries"><tbody id="sortablelist">
+        <tr class="heading"><td></td><th>Del</th><th>Seq</th><th>Book</th><th>#</th><th>Note</th>
             <th>Location</th><th>Title</th></tr>
         <?
         while ($row) {
@@ -90,7 +90,8 @@ if (! array_key_exists("stage", $_GET))
                 continue;
             }
             ?>
-            <tr>
+                <tr class="ui-state-default" id="hymn-<?=$row['hymnid']?>">
+                <td><span class="ui-icon ui-icon-arrowthick-2-n-s"></td>
                 <td>
                     <input type="checkbox" id="delete_<?=$row['hymnid']?>"
                         name="delete_<?=$row['hymnid']?>">
@@ -134,7 +135,8 @@ if (! array_key_exists("stage", $_GET))
             $row = $q->fetch(PDO::FETCH_ASSOC);
         }
         ?>
-        <tr class="table-template" data-index="0">
+        <tr class="table-template ui-state-default" data-index="0" id="hymn-0">
+            <td><span class="ui-icon ui-icon-arrowthick-2-n-s"></td>
             <td>
                 <input type="checkbox" id="delete_new" name="delete_new">
             </td>
@@ -172,8 +174,9 @@ if (! array_key_exists("stage", $_GET))
         <button type="reset">Reset</button>
         </form>
         </div>
-    </body>
-    </html>
+    <script type="text/javascript">
+        setupSortableList();
+    </script>
     <?
 } elseif (2 == $_GET['stage']) {
     //// Commit changes to db
