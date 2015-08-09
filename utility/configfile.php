@@ -250,14 +250,27 @@ class Configfile
     ***/
 
     public function __construct($FileName, $HasSections=false, $RawValues=true,
-        $writelock=true) {
+        $WriteLock=true)
+    {
         $this->IniFile = $FileName;
-        $this->HasSections = $HasSections;
-        $this->RawValues = $RawValues;
-        if ($writelock)
-            $this->Locktype=LOCK_EX;
-        else
-            $this->Locktype=LOCK_SH;
+        if (is_array($HasSections)) {
+            $params = $HasSections;
+            $this->HasSections = isset($params['hasSections'])?
+                (bool) $params['hasSections']:false;
+            $this->RawValues = isset($params['rawValues'])?
+                (bool) $params['rawValues']:false;
+            if (isset($params['writeLock']))
+                $this->Locktype = $params['writeLock']===true?$this->Locktype=LOCK_EX
+                    :$this->Locktype=LOCK_SH;
+            else $this->Locktype = $this->Locktype=LOCK_EX;
+        } else {
+            $this->HasSections = $HasSections;
+            $this->RawValues = $RawValues;
+            if ($WriteLock)
+                $this->Locktype=LOCK_EX;
+            else
+                $this->Locktype=LOCK_SH;
+        }
         if (! file_exists($FileName)) {
             touch($FileName);
             $this->_openWithLock($this->IniFile);
@@ -827,7 +840,9 @@ class Configfile
     }
 
     private function _openWithLock($filename) {
-        $this->IniFP = fopen($this->IniFile, "r+");
+        if ($this->Locktype == LOCK_SH) $fileMode = "r";
+        else $fileMode = "r+";
+        $this->IniFP = fopen($this->IniFile, $fileMode);
         if (flock($this->IniFP, $this->Locktype))
             return true;
         else
