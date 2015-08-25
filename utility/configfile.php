@@ -835,7 +835,19 @@ class Configfile
         flock($this->IniFP, LOCK_UN);
         fclose($this->IniFP);
         $this->IniFP = NULL;
+        // Save for integrity check
+        $iChk = array(
+            "Sections" => $this->Sections,
+            "SectionData" => $this->SectionData,
+            "Extensions" => $this->Extensions,
+            "IniData" => $this->IniData);
         $this->_parse();
+        //TODO: Don't use sort like this; it operates in-place
+        if (sort($iChk["Sections"]) != sort($this->Sections) &&
+            sort($iChk["SectionData"]) != sort($this->SectionData) &&
+            sort($iChk["Extensions"]) != sort($this->Extensions) &&
+            sort($iChk["IniData"]) != sort($this->IniData)) {
+        }
         return $result;
     }
 
