@@ -35,6 +35,7 @@
 
 class ConfigfileError extends Exception { }
 class ConfigfileUnknownKey extends ConfigfileError { }
+class ConfigfileSaveError extends ConfigfileError { }
 
 class Configsection
 {
@@ -462,8 +463,8 @@ class Configfile
     /**
      * Add a section at $k with $data
      */
-    private function _addSection($k, $data) {
-        $this->SectionData[$k] = new Configsection($k, $data);
+    private function _addSection($k, $data, $source=NULL) {
+        $this->SectionData[$k] = new Configsection($k, $data, $source);
         if (! in_array($k, $this->Sections))
             $this->Sections[] = $k;
     }
@@ -483,19 +484,19 @@ class Configfile
         if ($this->HasSections &&
             ($argcount > 2 || ($argcount == 2 && is_array($args[1]))))
         {
-           if (in_array($args[0], $this->Sections) && $argcount > 2) {
-               // Set in the configsection object
-               call_user_func_array(Array($this->SectionData[$args[0]], 'set'),
-                    array_slice($args, 1));
-           } else {
-               // Create a new configsection object.
-               $k = array_shift($args);
-               if (is_array($args[0]))
-                   $args = $args[0];
-               else
-                   $args = $this->_deepCreate($args);
-               $this->_addSection($k, $args);
-           }
+            if (in_array($args[0], $this->Sections) && $argcount > 2) {
+                // Set in the configsection object
+                call_user_func_array(Array($this->SectionData[$args[0]], 'set'),
+                     array_slice($args, 1));
+            } else {
+                // Create a new configsection object.
+                $k = array_shift($args);
+                if (is_array($args[0]))
+                    $args = $args[0];
+                else
+                    $args = $this->_deepCreate($args);
+                $this->_addSection($k, $args);
+            }
         } else {
             $structure = &$this->IniData;
             while (count($args) > 2) {
@@ -688,15 +689,10 @@ class Configfile
                     $section = trim($expand[0]);
                     $source = trim($expand[1]);
                     $this->Extensions[$section] = $source;
-                    $this->SectionData[$section] =
-                        new Configsection($section,
-                            $this->_processSection($values), $source);
+                    $this->_addSection($section, $this->_processSection($values), $source);
                 } else {
-                    $this->SectionData[$section] =
-                        new Configsection($section,
-                            $this->_processSection($values));
+                    $this->_addSection($section, $this->_processSection($values));
                 }
-                $this->Sections[] = $section;
             }
             foreach ($this->SectionData as $section) {
                 if (NULL == $section->Extends) continue;
@@ -706,8 +702,9 @@ class Configfile
                     throw new ConfigfileError("Undefined source section: '"
                         .$section->Extends."'.");
             }
-        } else
+        } else {
             $ini = $this->_processSection($ini);
+        }
         return $ini;
     }
 
@@ -841,12 +838,34 @@ class Configfile
             "SectionData" => $this->SectionData,
             "Extensions" => $this->Extensions,
             "IniData" => $this->IniData);
-        $this->_parse();
-        //TODO: Don't use sort like this; it operates in-place
-        if (sort($iChk["Sections"]) != sort($this->Sections) &&
-            sort($iChk["SectionData"]) != sort($this->SectionData) &&
-            sort($iChk["Extensions"]) != sort($this->Extensions) &&
-            sort($iChk["IniData"]) != sort($this->IniData)) {
+        $this->IniData = $this->_parse();
+        if (! ($iChk["Sections"]    == $this->Sections))
+        {
+            print_r($iChk['Sections']);
+            print_r($this->Sections);
+            throw new ConfigfileSaveError(
+                "Error Saving Sections to Configfile: Possible Data Loss!");
+        }
+        if (! ($iChk["SectionData"] == $this->SectionData))
+        {
+            print_r($iChk['SectionData']);
+            print_r($this->SectionData);
+            throw new ConfigfileSaveError(
+                "Error Saving SectionData to Configfile: Possible Data Loss!");
+        }
+        if (! ($iChk["Extensions"]  == $this->Extensions))
+        {
+            print_r($iChk['Extensions']);
+            print_r($this->Extensions);
+            throw new ConfigfileSaveError(
+                "Error Saving Extensions to Configfile: Possible Data Loss!");
+        }
+        if (! ($iChk["IniData"]     == $this->IniData) )
+        {
+            print_r($iChk['IniData']);
+            print_r($this->IniData);
+            throw new ConfigfileSaveError(
+                "Error Saving IniData to Configfile: Possible Data Loss!");
         }
         return $result;
     }
