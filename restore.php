@@ -38,6 +38,7 @@ if (! preg_match('/^(services|churchyear)-(\d+\.\d+\.\d+)_(\d+[[:alpha:]]{3}\d{4
     header("location: admin.php");
     exit(0);
 } else {
+    $dbstate = getDBState(false);
     $dbversion = $dbstate->get('dbversion');
     $timestamp = $fnmatches[3];
     $version = $fnmatches[2];
