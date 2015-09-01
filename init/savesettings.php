@@ -27,7 +27,7 @@
 $config = getConfig(true);
 // Check for set values and store them.
 if (isset($_POST["biblegwversion"]) && $auth) {
-    $config->set("biblegwversion", urlencode($_POST['biblegwversion']));
+    $config->set("biblegwversion", $_POST['biblegwversion']);
     setMessage("Config: Bible Gateway version has been set.");
 }
 
