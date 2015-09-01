@@ -396,7 +396,6 @@ Multiple abbreviations may be separated by a semicolon, like "SBLGNT;WLC;NKJV",
 which gives a 3-column Greek/Hebrew/English interlinear.</dd>
     <dd><input type="text" id="biblegwversion" name="biblegwversion"
         value="<?=$config->getDefault("", "biblegwversion")?>" placeholder="Unset">
-    </dl>
     <dt>Site Tab Selection & Order</dt>
     <dd class="explanation">Each line represents a single navigation tab. Each tab contains the tab
 name, followed by a colon (:), followed by a label for the tab. Tab names may
@@ -420,6 +419,12 @@ The only tabs accessible to anonymous users are "index", "records",
         "anonymous sitetabs") as $k=>$v)
         echo "$k:$v\n";
     ?></textarea></dd>
+    <dt>Default Service Location</dt>
+    <dd class="explanation">A default location to pre-fill the Location field
+    when entering new hymns or services.</dd>
+    <dd><input type="text" id="defaultlocation" name="defaultlocation"
+        value="<?=$options->getDefault("", "defaultlocation")?>" placeholder="Unset">
+    </dd>
     <dt>Maximum Auth Cookie Age</dt>
     <dd class="explanation">The maximum number of days you
       wish the Service Planner to remember your login session.

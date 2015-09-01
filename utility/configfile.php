@@ -846,10 +846,13 @@ class Configfile
             throw new ConfigfileSaveError(
                 "Error Saving Sections to Configfile: Possible Data Loss!");
         }
-        if (! ($iChk["SectionData"] == $this->SectionData))
+        // Checking these as serial json to relax the comparison standards
+        if (! (json_encode($iChk["SectionData"]) == json_encode($this->SectionData)))
         {
+            echo "<pre>\n";
             print_r($iChk['SectionData']);
             print_r($this->SectionData);
+            echo "</pre>\n";
             throw new ConfigfileSaveError(
                 "Error Saving SectionData to Configfile: Possible Data Loss!");
         }

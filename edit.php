@@ -158,6 +158,7 @@ if (! array_key_exists("stage", $_GET))
                  maxlength="100" name="note_new" class="edit-note">
             </td>
             <td><input type="text" id="location_new"
+                value="<?=$options->getDefault("", "defaultlocation")?>"
                 name="location_new" class="edit-location">
             </td>
             <td><input type="text" id="title_new" size="50"

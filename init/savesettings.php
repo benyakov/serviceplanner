@@ -27,7 +27,7 @@
 $config = getConfig(true);
 // Check for set values and store them.
 if (isset($_POST["biblegwversion"]) && $auth) {
-    $config->set("biblegwversion", $_POST['biblegwversion']);
+    $config->set("biblegwversion", urlencode($_POST['biblegwversion']));
     setMessage("Config: Bible Gateway version has been set.");
 }
 
@@ -80,6 +80,11 @@ $config->save();
 unset($config);
 
 $options = getOptions(True);
+
+if (isset($_POST['defaultlocation']) && $auth) {
+    $options->set('defaultlocation', htmlspecialchars($_POST['defaultlocation']));
+    setMessage("Default Location options has been set.");
+}
 
 if (isset($_POST['hymnbooks-option']) && $auth) {
     $options->set('hymnbooks', explode("\n", $_POST['hymnbooks-option']));

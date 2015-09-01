@@ -186,7 +186,8 @@ if (array_key_exists("date", $_POST)) {
     <li>
         <label for="location">Location:</label><br>
         <input tabindex="2" type="text" required
-            id="location" name="location" value="" >
+        id="location" name="location" placeholder="Required"
+        value="<?=$options->getDefault("", "defaultlocation")?>" >
     </li>
     <li>
         <label for="liturgical_name">Liturgical Name:</label><br>
