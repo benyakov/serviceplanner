@@ -1,0 +1,7 @@
+.git
+css/custom.css
+vendor
+components
+composer.phar
+*.swp
+*.swo
