@@ -210,14 +210,26 @@ class LectionaryImporter extends FormImporter {
                 exit(0);
             }
         }
+        $qcheck = $db->prepare("SELECT COUNT(*)
+            FROM `{$db->getPrefix()}churchyear_synonyms`
+            WHERE `synonym` = :check");
+        $check_day = NULL;
+        $qcheck->bindParam(":check", $check_day);
         while ($record = $this->getRecord()) {
             foreach ($thisrec as $key=>&$value) {
                 $value = $record[$key];
             }
-            if (! $q->execute()) die(array_pop($q->errorInfo()));
+            $check_day = $thisrec["Dayname"];
+            $qcheck->execute() or die(array_pop($qcheck->errorInfo()));
+            if ($qcheck->fetchColumn(0) < 1) {
+                $unknowns[] = $check_day;
+                continue;
+            }
+            $q->execute() or die(array_pop($q->errorInfo()));
         }
         $db->commit();
-        setMessage("Lectionary imported.");
+        setMessage("Lectionary imported. Unrecognized Days: ["
+            . implode(", ", $unknowns) . "]");
         header("Location: admin.php");
         exit(0);
     }
