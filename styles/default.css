@@ -699,6 +699,9 @@ tr.propers {
     page-break-before: avoid;
     page-break-inside: avoid;
 }
+tr.propers p {
+    vertical-align: middle;
+}
 /* Jquery tweaks */
 
 .ui-widget {
