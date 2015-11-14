@@ -432,11 +432,18 @@ function openMsgViewer() {
         if (! messages) {
             messages = ["No messages."];
         }
-        var display = "";
-        for (var i = 0, len = messages.length; i < len; i++) {
+        var display = '<form><button id="clearMessages">Clear Messages</button></form>';
+        display += "<p>(Most recent at the top.)</p>";
+        for (var i = messages.length-1; i > -1; i--) {
             display += "<p>"+messages[i]+"</p>";
         }
         $("#msgdialog").html(display);
+        $("#clearMessages").click(function() {
+            localStorage.removeItem('messages');
+            $("#msgdialog").dialog("close");
+            $(this).attr('data-state', "closed");
+            return;
+        });
         $("#msgdialog").dialog({title: "Message Viewer",
             width: $(window).width()*0.5,
             maxHeight: $(window).height()*0.9,

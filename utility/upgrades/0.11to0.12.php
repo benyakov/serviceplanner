@@ -44,7 +44,8 @@ $dbstate->save() or die("Problem saving dbstate file.");
 unset($dbstate);
 $rm[] = "Upgraded to {$newversion}";
 setMessage(implode("<br />\n", $rm));
-setMessage("Important: This version adds weekly graduals, but to use it, you must next: (1) 'Restore church year to default' and (2) 'Manually re-create synonym coordination views' on the Housekeeping tab (.../admin.php). BACK UP ALL CUSTOM LECTIONARIES/COLLECTS/ETC. FIRST!");
+setMessage("Important: This version adds weekly graduals, but to use it, you must next: (1) 'Restore church year to default' and (2) 'Manually re-create synonym coordination views' on the Housekeeping tab (.../admin.php). BACK UP ALL CUSTOM LECTIONARIES/COLLECTS/ETC. FIRST! These are not done automatically in case you have customized, unsaved Church Year data.");
 setMessage("Please contact me (jmatjac@gmail.com) if you run into trouble.");
 setMessage("To see previous messages, click 'Review Messages' above.");
+header("Location: admin.php");
 ?>
