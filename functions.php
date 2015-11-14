@@ -124,7 +124,12 @@ function rawQuery($where=array(), $order="", $limit="") {
     d.servicenotes, n.title, d.block,
     b.label AS blabel, b.notes AS bnotes,
     cyp.color AS color, cyp.theme AS theme, cyp.introit AS introit,
-    cyp.gradual AS gradual, cyp.note AS propersnote,
+    (CASE b.weeklygradual
+        WHEN '1' THEN cyp.weeklygradual
+        ELSE cyp.seasonalgradual
+        END)
+        AS gradual,
+    cyp.note AS propersnote,
     (smr.bibletext IS NOT NULL) AS has_sermon,
     COALESCE(l1s.lesson1, l1s.l1series) AS blesson1,
     COALESCE(l2s.lesson2, l2s.l2series) AS blesson2,
@@ -514,10 +519,14 @@ function get_style($filename) {
 function showMessage() {
     global $sprefix;
     if (array_key_exists('message', $_SESSION[$sprefix])) { ?>
-        <div id="message"><?
-        foreach ($_SESSION[$sprefix]['message'] as $msg)
-            echo "<div>{$msg}</div>\n";
-        ?></div>
+        <script type="text/javascript">
+            $(document).ready(function() {
+            <? foreach ($_SESSION[$sprefix]['message'] as $msg) {
+                $safemsg = str_replace('"', '\"', $msg); ?>
+                setMessage("<?=$safemsg?>");
+            <? } ?>
+            });
+        </script>
         <? unset($_SESSION[$sprefix]['message']);
     }
 }
@@ -573,6 +582,7 @@ function getUserActions($bare=false) {
         $actions[] = '<a href="resetpw.php"
         title="Reset Password">Reset Password</a>';
     }
+    $actions[] = '<a href="#" id="seemessages" title="Review Messages">Review Messages</a>';
     $stactions = implode(' | ', $actions);
     if ($bare) {
         return $stactions;
@@ -739,6 +749,7 @@ function pageHeader($displayonly=false) { ?>
     } ?>
     <?showMessage();?>
     </div>
+    <div id="msgdialog"></div>
     </header> <?
 }
 function siteTabs($auth, $basename=false, $displayonly=false) {

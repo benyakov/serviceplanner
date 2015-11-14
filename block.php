@@ -182,6 +182,9 @@ function blockPlanForm($vals=array()) {
     <td><input name="smcustom" id="smcustom" value="<?=$vals['smcustom']?>"></td></tr>
     </table>
     </section>
+    <p><input type="checkbox" name="weeklygradual" id="weeklygradual"
+        <?=$vals['weeklygradual']?"checked":""?> value="use">
+    <label for="dailygradual">Show Weekly Gradual rather than Seasonal Gradual</label></p>
     <label for="notes">Block Notes</label><br>
     <textarea name="notes" id="notes"><?=$vals['notes']?$vals['notes']:''?></textarea><br>
     <button type="submit">Submit</button>
@@ -206,26 +209,32 @@ if ($_POST['label']) {
     if ("custom" == $_POST['golect']) $_POST['goseries'] = $_POST['gocustom'];
     if ("custom" == $_POST['pslect']) $_POST['psseries'] = $_POST['pscustom'];
     if ("custom" == $_POST['smlect']) $_POST['smseries'] = $_POST['smcustom'];
+    if (isset($_POST['weeklygradual']) && "use" == $_POST['weeklygradual'])
+        $_POST['weeklygradual'] = true;
+    else
+        $_POST['weeklygradual'] = false;
     $binding = array($_POST['label'], $_POST['startdate'],
         $_POST['enddate'], $_POST['notes'], $_POST['l1lect'],
         $_POST['l1series'], $_POST['l2lect'], $_POST['l2series'],
         $_POST['golect'], $_POST['goseries'], $_POST['pslect'],
         $_POST['psseries'], $_POST['colect'], $_POST['coclass'],
-        $_POST['smtype'], $_POST['smlect'], $_POST['smseries']);
+        $_POST['smtype'], $_POST['smlect'], $_POST['smseries'],
+        $_POST['weeklygradual']);
     if ($_POST['id']) { // Update existing record
         array_push($binding, $_POST['id']);
         $q = $db->prepare("UPDATE `{$db->getPrefix()}blocks`
             SET label = ?, blockstart = ?, blockend = ?, notes = ?,
             l1lect = ?, l1series = ?, l2lect = ?, l2series = ?,
             golect = ?, goseries = ?, pslect = ?, psseries = ?,
-            colect = ?, coclass = ?, smtype = ?, smlect = ?, smseries = ?
+            colect = ?, coclass = ?, smtype = ?, smlect = ?, smseries = ?,
+            weeklygradual = ?
             WHERE id = ?");
     } else { // Create new record
         $q = $db->prepare("INSERT INTO `{$db->getPrefix()}blocks`
             (label, blockstart, blockend, notes, l1lect, l1series, l2lect,
             l2series, golect, goseries, pslect, psseries, colect, coclass,
-            smtype, smlect, smseries)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+            smtype, smlect, smseries, weeklygradual)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
     }
     if (! $q->execute($binding)) {
         setMessage("Problem saving block:" . array_pop($q->errorInfo()));
@@ -256,8 +265,8 @@ if ($_GET['action'] == "edit" && $_GET['id']) {
     }
     $q = $db->prepare("SELECT
         DATE_FORMAT(blockstart, '%Y-%m-%d') AS blockstart,
-        DATE_FORMAT(blockend, '%Y-%m-%d') AS blockend, label, notes, l1lect,
-        l1series, l2lect, l2series, golect, goseries, pslect, psseries,
+        DATE_FORMAT(blockend, '%Y-%m-%d') AS blockend, label, notes, weeklygradual,
+        l1lect, l1series, l2lect, l2series, golect, goseries, pslect, psseries,
         colect, coclass, smlect, smseries, id FROM `{$db->getPrefix()}blocks`
         WHERE id = ?");
     if ($q->execute(array($_GET['id'])) && $row = $q->fetch(PDO::FETCH_ASSOC)) {
@@ -574,7 +583,7 @@ applicable block plan when they are created or edited.</p>
     <table id="block-listing">
     <?
 $q = $db->prepare("SELECT DATE_FORMAT(blockstart, '%c/%e/%Y') AS blockstart,
-    DATE_FORMAT(blockend, '%c/%e/%Y') AS blockend, label, notes, l1lect,
+    DATE_FORMAT(blockend, '%c/%e/%Y') AS blockend, label, weeklygradual, notes, l1lect,
     l1series, l2lect, l2series, golect, goseries, pslect, psseries,
     colect, coclass, smtype, smlect, smseries, id
     FROM `{$db->getPrefix()}blocks` AS b
@@ -588,7 +597,9 @@ if ($q->execute()) {
         <td colspan="2"><?=$row['blockstart']?> to <?=$row['blockend']?></td>
         <td colspan="3"><?=$row['label']?>
         <div class="quicklinks"><a title="edit" href="" data-id="<?=$row['id']?>" class="edit">Edit</a>
-        <a title="delete" href="" data-label="<?=$row['label']?>" data-id="<?=$row['id']?>" class="delete">Delete</a></div></td><td></td></tr>
+        <a title="delete" href="" data-label="<?=$row['label']?>" data-id="<?=$row['id']?>" class="delete">Delete</a></div></td>
+        <td class="blocknotes">Gradual:<br>
+            <?=$row['weeklygradual']?"weekly":"seasonal"?></td></tr>
     <tr><td class="otcell"><b>Lesson 1:</b>
         <?=showLesson($row['l1lect'], $row['l1series'])?></td>
         <td class="epcell"><b>Lesson 2:</b>

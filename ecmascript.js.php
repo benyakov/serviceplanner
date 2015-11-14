@@ -290,13 +290,20 @@ function logout(evt) {
 
 function setMessage(msg) {
     var timestamp = (new Date).toTimeString();
+    if (localStorage.getItem('messages')) {
+        var msgs = JSON.parse(localStorage.getItem('messages'));
+    } else {
+        var msgs = [];
+    }
+    msgs.push(msg);
+    localStorage.setItem('messages', JSON.stringify(msgs));
     if ($("#message").length > 0) {
         $("#message").html(timestamp + " " + msg).slideDown()
-        .delay(5000).slideUp();
+        .delay(8000).slideUp();
     } else {
         $("body>header").append('<div id="message">'+
             timestamp+" "+msg+'</div>');
-        $("#message").delay(5000).slideUp();
+        $("#message").delay(8000).slideUp();
     }
 }
 
@@ -415,6 +422,29 @@ function openStyler() {
     }
 }
 
+function openMsgViewer() {
+    if ($(this).attr('data-state') == "open") {
+        $("#msgdialog").dialog("close");
+        $(this).attr('data-state', "closed");
+    } else {
+        $(this).attr('data-state', "open");
+        var messages = JSON.parse(localStorage.getItem("messages"));
+        if (! messages) {
+            messages = ["No messages."];
+        }
+        var display = "";
+        for (var i = 0, len = messages.length; i < len; i++) {
+            display += "<p>"+messages[i]+"</p>";
+        }
+        $("#msgdialog").html(display);
+        $("#msgdialog").dialog({title: "Message Viewer",
+            width: $(window).width()*0.5,
+            maxHeight: $(window).height()*0.9,
+            position: "center"
+        });
+    }
+}
+
 function updateCSS() {
     localStorage.setItem("basefont", $("#basefont").val());
     localStorage.setItem("hymnfont", $("#hymnfont").val());
@@ -522,7 +552,8 @@ $(document).ready(function() {
         submitLogin();
     });
     $("#openstyler").click(openStyler);
-    $("#message").delay(5000).slideUp();
+    $("#message").delay(8000).slideUp();
+    $("#seemessages").click(openMsgViewer);
     setCSSTweaks();
 });
 

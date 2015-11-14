@@ -1,6 +1,6 @@
 Pentecost second,Pentecost Monday,Pentecost second
-Trinity,Trinity Sunday,Trinity
-All Saints' Day,All Saints' Day,All Saints Day
+Trinity,Trinity Sunday,Trinity,Holy Trinity
+All Saints' Day,All Saints' Day,All Saints Day,All Saints
 Quinquagesima,Quinquagesima
 Baptism of Jesus,Baptism of Jesus,Baptism of our Lord
 Sexagesima,Sexagesima
@@ -13,9 +13,9 @@ Wednesday of Holy Week,Wednesday of Holy Week
 Maundy Thursday,Maundy Thursday
 Good Friday,Good Friday
 Holy Saturday,Holy Saturday
-Michaelmas,St. Michael's Day,Michaelmas
+Michaelmas,St. Michael's Day,Michaelmas,St. Michael and All Angels
 Tuesday of Holy Week,Tue./Holy Week,Tuesday of Holy Week
-Annunciation,Annunciation to the Virgin Mary,Annunciation
+Annunciation,Annunciation to the Virgin Mary,Annunciation,Annunciation of Our Lord
 Monday of Holy Week,Mon./Holy Week,Monday of Holy Week
 Epiphany,The Manifestation of Christ to the Gentiles,Epiphany
 Ascension,Ascension Sunday,Ascension
@@ -48,6 +48,11 @@ Lent 4,Laetare,Lent 4
 Lent 3,Oculi,Lent 3
 Lent 2,Reminiscere,Lent 2
 Lent 1,Invocavit,Lent 1
+Lent Midweek 1,Lent Midweek 1
+Lent Midweek 2,Lent Midweek 2
+Lent Midweek 3,Lent Midweek 3
+Lent Midweek 4,Lent Midweek 4
+Lent Midweek 5,Lent Midweek 5
 Epiphany 1,Epiphany 1
 Epiphany 2,Epiphany 2
 Epiphany 3,Epiphany 3
@@ -79,12 +84,12 @@ Trinity 21,Trinity 21,Pentecost 22
 Trinity 22,Trinity 22,Pentecost 23
 Trinity 23,Trinity 23,Pentecost 24
 Trinity 24,Trinity 24,Pentecost 25
-Third Last,Trinity 25,Third Last,Pentecost 26
-Second Last,Trinity 26,Second Last,Pentecost 27
+Third Last,Trinity 25,Third Last,Pentecost 26,3rd to Last Sunday
+Second Last,Trinity 26,Second Last,Pentecost 27,2nd to Last Sunday
 Last,Last,Trinity 27,Pentecost 28
 Presentation,Presentation of our Lord,Presentation
 Transfiguration,Last Sunday after Epiphany,Transfiguration
-Festival of the Reformation,Reformation Day,Festival of the Reformation
+Festival of the Reformation,Reformation Day,Festival of the Reformation,Reformation
 St. James of Jerusalem,St. James of Jerusalem
 St. Thomas the Apostle,St. Thomas the Apostle,Thomas
 "St. John, Apostle and Evangelist","St. John, Apostle and Evangelist",John the Apostle

@@ -711,3 +711,12 @@ ul#adjusterlocations {
     margin: 0px;
 }
 
+span.congregation {
+    font-weight: bold;
+    padding-left: .5em;
+}
+
+span.liturgist {
+    font-weight: normal;
+    padding: 0pt;
+}

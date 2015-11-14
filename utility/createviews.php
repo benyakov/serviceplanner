@@ -36,7 +36,7 @@ $q->execute() or die(array_pop($q->errorInfo()));
 $q = $dbh->exec("DROP VIEW IF EXISTS `{$dbp}synpropers`");
 $q = $dbh->prepare("CREATE VIEW `{$dbp}synpropers` AS
     SELECT s.synonym AS dayname, p.color, p.theme, p.introit, p.note,
-    COALESCE(p.gradual, g.gradual) AS gradual
+    p.gradual AS weeklygradual, g.gradual AS seasonalgradual
     FROM `{$dbp}churchyear_propers` AS p
     RIGHT JOIN `{$dbp}churchyear_synonyms` AS s ON (p.dayname = s.canonical)
     LEFT JOIN `{$dbp}churchyear` AS cy ON (p.dayname = cy.dayname)

@@ -155,6 +155,7 @@ CREATE TABLE `blocks` (
   `blockend` date,
   `label` varchar(128),
   `notes` text,
+  `weeklygradual` boolean default TRUE,
   `l1lect` varchar(56),
   `l1series` varchar(64),
   `l2lect` varchar(56),
