@@ -29,7 +29,7 @@ function propersForm($dayname) {
     $q = $dbh->prepare("SELECT pr.color, pr.theme, pr.introit, pr.note,
         pr.gradual, l.lesson1, l.lesson2, l.gospel, l.psalm, l.s2lesson,
         l.s2gospel, l.s3lesson, l.s3gospel, l.id, l.lectionary, l.hymnabc,
-        l.hymn
+        l.hymn, l.note
         FROM `{$dbp}churchyear` AS cy
         RIGHT OUTER JOIN `{$dbp}churchyear_synonyms` AS s
             ON (cy.dayname = s.synonym)
@@ -46,7 +46,7 @@ function propersForm($dayname) {
             "note"=>"", "lesson1"=>"", "lesson2"=>"", "gospel"=>"",
             "psalm"=>"", "s2lesson"=>"", "s2gospel"=>"", "s3lesson"=>"",
             "s3gospel"=>"", "id"=>0, "lectionary"=>"",
-            "hymnabc"=>"", "hymn"=>"");
+            "hymnabc"=>"", "hymn"=>"", "note"=>"");
     } else {
         $pdata = ($q->fetchAll(PDO::FETCH_ASSOC));
     }
@@ -172,10 +172,11 @@ function propersForm($dayname) {
     <input type="text" value="<?=$lset['gospel']?>" name="go"></div>
     <div class="formblock"><label for="ps">Psalm</label><br>
     <input type="text" value="<?=$lset['psalm']?>" name="ps"></div>
-    <div class="formblock"><label for="habc">General Hymn</label><br>
-    <input type="text" value="<?=$lset['hymnabc']?>" name="habc"></div>
+    <div class="formblock"><label for="hymnabc">General Hymn</label><br>
+    <input type="text" value="<?=$lset['hymnabc']?>" name="hymnabc"></div>
     <div class="formblock"><label for="hymn">Series Hymn</label><br>
     <input type="text" value="<?=$lset['hymn']?>" name="hymn"></div><br>
+    <textarea class="notes" name="note"><?=$lset['note']?></textarea><br>
     <button type="submit" class="submit-lessons">Submit</button>
     <button type="reset">Reset</button>
     </div>
@@ -224,6 +225,7 @@ function propersForm($dayname) {
     <input type="text" value="" name="habc"></div>
     <div class="formblock"><label for="hymn">Series Hymn</label><br>
     <input type="text" value="" name="hymn"></div><br>
+    <textarea class="notes" name="note"></textarea><br>
     <button type="submit" class="submit-lessons">Submit</button>
     <button type="reset">Reset</button>
     </div>

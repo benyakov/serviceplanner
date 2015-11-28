@@ -366,6 +366,15 @@ if ("blockitems" == $_GET['get'] && is_numeric($_GET['id']) && $_GET['day']) {
             WHERE cci.dayname=:dayname AND cci.lectionary=b.colect
             AND cyc.class=b.coclass
         LIMIT 1) AS bcollect,
+        (SELECT note FROM `{$db->getPrefix()}synlessons` AS cl
+            WHERE cl.dayname=:dayname AND cl.lectionary=b.smlect
+            LIMIT 1) AS smtextnote,
+        (SELECT hymnabc FROM `{$db->getPrefix()}synlessons` AS cl
+            WHERE cl.dayname=:dayname AND cl.lectionary=b.smlect
+            LIMIT 1) AS smhymnabc,
+        (SELECT hymn FROM `{$db->getPrefix()}synlessons` AS cl
+            WHERE cl.dayname=:dayname AND cl.lectionary=b.smlect
+            LIMIT 1) AS smhymn,
         b.l1lect != \"custom\" AS l1link,
         b.l2lect != \"custom\" AS l2link,
         b.golect != \"custom\" AS golink,
@@ -384,14 +393,17 @@ if ("blockitems" == $_GET['get'] && is_numeric($_GET['id']) && $_GET['day']) {
             linkbgw($cfg, $row['blesson2'], $row['l2link'], true)),
         "Gospel"=>bibleLinkOrHelp($row['bgospel'],
             linkbgw($cfg, $row['bgospel'], $row['golink'], true)),
-        "Sermon"=>bibleLinkOrHelp($row['bsermon'],
-            linkbgw($cfg, $row['bsermon'], $row['smlink'], true)),
         "Psalm"=>bibleLinkOrHelp($row['bpsalm'],
             linkbgw($cfg, "Psalm ".$row['bpsalm'], $row['pslink'], true)),
-        "Collect"=>bibleLinkOrHelp($row['bcollect'], $row['bcollect'])
+        "Sermon"=>bibleLinkOrHelp($row['bsermon'],
+            linkbgw($cfg, $row['bsermon'], $row['smlink'], true)),
+        "Collect"=>bibleLinkOrHelp($row['bcollect'], $row['bcollect']),
+        "Sermon Text Note"=>translate_markup($row['smtextnote']),
+        "Sermon Day Hymn"=>$row['smhymnabc'],
+        "Sermon Hymn" =>$row['smhymn']
     );
         unset($cfg);
-        if ($row['notes']) $rv["Notes"] = $row['notes'];
+        if ($row['notes']) $rv["Block Notes"] = $row['notes'];
         echo json_encode($rv);
     } else {
         echo array_pop($q->errorInfo());
@@ -596,7 +608,7 @@ if ($q->execute()) {
     <tr class="heading">
         <td colspan="2"><?=$row['blockstart']?> to <?=$row['blockend']?></td>
         <td colspan="3"><?=$row['label']?>
-        <div class="quicklinks"><a title="edit" href="" data-id="<?=$row['id']?>" class="edit">Edit</a>
+        <div class="blocklinks"><a title="edit" href="" data-id="<?=$row['id']?>" class="edit">Edit</a>
         <a title="delete" href="" data-label="<?=$row['label']?>" data-id="<?=$row['id']?>" class="delete">Delete</a></div></td>
         <td class="blocknotes">Gradual:<br>
             <?=$row['weeklygradual']?"weekly":"seasonal"?></td></tr>

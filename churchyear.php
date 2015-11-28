@@ -633,9 +633,10 @@ if ($_POST['lessontype'] == "ilcw") {
     $q = $db->prepare("UPDATE `{$dbp}churchyear_lessons` SET
        lesson1=?, lesson2=?, gospel=?, psalm=?,
        s2lesson='', s2gospel='', s3lesson='', s3gospel='',
-       hymnabc=?, hymn=?  WHERE id=?");
+       hymnabc=?, hymn=?, note=?  WHERE id=?");
     if (! $q->execute(array($_POST['l1'], $_POST['l2'], $_POST['go'],
-        $_POST['ps'], $_POST['hymnabc'], $_POST['hymn'], $_POST['lessons'])))
+        $_POST['ps'], $_POST['hymnabc'], $_POST['hymn'],
+        $_POST['note'], $_POST['lessons'])))
     {
         $rv = array(false, "Problem updating propers: ".
             array_pop($q->errorInfo()));
@@ -655,11 +656,11 @@ if ($_POST['lessons'] == "New") {
         exit(0);
     }
     $q = $db->prepare("INSERT INTO `{$dbp}churchyear_lessons`
-        (dayname, lectionary, lesson1, lesson2, gospel, psalm, hymnabc, hymn)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
+        (dayname, lectionary, lesson1, lesson2, gospel, psalm, hymnabc, hymn, note)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
     if (! $q->execute(array($_POST['dayname'], $_POST['lectionary'],
         $_POST['l1'], $_POST['l2'], $_POST['go'], $_POST['ps'], $_POST['habc'],
-        $_POST['hymn'])))
+        $_POST['hymn'], $_POST['note'])))
     {
         $rv = array(false,
             "Problem saving new lessons.  "

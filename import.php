@@ -182,14 +182,14 @@ class LectionaryImporter extends FormImporter {
         // Create records for new lessons
         $q = $db->prepare("INSERT INTO `{$db->getPrefix()}churchyear_lessons`
             (lectionary, dayname, lesson1, lesson2, gospel, psalm,
-            s2lesson, s2gospel, s3lesson, s3gospel, hymnabc, hymn)
+            s2lesson, s2gospel, s3lesson, s3gospel, hymnabc, hymn, note)
             VALUES
             (:lectionary, :dayname, :lesson1, :lesson2, :gospel, :psalm,
-            :s2lesson, :s2gospel, :s3lesson, :s3gospel, :hymnabc, :hymn)");
+            :s2lesson, :s2gospel, :s3lesson, :s3gospel, :hymnabc, :hymn, :note)");
         $thisrec = array("Dayname"=>NULL, "Lesson 1"=>NULL, "Lesson 2"=>NULL,
             "Gospel"=>NULL, "Psalm"=>NULL, "Series 2 Lesson"=>NULL,
             "Series 2 Gospel"=>NULL, "Series 3 Lesson"=>NULL,
-            "Series 3 Gospel"=>NULL, "Week Hymn"=>NULL, "Year Hymn"=>NULL);
+            "Series 3 Gospel"=>NULL, "Week Hymn"=>NULL, "Year Hymn"=>NULL, "Note"=>NULL);
         $q->bindParam(":lectionary", $_POST['lectionary_name']);
         $q->bindParam(":dayname", $thisrec["Dayname"]);
         $q->bindParam(":lesson1", $thisrec["Lesson 1"]);
@@ -202,6 +202,7 @@ class LectionaryImporter extends FormImporter {
         $q->bindParam(":s3gospel", $thisrec["Series 3 Gospel"]);
         $q->bindParam(":hymnabc", $thisrec["Week Hymn"]);
         $q->bindParam(":hymn", $thisrec["Year Hymn"]);
+        $q->bindParam(":note", $thisrec["Note"]);
         // Verify that the CSV file contains the appropriate fields
         foreach ($this->getKeys() as $fieldname) {
             if (! array_key_exists($fieldname, $thisrec)) {
@@ -228,8 +229,10 @@ class LectionaryImporter extends FormImporter {
             $q->execute() or die(array_pop($q->errorInfo()));
         }
         $db->commit();
-        setMessage("Lectionary imported. Unrecognized Days: ["
-            . implode(", ", $unknowns) . "]");
+        if (count($unknowns)) {
+            $unrecognized = " Unrecognized Days: [" . implode(", ", $unknowns) . "]";
+        } else $unrecognized = "";
+        setMessage("Lectionary imported.{$unrecognized}");
         header("Location: admin.php");
         exit(0);
     }

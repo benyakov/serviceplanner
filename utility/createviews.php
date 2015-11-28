@@ -29,7 +29,7 @@ $q = $dbh->exec("DROP VIEW IF EXISTS `{$dbp}synlessons`");
 $q = $dbh->prepare("CREATE VIEW `{$dbp}synlessons` AS
     SELECT s.synonym AS dayname, l.lectionary, l.lesson1, l.lesson2,
     l.gospel, l.psalm, l.s2lesson, l.s2gospel, l.s3lesson, l.s3gospel,
-    l.hymnabc, l.hymn
+    l.hymnabc, l.hymn, l.note
     FROM `{$dbp}churchyear_lessons` AS l
     RIGHT JOIN `{$dbp}churchyear_synonyms` AS s ON (l.dayname = s.canonical)");
 $q->execute() or die(array_pop($q->errorInfo()));

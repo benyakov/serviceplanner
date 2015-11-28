@@ -125,8 +125,8 @@ function fill_lessons($db) {
     $headings = fgetcsv($fh);
     $ql = $db->prepare("INSERT INTO {$db->getPrefix()}churchyear_lessons
         (dayname, lectionary, lesson1, lesson2, gospel, psalm,
-        s2lesson, s2gospel, s3lesson, s3gospel, hymnabc, hymn)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+        s2lesson, s2gospel, s3lesson, s3gospel, hymnabc, hymn, note)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
     while (($record = fgetcsv($fh)) != FALSE) {
         $dict = array_combine($headings, $record);
         $ql->bindValue(1, $dict['dayname'], paramStrNull($dict['dayname']));
@@ -141,6 +141,7 @@ function fill_lessons($db) {
         $ql->bindValue(10, $dict['s3gospel'], paramStrNull($dict['s3gospel']));
         $ql->bindValue(11, $dict['hymnabc'], paramStrNull($dict['hymnabc']));
         $ql->bindValue(12, $dict['hymn'], paramStrNull($dict['hymn']));
+        $ql->bindValue(13, $dict['note'], paramStrNull($dict['hymn']));
         $ql->execute() or die(__FILE__.":".__LINE__.$dict['dayname']);
     }
     fclose($fh);

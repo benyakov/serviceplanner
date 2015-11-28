@@ -165,7 +165,7 @@ if ($_GET['lectionary']) {
     }
     $q = $db->prepare("SELECT `cl`.`dayname`, `lesson1`, `lesson2`,
         `gospel`, `psalm`, `s2lesson`, `s2gospel`, `s3lesson`, `s3gospel`,
-        `hymnabc`, `hymn` FROM `{$db->getPrefix()}churchyear_lessons` AS cl
+        `hymnabc`, `hymn`, `note` FROM `{$db->getPrefix()}churchyear_lessons` AS cl
         JOIN `{$db->getPrefix()}churchyear` as cy
             ON (cl.dayname = cy.dayname)
         LEFT OUTER JOIN `{$db->getPrefix()}churchyear_order` AS cyo
@@ -180,7 +180,7 @@ if ($_GET['lectionary']) {
     }
     $fieldnames = array("Dayname", "Lesson 1", "Lesson 2", "Gospel", "Psalm",
         "Series 2 Lesson", "Series 2 Gospel", "Series 3 Lesson",
-        "Series 3 Gospel", "Week Hymn", "Year Hymn");
+        "Series 3 Gospel", "Week Hymn", "Year Hymn", "Note");
     $csvex = new CSVExporter($q, $lectname, "utf-8", $fieldnames);
     $csvex->export();
     $db->commit();
