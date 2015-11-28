@@ -50,5 +50,5 @@ $dbstate->save() or die("Problem saving dbstate file.");
 unset($dbstate);
 $rm[] = "Upgraded to {$newversion}";
 setMessage(implode("<br />\n", $rm));
-header("Location: admin.php");
+header("Location: admin.php?flag=create-views");
 ?>
