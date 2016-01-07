@@ -550,6 +550,7 @@ div#block-info {
     float: right;
     display: block;
     width: 350px;
+    background-color: rgb(239,239,253);
 }
 div#block-info div {
     border: thin solid green;
