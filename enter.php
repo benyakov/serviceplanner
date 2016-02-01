@@ -173,7 +173,7 @@ if (array_key_exists("date", $_POST)) {
     You can use <a href="http://michelf.com/projects/php-markdown/concepts/">Markdown syntax</a>
     to format the service notes.</p>
     </header>
-    <form action="http://<?=$this_script?>" method="post">
+    <form action="<?=$protocol?>://<?=$this_script?>" method="post">
     <section id="existing-services">
     </section>
     <section id="service-items">

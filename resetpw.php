@@ -68,7 +68,7 @@ application at {$_SERVER['HTTP_HOST']}.  If it was not you, you can safely
 ignore this message.
 
 To reset the password for {$row['username']}, use this link:
-http://{$serverdir}/useradmin.php?flag=reset&auth={$resetkey}
+{$protocol}://{$serverdir}/useradmin.php?flag=reset&auth={$resetkey}
 
 The link will expire after six days.
 EOM

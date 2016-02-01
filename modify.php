@@ -254,7 +254,7 @@ if (checkContentReq()) {
 services, with all associated hymns at that location. To delete only certain
 hymns, edit the service using the "Edit" link.  To create or edit a sermon plan
 for that service, use the "Sermon" link.</p>
-<form action="http://<?=$this_script?>" method="GET">
+<form action="<?=$protocol?>://<?=$this_script?>" method="GET">
 <input type="checkbox" id="allfuture" name="allfuture" value="checked" <?=$allfuture?>>
 <label for="allfuture">Include all future services.</label>
 <label for="lowdate">From</label>

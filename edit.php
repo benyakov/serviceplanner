@@ -48,7 +48,7 @@ if (! array_key_exists("stage", $_GET))
         $q->execute(array($_GET['id'])) or die(array_pop($q->errorInfo()));
         $row = $q->fetch(PDO::FETCH_ASSOC);
         ?>
-        <form action="http://<?=$this_script?>?stage=2" method="POST">
+        <form action="<?=$protocol?>://<?=$this_script?>?stage=2" method="POST">
         <button type="submit" value="Commit">Commit</button>
         <button type="reset">Reset</button>
         <input type="hidden" id="id" name="id" value="<?=$_GET['id']?>">

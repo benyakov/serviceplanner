@@ -78,7 +78,7 @@ if ((! array_key_exists("stage", $_GET)) || $ajax) {
         }
         $db->commit();
         ?>
-        <form action="http://<?=$this_script."?stage=2"?>" method="POST">
+        <form action="<?=$protocol?>://<?=$this_script."?stage=2"?>" method="POST">
         <button type="submit">Confirm</button>
         </form>
     <? if (! $ajax) { ?>

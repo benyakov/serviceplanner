@@ -87,10 +87,10 @@ if (! array_key_exists('stage', $_GET)) {
     $row = $q->fetch(PDO::FETCH_ASSOC);
 
     if ($row['mstype']) { ?>
-        <div id="manuscript-link"><a href="http://<?=$this_script."?manuscript=1&id=".$id?>">Download Manuscript</a> (<?=$row['mstype']?>)</div>
+        <div id="manuscript-link"><a href="<?=$protocol?>://<?=$this_script."?manuscript=1&id=".$id?>">Download Manuscript</a> (<?=$row['mstype']?>)</div>
     <? } ?>
         <div id="sermondata">
-        <form action="http://<?=$this_script?>?stage=2" method="POST"
+        <form action="<?=$protocol?>://<?=$this_script?>?stage=2" method="POST"
             enctype="multipart/form-data">
         <input type="hidden" id="service" name="service" value="<?=$id?>">
         <label for="manuscript_file">Upload new manuscript:</label><br />
@@ -178,5 +178,5 @@ if (! array_key_exists('stage', $_GET)) {
     fclose($fp);
     $now = strftime('%T');
     setMessage("Sermon plans saved at {$now} server time.");
-    header("Location: http://{$this_script}?id={$_POST['service']}");
+    header("Location: {$protocol}://{$this_script}?id={$_POST['service']}");
 }

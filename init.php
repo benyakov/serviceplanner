@@ -23,6 +23,9 @@
     The Dalles, OR 97058
     USA
  */
+$protocol = substr(
+    $_SERVER['SERVER_PROTOCOL'], 0,
+    strpos($_SERVER['SERVER_PROTOCOL'], '/'));
 $thisdir = __DIR__;
 $serverdir = dirname($_SERVER['PHP_SELF']);
 chdir($thisdir);
