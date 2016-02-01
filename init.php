@@ -23,9 +23,11 @@
     The Dalles, OR 97058
     USA
  */
-$protocol = substr(
-    $_SERVER['SERVER_PROTOCOL'], 0,
-    strpos($_SERVER['SERVER_PROTOCOL'], '/'));
+if (empty($_SERVER['HTTPS']) || 'off' == $_SERVER['HTTPS']) {
+    $protocol = "http";
+} else {
+    $protocol = "https";
+}
 $thisdir = __DIR__;
 $serverdir = dirname($_SERVER['PHP_SELF']);
 chdir($thisdir);
