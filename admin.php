@@ -30,7 +30,7 @@ if (! $auth) {
     header('Location: index.php');
     exit(0);
 }
-$this_script = "{$protocol}//".$_SERVER['HTTP_HOST'].$_SERVER['SCRIPT_NAME'] ;
+$this_script = "{$protocol}://".$_SERVER['HTTP_HOST'].$_SERVER['SCRIPT_NAME'] ;
 if ('dellect' == $_POST['action']) {
     $db = new DBConnection();
     $q = $db->prepare("DELETE FROM `{$db->getPrefix()}churchyear_lessons`
@@ -163,25 +163,25 @@ recommended!</p>
     <dl>
         <dt>In the page header (if it's not already there), insert:</dt>
         <dd class="honorspaces">
-&lt;script type="text/javascript" src="<?=$protocol?>//ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery.min.js"&gt;&lt;/script&gt;
+&lt;script type="text/javascript" src="<?=$protocol?>://ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery.min.js"&gt;&lt;/script&gt;
         </dd>
         <dt>Where you want the listing of all records to appear in the page body, insert:</dt>
         <dd class="honorspaces">
 &lt;div id="services-import"&gt;&lt;/div&gt;
 &lt;script type="text/javascript"&gt;
-$(document).ready(function(){var a="<?=$protocol?>//<?=$_SERVER['SERVER_NAME']?>/<?=dirname($_SERVER['PHP_SELF'])?>/servicerecords.php";$("#services-import").load(a+" #content-container",function(){if(!$("#services-import").has("#content-container").length){$.ajax(a,{dataType:"jsonp",jsonp:"jsonpreq",success:function(a,b){$("#services-import").html(a)}})}})})
+$(document).ready(function(){var a="<?=$protocol?>://<?=$_SERVER['SERVER_NAME']?>/<?=dirname($_SERVER['PHP_SELF'])?>/servicerecords.php";$("#services-import").load(a+" #content-container",function(){if(!$("#services-import").has("#content-container").length){$.ajax(a,{dataType:"jsonp",jsonp:"jsonpreq",success:function(a,b){$("#services-import").html(a)}})}})})
 &lt;/script&gt;
         </dd>
         <dt>Where you want the listing of <em>future</em> hymns to appear in the page body, insert:</dt>
         <dd class="honorspaces">
 &lt;div id="services-import"&gt;&lt;/div&gt;
 &lt;script type="text/javascript"&gt;
-$(document).ready(function(){var a="<?=$protocol?>//<?=$_SERVER['SERVER_NAME']?>/<?=dirname($_SERVER['PHP_SELF'])?>/index.php";$("#services-import").load(a+" #content-container",function(){if(!$("#services-import").has("#content-container").length){$.ajax(a,{dataType:"jsonp",jsonp:"jsonpreq",success:function(a,b){$("#services-import").html(a)}})}})})
+$(document).ready(function(){var a="<?=$protocol?>://<?=$_SERVER['SERVER_NAME']?>/<?=dirname($_SERVER['PHP_SELF'])?>/index.php";$("#services-import").load(a+" #content-container",function(){if(!$("#services-import").has("#content-container").length){$.ajax(a,{dataType:"jsonp",jsonp:"jsonpreq",success:function(a,b){$("#services-import").html(a)}})}})})
 &lt;/script&gt;
         </dd>
         <dt>Finally, save your server's domain name here
         (or multiple servers' domain names, one per line),
-        like "<?=$protocol?>//www.mydomain.com":<dt>
+        like "<?=$protocol?>://www.mydomain.com":<dt>
         <dd>
 <?
     if (file_exists("corsfile.txt")) {
