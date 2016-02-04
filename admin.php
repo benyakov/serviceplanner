@@ -381,7 +381,7 @@ to have a recent backup first, at least of your church year data.</p>
         echo "{$version['major']}.{$version['minor']}.{$version['tick']}";
 ?>.  Refer to this version number, and include the address
     <?=$_SERVER['SERVER_NAME'].$_SERVER['PHP_SELF']?> when writing bug reports.  You may send them via
-    email to <a href="mailto: jmatjac@gmail.com">the author</a>.
+    email to <a href="mailto: jesse@ma-amad.com">the author</a>.
     </li>
     </ol>
 

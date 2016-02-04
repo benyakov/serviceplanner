@@ -491,15 +491,17 @@ graceful recovery from some of the problems that may arise.</p>
 
     <h2><a name="bug_reporting">Bug Reporting</a></h2>
 
-    <p>When something doesn't work right, that's a bug. Bug
-reports are welcome and appreciated. You can submit bugs in <a
-href="http://code.google.com/p/service-planner/issues/list">the issue
-tracker at Google Code</a>, or by emailing me using the link provided
-at the bottom of the Housekeeping tab. Please be as descriptive as
-possible, saying what you expected and how that's different from what
-actually happened. Also, please include the version number of your
-Service Planner, which can be found at the bottom of the Housekeeping
-tab.</p>
+    <p>When something doesn't work right, that's a bug. Bug reports are welcome
+and appreciated. You can submit bugs by emailing the author using the link
+provided at the bottom of the Housekeeping tab. Please be as descriptive as
+possible, saying what you expected and how that's different from what actually
+happened.  Also, please include the version number of your Service Planner,
+which can be found at the bottom of the Housekeeping tab. If you're not sure
+it's a bug, you can also send the same thing to
+<a mailto="ma-amad@googlegroups.com">ma-amad@googlegroups.com</a>.</p>
+
+    <p>If you'd like to help more directly with development, you don't have to
+learn how to write code. Ma-amad has an issue tracker at <a href="https://www.ma-amad.com/issues/" title="Issue tracker">www.ma-amad.com/issues</a>.
 
     <p>Some "bugs" are not really problems, but feature requests. Those
 are welcome too. With those too, please be as descriptive as possible
