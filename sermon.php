@@ -31,20 +31,22 @@ if (array_key_exists('manuscript', $_GET)) {
         WHERE service=:id");
     $q->bindParam(":id", $_GET['id']);
     $q->execute();
-    $q->bindColumn(1, $mss, PDO::PARAM_LOB);
-    $q->bindColumn(2, $mstype, PDO::PARAM_STR, 256);
-    $q->fetch(PDO::FETCH_BOUND);
-    if (! $mstype) {
+    $row = $q->fetch(PDO::FETCH_ASSOC);
+    if (! $row['manuscript']) {
         setMessage("No manuscript has been saved for this sermon.");
         header("Location: sermon.php?id={$_GET['id']}");
         exit(0);
     }
-    header("Content-type: {$mstype}");
-    header("Content-disposition: attachment; filename=sermonmanuscript");
-    if (is_string($mss))
-        echo $mss;
-    else fpassthru($mss);
-    exit(0);
+    $mss = fopen($row['manuscript'], 'rb');
+    if ($mss !== FALSE) {
+        header("Content-type: {$mstype}");
+        header("Content-disposition: attachment; filename=sermonmanuscript");
+        fpassthru($mss);
+        fclose($mss);
+        exit(0);
+    } else {
+        setMessage("There was trouble downloading your manuscript.");
+    }
 }
 if (! array_key_exists('stage', $_GET)) {
     if (! is_numeric($_GET['id'])) {
@@ -123,22 +125,34 @@ if (! array_key_exists('stage', $_GET)) {
 <?
 } elseif (2 == $_GET["stage"])
 {
+    if (is_digits($_POST['service'])) {
+        $service = str_pad($_POST['service'], 4, '0', STR_PAD_LEFT);
+    } else {
+        setMessage("Unrecognized service ID: ".htmlspecialchars($_POST['service']));
+        header("Location: {$protocol}://{$this_script}");
+    }
+    $dest = "";
     $db->beginTransaction();
+    // Move the file into the uploads archive
+    // This is handled separately from the other data updates
     $msfile = "manuscript-{$dbconnection['dbname']}.txt";
     if ((! move_uploaded_file($_FILES['manuscript_file']['tmp_name'], $msfile))
             || $_POST['deletems']) {
-        $fp = tmpfile();
         $ft = "";
     } else {
-        $fp = fopen($msfile, 'rb');
+        $dest1 = substr($service, 0, 2);
+        $dest2 = substr($service, 2, 2);
+        if (! file_exists("{$thisdir}/{$dest1}/{$dest2}/{$service}"))
+            mkdir("{$thisdir}/{$dest1}/{$dest2}/{$service}", 0750, TRUE);
+        $dest = "{$thisdir}/{$dest1}/{$dest2}/{$service}/manuscript";
+        if (file_exists($dest)) unlink($dest);
+        rename($msfile, $dest);
         $ft = $_FILES['manuscript_file']['type'];
     }
     if ($ft || $_POST['deletems']) {
-        // Update the saved file blob and type field
-        // This is handled separately from the other data updates
         $q = $db->prepare("SELECT 1 from `{$db->getPrefix()}sermons`
             WHERE service=?");
-        $q->execute(array($_POST['service']))
+        $q->execute(array($service))
             or die(array_pop($q->errorInfo()));
         $exists = $q->fetchColumn();
         if ($exists) {
@@ -150,9 +164,9 @@ if (! array_key_exists('stage', $_GET)) {
                 (manuscript, mstype, service)
                 VALUES (?, ?, ?)");
         }
-        $q->bindParam(1, $fp, PDO::PARAM_LOB);
+        $q->bindParam(1, $dest);
         $q->bindParam(2, $ft);
-        $q->bindParam(3, $_POST['service']);
+        $q->bindParam(3, $service);
         $q->execute() or die(array_pop($q->errorInfo()));
     }
     // Insert or update the sermon plans.
@@ -162,7 +176,7 @@ if (! array_key_exists('stage', $_GET)) {
     $q->bindParam(':bibletext', $_POST['bibletext']);
     $q->bindParam(':outline', $_POST['outline']);
     $q->bindParam(':notes', $_POST['notes']);
-    $q->bindParam(':id', $_POST['service']);
+    $q->bindParam(':id', $service);
     if (! $q->execute()) {
         $q = $db->prepare("UPDATE `{$db->getPrefix()}sermons`
             SET bibletext = :bibletext,
@@ -171,12 +185,12 @@ if (! array_key_exists('stage', $_GET)) {
         $q->bindParam(':bibletext', $_POST['bibletext']);
         $q->bindParam(':outline', $_POST['outline']);
         $q->bindParam(':notes', $_POST['notes']);
-        $q->bindParam(':id', $_POST['service']);
+        $q->bindParam(':id', $service);
         $q->execute() or die(array_pop($q->errorInfo()));
     }
     $db->commit();
     fclose($fp);
     $now = strftime('%T');
     setMessage("Sermon plans saved at {$now} server time.");
-    header("Location: {$protocol}://{$this_script}?id={$_POST['service']}");
+    header("Location: {$protocol}://{$this_script}?id={$service}");
 }

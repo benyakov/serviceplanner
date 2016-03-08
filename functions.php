@@ -802,5 +802,10 @@ function fillServiceTables() {
 </script>';
 }
 
+function is_digits($item) {
+    // For checking web input
+    return !preg_match("/[^0-9]/", $item);
+}
+
 // vim: set foldmethod=indent :
 ?>

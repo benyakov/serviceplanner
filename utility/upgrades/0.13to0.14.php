@@ -38,10 +38,11 @@ $q = $db->prepare("SELECT `service`, `manuscript`
 $q->execute() or die(array_pop($q->errorInfo()));
 $moved = array();
 while ($row = $q->fetch(PDO::FETCH_ASSOC)) {
-    $first = substr((string) $row['service'], 0, 2);
-    $second = substr((string) $row['service'], 2, 2);
-    $dirpath = "{$thisdir}/uploads/{$first}/{$second}/{$row['service']}";
-    mkdir($dirpath);
+    $service = str_pad($row['service'], 4, '0', STR_PAD_LEFT);
+    $first = substr((string) $service, 0, 2);
+    $second = substr((string) $service, 2, 2);
+    $dirpath = "{$thisdir}/uploads/{$first}/{$second}/{$service}";
+    if (! file_exists($dirpath)) mkdir($dirpath, 0750, TRUE);
     $fh = fopen("{$dirpath}/manuscript", "wb");
     fwrite($fh, $row['manuscript']);
     fclose($fh);
@@ -57,7 +58,7 @@ if ($moved) {
         WHERE `service` = :service");
     $q->bindParam(':path', $path);
     $q->bindParam(':service', $service);
-    foreach ($moved as ($service, $path)) {
+    foreach ($moved as list($service, $path)) {
         $q->execute or die(array_pop($q->errorInfo()));
     }
 }

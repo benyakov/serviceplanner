@@ -55,7 +55,7 @@ CREATE TABLE `sermons` (
   `bibletext` varchar(80) default NULL,
   `outline` text,
   `notes` text,
-  `manuscript` blob,
+  `manuscript` text,
   `mstype` varchar(50) default NULL,
   `service` int(10) unsigned default NULL,
   UNIQUE KEY `service` (`service`),
