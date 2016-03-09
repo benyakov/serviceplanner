@@ -37,7 +37,7 @@ if (array_key_exists('manuscript', $_GET)) {
         header("Location: sermon.php?id={$_GET['id']}");
         exit(0);
     }
-    $mss = fopen("uploads/{$row['manuscript']}", 'rb');
+    $mss = fopen("{$row['manuscript']}", 'rb');
     if ($mss !== FALSE) {
         header("Content-type: {$row['mstype']}");
         header("Content-disposition: attachment; filename=sermonmanuscript");
