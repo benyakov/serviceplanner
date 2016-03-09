@@ -37,7 +37,7 @@ if (array_key_exists('manuscript', $_GET)) {
         header("Location: sermon.php?id={$_GET['id']}");
         exit(0);
     }
-    $mss = fopen($row['manuscript'], 'rb');
+    $mss = fopen("uploads/{$row['manuscript']}", 'rb');
     if ($mss !== FALSE) {
         header("Content-type: {$row['mstype']}");
         header("Content-disposition: attachment; filename=sermonmanuscript");
@@ -142,9 +142,9 @@ if (! array_key_exists('stage', $_GET)) {
     } else {
         $dest1 = substr($service, 0, 2);
         $dest2 = substr($service, 2, 2);
-        if (! file_exists("{$thisdir}/{$dest1}/{$dest2}/{$service}"))
-            mkdir("{$thisdir}/{$dest1}/{$dest2}/{$service}", 0750, TRUE);
-        $dest = "{$thisdir}/{$dest1}/{$dest2}/{$service}/manuscript";
+        if (! file_exists("{$thisdir}/uploads/{$dest1}/{$dest2}/{$service}"))
+            mkdir("{$thisdir}/uploads/{$dest1}/{$dest2}/{$service}", 0750, TRUE);
+        $dest = "{$thisdir}/uploads/{$dest1}/{$dest2}/{$service}/manuscript";
         if (file_exists($dest)) unlink($dest);
         rename($msfile, $dest);
         $ft = $_FILES['manuscript_file']['type'];
