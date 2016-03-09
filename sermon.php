@@ -39,7 +39,7 @@ if (array_key_exists('manuscript', $_GET)) {
     }
     $mss = fopen($row['manuscript'], 'rb');
     if ($mss !== FALSE) {
-        header("Content-type: {$mstype}");
+        header("Content-type: {$row['mstype']}");
         header("Content-disposition: attachment; filename=sermonmanuscript");
         fpassthru($mss);
         fclose($mss);
@@ -189,7 +189,6 @@ if (! array_key_exists('stage', $_GET)) {
         $q->execute() or die(array_pop($q->errorInfo()));
     }
     $db->commit();
-    fclose($fp);
     $now = strftime('%T');
     setMessage("Sermon plans saved at {$now} server time.");
     header("Location: {$protocol}://{$this_script}?id={$service}");

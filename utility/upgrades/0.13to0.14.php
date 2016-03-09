@@ -58,8 +58,9 @@ if ($moved) {
         WHERE `service` = :service");
     $q->bindParam(':path', $path);
     $q->bindParam(':service', $service);
-    foreach ($moved as list($service, $path)) {
-        $q->execute or die(array_pop($q->errorInfo()));
+    foreach ($moved as $m)  {
+        list($service, $path) = $m;
+        $q->execute() or die(array_pop($q->errorInfo()));
     }
 }
 $db->commit();
