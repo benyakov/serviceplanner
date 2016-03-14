@@ -1,0 +1,24 @@
+@font-face {
+  font-family: 'Heros';
+  font-style: normal;
+  font-weight: normal;
+  src: local('Heros'), local('Heros-Regular'), url('texgyreheros-regular.otf') format('opentype');
+}
+@font-face {
+  font-family: 'Heros';
+  font-style: normal;
+  font-weight: bold;
+  src: local('Heros-Bold'), url('texgyreheros-bold.otf') format('opentype');
+}
+@font-face {
+  font-family: 'Heros';
+  font-style: italic;
+  font-weight: normal;
+  src: local('Heros-Italic'), url('texgyreheros-italic.otf') format('opentype');
+}
+@font-face {
+  font-family: 'Heros';
+  font-style: italic;
+  font-weight: bold;
+  src: local('Heros'), local('Heros-Bold-Italic'), url('texgyreheros-bolditalic.otf') format('opentype');
+}
