@@ -102,8 +102,8 @@ function querySomeHymns($limit) {
 }
 
 function queryServiceDateRange($lowdate, $highdate, $allfuture=false, $order="DESC") {
-    $where = array("d.caldate > :lowdate");
-    if (! $allfuture) $where[] = "d.caldate < :highdate";
+    $where = array("d.caldate >= :lowdate");
+    if (! $allfuture) $where[] = "d.caldate <= :highdate";
     $q = rawQuery($where, $order);
     $q->bindParam(":lowdate", $lowdate->format("Y-m-d"));
     if (! $allfuture) $q->bindParam(":highdate", $highdate->format("Y-m-d"));

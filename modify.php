@@ -259,10 +259,10 @@ for that service, use the "Sermon" link.</p>
 <label for="allfuture">Include all future services.</label>
 <label for="lowdate">From</label>
 <input type="date" id="lowdate" name="lowdate"
-    value="<?=$lowdate->format("Y-m-d")?>">
+    value="<?=$lowdate->format("m/d/Y")?>">
 <label for="highdate">To</label>
 <input type="date" id="highdate" name="highdate"
-    value="<?=$highdate->format("Y-m-d")?>">
+    value="<?=$highdate->format("m/d/Y")?>">
 <button type="submit" name="submit" value="Apply">Apply</button>
 <br>
 <?
