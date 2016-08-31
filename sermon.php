@@ -70,6 +70,12 @@ if (! array_key_exists('stage', $_GET)) {
                     $('#manuscript_file').prop('disabled', false);
                 }
             });
+            $('#delete_button').click(function(e) {
+                var c = confirm("Are you sure you want to delete this sermon plan?");
+                if (c == false) {
+                    return false;
+                }
+            });
         });
     </script>
     <? pageHeader();
@@ -93,7 +99,7 @@ if (! array_key_exists('stage', $_GET)) {
     <? } ?>
         <div id="sermondata">
         <form action="<?=$protocol?>://<?=$this_script?>?stage=2" method="POST"
-            enctype="multipart/form-data">
+            enctype="multipart/form-data" id="sermonform">
         <input type="hidden" id="service" name="service" value="<?=$id?>">
         <label for="manuscript_file">Upload new manuscript:</label><br />
         <input type="file" name="manuscript_file" id="manuscript_file"
@@ -111,8 +117,9 @@ if (! array_key_exists('stage', $_GET)) {
         <label for="notes">Notes:</label><br />
         <textarea id="notes" name="notes"
          placeholder="Include extra notes on the sermon"><?=trim($row['notes'])?></textarea><br />
-        <button type="submit" value="Commit">Commit</button>
-        <button type="reset">Reset</button>
+        <button type="submit" name="commit" value="Commit">Commit</button>
+        <button type="reset" name="reset" value="Reset">Reset</button>
+        <button type="submit" id="delete_button" name="delete" value="Delete">Delete this sermon plan</button>
         </form>
         </div>
     <?
@@ -130,6 +137,14 @@ if (! array_key_exists('stage', $_GET)) {
     } else {
         setMessage("Unrecognized service ID: ".htmlspecialchars($_POST['service']));
         header("Location: {$protocol}://{$this_script}");
+    }
+    if ($_POST['delete']) {
+        $q = $db->prepare("DELETE FROM `{$db->getPrefix()}sermons`
+            WHERE service=?");
+        $q->execute(array($service)) or die(array_pop($q->errorInfo()));
+        setMessage("Sermon plan deleted for this service.");
+        header("Location: {$protocol}://{$this_script}?id={$service}");
+        exit(0);
     }
     $dest = "";
     $db->beginTransaction();
