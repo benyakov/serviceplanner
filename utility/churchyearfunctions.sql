@@ -48,6 +48,20 @@ BEGIN
     RETURN paschalMoon + INTERVAL (8 - DAYOFWEEK(paschalMoon)) DAY;
 END;
 
+
+DROP FUNCTION IF EXISTS `{{DBP}}advent4_in_year`;
+CREATE FUNCTION `{{DBP}}advent4_in_year`(p_year INTEGER) RETURNS DATE
+DETERMINISTIC
+BEGIN
+    DECLARE wdchristmas INTEGER;
+    SET wdchristmas = DAYOFWEEK(CONCAT_WS('-', p_year, 12, 25));
+    IF wdchristmas = 1 THEN
+        RETURN CONCAT_WS('-', p_year, 12, 18);
+    ELSE
+        RETURN CONCAT_WS('-', p_year, 12, 25) - INTERVAL wdchristmas DAY;
+    END IF;
+END;
+
 DROP FUNCTION IF EXISTS `{{DBP}}christmas1_in_year`;
 CREATE FUNCTION `{{DBP}}christmas1_in_year`(p_year INTEGER) RETURNS DATE
 DETERMINISTIC
