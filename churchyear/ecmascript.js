@@ -59,21 +59,17 @@ function getDateFor(year) {
         }
     } else if ("Easter" == $("#base").val()) {
         var base = calcEaster(year);
-        base.setDate(base.getDate()+offset);
-        return base;
+    } else if ("Advent 4" == $("#base").val()) {
+        var base = calcAdvent4(year);
     } else if ("Christmas 1" == $("#base").val()) {
         var base = calcChristmas1(year);
-        base.setDate(base.getDate()+offset);
-        return base;
     } else if ("Michaelmas 1" == $("#base").val()) {
         var base = calcMichaelmas1(year);
-        base.setDate(base.getDate()+offset);
-        return base;
     } else if ("Epiphany 1" == $("#base").val()) {
         var base = calcEpiphany1(year);
-        base.setDate(base.getDate()+offset);
-        return base;
     }
+    base.setDate(base.getDate()+offset);
+    return base;
 }
 
 function setupPropers() {

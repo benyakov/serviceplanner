@@ -342,14 +342,9 @@ function calcAdvent4(year) {
 }
 function calcChristmas1(year) {
     var base = new Date(year, 11, 25); // Christmas
-    if (base.getDay() == 0) {
-        base.setDate(base.getDate() + 7)
-        return base;
-    } else {
-        var offset = new Number(7-base.getDay());
-        base.setDate(base.getDate() + offset);
-        return base;
-    }
+    var offset = new Number(7-base.getDay());
+    base.setDate(base.getDate() + offset);
+    return base;
 }
 function calcEpiphany1(year) {
     var base = new Date(year, 0, 6); // Epiphany
