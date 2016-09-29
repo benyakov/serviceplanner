@@ -58,7 +58,7 @@ BEGIN
     IF wdchristmas = 1 THEN
         RETURN CONCAT_WS('-', p_year, 12, 18);
     ELSE
-        RETURN CONCAT_WS('-', p_year, 12, 25) - INTERVAL wdchristmas DAY;
+        RETURN CONCAT_WS('-', p_year, 12, 25) - INTERVAL (wdchristmas-1) DAY;
     END IF;
 END;
 
@@ -122,6 +122,8 @@ BEGIN
             SET p_year = p_year - 1;
         END IF;
         RETURN `{{DBP}}christmas1_in_year`(p_year) + INTERVAL offset DAY;
+    ELSEIF base = "Advent 4" THEN
+        RETURN `{{DBP}}advent4_in_year`(p_year) + INTERVAL offset DAY;
     ELSEIF base = "Michaelmas 1" THEN
         RETURN `{{DBP}}michaelmas1_in_year`(p_year) + INTERVAL offset DAY;
     ELSEIF base = "Epiphany 1" THEN
