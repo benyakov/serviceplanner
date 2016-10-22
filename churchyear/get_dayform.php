@@ -51,6 +51,8 @@
             <option value="None">None</option>
             <option value="Easter"
                 <?=$specifics['base']=="Easter"?"selected=\"selected\"":""?>>Easter</option>
+            <option value="Advent 4"
+                <?=$specifics['base']=="Advent 4"?"selected=\"selected\"":""?>>Advent 4</option>
             <option value="Christmas 1"
                 <?=$specifics['base']=="Christmas 1"?"selected=\"selected\"":""?>>Christmas 1</option>
             <option value="Epiphany 1"
