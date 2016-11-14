@@ -198,6 +198,7 @@ if (array_key_exists("date", $_POST)) {
         <label for="rite">Rite or Order:</label><br>
         <input tabindex="27" type="text" id="rite" name="rite" value="">
         <input tabindex="28" type="checkbox" id="communion" name="communion">
+        <label for="communion">Communion Offered</label>
     </li>
     <li class="vcenter">
         <label for="servicenotes">Service Notes:</label><br>
