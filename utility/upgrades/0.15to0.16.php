@@ -1,5 +1,5 @@
-<? /* Record the version
-    Copyright (C) 2014 Jesse Jacobsen
+<? /* Upgrade from version 0.15 to 0.16
+    Copyright (C) 2016 Jesse Jacobsen
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -23,5 +23,26 @@
     The Dalles, OR 97058
     USA
  */
-$version = array('major' => 0, 'minor' => 16, 'tick' => 0);
+if (! (isset($newversion) && isset($oldversion))) {
+    echo "Error: This upgrade must be run automatically.";
+}
+if ("0.15." != substr($oldversion, 0, 5).'.') {
+    die("Can't upgrade from 0.15.x, since the current db version is {$oldversion}.");
+}
+
+$db = new DBConnection();
+$db->beginTransaction();
+$q = $db->prepare("ALTER TABLE `{$db->getPrefix()}days`
+    ADD COLUMN `communion` boolean default 1 AFTER `block`");
+$q->execute() or die(array_pop($q->errorInfo()));
+$db->commit();
+
+$dbstate = getDBState(true);
+$newversion = "{$version['major']}.{$version['minor']}.{$version['tick']}";
+$dbstate->set('dbversion', $newversion);
+$dbstate->save() or die("Problem saving dbstate file.");
+unset($dbstate);
+$rm[] = "Upgraded to {$newversion}";
+setMessage(implode("<br />\n", $rm));
+header("Location: admin.php?flag=create-views");
 ?>

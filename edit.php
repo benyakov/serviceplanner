@@ -67,6 +67,8 @@ if (! array_key_exists("stage", $_GET))
             <dd>
                 <input type="text" id="rite" name="rite"
                  value="<?=$row['rite']?>" size="50" maxlength="50">
+                <input type="checkbox" id="communion" name="communion"
+                 value="<?$row['communion']==1?'checked':''?>">
             </dd>
             <dt>Service Notes</dt>
             <dd>
@@ -190,7 +192,7 @@ if (! array_key_exists("stage", $_GET))
     $id = "";
     foreach ($_POST as $key => $value) {
         if (in_array($key, array("date", "dayname", "rite",
-            "servicenotes", "block")))
+            "servicenotes", "block", "communion")))
         {
             $todays[$key] = $value;
         } elseif (preg_match('/delete_(\d+)/', $key, $matches)) {
@@ -227,7 +229,7 @@ if (! array_key_exists("stage", $_GET))
     }
     // Update day information
     $q = $db->prepare("UPDATE `{$db->getPrefix()}days` SET `caldate`=:date,
-        `name`=:name, `rite`=:rite,
+        `name`=:name, `rite`=:rite, `communion`=:communion,
         `servicenotes`=:servicenotes, `block`=:block
         WHERE `pkey` = :id");
     $q->bindValue(":date", strftime("%Y-%m-%d", strtotime($todays['date'])));
@@ -235,6 +237,7 @@ if (! array_key_exists("stage", $_GET))
     $q->bindValue(":rite", $todays['rite']);
     $q->bindValue(":servicenotes", $todays['servicenotes']);
     $q->bindValue(":block", $todays['block']);
+    $q->bindValue(":communion", $todays['communion']?1:0;
     $q->bindValue(":id", $_POST['id']);
     $q->execute() or dieWithRollback($q, $q->queryString);
 
