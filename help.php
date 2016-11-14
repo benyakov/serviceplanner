@@ -110,8 +110,8 @@ may be customized by privileged users. It's available for those who need
 to print a simpler sheet of information, or one showing custom
 fields.</p>
 
-    <p>On the Service Records page (and the soon-to-be-introduced Modify
-Services page), for your convenience, there is a <a name="thisweek">Jump to
+    <p>On the Service Records page and the soon-to-be-introduced Modify
+Services page, for your convenience, there is a <a name="thisweek">Jump to
 This Week</a> link-button at the top right of the page, which will scroll the
 page to contemporary planned services.  (That's different from planned
 contemporary services, which the service planner does not support.)</p>
@@ -166,9 +166,11 @@ services or change ones you've already planned.</p>
 share the same basic format for displaying each service.</p>
 
     <p>Each service is listed under its own heading line containing the date
-and location of the service and liturgical day name.  Below that line appear
-the <em>Evangelical Lutheran Hymnary (ELH)</em>'s topical description for
-hymns on that day, as well as the liturgical color for paraments.</p>
+and location of the service and liturgical day name.  If the service is flagged
+as one where communion is offered, a boxed C appears after the liturgical day name.
+Below that line appear the <em>Evangelical Lutheran Hymnary (ELH)</em>'s
+topical description for hymns on that day, as well as the liturgical color for
+paraments.</p>
 
     <p>The actual hymns are listed line-by-line, with the abbreviation for the
 hymnbook, the number, any notes for that hymn (verse/stanza numbers, etc.), and
@@ -302,9 +304,9 @@ because it's an occasional service, I will put the occasion into the Liturgical
 Name field.  If multiple "Liturgical Name" matches were found, choose only one
 and delete the rest.  Anything could be written in this field, but the Service
 Planner uses it to find propers automatically for this service.  If the field
-does not contain a recognized liturgical name, then no propers will be found.
-(You can add new liturgical days or adjust their names on the <a
-href="#church_year">Church Year</a> tab.)</li>
+does not exactly contain a recognized liturgical name, then no propers will be
+found.  (You can add new liturgical days or adjust their names on the
+<a href="#church_year">Church Year</a> tab.)</li>
     <li>Each service can have its own notes, which may contain anything you
 like.  This would be a good place to note deviations from the printed
 liturgical rite, plan for extra things like choir pieces, or include the name
