@@ -232,9 +232,9 @@ function display_records_table($q) {
             } else {
                 $datetext = $row['date'];
             }
-            $communion = $row['communion']? '<span class="communion-icon">' : '';
+            $communion = $row['communion']? 'communion-service' : 'dry-mass';
             echo "<tr data-loc=\"{$row['location']}\" class=\"heading servicehead\"><td class=\"heavy\">{$datetext} {$row['location']}</td>
-                <td colspan=2><a name=\"service_{$row['serviceid']}\">{$row['dayname']}</a>: {$row['rite']} {$communion}".
+                <td colspan=2><span class=\"{$communion}\"><a name=\"service_{$row['serviceid']}\">{$row['dayname']}</a>: {$row['rite']}</span>".
             ($auth?
             "<a class=\"menulink\" href=\"sermon.php?id={$row['serviceid']}\">Sermon</a>
             <a class=\"menulink\" href=\"export.php?service={$row['serviceid']}\">CSV Data</a>"
@@ -333,7 +333,7 @@ function modify_records_table($q, $action) {
                 $datetext = $row['date'];
             }
             $urldate=urlencode($row['browserdate']);
-            $communion = $row['communion']? '<span class="communion-icon">' : '';
+            $communion = $row['communion']? 'communion-service' : 'dry-mass';
             echo "<tr data-loc=\"{$row['location']}\" class=\"heading servicehead\"><td>
             <input form=\"delete-service\" type=\"checkbox\" name=\"{$row['serviceid']}_{$row['location']}\" id=\"check_{$row['serviceid']}_{$row['location']}\">
             <span class=\"heavy\">{$datetext} {$row['location']}</span>
@@ -346,8 +346,9 @@ function modify_records_table($q, $action) {
             </div>
             </td>
             <td colspan=2>
+            <span class=\"{$communion}\">
             <a name=\"service_{$row['serviceid']}\">{$row['dayname']}</a>: {$row['rite']}
-            {$communion}
+            </span>
             </td></tr>\n";
             echo "<tr data-loc=\"{$row['location']}\" class=\"heading\"><td colspan=3 class=\"propers\">\n";
             echo "<table><tr><td class=\"heavy smaller\">{$row['theme']}</td>";

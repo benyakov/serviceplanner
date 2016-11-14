@@ -733,3 +733,11 @@ span.liturgist {
     font-weight: normal;
     padding: 0pt;
 }
+
+span.communion-service::after {
+    content: "C";
+    font-weight: bold;
+    border: thin solid black;
+    padding: 2px;
+    margin: 0 2px;
+}
