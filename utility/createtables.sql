@@ -33,6 +33,14 @@ CREATE TABLE `days` (
   `communion` boolean default 1,
   KEY `pkey` (`pkey`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
+CREATE TABLE `service_flags` (
+  `pkey` int(10) unsigned NOT NULL auto_increment,
+  `day` int(10) unsigned,
+  `location` varchar(50),
+  `flag` varchar(100) NOT NULL,
+  CONSTRAINT `service_flags_ibfk_1` FOREIGN KEY (`service`) REFERENCES `days` (`pkey`)    ON DELETE CASCADE,
+  UNIQUE KEY `service_location` (`day`,`location`)
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
 CREATE TABLE `hymns` (
   `pkey` int(10) unsigned NOT NULL auto_increment,
   `book` varchar(5) default NULL,
