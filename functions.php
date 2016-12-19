@@ -788,7 +788,7 @@ function fillServiceTables() {
         var spinopts = { // See http://fgnass.github.io/spin.js/
             speed: 0.25, corners: 0};
         var target = document.getElementById(\'content-container\');
-        var spinner = new Spinner(spinopts).spin(target);
+        $().ma_spinner = new Spinner(spinopts).spin(target);
         churchYearTables();
     });
     function churchYearTables() {
@@ -796,7 +796,7 @@ function fillServiceTables() {
             function(rv) {
                 setMessage(rv[1]);
                 if (6 == Number(rv[0])) {
-                    spinner.stop();
+                    $().ma_spinner.stop();
                     window.location="admin.php";
                 } else {
                     churchYearTables();
