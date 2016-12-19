@@ -421,7 +421,7 @@ function html_head($title, $xstylesheets=Array()) {
     global $AddToHeader;
     $rv[] = '<meta charset="utf-8">';
     $rv[] = "<head><title>{$title}</title>";
-    $jqf = fopen("jquery/locations.php", "r");
+    $jqf = fopen("jquery/locations.json", "r");
     $jquery_locations = json_decode(fread($jqf, 1024));
     fclose($jqf);
 
