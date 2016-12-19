@@ -782,26 +782,25 @@ function fillServiceTables() {
     global $AddToHeader;
 
     $AddToHeader[] = '
-<script type="text/javascript" src="spin/spin.min.js"></script>
 <script type="text/javascript">
     $(document).ready(function() {
-        var spinopts = { // See http://fgnass.github.io/spin.js/
-            speed: 0.25, corners: 0};
-        var target = document.getElementById(\'content-container\');
-        var spinner = new Spinner(spinopts).spin(target);
-        churchYearTables(spinner);
+        if ($("#spinner").length == 0) {
+            $("body").append("<div id=\"spinner\"><img class=\"spinner\" src=\"spin/spinner.gif\"></div>");
+        }
+        $("#spinner").css("visibility", "visible");
+        churchYearTables();
     });
-    function churchYearTables(spinner) {
-        $.getJSON("dbadmin.php", {action: "churchyeartables"},
-            function(rv) {
-                setMessage(rv[1]);
-                if (6 == Number(rv[0])) {
-                    spinner.stop();
-                    window.location="admin.php";
-                } else {
-                    churchYearTables();
-                }
-            });
+    function churchYearTables() {
+        var msgWrapper = function(rv) {
+            setMessage(rv[1]);
+            if (6 == Number(rv[0])) {
+                $("#spinner").hide();
+                window.location="admin.php";
+            } else {
+                churchYearTables();
+            }
+        };
+        $.getJSON("dbadmin.php", {action: "churchyeartables"}, msgWrapper);
     }
 </script>';
 }
