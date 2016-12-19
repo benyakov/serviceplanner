@@ -439,7 +439,7 @@ function html_head($title, $xstylesheets=Array()) {
             }
         }
         $rv[] = "<script type=\"text/javascript\" src=\"https://code.jquery.com/jquery-3.1.1.min.js\"></script>";
-        $rv[] = "<link href=\"https://code.jquery.com/ui/1.12.1/jquery-ui.css\" rel=\"stylesheet\" type=\"text/css\"/>
+        $rv[] = "<link href=\"https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css\" rel=\"stylesheet\" type=\"text/css\"/>
         <script type=\"text/javascript\" src=\"modernizr/modernizr.js\"></script>
         <script type=\"text/javascript\" src=\"https://code.jquery.com/ui/1.12.1/jquery-ui.min.js\"></script>
         <script type=\"text/javascript\" src=\"jquery/jquery.ba-dotimeout.min.js\"></script>";
