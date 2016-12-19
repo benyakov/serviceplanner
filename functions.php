@@ -421,6 +421,10 @@ function html_head($title, $xstylesheets=Array()) {
     global $AddToHeader;
     $rv[] = '<meta charset="utf-8">';
     $rv[] = "<head><title>{$title}</title>";
+    $jqf = fopen("jquery/locations.php", "r");
+    $jquery_locations = json_decode(fread($jqf, 1024));
+    fclose($jqf);
+
     if (is_link($_SERVER['SCRIPT_FILENAME']))
     {   // Find the installation for css and other links
         $here = dirname(__FILE__);
@@ -438,10 +442,10 @@ function html_head($title, $xstylesheets=Array()) {
                 $rv[] = "<link type=\"text/css\" rel=\"stylesheet\" href=\"{$here}/styles/{$xstyle}\">";
             }
         }
-        $rv[] = "<script type=\"text/javascript\" src=\"https://code.jquery.com/jquery-3.1.1.min.js\"></script>";
-        $rv[] = "<link href=\"https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css\" rel=\"stylesheet\" type=\"text/css\"/>
+        $rv[] = "<script type=\"text/javascript\" src=\"{$jquery_locations['jquery']}\"></script>";
+        $rv[] = "<link href=\"{$jquery_locations['style']}\" rel=\"stylesheet\" type=\"text/css\"/>
         <script type=\"text/javascript\" src=\"modernizr/modernizr.js\"></script>
-        <script type=\"text/javascript\" src=\"https://code.jquery.com/ui/1.12.1/jquery-ui.min.js\"></script>
+        <script type=\"text/javascript\" src=\"{$jquery_locations['ui']}\"></script>
         <script type=\"text/javascript\" src=\"jquery/jquery.ba-dotimeout.min.js\"></script>";
         $rv[] = "<script type=\"text/javascript\" src=\"{$here}/ecmascript.js.php\"></script>";
     }
