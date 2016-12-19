@@ -788,15 +788,15 @@ function fillServiceTables() {
         var spinopts = { // See http://fgnass.github.io/spin.js/
             speed: 0.25, corners: 0};
         var target = document.getElementById(\'content-container\');
-        $().ma_spinner = new Spinner(spinopts).spin(target);
-        churchYearTables();
+        var spinner = new Spinner(spinopts).spin(target);
+        churchYearTables(spinner);
     });
-    function churchYearTables() {
+    function churchYearTables(spinner) {
         $.getJSON("dbadmin.php", {action: "churchyeartables"},
             function(rv) {
                 setMessage(rv[1]);
                 if (6 == Number(rv[0])) {
-                    $().ma_spinner.stop();
+                    spinner.stop();
                     window.location="admin.php";
                 } else {
                     churchYearTables();
