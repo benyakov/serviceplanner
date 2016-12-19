@@ -1,6 +1,6 @@
 <?php
 $fh = fopen("locations.json", "w");
-fwrite(json_encode(["jquery" => "https://code.jquery.com/jquery-3.1.1.min.js",
+fwrite($fh, json_encode(["jquery" => "https://code.jquery.com/jquery-3.1.1.min.js",
     "ui" => "https://code.jquery.com/ui/1.12.1/jquery-ui.min.js",
     "style" => "https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css"
 ]));

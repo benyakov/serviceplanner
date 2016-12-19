@@ -7,7 +7,7 @@ if (! file_exists("jquery-ui-1.12.1"))
     system("unzip jquery-ui-1.12.1.zip");
 
 $fh = fopen("locations.json", "w");
-fwrite(json_encode(["jquery" => "jquery/jquery-3.1.1.min.js",
+fwrite($fh, json_encode(["jquery" => "jquery/jquery-3.1.1.min.js",
     "ui" => "jquery/jquery-ui-1.12.1/jquery-ui.min.js",
     "style" => "jquery/jquery-ui-1.12.1/jquery-ui.css"
 ]));
