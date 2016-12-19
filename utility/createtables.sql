@@ -35,11 +35,13 @@ CREATE TABLE `days` (
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
 CREATE TABLE `service_flags` (
   `pkey` int(10) unsigned NOT NULL auto_increment,
-  `day` int(10) unsigned,
+  `service` int(10) unsigned,
   `location` varchar(50),
   `flag` varchar(100) NOT NULL,
-  CONSTRAINT `service_flags_ibfk_1` FOREIGN KEY (`service`) REFERENCES `days` (`pkey`)    ON DELETE CASCADE,
-  UNIQUE KEY `service_location` (`day`,`location`)
+  `value` varchar(100) default NULL,
+  KEY `pkey` (`pkey`),
+  CONSTRAINT `service_flags_ibfk_1` FOREIGN KEY (`svc`) REFERENCES `days` (`pkey`)
+    ON DELETE CASCADE
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
 CREATE TABLE `hymns` (
   `pkey` int(10) unsigned NOT NULL auto_increment,

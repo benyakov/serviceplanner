@@ -32,7 +32,17 @@ if ("0.16." != substr($oldversion, 0, 5).'.') {
 
 $db = new DBConnection();
 $db->beginTransaction();
-// TODO: Create the table `service_flags`
+$q = $db->prepare("CREATE TABLE `service_flags` (
+  `pkey` int(10) unsigned NOT NULL auto_increment,
+  `service` int(10) unsigned,
+  `location` varchar(50),
+  `flag` varchar(100) NOT NULL,
+  `value` varchar(100) default NULL,
+  KEY `pkey` (`pkey`),
+  CONSTRAINT `service_flags_ibfk_1` FOREIGN KEY (`svc`) REFERENCES `days` (`pkey`)
+    ON DELETE CASCADE
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8");
+$q->execute() or die(array_pop($q->errorInfo()));
 // Populate with existing communion service data.
 $q = $db->prepare("INSERT INTO `{$db->getPrefix()}service_flags`
     (`day`, `location`, `flag`)
