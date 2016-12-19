@@ -91,7 +91,7 @@ function fill_synonyms($db) {
             $qs->bindValue(":canonical", $canonical);
             $qs->bindValue(":synonym", $synonym);
             $qs->execute()
-                or die(var_export($q->errorInfo())." with {$canonical}, {$synonym}");
+                or die(var_export($qs->errorInfo())." with {$canonical}, {$synonym}");
         }
     }
     fclose($fh);
