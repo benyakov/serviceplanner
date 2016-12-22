@@ -298,13 +298,42 @@ function setMessage(msg) {
     msgs.push(msg);
     localStorage.setItem('messages', JSON.stringify(msgs));
     if ($("#message").length > 0) {
-        $("#message").html(timestamp + " " + msg).slideDown()
-        .delay(8000).slideUp();
+        $("#message").html(timestamp + " " + msg)
     } else {
-        $("body>header").append('<div id="message">'+
+        $("body>header").append('<div style="display: none" id="message">'+
             timestamp+" "+msg+'</div>');
-        $("#message").delay(8000).slideUp();
     }
+    $("#message").data("seconds", 0);
+    displayMessage();
+}
+
+function displayMessage() {
+    if ($("#message").data("seconds") == 0) {
+        $("#message").data("seconds", 5);
+        waitAndCheck(hideMessage);
+    } else {
+        $("#message").data("seconds", 5);
+    }
+    $("#message").show();
+}
+
+function waitAndCheck(doAfter) {
+    if ($("#message").data("seconds") == 0) {
+        doAfter();
+        return;
+    } else {
+        window.setTimeout(function() {
+            var secs = $("#message").data("seconds");
+            if (secs > 0) {
+                $("#message").data("seconds", secs-1);
+                waitAndCheck(doAfter);
+            }
+        }, 1000);
+    }
+}
+
+function hideMessage() {
+    $("#message").hide();
 }
 
 function calcEaster(year) {

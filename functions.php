@@ -421,6 +421,10 @@ function html_head($title, $xstylesheets=Array()) {
     global $AddToHeader;
     $rv[] = '<meta charset="utf-8">';
     $rv[] = "<head><title>{$title}</title>";
+    $jqf = fopen("jquery/locations.json", "r");
+    $jquery_locations = json_decode(fread($jqf, 1024));
+    fclose($jqf);
+
     if (is_link($_SERVER['SCRIPT_FILENAME']))
     {   // Find the installation for css and other links
         $here = dirname(__FILE__);
@@ -438,10 +442,10 @@ function html_head($title, $xstylesheets=Array()) {
                 $rv[] = "<link type=\"text/css\" rel=\"stylesheet\" href=\"{$here}/styles/{$xstyle}\">";
             }
         }
-        $rv[] = "<script type=\"text/javascript\" src=\"jquery/jquery.js\"></script>";
-        $rv[] = "<link href=\"jquery/jquery-ui.css\" rel=\"stylesheet\" type=\"text/css\"/>
+        $rv[] = "<script type=\"text/javascript\" src=\"{$jquery_locations->jquery}\"></script>";
+        $rv[] = "<link href=\"{$jquery_locations->style}\" rel=\"stylesheet\" type=\"text/css\"/>
         <script type=\"text/javascript\" src=\"modernizr/modernizr.js\"></script>
-        <script type=\"text/javascript\" src=\"jquery/jquery-ui.js\"></script>
+        <script type=\"text/javascript\" src=\"{$jquery_locations->ui}\"></script>
         <script type=\"text/javascript\" src=\"jquery/jquery.ba-dotimeout.min.js\"></script>";
         $rv[] = "<script type=\"text/javascript\" src=\"{$here}/ecmascript.js.php\"></script>";
     }
@@ -782,26 +786,25 @@ function fillServiceTables() {
     global $AddToHeader;
 
     $AddToHeader[] = '
-<script type="text/javascript" src="spin/spin.min.js"></script>
 <script type="text/javascript">
     $(document).ready(function() {
-        var spinopts = { // See http://fgnass.github.io/spin.js/
-            speed: 0.25, corners: 0};
-        var target = document.getElementById(\'content-container\');
-        var spinner = new Spinner(spinopts).spin(target);
+        if ($("#spinner").length == 0) {
+            $("body").append("<div id=\"spinner\"><img class=\"spinner\" src=\"spin/spinner.gif\"></div>");
+        }
+        $("#spinner").css("visibility", "visible");
         churchYearTables();
     });
     function churchYearTables() {
-        $.getJSON("dbadmin.php", {action: "churchyeartables"},
-            function(rv) {
-                setMessage(rv[1]);
-                if (6 == Number(rv[0])) {
-                    spinner.stop();
-                    window.location="admin.php";
-                } else {
-                    churchYearTables();
-                }
-            });
+        var msgWrapper = function(rv) {
+            setMessage(rv[1]);
+            if (6 == Number(rv[0])) {
+                $("#spinner").hide();
+                window.location="admin.php";
+            } else {
+                churchYearTables();
+            }
+        };
+        $.getJSON("dbadmin.php", {action: "churchyeartables"}, msgWrapper);
     }
 </script>';
 }
