@@ -121,7 +121,7 @@ function rawQuery($where=array(), $order="", $limit="") {
     DATE_FORMAT(d.caldate, '%c/%e/%Y') AS date,
     DATE_FORMAT(d.caldate, '%Y-%m-%d') AS browserdate,
     h.book, h.number, h.note, h.location, d.name AS dayname, d.rite,
-    d.servicenotes, d.communion, n.title, d.block,
+    d.servicenotes, n.title, d.block,
     b.label AS blabel, b.notes AS bnotes,
     cyp.color AS color, cyp.theme AS theme, cyp.introit AS introit,
     (CASE b.weeklygradual
@@ -232,9 +232,8 @@ function display_records_table($q) {
             } else {
                 $datetext = $row['date'];
             }
-            $communion = $row['communion']? 'communion-service' : 'dry-mass';
             echo "<tr data-loc=\"{$row['location']}\" class=\"heading servicehead\"><td class=\"heavy\">{$datetext} {$row['location']}</td>
-                <td colspan=2><span class=\"{$communion}\"><a name=\"service_{$row['serviceid']}\">{$row['dayname']}</a>: {$row['rite']}</span>".
+                <td colspan=2><span class=\"communicants\"><a name=\"service_{$row['serviceid']}\">{$row['dayname']}</a>: {$row['rite']}</span>".
             ($auth?
             "<a class=\"menulink\" href=\"sermon.php?id={$row['serviceid']}\">Sermon</a>
             <a class=\"menulink\" href=\"export.php?service={$row['serviceid']}\">CSV Data</a>"
@@ -333,7 +332,6 @@ function modify_records_table($q, $action) {
                 $datetext = $row['date'];
             }
             $urldate=urlencode($row['browserdate']);
-            $communion = $row['communion']? 'communion-service' : 'dry-mass';
             echo "<tr data-loc=\"{$row['location']}\" class=\"heading servicehead\"><td>
             <input form=\"delete-service\" type=\"checkbox\" name=\"{$row['serviceid']}_{$row['location']}\" id=\"check_{$row['serviceid']}_{$row['location']}\">
             <span class=\"heavy\">{$datetext} {$row['location']}</span>
@@ -346,7 +344,7 @@ function modify_records_table($q, $action) {
             </div>
             </td>
             <td colspan=2>
-            <span class=\"{$communion}\">
+            <span class=\"communicants\">
             <a name=\"service_{$row['serviceid']}\">{$row['dayname']}</a>: {$row['rite']}
             </span>
             </td></tr>\n";

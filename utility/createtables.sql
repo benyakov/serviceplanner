@@ -30,7 +30,6 @@ CREATE TABLE `days` (
   `rite` varchar(50) default NULL,
   `servicenotes` text default NULL,
   `block` integer default NULL,
-  `communion` boolean default 1,
   KEY `pkey` (`pkey`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
 CREATE TABLE `service_flags` (
