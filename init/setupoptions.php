@@ -1,5 +1,5 @@
 <? /* Set up the options to reasonable defaults
-    Copyright (C) 2014 Jesse Jacobsen
+    Copyright (C) 2016 Jesse Jacobsen
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -68,6 +68,17 @@ $sitetabs_anonymous = array(
     ,"hymnindex"=>"Cross Ref"
 );
 
+// These services flags can be set by less privileged users to indicate possibilities
+// that may have to be approved by someone overseeing the service.
+$addable_service_flags = array(
+    "Organist Available",
+    "Altar Guild Available",
+    "Choir Available",
+    "Soloist Available",
+    "Lector Available",
+    "Acolyte Available",
+    "Assistant Available");
+
 // Default order for the presentation of hymns and services on the Modify tab.
 // May be "Future" or "All".
 $modifyorder = "All";
@@ -86,6 +97,7 @@ foreach ($sitetabs as $k=>$v)
 foreach ($sitetabs_anonymous as $k=>$v)
     $options->set('anonymous sitetabs', $k, $v);
 $options->set('modifyorder', $modifyorder);
+$options->set('addable_service_flags', $addable_service_flags);
 $options->save();
 unset($options);
 

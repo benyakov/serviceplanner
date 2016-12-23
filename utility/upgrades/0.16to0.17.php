@@ -62,6 +62,20 @@ $q = $db->prepare("ALTER TABLE `{$db->getPrefix()}days`
 $q->execute() or die(array_pop($q->errorInfo()));
 $db->commit();
 
+$options = new Configfile("./options.ini", true, true, true);
+// These services flags can be set by less privileged users to indicate possibilities
+// that may have to be approved by someone overseeing the service.
+$addable_service_flags = array(
+    "Organist Available",
+    "Altar Guild Available",
+    "Choir Available",
+    "Soloist Available",
+    "Lector Available",
+    "Acolyte Available",
+    "Assistant Available");
+$options->set('addable_service_flags', $addable_service_flags);
+$options->save();
+
 $dbstate = getDBState(true);
 $newversion = "{$version['major']}.{$version['minor']}.{$version['tick']}";
 $dbstate->set('dbversion', $newversion);
