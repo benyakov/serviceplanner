@@ -38,6 +38,7 @@ CREATE TABLE `service_flags` (
   `location` varchar(50),
   `flag` varchar(100) NOT NULL,
   `value` varchar(100) default NULL,
+  `uid` smallint,
   KEY `pkey` (`pkey`),
   CONSTRAINT `service_flags_ibfk_1` FOREIGN KEY (`svc`) REFERENCES `days` (`pkey`)
     ON DELETE CASCADE

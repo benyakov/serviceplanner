@@ -1,4 +1,4 @@
-<?php /* Service flags getting and setting
+<?php /* Service flags management
     Copyright (C) 2016 Jesse Jacobsen
 
     This program is free software; you can redistribute it and/or modify
@@ -51,10 +51,11 @@ if (! array_key_exists('stage', $_GET)) {
         <p class="explanation">This page allows you to see the flags on a
 service and either add to them or change them.</p>
 <?
-    $q = $db->prepare("SELECT rite, DATE_FORMAT(d.caldate, '%c/%e/%Y') as date,
-        flag, value, f.id AS flag_id
+    $q = $db->prepare("SELECT d.rite, DATE_FORMAT(d.caldate, '%c/%e/%Y') AS d.date,
+        f.flag, f.value, f.id AS flag_id, f.`uid`, CONCAT(u.fname, ' ', u.lname) AS user
         FROM `{$db->getPrefix()}days` AS d
         JOIN `{$db->getPrefix()}service_flags` AS f
+        JOIN `{$db->getPrefix()}users` AS u ON (u.`uid` == f.`uid`)
         WHERE f.service = :day
         AND f.location = :location");
     $q->bindParam(":day", $id);
@@ -66,40 +67,63 @@ service and either add to them or change them.</p>
         on <?=$rows[0]['date']?></h1><?
 
     $authlevel = authLevel();
+    $uid = authUid();
     if (3 == $authlevel) { // Is Admin
     // Display a form of service flags for privileged users to edit
 ?>
-        <form id="service_flags" action="<?= $_SERVER['PHP_SELF'] ?>" method="post">
->
+        <form id="service_flags" action="<?= $_SERVER['PHP_SELF']."?stage=2" ?>"
+            method="post">
+
             <input type="hidden" name="step" value="change_flags">
             <dl>
-<?php   foreach $rows as $row) { ?>
+<?      foreach $rows as $row) { ?>
             <dt><input type="checkbox" name="<?="{$row['flag-id']}_delete"?>"> (delete)
                 <input type="text" name="<?="{$row['flag_id']}_flag"?>"
-                value="<?=$row['flag']?>"></dt>
+                value="<?=$row['flag']?>"> [<?=$row['user']?>]</dt>
             <dd><input type="text" name="<?="{$row['flag_id']}_value"?>"
                 value="<?=$row['value']?>"></dt>
-<?php   } ?>
+<?      } ?>
             </dl>
 
             <button id="submit" type="submit">Submit Flag Changes</button>
         </form>
-<?php
+<?
 
     } else {
     // Display a table for less privileged users
 ?>
+        <form id="service_flags" action="<?= $_SERVER['PHP_SELF']."?stage=2" ?>"
+            method="post">
         <table id="service_flags">
-<?php   foreach $rows as $row) { ?>
-            <tr><th><?={$row['flag']}?></th>
-                <td><?={$row['value']}?></td></tr>
-<?php   } ?>
+<?      foreach $rows as $row) {
+            ?> <tr><th><?={$row['flag']}?> <?
+            if ($uid == $row['uid']) {
+                ?> <button name="delete_flag" data-id="<?=$row['flag_id']?>">Delete</button><?
+            } else {
+                ?>[<?=$row['user']?>]<?
+            }
+            ?></th> <td><?={$row['value']}?></td></tr>
+<?      } ?>
         </table>
-<?php
+        </form>
+<?
     }
     // Display a form for privileged and less-privileged users to add flags
-        // TODO: put a list in config of flags addable for less-privileged users
-
+?>
+    <form id="add_flag" action="<?= $_SERVER['PHP_SELF']."?stage=2" ?>" method="post">
+        <input type="hidden" name="step" value="add_flag">
+        <input type="hidden" name="user" value="<?=$uid?>">
+        <?
+        if (3 == $authlevel) { ?>
+            <input type="text" name="flag">
+        <? } else {
+            $options = getOptions();
+            ?> <select name="flag" id="flag"> <?
+            foreach ($options->get("addable_service_flags") as $opt)
+                echo "<option name=\"{$opt}\">{$opt}</option>\n";
+            ?> </select> <?
+        }
+    ?> </form> <?
     $q = queryService($id);
     display_records_table($q, "delete.php");
     ?>

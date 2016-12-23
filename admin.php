@@ -1,5 +1,5 @@
 <? /* Administrative interface
-    Copyright (C) 2012 Jesse Jacobsen
+    Copyright (C) 2016 Jesse Jacobsen
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -464,6 +464,14 @@ available for specifying hymns. The first will be the default book.</dd>
         echo "<option name='$moopt'$selected>$moopt</option>\n";
     }?>
         </select></dd>
+    <dt>Addable Service Flags</dt>
+    <dd class="explanation">Users with admin privileges can add any service
+    flags they like other logged-in users can only add the service flags listed
+    here. Write one per line.</dd>
+    <dd><textarea id="service-flags-option" class="serviceflagsconfig"
+        name="service-flags-option"><?
+    foreach ($options->get('addable_service_flags') as $flag) echo "$flag\n";
+    ?></textarea></dd>
     </dl>
     <button type="submit">Submit</button><button type="reset">Reset</button>
     </form>

@@ -30,6 +30,7 @@ if ("0.16." != substr($oldversion, 0, 5).'.') {
     die("Can't upgrade from 0.16.x, since the current db version is {$oldversion}.");
 }
 
+$authdata = $_SESSION[$sprefix]['authdata'];
 $db = new DBConnection();
 $db->beginTransaction();
 $q = $db->prepare("CREATE TABLE `{$db->getPrefix()}service_flags` (
@@ -38,17 +39,20 @@ $q = $db->prepare("CREATE TABLE `{$db->getPrefix()}service_flags` (
   `location` varchar(50),
   `flag` varchar(100) NOT NULL,
   `value` varchar(100) default NULL,
+  `uid` tinyint,
   KEY `pkey` (`pkey`),
   FOREIGN KEY (`service`) REFERENCES `{$db->getPrefix()}days` (`pkey`)
-    ON DELETE CASCADE
+    ON DELETE CASCADE,
+  FOREIGN KEY (`uid`) REFERENCES `{$db->getPrefix()}users` (`uid`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8");
 $q->execute() or die(array_pop($q->errorInfo()));
 $db->commit();
 $db->beginTransaction();
 // Populate with existing communion service data.
+$uid = (int)$authdata['uid'];
 $q = $db->prepare("INSERT INTO `{$db->getPrefix()}service_flags`
-    (`service`, `location`, `flag`)
-    SELECT d.pkey, h.location, 'communion' FROM
+    (`service`, `location`, `flag`, `uid`)
+    SELECT d.pkey, h.location, 'communion', {$uid} FROM
     `{$db->getPrefix()}days` AS d
     JOIN `{$db->getPrefix()}hymns` AS h");
 $q->execute() or die(array_pop($q->errorInfo()));

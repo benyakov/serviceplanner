@@ -106,6 +106,11 @@ if (isset($_POST['modifyorder-option']) && $auth) {
     setMessage("Modify Tab default order option has been set.");
 }
 
+if (isset($_POST['service-flags-option']) && $auth) {
+    $options->set('addable_service_flags'), explode("\n", $_POST['service-flags-option']));
+    setMessage("Addable Service Flags option has been set.");
+}
+
 $options->save();
 unset($options);
 
