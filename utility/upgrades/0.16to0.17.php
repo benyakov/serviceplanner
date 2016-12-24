@@ -53,8 +53,9 @@ $q = $db->prepare("INSERT INTO `{$db->getPrefix()}service_flags`
     (`service`, `location`, `flag`, `uid`)
     SELECT d.pkey, h.location, 'communion', {$uid} FROM
     `{$db->getPrefix()}days` AS d
-    LEFT JOIN `{$db->getPrefix()}hymns` AS h ON (d.pkey = h.service)
-    WHERE d.communion = 1");
+    JOIN `{$db->getPrefix()}hymns` AS h ON (d.pkey = h.service)
+    WHERE d.communion = 1
+    GROUP BY d.pkey");
 $q->execute() or die(array_pop($q->errorInfo()));
 // Delete communion field
 $q = $db->prepare("ALTER TABLE `{$db->getPrefix()}days`
