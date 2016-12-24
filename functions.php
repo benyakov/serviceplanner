@@ -232,6 +232,7 @@ function display_records_table($q) {
             } else {
                 $datetext = $row['date'];
             }
+            $urllocation = urlencode($row['location']);
             echo "<tr data-loc=\"{$row['location']}\" class=\"heading servicehead\"><td class=\"heavy\">{$datetext} {$row['location']}</td>
                 <td colspan=2><span class=\"communicants\"><a name=\"service_{$row['serviceid']}\">{$row['dayname']}</a>: {$row['rite']}</span>".
             ($auth?
@@ -240,7 +241,8 @@ function display_records_table($q) {
 
             :"").
                 " <a class=\"menulink\" href=\"print.php?id={$row['serviceid']}\" ".
-                "title=\"print\">Print</a></td></tr>\n";
+                "title=\"print\">Print</a>
+                  <a class=\"menulink\" title=\"See or edit flags for this service.\" href=\"flags.php?id={$row['serviceid']}&location={$urllocation}\">Flags</a></td></tr>\n";
             echo "<tr data-loc=\"{$row['location']}\" class=\"heading\"><td class=\"propers\" colspan=3>\n";
             echo "<table><tr><td class=\"heavy smaller\">{$row['theme']}</td>";
             echo "<td colspan=2>{$row['color']}</td></tr>";
@@ -332,6 +334,7 @@ function modify_records_table($q, $action) {
                 $datetext = $row['date'];
             }
             $urldate=urlencode($row['browserdate']);
+            $urllocation=urlencode($row['location']);
             echo "<tr data-loc=\"{$row['location']}\" class=\"heading servicehead\"><td>
             <input form=\"delete-service\" type=\"checkbox\" name=\"{$row['serviceid']}_{$row['location']}\" id=\"check_{$row['serviceid']}_{$row['location']}\">
             <span class=\"heavy\">{$datetext} {$row['location']}</span>
@@ -341,6 +344,7 @@ function modify_records_table($q, $action) {
             <a href=\"#\" class=\"edit-service menulink\" title=\"Edit this service.\" data-id=\"{$row['serviceid']}\">Edit</a>
             <a class=\"menulink\" href=\"print.php?id={$row['serviceid']}\" title=\"Show a printable format of this service.\">Print</a>
             <a class=\"menulink\" title=\"See or edit sermon plans for this service.\" href=\"sermon.php?id={$row['serviceid']}\">Sermon</a>
+            <a class=\"menulink\" title=\"See or edit flags for this service.\" href=\"flags.php?id={$row['serviceid']}&location={$urllocation}\">Flags</a>
             </div>
             </td>
             <td colspan=2>

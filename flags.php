@@ -27,7 +27,8 @@ require("./init.php");
 $this_script = $_SERVER['HTTP_HOST'].$_SERVER['SCRIPT_NAME'] ;
 if (! array_key_exists('stage', $_GET)) {
     if (! (is_numeric($_GET['id']) and $_GET['location']) ) {
-        setMessage("Need a service and location to see service flags.");
+        setMessage("Need both a service and location to see service flags. ".
+            "Have you chosen a location by adding hymns?");
         header("Location: modify.php");
         exit(0);
     } else {
@@ -58,63 +59,87 @@ service and either add to them or change them.</p>
 //        JOIN `{$db->getPrefix()}users` AS u ON (u.`uid` == f.`uid`)
 //        WHERE d.pkey = :day");
 //        AND f.location = :location");
-    $q = $db->prepare("SELECT d.rite, DATE_FORMAT(d.caldate, '%c/%e/%Y') AS date
+    $q = $db->prepare("SELECT d.rite, DATE_FORMAT(d.caldate, '%c/%e/%Y') AS date,
+        f.flag, f.value, f.pkey AS flag_id, f.`uid`, CONCAT(u.fname, ' ', u.lname) AS user
         FROM `{$db->getPrefix()}days` AS d
         JOIN `{$db->getPrefix()}service_flags` AS f ON (d.pkey=f.service)
-        WHERE d.pkey=:day
+        JOIN `{$db->getPrefix()}users` AS u ON (u.`uid` = f.`uid`)
+        WHERE d.pkey = :day
         AND f.location = :location ");
     $q->bindParam(":day", $id);
     $q->bindParam(":location", $location);
-    $q->execute();
+    $q->execute() or die(array_pop($q->errorInfo()));
     $rows = $q->fetchAll(PDO::FETCH_ASSOC);
 
-    echo ("Found ".count($rows). " at {$location} for {$id}.");
+    if (0 == count($rows)) { // No flags found, just need service info.
+        $has_flags = false;
+        $q = $db->prepare("SELECT rite, DATE_FORMAT(caldate, '%c/%e/%Y') AS date
+            FROM `{$db->getPrefix()}days`
+            WHERE pkey = :day");
+        $q->bindParam(":day", $id);
+        $q->execute() or die(array_pop($q->errorInfo()));
+        $rows = $q->fetchAll(PDO::FETCH_ASSOC);
+    } else {
+        $has_flags = true;
+    }
+
+    //echo ("Found ".count($rows). " at {$location} for {$id}.");
 
     ?><h1><?=$rows[0]['rite']?> at <?=htmlentities($location)?>
-        on <?=$rows[0]['date']?></h1><?
+        on <?=$rows[0]['date']?></h1>
+      <h2>Current Flags</h2><?
 
     $authlevel = authLevel();
     $uid = authUid();
-    if (3 == $authlevel) { // Is Admin
-    // Display a form of service flags for privileged users to edit
-?>
-        <form id="service_flags" action="<?= $_SERVER['PHP_SELF']."?stage=2" ?>"
-            method="post">
+    if ($has_flags) {
+        if (3 == $authlevel) { // Is Admin
+        // Display a form of service flags for privileged users to edit
+    ?>
+            <form id="service_flags" action="<?= $_SERVER['PHP_SELF']."?stage=2" ?>"
+                method="post">
 
-            <input type="hidden" name="step" value="change_flags">
-            <dl>
-<?      foreach ($rows as $row) { ?>
-            <dt><input type="checkbox" name="<?="{$row['flag-id']}_delete"?>"> (delete)
-                <input type="text" name="<?="{$row['flag_id']}_flag"?>"
-                value="<?=$row['flag']?>"> [<?=$row['user']?>]</dt>
-            <dd><input type="text" name="<?="{$row['flag_id']}_value"?>"
-                value="<?=$row['value']?>"></dt>
-<?      } ?>
+                <input type="hidden" name="step" value="change_flags">
+                <dl class="flags">
+    <?      foreach ($rows as $row) { ?>
+                <dt><input type="text" name="<?="{$row['flag_id']}_flag"?>"
+                    value="<?=$row['flag']?>"><br>
+                    [<?=$row['user']?>]</dt>
+                <dd><input class="flag-value" type="text" name="<?="{$row['flag_id']}_value"?>"
+                    value="<?=$row['value']?>" placeholder="No value"></dd>
+                <dd><input type="checkbox" name="<?="{$row['flag-id']}_delete"?>">
+                    (delete)</dd>
+    <?      } ?>
+                </dl>
+
+                <button id="submit" type="submit">Submit Flag Changes</button>
+            </form>
+    <?
+
+        } else {
+        // Display a table for less privileged users
+    ?>
+            <form id="service_flags" action="<?= $_SERVER['PHP_SELF']."?stage=2" ?>"
+                method="post">
+            <dl class="flags">
+    <?      foreach ($rows as $row) {
+    ?>         <dt><?=$row['flag']?> <br>
+    <?
+                if ($uid == $row['uid']) {
+                    ?> <button name="delete_flag"
+                        data-id="<?=$row['flag_id']?>">Delete</button><?
+                } else {
+                    ?>[<?=$row['user']?>]<?
+                }
+                ?></dt>
+                <dd><?=$row['value']?></dd>
             </dl>
-
-            <button id="submit" type="submit">Submit Flag Changes</button>
-        </form>
-<?
-
-    } else {
-    // Display a table for less privileged users
-?>
-        <form id="service_flags" action="<?= $_SERVER['PHP_SELF']."?stage=2" ?>"
-            method="post">
-        <table id="service_flags">
-<?      foreach ($rows as $row) {
-            ?> <tr><th><?=$row['flag']?> <?
-            if ($uid == $row['uid']) {
-                ?> <button name="delete_flag" data-id="<?=$row['flag_id']?>">Delete</button><?
-            } else {
-                ?>[<?=$row['user']?>]<?
-            }
-            ?></th> <td><?=$row['value']?></td></tr>
-<?      } ?>
-        </table>
-        </form>
-<?
+    <?      } ?>
+            </table>
+            </form>
+    <?
+        }
     }
+    ?><hr><h2>Set a New Flag</h2><?
     // Display a form for privileged and less-privileged users to add flags
 ?>
     <form id="add_flag" action="<?= $_SERVER['PHP_SELF']."?stage=2" ?>" method="post">
@@ -122,15 +147,20 @@ service and either add to them or change them.</p>
         <input type="hidden" name="user" value="<?=$uid?>">
         <?
         if (3 == $authlevel) { ?>
-            <input type="text" name="flag">
+            <input type="text" name="flag" placeholder="Name of flag">
         <? } else {
             $options = getOptions();
             ?> <select name="flag" id="flag"> <?
             foreach ($options->get("addable_service_flags") as $opt)
                 echo "<option name=\"{$opt}\">{$opt}</option>\n";
-            ?> </select> <?
+            ?> </select>
+            <?
         }
-    ?> </form> <?
+    ?>
+        <input class="flag-value" type="text" id="value" name="value"
+            placeholder="No value">
+        <button id="submit" name="submit">Submit New Flag</button>
+        </form> <br><?
     $q = queryService($id);
     display_records_table($q, "delete.php");
     ?>

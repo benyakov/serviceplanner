@@ -46,6 +46,7 @@ $q = $db->prepare("CREATE TABLE `{$db->getPrefix()}service_flags` (
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8");
 $q->execute() or die(array_pop($q->errorInfo()));
 $db->commit();
+$rm[] = "Created service_flags table.";
 $db->beginTransaction();
 // Populate with existing communion service data.
 $uid = (int)$authdata['uid'];
@@ -57,11 +58,13 @@ $q = $db->prepare("INSERT INTO `{$db->getPrefix()}service_flags`
     WHERE d.communion = 1 AND h.location IS NOT NULL
     GROUP BY d.pkey, h.location");
 $q->execute() or die(array_pop($q->errorInfo()));
+$rm[] = "Populated service flags table with communion flags.";
 // Delete communion field
 $q = $db->prepare("ALTER TABLE `{$db->getPrefix()}days`
     DROP COLUMN `communion`");
 $q->execute() or die(array_pop($q->errorInfo()));
 $db->commit();
+$rm[] = "Removed communion column from days table.";
 
 $options = new Configfile("./options.ini", true, true, true);
 // These services flags can be set by less privileged users to indicate possibilities
@@ -77,6 +80,7 @@ $addable_service_flags = array(
 $options->set('addable_service_flags', $addable_service_flags);
 $options->save();
 unset($options);
+$rm[] = "Created default addable flags in options. (Adjust on Housekeeping page.)";
 
 $dbstate = getDBState(true);
 $newversion = "{$version['major']}.{$version['minor']}.{$version['tick']}";

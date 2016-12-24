@@ -765,3 +765,34 @@ img.spinner {
     height: 75px;
     opacity: 1.0;
 }
+
+dl.flags {
+    margin: 2em 0;
+    padding: 0;
+}
+
+dl.flags input[type="text"] {
+    width: 10em;
+}
+
+dl.flags input[type="text"].flag-value,
+input[type="text"].flag-value {
+    width: 20em;
+}
+
+dl.flags dt {
+    position: relative;
+    top: 1.5em;
+    left: 0;
+    width: 11em;
+    font-weight: bold;
+}
+
+dl.flags dd {
+    position: relative;
+    left: 10em;
+    top: -1.5em;
+    border-left: 1px solid black;
+    padding: 0 0 .5em .5em;
+}
+
