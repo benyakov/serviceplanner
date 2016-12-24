@@ -40,7 +40,7 @@ if (! array_key_exists("stage", $_GET))
             hymns.book, hymns.number, hymns.note,
             hymns.pkey as hymnid, hymns.location,
             hymns.sequence, days.name as dayname, days.rite, days.block,
-            days.servicenotes, days.communion
+            days.servicenotes
             FROM `{$db->getPrefix()}hymns` AS hymns
             RIGHT OUTER JOIN `{$db->getPrefix()}days` AS days ON (hymns.service=days.pkey)
             WHERE days.pkey = ?
@@ -67,9 +67,6 @@ if (! array_key_exists("stage", $_GET))
             <dd>
                 <input type="text" id="rite" name="rite"
                  value="<?=$row['rite']?>" size="50" maxlength="50">
-                <input type="checkbox" id="communion" name="communion"
-                 <?=$row['communion']==1?'checked="checked"':''?>>
-                Communion Offered
             </dd>
             <dt>Service Notes</dt>
             <dd>
@@ -188,7 +185,7 @@ if (! array_key_exists("stage", $_GET))
     $db->beginTransaction();
     $tohymns = array();
     $tonames = array();
-    $todays = array("communion"=>0);
+    $todays = array();
     $todelete = array();
     $id = "";
     foreach ($_POST as $key => $value) {
@@ -196,8 +193,6 @@ if (! array_key_exists("stage", $_GET))
             "servicenotes", "block")))
         {
             $todays[$key] = $value;
-        } elseif ("communion" == $key) {
-            $todays["communion"] = 1;
         } elseif (preg_match('/delete_(\d+)/', $key, $matches)) {
             $todelete[] = $matches[1];
         } elseif (preg_match('/(\w+)_([-0-9a-z]+)/', $key, $matches)) {
@@ -232,7 +227,7 @@ if (! array_key_exists("stage", $_GET))
     }
     // Update day information
     $q = $db->prepare("UPDATE `{$db->getPrefix()}days` SET `caldate`=:date,
-        `name`=:name, `rite`=:rite, `communion`=:communion,
+        `name`=:name, `rite`=:rite,
         `servicenotes`=:servicenotes, `block`=:block
         WHERE `pkey` = :id");
     $q->bindValue(":date", strftime("%Y-%m-%d", strtotime($todays['date'])));
@@ -240,7 +235,6 @@ if (! array_key_exists("stage", $_GET))
     $q->bindValue(":rite", $todays['rite']);
     $q->bindValue(":servicenotes", $todays['servicenotes']);
     $q->bindValue(":block", $todays['block']);
-    $q->bindValue(":communion", $todays['communion']?1:0);
     $q->bindValue(":id", $_POST['id']);
     $q->execute() or dieWithRollback($q, $q->queryString);
 

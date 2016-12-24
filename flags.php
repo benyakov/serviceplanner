@@ -47,21 +47,28 @@ if (! array_key_exists('stage', $_GET)) {
         <div id="content-container">
         <div class="quicklinks"><a href="modify.php">Back to Service Listing</a>
         </div>
-        <h1>Service Listing</h1>
+        <h1>Service Flags</h1>
         <p class="explanation">This page allows you to see the flags on a
 service and either add to them or change them.</p>
 <?
-    $q = $db->prepare("SELECT d.rite, DATE_FORMAT(d.caldate, '%c/%e/%Y') AS d.date,
-        f.flag, f.value, f.id AS flag_id, f.`uid`, CONCAT(u.fname, ' ', u.lname) AS user
+//    $q = $db->prepare("SELECT d.rite, DATE_FORMAT(d.caldate, '%c/%e/%Y') AS d.date,
+//        f.flag, f.value, f.id AS flag_id, f.`uid`, CONCAT(u.fname, ' ', u.lname) AS user
+//        FROM `{$db->getPrefix()}days` AS d
+//        JOIN `{$db->getPrefix()}service_flags` AS f
+//        JOIN `{$db->getPrefix()}users` AS u ON (u.`uid` == f.`uid`)
+//        WHERE d.pkey = :day");
+//        AND f.location = :location");
+    $q = $db->prepare("SELECT d.rite, DATE_FORMAT(d.caldate, '%c/%e/%Y') AS date
         FROM `{$db->getPrefix()}days` AS d
-        JOIN `{$db->getPrefix()}service_flags` AS f
-        JOIN `{$db->getPrefix()}users` AS u ON (u.`uid` == f.`uid`)
-        WHERE f.service = :day
-        AND f.location = :location");
+        JOIN `{$db->getPrefix()}service_flags` AS f ON (d.pkey=f.service)
+        WHERE d.pkey=:day
+        AND f.location = :location ");
     $q->bindParam(":day", $id);
     $q->bindParam(":location", $location);
     $q->execute();
     $rows = $q->fetchAll(PDO::FETCH_ASSOC);
+
+    echo ("Found ".count($rows). " at {$location} for {$id}.");
 
     ?><h1><?=$rows[0]['rite']?> at <?=htmlentities($location)?>
         on <?=$rows[0]['date']?></h1><?
