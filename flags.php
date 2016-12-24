@@ -36,7 +36,7 @@ if (! array_key_exists('stage', $_GET)) {
     }
     ?><!DOCTYPE html>
     <html lang="en">
-    <?=html_head("Edit Service Flags"))?>
+    <?=html_head("Edit Service Flags")?>
     <body>
     <script type="text/javascript">
         $(document).ready(function() {
@@ -76,7 +76,7 @@ service and either add to them or change them.</p>
 
             <input type="hidden" name="step" value="change_flags">
             <dl>
-<?      foreach $rows as $row) { ?>
+<?      foreach ($rows as $row) { ?>
             <dt><input type="checkbox" name="<?="{$row['flag-id']}_delete"?>"> (delete)
                 <input type="text" name="<?="{$row['flag_id']}_flag"?>"
                 value="<?=$row['flag']?>"> [<?=$row['user']?>]</dt>
@@ -95,14 +95,14 @@ service and either add to them or change them.</p>
         <form id="service_flags" action="<?= $_SERVER['PHP_SELF']."?stage=2" ?>"
             method="post">
         <table id="service_flags">
-<?      foreach $rows as $row) {
-            ?> <tr><th><?={$row['flag']}?> <?
+<?      foreach ($rows as $row) {
+            ?> <tr><th><?=$row['flag']?> <?
             if ($uid == $row['uid']) {
                 ?> <button name="delete_flag" data-id="<?=$row['flag_id']?>">Delete</button><?
             } else {
                 ?>[<?=$row['user']?>]<?
             }
-            ?></th> <td><?={$row['value']}?></td></tr>
+            ?></th> <td><?=$row['value']?></td></tr>
 <?      } ?>
         </table>
         </form>

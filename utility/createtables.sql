@@ -40,7 +40,7 @@ CREATE TABLE `service_flags` (
   `value` varchar(100) default NULL,
   `uid` smallint,
   KEY `pkey` (`pkey`),
-  CONSTRAINT `service_flags_ibfk_1` FOREIGN KEY (`svc`) REFERENCES `days` (`pkey`)
+  CONSTRAINT `service_flags_ibfk_1` FOREIGN KEY (`service`) REFERENCES `days` (`pkey`)
     ON DELETE CASCADE
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
 CREATE TABLE `hymns` (

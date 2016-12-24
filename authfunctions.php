@@ -92,7 +92,7 @@ function authId($authdata=false) {
 
 function authUid($authdata=false) {
     // Return the current user id from the parameter or session, or false
-    global $sprefix
+    global $sprefix;
     $authdata = $authdata?$authdata:
         (isset($_SESSION[$sprefix]['authdata'])?
             $_SESSION[$sprefix]['authdata']:0);
