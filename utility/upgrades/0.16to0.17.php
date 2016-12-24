@@ -76,6 +76,7 @@ $addable_service_flags = array(
     "Assistant Available");
 $options->set('addable_service_flags', $addable_service_flags);
 $options->save();
+unset($options);
 
 $dbstate = getDBState(true);
 $newversion = "{$version['major']}.{$version['minor']}.{$version['tick']}";
@@ -84,5 +85,5 @@ $dbstate->save() or die("Problem saving dbstate file.");
 unset($dbstate);
 $rm[] = "Upgraded to {$newversion}";
 setMessage(implode("<br />\n", $rm));
-header("Location: admin.php?flag=create-views");
+header("Location: admin.php");
 ?>
