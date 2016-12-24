@@ -42,8 +42,7 @@ $q = $db->prepare("CREATE TABLE `{$db->getPrefix()}service_flags` (
   `uid` tinyint,
   KEY `pkey` (`pkey`),
   FOREIGN KEY (`service`) REFERENCES `{$db->getPrefix()}days` (`pkey`)
-    ON DELETE CASCADE,
-  FOREIGN KEY (`uid`) REFERENCES `{$db->getPrefix()}users` (`uid`)
+    ON DELETE CASCADE
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8");
 $q->execute() or die(array_pop($q->errorInfo()));
 $db->commit();
@@ -54,7 +53,8 @@ $q = $db->prepare("INSERT INTO `{$db->getPrefix()}service_flags`
     (`service`, `location`, `flag`, `uid`)
     SELECT d.pkey, h.location, 'communion', {$uid} FROM
     `{$db->getPrefix()}days` AS d
-    JOIN `{$db->getPrefix()}hymns` AS h");
+    JOIN `{$db->getPrefix()}hymns` AS h
+    WHERE d.communion = 1");
 $q->execute() or die(array_pop($q->errorInfo()));
 // Delete communion field
 $q = $db->prepare("ALTER TABLE `{$db->getPrefix()}days`
