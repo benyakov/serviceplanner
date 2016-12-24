@@ -54,7 +54,7 @@ $q = $db->prepare("INSERT INTO `{$db->getPrefix()}service_flags`
     SELECT d.pkey, h.location, 'communion', {$uid} FROM
     `{$db->getPrefix()}days` AS d
     JOIN `{$db->getPrefix()}hymns` AS h ON (d.pkey = h.service)
-    WHERE d.communion = 1
+    WHERE d.communion = 1 AND h.location IS NOT NULL
     GROUP BY d.pkey, h.location");
 $q->execute() or die(array_pop($q->errorInfo()));
 // Delete communion field
