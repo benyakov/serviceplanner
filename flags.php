@@ -24,6 +24,7 @@
     USA
  */
 require("./init.php");
+$now = strftime('%T');
 $this_script = $_SERVER['HTTP_HOST'].$_SERVER['SCRIPT_NAME'] ;
 if (! array_key_exists('step', $_POST)) {
     if (! (is_numeric($_GET['id']) and $_GET['location']) ) {
@@ -94,6 +95,7 @@ service and either add to them or change them.</p>
                 method="post">
 
                 <input type="hidden" name="step" value="change_flags">
+                <input type="hidden" name="user" value="<?=$uid?>">
                 <dl class="flags">
     <?      foreach ($rows as $row) { ?>
                 <dt><input type="text" name="<?="{$row['flag_id']}_flag"?>"
@@ -116,6 +118,7 @@ service and either add to them or change them.</p>
             <form id="service_flags" action="<?= $_SERVER['PHP_SELF'] ?>"
                 method="post">
             <input type="hidden" name="step" value="delete_flag">
+            <input type="hidden" name="user" value="<?=$uid?>">
             <dl class="flags">
     <?      foreach ($rows as $row) {
     ?>         <dt><?=$row['flag']?> <br>
@@ -168,13 +171,7 @@ service and either add to them or change them.</p>
 <?
 } elseif ("add_flag" == $_POST["step"]) {
 
-    if ($_POST["user"] == authUid()) {
-        $uid = $_POST["user"];
-    } else {
-        setMessage("Access denied.");
-        header("Location: index.php");
-        exit(0);
-    }
+    $uid = checkPostUser();
     $q = $db->prepare("INSERT INTO `{$db->getPrefix()}service_flags
         (`service`, `location`, `flag`, `value`, `uid`)
         VALUES (:service, :location, :flag, :value, :uid)");
@@ -187,13 +184,89 @@ service and either add to them or change them.</p>
 
     setMessage("Service flag added at {$now} server time.");
     header("Location: {$protocol}://{$this_script}?id={$id}&location={$urllocation}");
+
 } elseif ("delete_flag" == $_POST["step"]) {
 
-    setMessage("Service flags updated at {$now} server time.");
+    $uid = checkPostUser();
+    if ($_POST['delete_flag']) {
+        $flag_id = $_POST['delete_flag'];
+        // Check that this flag is owned by the current user.
+        $q = $db->prepare("DELETE FROM `{$db->getPrefix()}service_flags`
+            WHERE `pkey` = :flag_id AND `uid` = :user");
+        $q->bindParam(":flag_id", $flag_id);
+        $q->bindParam(":user", authUid());
+        $q->execute() or die(array_pop($q->errorInfo()));
+        if (1 > $q->rowCount) {
+            setMessage("Flag was not deleted. Are you sure it was yours?");
+        } else {
+            setMessage("Service flag deleted at {$now} server time.");
+        }
+    }
     header("Location: {$protocol}://{$this_script}?id={$id}&location={$urllocation}");
+
 } elseif ("change_flags" == $_POST["step"]) {
 
+    $uid = checkPostUser();
+    if (3 != authLevel()) {
+        setMessage("Access denied for non-admin user.");
+        header("Location: {$protocol}://{$this_script}?id={$id}&location={$urllocation}");
+        exit(0);
+    }
+    unset($_POST['step']); unset($_POST['user']);
+    $matches = array();
+    $deletes = array();
+    $flags = array();
+    foreach ($_POST as $key => $value) {
+        if (preg_match('/(\d+)_delete/', $key, $matches)) {
+            $deletes[] = $matches[1];
+        }
+        if (preg_match('/(\d+)_flag/', $key, $matches)) {
+            $flags[$matches[1]]['flag'] = $value;
+        }
+        if (preg_match('/(\d+)_value/', $key, $matches)) {
+            $flags[$matches[1]]['value'] = $value;
+        }
+    }
+    $deletecount = 0;
+    foreach ($deletes as $flag_id) {
+        if (isset($flags[$flag_id])) {
+            unset($flags[$flag_id]);
+        }
+        $q = $db->prepare("DELETE FROM `{$db->getPrefix()}service_flags`
+            WHERE `pkey` = :flag_id");
+        $q->bindParam(":flag_id", $flag_id);
+        $q->execute() or die(array_pop($q->errorInfo()));
+        $deletecount++;
+    }
+    setMessage("Deleted {$deletecount} flags.");
 
-    setMessage("Service flags updated at {$now} server time.");
+    $updatecount = 0;
+    $flag = "";
+    $value = "";
+    $flag_id = 0;
+    $q = >db->prepare("UPDATE `{$db->getPrefix()}service_flags`
+        SET `flag` = :flag, `value` = :value, `uid` = :uid
+        WHERE `pkey` = :flag_id");
+    $q->bindParam(":flag", $flag);
+    $q->bindParam(":value", $value);
+    $q->bindParam(":uid", $uid);
+    $q->bindParam(":flag_id", $flag_id);
+    foreach ($flags as $key => $val) {
+        $flag = $key;
+        $value = $val;
+        $q->execute() or die(array_pop($q->errorInfo()));
+        $updatecount++;
+    }
+    setMessage("{$updatecount} service flags updated at {$now} server time.");
     header("Location: {$protocol}://{$this_script}?id={$id}&location={$urllocation}");
+}
+
+function checkPostUser() {
+    if ($_POST["user"] == authUid()) {
+        return $_POST["user"];
+    } else {
+        setMessage("Access denied.");
+        header("Location: index.php");
+        exit(0);
+    }
 }
