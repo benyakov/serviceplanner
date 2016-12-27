@@ -25,7 +25,7 @@
  */
 require("./init.php");
 $this_script = $_SERVER['HTTP_HOST'].$_SERVER['SCRIPT_NAME'] ;
-if (! array_key_exists('stage', $_GET)) {
+if (! array_key_exists('step', $_POST)) {
     if (! (is_numeric($_GET['id']) and $_GET['location']) ) {
         setMessage("Need both a service and location to see service flags. ".
             "Have you chosen a location by adding hymns?");
@@ -34,6 +34,8 @@ if (! array_key_exists('stage', $_GET)) {
     } else {
         $id = $_GET['id'];
         $location = $_GET['location'];
+        $urllocation = urlencode($location);
+        $htmllocation = htmlentities($location);
     }
     ?><!DOCTYPE html>
     <html lang="en">
@@ -52,13 +54,6 @@ if (! array_key_exists('stage', $_GET)) {
         <p class="explanation">This page allows you to see the flags on a
 service and either add to them or change them.</p>
 <?
-//    $q = $db->prepare("SELECT d.rite, DATE_FORMAT(d.caldate, '%c/%e/%Y') AS d.date,
-//        f.flag, f.value, f.id AS flag_id, f.`uid`, CONCAT(u.fname, ' ', u.lname) AS user
-//        FROM `{$db->getPrefix()}days` AS d
-//        JOIN `{$db->getPrefix()}service_flags` AS f
-//        JOIN `{$db->getPrefix()}users` AS u ON (u.`uid` == f.`uid`)
-//        WHERE d.pkey = :day");
-//        AND f.location = :location");
     $q = $db->prepare("SELECT d.rite, DATE_FORMAT(d.caldate, '%c/%e/%Y') AS date,
         f.flag, f.value, f.pkey AS flag_id, f.`uid`, CONCAT(u.fname, ' ', u.lname) AS user
         FROM `{$db->getPrefix()}days` AS d
@@ -85,7 +80,7 @@ service and either add to them or change them.</p>
 
     //echo ("Found ".count($rows). " at {$location} for {$id}.");
 
-    ?><h1><?=$rows[0]['rite']?> at <?=htmlentities($location)?>
+    ?><h1><?=$rows[0]['rite']?> at <?=$htmllocation?>
         on <?=$rows[0]['date']?></h1>
       <h2>Current Flags</h2><?
 
@@ -95,7 +90,7 @@ service and either add to them or change them.</p>
         if (3 == $authlevel) { // Is Admin
         // Display a form of service flags for privileged users to edit
     ?>
-            <form id="service_flags" action="<?= $_SERVER['PHP_SELF']."?stage=2" ?>"
+            <form id="service_flags" action="<?= $_SERVER['PHP_SELF'] ?>"
                 method="post">
 
                 <input type="hidden" name="step" value="change_flags">
@@ -118,8 +113,9 @@ service and either add to them or change them.</p>
         } else {
         // Display a table for less privileged users
     ?>
-            <form id="service_flags" action="<?= $_SERVER['PHP_SELF']."?stage=2" ?>"
+            <form id="service_flags" action="<?= $_SERVER['PHP_SELF'] ?>"
                 method="post">
+            <input type="hidden" name="step" value="delete_flag">
             <dl class="flags">
     <?      foreach ($rows as $row) {
     ?>         <dt><?=$row['flag']?> <br>
@@ -142,9 +138,11 @@ service and either add to them or change them.</p>
     ?><hr><h2>Set a New Flag</h2><?
     // Display a form for privileged and less-privileged users to add flags
 ?>
-    <form id="add_flag" action="<?= $_SERVER['PHP_SELF']."?stage=2" ?>" method="post">
+    <form id="add_flag" action="<?= $_SERVER['PHP_SELF'] ?>" method="post">
         <input type="hidden" name="step" value="add_flag">
         <input type="hidden" name="user" value="<?=$uid?>">
+        <input type="hidden" name="service" value="<?=$id?>">
+        <input type="hidden" name="location" value="<?=$location?>">
         <?
         if (3 == $authlevel) { ?>
             <input type="text" name="flag" placeholder="Name of flag">
@@ -152,13 +150,13 @@ service and either add to them or change them.</p>
             $options = getOptions();
             ?> <select name="flag" id="flag"> <?
             foreach ($options->get("addable_service_flags") as $opt)
-                echo "<option name=\"{$opt}\">{$opt}</option>\n";
+                echo "<option value=\"{$opt}\">{$opt}</option>\n";
             ?> </select>
             <?
         }
     ?>
         <input class="flag-value" type="text" id="value" name="value"
-            placeholder="No value">
+            placeholder="Flag value (optional)">
         <button id="submit" name="submit">Submit New Flag</button>
         </form> <br><?
     $q = queryService($id);
@@ -168,8 +166,34 @@ service and either add to them or change them.</p>
     </body>
     </html>
 <?
-} elseif (2 == $_GET["stage"])
-{
+} elseif ("add_flag" == $_POST["step"]) {
+
+    if ($_POST["user"] == authUid()) {
+        $uid = $_POST["user"];
+    } else {
+        setMessage("Access denied.");
+        header("Location: index.php");
+        exit(0);
+    }
+    $q = $db->prepare("INSERT INTO `{$db->getPrefix()}service_flags
+        (`service`, `location`, `flag`, `value`, `uid`)
+        VALUES (:service, :location, :flag, :value, :uid)");
+    $q->bindParam(":service", $_POST['service']);
+    $q->bindParam(":location", $_POST['location']);
+    $q->bindParam(":flag":, $_POST['flag']);
+    $q->bindParam(":value":, $_POST['value']);
+    $q->bindParam(":uid": , $uid);
+    $q->execute() or die(array_pop($q->errorInfo()));
+
+    setMessage("Service flag added at {$now} server time.");
+    header("Location: {$protocol}://{$this_script}?id={$id}&location={$urllocation}");
+} elseif ("delete_flag" == $_POST["step"]) {
+
     setMessage("Service flags updated at {$now} server time.");
-    header("Location: {$protocol}://{$this_script}?id={$service}");
+    header("Location: {$protocol}://{$this_script}?id={$id}&location={$urllocation}");
+} elseif ("change_flags" == $_POST["step"]) {
+
+
+    setMessage("Service flags updated at {$now} server time.");
+    header("Location: {$protocol}://{$this_script}?id={$id}&location={$urllocation}");
 }
