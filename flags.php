@@ -95,6 +95,8 @@ service and either add to them or change them.</p>
                 method="post">
 
                 <input type="hidden" name="step" value="change_flags">
+                <input type="hidden" name="service" value="<?=$id?>">
+                <input type="hidden" name="location" value="<?=$location?>">
                 <input type="hidden" name="user" value="<?=$uid?>">
                 <dl class="flags">
     <?      foreach ($rows as $row) { ?>
@@ -103,7 +105,7 @@ service and either add to them or change them.</p>
                     [<?=$row['user']?>]</dt>
                 <dd><input class="flag-value" type="text" name="<?="{$row['flag_id']}_value"?>"
                     value="<?=$row['value']?>" placeholder="No value"></dd>
-                <dd><input type="checkbox" name="<?="{$row['flag-id']}_delete"?>">
+                <dd><input type="checkbox" name="<?="{$row['flag_id']}_delete"?>">
                     (delete)</dd>
     <?      } ?>
                 </dl>
@@ -119,6 +121,8 @@ service and either add to them or change them.</p>
                 method="post">
             <input type="hidden" name="step" value="delete_flag">
             <input type="hidden" name="user" value="<?=$uid?>">
+            <input type="hidden" name="service" value="<?=$id?>">
+            <input type="hidden" name="location" value="<?=$location?>">
             <dl class="flags">
     <?      foreach ($rows as $row) {
     ?>         <dt><?=$row['flag']?> <br>
@@ -172,18 +176,18 @@ service and either add to them or change them.</p>
 } elseif ("add_flag" == $_POST["step"]) {
 
     $uid = checkPostUser();
-    $q = $db->prepare("INSERT INTO `{$db->getPrefix()}service_flags
+    $q = $db->prepare("INSERT INTO `{$db->getPrefix()}service_flags`
         (`service`, `location`, `flag`, `value`, `uid`)
         VALUES (:service, :location, :flag, :value, :uid)");
     $q->bindParam(":service", $_POST['service']);
     $q->bindParam(":location", $_POST['location']);
-    $q->bindParam(":flag":, $_POST['flag']);
-    $q->bindParam(":value":, $_POST['value']);
-    $q->bindParam(":uid": , $uid);
+    $q->bindParam(":flag", $_POST['flag']);
+    $q->bindParam(":value", $_POST['value']);
+    $q->bindParam(":uid", $uid);
     $q->execute() or die(array_pop($q->errorInfo()));
 
     setMessage("Service flag added at {$now} server time.");
-    header("Location: {$protocol}://{$this_script}?id={$id}&location={$urllocation}");
+    header("Location: {$protocol}://{$this_script}?id={$_POST['service']}&location={$_POST['location']}");
 
 } elseif ("delete_flag" == $_POST["step"]) {
 
@@ -201,18 +205,22 @@ service and either add to them or change them.</p>
         } else {
             setMessage("Service flag deleted at {$now} server time.");
         }
+        header("Location: {$protocol}://{$this_script}?id={$_POST['service']}&location={$_POST['location']}");
+    } else {
+        setMessage("Couldn't identify a flag to delete.");
+        header("Location: index.php");
     }
-    header("Location: {$protocol}://{$this_script}?id={$id}&location={$urllocation}");
 
 } elseif ("change_flags" == $_POST["step"]) {
 
     $uid = checkPostUser();
     if (3 != authLevel()) {
         setMessage("Access denied for non-admin user.");
-        header("Location: {$protocol}://{$this_script}?id={$id}&location={$urllocation}");
+        header("Location: index.php");
         exit(0);
     }
     unset($_POST['step']); unset($_POST['user']);
+    $message = array();
     $matches = array();
     $deletes = array();
     $flags = array();
@@ -236,15 +244,15 @@ service and either add to them or change them.</p>
             WHERE `pkey` = :flag_id");
         $q->bindParam(":flag_id", $flag_id);
         $q->execute() or die(array_pop($q->errorInfo()));
-        $deletecount++;
+        $deletecount += $q->rowCount();
     }
-    setMessage("Deleted {$deletecount} flags.");
+    $message[] = "Deleted {$deletecount} flags.";
 
     $updatecount = 0;
     $flag = "";
     $value = "";
     $flag_id = 0;
-    $q = >db->prepare("UPDATE `{$db->getPrefix()}service_flags`
+    $q = $db->prepare("UPDATE `{$db->getPrefix()}service_flags`
         SET `flag` = :flag, `value` = :value, `uid` = :uid
         WHERE `pkey` = :flag_id");
     $q->bindParam(":flag", $flag);
@@ -255,10 +263,12 @@ service and either add to them or change them.</p>
         $flag = $key;
         $value = $val;
         $q->execute() or die(array_pop($q->errorInfo()));
-        $updatecount++;
+        $updatecount += $q->rowCount();
     }
-    setMessage("{$updatecount} service flags updated at {$now} server time.");
-    header("Location: {$protocol}://{$this_script}?id={$id}&location={$urllocation}");
+    $message[] = "{$updatecount} service flags updated at {$now} server time.";
+    setMessage(implode("<br>", $message));
+    header("Location: {$protocol}://{$this_script}?id={$_POST['service']}&location={$_POST['location']}");
+
 }
 
 function checkPostUser() {
