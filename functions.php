@@ -338,12 +338,16 @@ function modify_records_table($q, $action) {
             echo "<tr data-loc=\"{$row['location']}\" class=\"heading servicehead\"><td>
             <input form=\"delete-service\" type=\"checkbox\" name=\"{$row['serviceid']}_{$row['location']}\" id=\"check_{$row['serviceid']}_{$row['location']}\">
             <span class=\"heavy\">{$datetext} {$row['location']}</span>
-            <div class=\"menublock\">
+            <div class=\"menublock\">";
+            if (3 == $auth) {
+                echo "
             <a class=\"menulink\" href=\"enter.php?date={$urldate}\" title=\"Add another service or hymns on {$row['date']}.\">Add</a>
-            <a class=\"menulink copy-service\" data-id=\"{$row['serviceid']}\" href=\"#\" title=\"Copy this to another date.\">Copy</a>
-            <a href=\"#\" class=\"edit-service menulink\" title=\"Edit this service.\" data-id=\"{$row['serviceid']}\">Edit</a>
-            <a class=\"menulink\" href=\"print.php?id={$row['serviceid']}\" title=\"Show a printable format of this service.\">Print</a>
             <a class=\"menulink\" title=\"See or edit sermon plans for this service.\" href=\"sermon.php?id={$row['serviceid']}\">Sermon</a>
+            <a class=\"menulink copy-service\" data-id=\"{$row['serviceid']}\" href=\"#\" title=\"Copy this to another date.\">Copy</a>
+            <a href=\"#\" class=\"edit-service menulink\" title=\"Edit this service.\" data-id=\"{$row['serviceid']}\">Edit</a>";
+            }
+            echo "
+            <a class=\"menulink\" href=\"print.php?id={$row['serviceid']}\" title=\"Show a printable format of this service.\">Print</a>
             <a class=\"menulink\" title=\"See or edit flags for this service.\" href=\"flags.php?id={$row['serviceid']}&location={$urllocation}\">Flags</a>
             </div>
             </td>

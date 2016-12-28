@@ -96,15 +96,15 @@ service and either add to them or change them.</p>
 
                 <input type="hidden" name="step" value="change_flags">
                 <input type="hidden" name="service" value="<?=$id?>">
-                <input type="hidden" name="location" value="<?=$location?>">
+                <input type="hidden" name="location" value="<?=htmlspecialchars($location)?>">
                 <input type="hidden" name="user" value="<?=$uid?>">
                 <dl class="flags">
     <?      foreach ($rows as $row) { ?>
                 <dt><input type="text" name="<?="{$row['flag_id']}_flag"?>"
-                    value="<?=$row['flag']?>"><br>
-                    [<?=$row['user']?>]</dt>
+                    value="<?=htmlspecialchars($row['flag'])?>"><br>
+                    [<?=htmlspecialchars($row['user'])?>]</dt>
                 <dd><input class="flag-value" type="text" name="<?="{$row['flag_id']}_value"?>"
-                    value="<?=$row['value']?>" placeholder="No value"></dd>
+                    value="<?=htmlspecialchars($row['value'])?>" placeholder="No value"></dd>
                 <dd><input type="checkbox" name="<?="{$row['flag_id']}_delete"?>">
                     (delete)</dd>
     <?      } ?>
@@ -115,28 +115,28 @@ service and either add to them or change them.</p>
     <?
 
         } else {
-        // Display a table for less privileged users
+        // Display a list for less privileged users
     ?>
             <form id="service_flags" action="<?= $_SERVER['PHP_SELF'] ?>"
                 method="post">
             <input type="hidden" name="step" value="delete_flag">
             <input type="hidden" name="user" value="<?=$uid?>">
             <input type="hidden" name="service" value="<?=$id?>">
-            <input type="hidden" name="location" value="<?=$location?>">
+            <input type="hidden" name="location" value="<?=htmlspecialchars($location)?>">
             <dl class="flags">
     <?      foreach ($rows as $row) {
-    ?>         <dt><?=$row['flag']?> <br>
+    ?>         <dt><?=htmlspecialchars($row['flag'])?> <br>
+                [<?=htmlspecialchars($row['user'])?>] </dt>
+               <dd><?=htmlspecialchars($row['value'])?>
     <?
                 if ($uid == $row['uid']) {
-                    ?> <button name="delete_flag"
-                        data-id="<?=$row['flag_id']?>">Delete</button><?
-                } else {
-                    ?>[<?=$row['user']?>]<?
-                }
-                ?></dt>
-                <dd><?=$row['value']?></dd>
-            </dl>
+                  ?><br><button name="delete_flag"
+                        data-id="<?=$row['flag_id']?>"
+                        value="<?=$row['flag_id']?>">Delete</button><?
+                } ?>
+                <dd>
     <?      } ?>
+            </dl>
             </table>
             </form>
     <?
@@ -186,24 +186,26 @@ service and either add to them or change them.</p>
     $q->bindParam(":uid", $uid);
     $q->execute() or die(array_pop($q->errorInfo()));
 
-    setMessage("Service flag added at {$now} server time.");
+    setMessage("Service flag added.");
     header("Location: {$protocol}://{$this_script}?id={$_POST['service']}&location={$_POST['location']}");
 
 } elseif ("delete_flag" == $_POST["step"]) {
 
     $uid = checkPostUser();
     if ($_POST['delete_flag']) {
+        //print_r($_POST);
+        //exit(0);
         $flag_id = $_POST['delete_flag'];
         // Check that this flag is owned by the current user.
         $q = $db->prepare("DELETE FROM `{$db->getPrefix()}service_flags`
             WHERE `pkey` = :flag_id AND `uid` = :user");
         $q->bindParam(":flag_id", $flag_id);
-        $q->bindParam(":user", authUid());
+        $q->bindParam(":user", $uid);
         $q->execute() or die(array_pop($q->errorInfo()));
-        if (1 > $q->rowCount) {
+        if (1 > $q->rowCount()) {
             setMessage("Flag was not deleted. Are you sure it was yours?");
         } else {
-            setMessage("Service flag deleted at {$now} server time.");
+            setMessage("Service flag deleted.");
         }
         header("Location: {$protocol}://{$this_script}?id={$_POST['service']}&location={$_POST['location']}");
     } else {
@@ -236,13 +238,16 @@ service and either add to them or change them.</p>
         }
     }
     $deletecount = 0;
-    foreach ($deletes as $flag_id) {
-        if (isset($flags[$flag_id])) {
-            unset($flags[$flag_id]);
+    $flag_id = 0;
+    $db->beginTransaction();
+    $q = $db->prepare("DELETE FROM `{$db->getPrefix()}service_flags`
+        WHERE `pkey` = :flag_id");
+    $q->bindParam(":flag_id", $flag_id);
+    foreach ($deletes as $fid) {
+        if (isset($flags[$fid])) {
+            unset($flags[$fid]);
         }
-        $q = $db->prepare("DELETE FROM `{$db->getPrefix()}service_flags`
-            WHERE `pkey` = :flag_id");
-        $q->bindParam(":flag_id", $flag_id);
+        $flag_id = $fid;
         $q->execute() or die(array_pop($q->errorInfo()));
         $deletecount += $q->rowCount();
     }
@@ -250,7 +255,7 @@ service and either add to them or change them.</p>
 
     $updatecount = 0;
     $flag = "";
-    $value = "";
+    $value = '';
     $flag_id = 0;
     $q = $db->prepare("UPDATE `{$db->getPrefix()}service_flags`
         SET `flag` = :flag, `value` = :value, `uid` = :uid
@@ -259,13 +264,15 @@ service and either add to them or change them.</p>
     $q->bindParam(":value", $value);
     $q->bindParam(":uid", $uid);
     $q->bindParam(":flag_id", $flag_id);
-    foreach ($flags as $key => $val) {
-        $flag = $key;
-        $value = $val;
+    foreach ($flags as $fid => $data) {
+        $flag_id = $fid;
+        $flag = $data['flag'];
+        $value = $data['value'];
         $q->execute() or die(array_pop($q->errorInfo()));
         $updatecount += $q->rowCount();
     }
-    $message[] = "{$updatecount} service flags updated at {$now} server time.";
+    $message[] = "{$updatecount} service flags updated.";
+    $db->commit();
     setMessage(implode("<br>", $message));
     header("Location: {$protocol}://{$this_script}?id={$_POST['service']}&location={$_POST['location']}");
 
