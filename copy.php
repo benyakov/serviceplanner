@@ -32,10 +32,10 @@ if (! $auth) {
 $this_script = $_SERVER['HTTP_HOST'].$_SERVER['SCRIPT_NAME'] ;
 $dbh = new DBConnection();
 $dbh->beginTransaction();
-$q = $dbh->prepare("INSERT INTO `{$dbp}days`
+$q = $dbh->prepare("INSERT INTO `{$db->getPrefix()}days`
     (caldate, name, rite, servicenotes, block)
     SELECT :date, name, rite, servicenotes, block
-    FROM `{$dbp}days` WHERE pkey = :id");
+    FROM `{$db->getPrefix()}days` WHERE pkey = :id");
 $q->bindParam(':date', $_GET['chosendate']);
 $q->bindParam(':id', $_GET['id']);
 $q->execute() or die(json_encode(array(False, array_pop($q->errorInfo()))));
@@ -43,18 +43,18 @@ $q = $dbh->prepare("SELECT LAST_INSERT_ID()");
 $q->execute() or die(json_encode(array(False, array_pop($q->errorInfo()))));
 $row = $q->fetch();
 $serviceid = $row[0];
-$q = $dbh->prepare("INSERT INTO `{$dbp}hymns`
+$q = $dbh->prepare("INSERT INTO `{$db->getPrefix()}hymns`
     (service, location, book, number, note, sequence)
     SELECT :service, location, book, number, note, sequence
-    FROM `{$dbp}hymns`
+    FROM `{$db->getPrefix()}hymns`
     WHERE service = :id");
 $q->bindParam(":service", $serviceid);
 $q->bindParam(":id", $_GET['id']);
 $q->execute() or die(json_encode(array(False, array_pop($q->errorInfo()))));
-$q = $dbh->prepare("INSERT INTO `{$dbp}sermons`
+$q = $dbh->prepare("INSERT INTO `{$db->getPrefix()}sermons`
     (bibletext, outline, notes, manuscript, mstype, service)
     SELECT bibletext, outline, notes, manuscript, mstype, :service
-    FROM `{$dbp}sermons`
+    FROM `{$db->getPrefix()}sermons`
     WHERE service = :id");
 $q->bindParam(":service", $serviceid);
 $q->bindParam(":id", $_GET['id']);
