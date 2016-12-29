@@ -386,7 +386,7 @@ to have a recent backup first, at least of your church year data.</p>
     </ol>
 
     <? // Use standard lookup function, providing default and returning seconds
-    $akmax = getAuthCookieMaxAge()/(24*60*60);  ?>
+    $akmax = floor(getAuthCookieMaxAge()/(24*60*60));  ?>
     <h3>Config Settings</h2><? $config = getConfig(false); ?>
     <form id="configsettings" action="<?=$_SERVER['PHP_SELF']?>?flag=savesettings" method="post">
     <dl>
@@ -431,7 +431,7 @@ The only tabs accessible to anonymous users are "index", "records",
       This extends your normal login session, which expires after a few hours,
       usually just before you submit a meticulously-prepared service.</dd>
     <dd><input type="number" name="cookie-age"
-         value="<?=$akmax/(60*60*24)?>" size="4"></dd>
+         value="<?=$akmax?>" size="4"></dd>
     <dt>Hymnbooks Available</dt>
     <dd class="explanation">List of hymnbook abbreviations that will be
 available for specifying hymns. The first will be the default book.</dd>

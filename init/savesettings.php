@@ -72,7 +72,7 @@ if (isset($_POST['sitetabs-config-anon']) && $auth) {
 }
 
 if (isset($_POST["cookie-age"]) && $auth) {
-    $config->set('authcookie_max_age', intval($_POST['cookie-age']*60*60*24));
+    $config->set('authcookie_max_age', intval($_POST['cookie-age']));
     setMessage("Config: Set max authorization cookie age.");
 }
 
@@ -107,7 +107,7 @@ if (isset($_POST['modifyorder-option']) && $auth) {
 }
 
 if (isset($_POST['service-flags-option']) && $auth) {
-    $options->set('addable_service_flags'), explode("\n", $_POST['service-flags-option']));
+    $options->set('addable_service_flags', explode("\n", $_POST['service-flags-option']));
     setMessage("Addable Service Flags option has been set.");
 }
 
