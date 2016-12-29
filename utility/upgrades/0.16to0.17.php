@@ -36,7 +36,7 @@ $db->beginTransaction();
 $q = $db->prepare("CREATE TABLE `{$db->getPrefix()}service_flags` (
   `pkey` int(10) unsigned NOT NULL auto_increment,
   `service` int(10) unsigned,
-  `location` varchar(50),
+  `occurrence` varchar(50),
   `flag` varchar(100) NOT NULL,
   `value` varchar(100) default NULL,
   `uid` tinyint,
@@ -51,7 +51,7 @@ $db->beginTransaction();
 // Populate with existing communion service data.
 $uid = (int)$authdata['uid'];
 $q = $db->prepare("INSERT INTO `{$db->getPrefix()}service_flags`
-    (`service`, `location`, `flag`, `uid`)
+    (`service`, `occurrence`, `flag`, `uid`)
     SELECT d.pkey, h.location, 'communion', {$uid} FROM
     `{$db->getPrefix()}days` AS d
     JOIN `{$db->getPrefix()}hymns` AS h ON (d.pkey = h.service)
@@ -63,8 +63,15 @@ $rm[] = "Populated service flags table with communion flags.";
 $q = $db->prepare("ALTER TABLE `{$db->getPrefix()}days`
     DROP COLUMN `communion`");
 $q->execute() or die(array_pop($q->errorInfo()));
-$db->commit();
 $rm[] = "Removed communion column from days table.";
+
+// Change "location" to "occurrence"
+$db->beginTransaction();
+$q = >db->prepare("ALTER TABLE `{$db->getPrefix()}hymns`
+    CHANGE `location` `occurrence` varchar(50) default NULL");
+$q->execute() or die(array_pop($q->errorInfo()));
+$db->commit();
+
 
 $options = new Configfile("./options.ini", true, true, true);
 // These services flags can be set by less privileged users to indicate possibilities

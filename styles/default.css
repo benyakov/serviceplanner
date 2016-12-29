@@ -165,7 +165,7 @@ a.command-link:visited {
     color: blue;
     background-color: transparent;
 }
-input.edit-location {
+input.edit-occurrence {
     width: 10em;
 }
 input#lowdate,
@@ -574,7 +574,7 @@ section#service-items label {
     font-weight: bold;
 }
 
-input#location,
+input#occurrence,
 input#liturgicalname,
 input#rite {
     width: 25em;
@@ -717,7 +717,7 @@ tr.propers p {
     font-size: .8em;
 }
 
-ul#adjusterlocations {
+ul#adjusteroccurrences {
     list-style-type: none;
     padding: 0px;
     margin: 0px;

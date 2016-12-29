@@ -35,7 +35,7 @@ CREATE TABLE `days` (
 CREATE TABLE `service_flags` (
   `pkey` int(10) unsigned NOT NULL auto_increment,
   `service` int(10) unsigned,
-  `location` varchar(50),
+  `occurrence` varchar(50),
   `flag` varchar(100) NOT NULL,
   `value` varchar(100) default NULL,
   `uid` smallint,
@@ -48,7 +48,7 @@ CREATE TABLE `hymns` (
   `book` varchar(5) default NULL,
   `number` int(11) default NULL,
   `note` varchar(100) default NULL,
-  `location` varchar(50) default NULL,
+  `occurrence` varchar(50) default NULL,
   `service` int(10) unsigned default NULL,
   `sequence` tinyint(3) unsigned default NULL,
   KEY `pkey` (`pkey`),

@@ -28,16 +28,16 @@ $now = strftime('%T');
 $this_script = $_SERVER['HTTP_HOST'].$_SERVER['SCRIPT_NAME'] ;
 if (! array_key_exists('step', $_POST)) {
     if ("get" == $_GET['action'] &&
-        is_numeric($_GET['service']) && $_GET['loc']) // Return a formatted flag.
+        is_numeric($_GET['service']) && $_GET['occurence']) // Return a formatted flag.
     {
         $q = $db->prepare("SELECT f.flag, f.value,
             CONCAT(u.fname, ' ', u.lname) AS user
             FROM `{$db->getPrefix()}service_flags` AS f
             JOIN `{$db->getPrefix()}users` AS u ON (u.`uid` = f.`uid`)
             WHERE f.service = :service
-            AND f.location = :location ");
+            AND f.occurrence = :occurrence ");
         $q->bindParam(":service", $_GET['service']);
-        $q->bindParam(":location", $_GET['loc']);
+        $q->bindParam(":occurrence", $_GET['occurence']);
         $q->execute() or die(json_encode(array(-1, array_pop($q->errorInfo()))));
         $results = $q->fetchAll(PDO::FETCH_ASSOC);
         $rv = array();
@@ -52,16 +52,16 @@ if (! array_key_exists('step', $_POST)) {
         echo(json_encode(array(count($results), $formatted)));
         exit(0);
     }
-    if (! (is_numeric($_GET['id']) and $_GET['location']) ) {
-        setMessage("Need both a service and location to see service flags. ".
-            "Have you chosen a location by adding hymns?");
+    if (! (is_numeric($_GET['id']) and $_GET['occurrence']) ) {
+        setMessage("Need both a service and occurrence to see service flags. ".
+            "Have you chosen a occurrence by adding hymns?");
         header("Location: modify.php");
         exit(0);
     } else {
         $id = $_GET['id'];
-        $location = $_GET['location'];
-        $urllocation = urlencode($location);
-        $htmllocation = htmlspecialchars($location);
+        $occurrence = $_GET['occurrence'];
+        $urloccurrence = urlencode($occurrence);
+        $htmloccurrence = htmlspecialchars($occurrence);
     }
     ?><!DOCTYPE html>
     <html lang="en">
@@ -87,9 +87,9 @@ service and either add to them or change them.</p>
         JOIN `{$db->getPrefix()}service_flags` AS f ON (d.pkey=f.service)
         JOIN `{$db->getPrefix()}users` AS u ON (u.`uid` = f.`uid`)
         WHERE d.pkey = :day
-        AND f.location = :location ");
+        AND f.occurrence = :occurrence ");
     $q->bindParam(":day", $id);
-    $q->bindParam(":location", $location);
+    $q->bindParam(":occurrence", $occurrence);
     $q->execute() or die(array_pop($q->errorInfo()));
     $rows = $q->fetchAll(PDO::FETCH_ASSOC);
 
@@ -105,9 +105,9 @@ service and either add to them or change them.</p>
         $has_flags = true;
     }
 
-    //echo ("Found ".count($rows). " at {$location} for {$id}.");
+    //echo ("Found ".count($rows). " at {$occurrence} for {$id}.");
 
-    ?><h1><?=$rows[0]['rite']?> at <?=$htmllocation?>
+    ?><h1><?=$rows[0]['rite']?> at <?=$htmloccurrence?>
         on <?=$rows[0]['date']?></h1>
       <h2>Current Flags</h2><?
 
@@ -122,7 +122,7 @@ service and either add to them or change them.</p>
 
                 <input type="hidden" name="step" value="change_flags">
                 <input type="hidden" name="service" value="<?=$id?>">
-                <input type="hidden" name="location" value="<?=htmlspecialchars($location)?>">
+                <input type="hidden" name="occurrence" value="<?=htmlspecialchars($occurrence)?>">
                 <input type="hidden" name="user" value="<?=$uid?>">
                 <dl class="flags">
     <?      foreach ($rows as $row) { ?>
@@ -148,7 +148,7 @@ service and either add to them or change them.</p>
             <input type="hidden" name="step" value="delete_flag">
             <input type="hidden" name="user" value="<?=$uid?>">
             <input type="hidden" name="service" value="<?=$id?>">
-            <input type="hidden" name="location" value="<?=htmlspecialchars($location)?>">
+            <input type="hidden" name="occurrence" value="<?=htmlspecialchars($occurrence)?>">
             <dl class="flags">
     <?      foreach ($rows as $row) {
     ?>         <dt><?=htmlspecialchars($row['flag'])?> <br>
@@ -175,7 +175,7 @@ service and either add to them or change them.</p>
         <input type="hidden" name="step" value="add_flag">
         <input type="hidden" name="user" value="<?=$uid?>">
         <input type="hidden" name="service" value="<?=$id?>">
-        <input type="hidden" name="location" value="<?=$location?>">
+        <input type="hidden" name="occurrence" value="<?=$occurrence?>">
         <?
         if (3 == $authlevel) { ?>
             <input type="text" name="flag" placeholder="Name of flag">
@@ -203,17 +203,17 @@ service and either add to them or change them.</p>
 
     $uid = checkPostUser();
     $q = $db->prepare("INSERT INTO `{$db->getPrefix()}service_flags`
-        (`service`, `location`, `flag`, `value`, `uid`)
-        VALUES (:service, :location, :flag, :value, :uid)");
+        (`service`, `occurrence`, `flag`, `value`, `uid`)
+        VALUES (:service, :occurrence, :flag, :value, :uid)");
     $q->bindParam(":service", $_POST['service']);
-    $q->bindParam(":location", $_POST['location']);
+    $q->bindParam(":occurrence", $_POST['occurrence']);
     $q->bindParam(":flag", $_POST['flag']);
     $q->bindParam(":value", $_POST['value']);
     $q->bindParam(":uid", $uid);
     $q->execute() or die(array_pop($q->errorInfo()));
 
     setMessage("Service flag added.");
-    header("Location: {$protocol}://{$this_script}?id={$_POST['service']}&location={$_POST['location']}");
+    header("Location: {$protocol}://{$this_script}?id={$_POST['service']}&occurrence={$_POST['occurrence']}");
 
 } elseif ("delete_flag" == $_POST["step"]) {
 
@@ -233,7 +233,7 @@ service and either add to them or change them.</p>
         } else {
             setMessage("Service flag deleted.");
         }
-        header("Location: {$protocol}://{$this_script}?id={$_POST['service']}&location={$_POST['location']}");
+        header("Location: {$protocol}://{$this_script}?id={$_POST['service']}&occurrence={$_POST['occurrence']}");
     } else {
         setMessage("Couldn't identify a flag to delete.");
         header("Location: index.php");
@@ -300,7 +300,7 @@ service and either add to them or change them.</p>
     $message[] = "{$updatecount} service flags updated.";
     $db->commit();
     setMessage(implode("<br>", $message));
-    header("Location: {$protocol}://{$this_script}?id={$_POST['service']}&location={$_POST['location']}");
+    header("Location: {$protocol}://{$this_script}?id={$_POST['service']}&occurrence={$_POST['occurrence']}");
 
 }
 

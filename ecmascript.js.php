@@ -74,9 +74,9 @@ function addHymnToTable() {
         .attr("id", "note_new-"+indexStart)
         .attr("name", "note_new-"+indexStart)
         .val("");
-    $("#hymnentries > tbody > tr").eq(-2).find('[id^=location]')
-        .attr("id", "location_new-"+indexStart)
-        .attr("name", "location_new-"+indexStart);
+    $("#hymnentries > tbody > tr").eq(-2).find('[id^=occurrence]')
+        .attr("id", "occurrence_new-"+indexStart)
+        .attr("name", "occurrence_new-"+indexStart);
     $("#hymnentries > tbody > tr").eq(-2).find('[id^=title]')
         .attr("id", "title_new-"+indexStart)
         .attr("name", "title_new-"+indexStart)
@@ -219,13 +219,13 @@ function fetchHymnTitle() {
                     $("#savetitle_"+entryNumber).show();
                 }
                 var past = new Array;
-                var locstr;
+                var occstr;
                 for (service in pastServices) {
-                    locstr = pastServices[service]['location']
-                        ?" (" + pastServices[service]['location'] + ")"
+                    occstr = pastServices[service]['occurrence']
+                        ?" (" + pastServices[service]['occurrence'] + ")"
                         :"";
                     if (pastServices[service]['date']) {
-                        past.push(pastServices[service]['date'] + locstr);
+                        past.push(pastServices[service]['date'] + occstr);
                     }
                 }
                 if (past) {
@@ -491,16 +491,16 @@ function updateCSS() {
     localStorage.setItem("notefont", $("#notefont").val());
     localStorage.setItem("blockdisplay", $("#cssblockdisplay").is(':checked'));
     localStorage.setItem("propers", $("#csspropers").is(':checked'));
-    var locboxes = $(".cssadjusterloc").get();
-    if (localStorage.getItem('locations'))
-        var locarray = $.parseJSON(localStorage.getItem('locations'));
+    var occboxes = $(".cssadjusterloc").get();
+    if (localStorage.getItem('occurrences'))
+        var locarray = $.parseJSON(localStorage.getItem('occurrences'));
     else var locarray = new Object();
-    for (domitem in locboxes) {
-        var name = $(locboxes[domitem]).attr('name');
-        var checked = $(locboxes[domitem]).is(':checked');
-        locarray[name] = checked;
+    for (domitem in occboxes) {
+        var name = $(occboxes[domitem]).attr('name');
+        var checked = $(occboxes[domitem]).is(':checked');
+        occarray[name] = checked;
     }
-    localStorage.setItem("locations", JSON.stringify(locarray));
+    localStorage.setItem("occurrences", JSON.stringify(occarray));
     setCSSTweaks();
 }
 
@@ -519,13 +519,13 @@ function setCSSTweaks() {
         localStorage.getItem("propers") == "false")
         $(".propers").addClass("hidden");
     else $(".propers").removeClass("hidden");
-    if (localStorage.getItem("locations")) {
-        var locations = $.parseJSON(localStorage.getItem("locations"));
-        for (loc in locations) {
-            if (locations[loc]) {
-                $('tr[data-loc="'+loc+'"]').show();
+    if (localStorage.getItem("occurrences")) {
+        var occurrences = $.parseJSON(localStorage.getItem("occurrences"));
+        for (occ in occurrences) {
+            if (occurrences[occ]) {
+                $('tr[data-occ="'+occ+'"]').show();
             } else {
-                $('tr[data-loc="'+loc+'"]').hide();
+                $('tr[data-occ="'+occ+'"]').hide();
             }
         }
     }
@@ -591,13 +591,13 @@ function setupFlags() {
 }
 function pullFlags(index, row) {
     if (! ($(row).data('service')
-        && $(row).data('loc'))) {
+        && $(row).data('occ'))) {
         return true;
     }
     var xhr = $.getJSON("flags.php", {
         action: 'get',
         service: $(row).data('service'),
-        loc: $(row).data('loc') },
+        occ: $(row).data('occ') },
         function(result) {
             if (result[0]>0) {
                 $(row).children().eq(0).html(result[1]);

@@ -36,11 +36,11 @@ if (is_numeric($_GET["service"])) {
     $csvex->setFieldnames(array("Date", "Day", "Order", "Service Notes",
         "Introit", "Gradual", "Propers Note", "Color", "Theme", "Block",
         "Block Notes", "Lesson 1", "Lesson 2", "Gospel", "Psalm", "Collect",
-        "Hymnbook", "Hymnnumber", "Hymnnote", "Hymnlocation", "Hymntitle"));
+        "Hymnbook", "Hymnnumber", "Hymnnote", "Hymnoccurrence", "Hymntitle"));
     $csvex->setFieldselection(array('date', 'dayname', 'rite', 'servicenotes',
         'introit', 'gradual', 'propersnote', 'color', 'theme', 'blabel',
         'bnotes', 'blesson1', 'blesson2', 'bgospel', 'bpsalm', 'bcollect',
-        'book', 'number', 'note', 'location', 'title'));
+        'book', 'number', 'note', 'occurrence', 'title'));
     $csvex->setFilebaseIndex("dayname");
     $csvex->export();
 }

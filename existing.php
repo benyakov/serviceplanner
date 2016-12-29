@@ -50,7 +50,7 @@ if ($q->rowCount()) {
         $qh = $db->prepare("SELECT h.book, h.number
             FROM `{$db->getPrefix()}hymns` AS h
             WHERE h.service = ?
-            ORDER BY h.location, h.sequence");
+            ORDER BY h.occurrence, h.sequence");
         $qh->execute(array($row['service'])) or die(array_pop($qh->errorInfo()));
         $hymns = array();
         while ($hrow = $qh->fetch(PDO::FETCH_ASSOC))

@@ -44,8 +44,8 @@ $q->execute() or die(json_encode(array(False, array_pop($q->errorInfo()))));
 $row = $q->fetch();
 $serviceid = $row[0];
 $q = $dbh->prepare("INSERT INTO `{$db->getPrefix()}hymns`
-    (service, location, book, number, note, sequence)
-    SELECT :service, location, book, number, note, sequence
+    (service, occurrence, book, number, note, sequence)
+    SELECT :service, occurrence, book, number, note, sequence
     FROM `{$db->getPrefix()}hymns`
     WHERE service = :id");
 $q->bindParam(":service", $serviceid);

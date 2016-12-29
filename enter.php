@@ -121,7 +121,7 @@ if (array_key_exists("date", $_POST)) {
         if (! Modernizr.inputtypes.date) {
             $("#date").datepicker({showOn:"button", numberOfMonths: [1,2],
                 stepMonths: 2, onClose: function() {
-                    $("#location").focus();
+                    $("#occurrence").focus();
                 }});
         }
         updateFromDate($("#date"));
@@ -184,10 +184,10 @@ if (array_key_exists("date", $_POST)) {
             name="date" value="<?=$date?>" autofocus required>
     </li>
     <li>
-        <label for="location">Location:</label><br>
+        <label for="occurrence">Occurrence:</label><br>
         <input tabindex="2" type="text" required
-        id="location" name="location" placeholder="Required"
-        value="<?=$options->getDefault("", "defaultlocation")?>" >
+        id="occurrence" name="occurrence" placeholder="Required"
+        value="<?=$options->getDefault("", "defaultoccurrence")?>" >
     </li>
     <li>
         <label for="liturgical_name">Liturgical Name:</label><br>
@@ -336,25 +336,25 @@ function processFormData() {
             }
         }
     }
-    //// Enter hymns and location on selected date
+    //// Enter hymns and occurrence on selected date
     if ($hymns) {
         $sqlhymns = array();
         $saved = array();
         $q = $dbh->prepare("SELECT MAX(`sequence`) FROM `{$dbp}hymns`
             WHERE `service`=:serviceid
-            AND `location`=:location");
-        $q->bindParam(':location', $_POST['location']);
+            AND `occurrence`=:occurrence");
+        $q->bindParam(':occurrence', $_POST['occurrence']);
         $q->bindParam(':serviceid', $serviceid);
         $q->execute() or dieWithRollback($q, ".");
         $sequenceMax = array_pop($q->fetch());
         $q = $dbh->prepare("INSERT INTO `{$dbp}hymns`
-            (service, location, book, number, note, sequence)
-            VALUES (:service, :location, :book, :number, :note, :sequence)");
+            (service, occurrence, book, number, note, sequence)
+            VALUES (:service, :occurrence, :book, :number, :note, :sequence)");
         foreach ($hymns as $sequence => $ahymn) {
             if (! is_numeric($ahymn['number'])) continue;
             $realsequence = $sequence + $sequenceMax;
             $q->bindValue(":service", $serviceid);
-            $q->bindValue(":location", $_POST['location']);
+            $q->bindValue(":occurrence", $_POST['occurrence']);
             $q->bindValue(":book", $ahymn['book']);
             $q->bindValue(":number", $ahymn['number']);
             $q->bindValue(":note", $ahymn['note']);

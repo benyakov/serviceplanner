@@ -81,9 +81,9 @@ unset($config);
 
 $options = getOptions(True);
 
-if (isset($_POST['defaultlocation']) && $auth) {
-    $options->set('defaultlocation', htmlspecialchars($_POST['defaultlocation']));
-    setMessage("Default Location options has been set.");
+if (isset($_POST['defaultoccurrence']) && $auth) {
+    $options->set('defaultoccurrence', htmlspecialchars($_POST['defaultoccurrence']));
+    setMessage("Default Occurence option has been set.");
 }
 
 if (isset($_POST['hymnbooks-option']) && $auth) {

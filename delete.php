@@ -52,13 +52,13 @@ if ((! array_key_exists("stage", $_GET)) || $ajax) {
             if (0 == strlen($loc)) {
                 $whereclause = "";
             } else {
-                $whereclause = "AND hymns.location = :location";
+                $whereclause = "AND hymns.occurrence = :occurrence";
             }
             $deletions = implode(", ", array_map($db->quote, $deletions));
             $q = $db->prepare("
                 SELECT DATE_FORMAT(days.caldate, '%e %b %Y') as date,
                 hymns.book, hymns.number, hymns.note,
-                hymns.location, days.name as dayname, days.rite,
+                hymns.occurrence, days.name as dayname, days.rite,
                 days.pkey as id, days.servicenotes, names.title
                 FROM {$db->getPrefix()}hymns AS hymns
                 RIGHT OUTER JOIN {$db->getPrefix()}days AS days
@@ -69,9 +69,9 @@ if ((! array_key_exists("stage", $_GET)) || $ajax) {
                 WHERE days.pkey IN({$deletions})
                 {$whereclause}
                 ORDER BY days.caldate DESC, hymns.service DESC,
-                    hymns.location, hymns.sequence");
+                    hymns.occurrence, hymns.sequence");
             if ($whereclause) {
-                $q->bindValue(":location", $loc);
+                $q->bindValue(":occurrence", $loc);
             }
             $q->execute();
             display_records_table($q);
@@ -90,16 +90,16 @@ if ((! array_key_exists("stage", $_GET)) || $ajax) {
     //// Delete and acknowledge deletion.
     $db->beginTransaction();
     foreach ($_SESSION[$sprefix]['stage1'] as $loc => $deletions) {
-        // Check to see if service has hymns at another location
+        // Check to see if service has hymns at another occurrence
         $deletions = implode(", ", array_map($db->quote, $deletions));
         $q = $db->prepare("SELECT number
                 FROM {$db->getPrefix()}hymns as hymns
                 JOIN {$db->getPrefix()}days as days
                 ON (hymns.service = days.pkey)
-                WHERE hymns.location != :location
+                WHERE hymns.occurrence != :occurrence
                     AND days.pkey IN ({$deletions})
                 LIMIT 1");
-        $q->bindValue(":location", $loc);
+        $q->bindValue(":occurrence", $loc);
         $q->execute();
         if ($q->fetch()) {
             // If so, delete only the hymns.
@@ -107,9 +107,9 @@ if ((! array_key_exists("stage", $_GET)) || $ajax) {
                 USING `{$db->getPrefix()}hymns` as hymns
                 JOIN `{$db->getPrefix()}days` as days
                 ON (hymns.service = days.pkey)
-                WHERE hymns.location = :location
+                WHERE hymns.occurrence = :occurrence
                     AND days.pkey IN ({$deletions})");
-            $q->bindValue(":location", $loc);
+            $q->bindValue(":occurrence", $loc);
             $q->execute();
         } else {
             // If not, delete the service (should cascade to hymns)

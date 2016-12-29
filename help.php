@@ -166,11 +166,13 @@ services or change ones you've already planned.</p>
 share the same basic format for displaying each service.</p>
 
     <p>Each service is listed under its own heading line containing the date
-and location of the service and liturgical day name.  If the service is flagged
-as one where communion is offered, a boxed C appears after the liturgical day name.
-Below that line appear the <em>Evangelical Lutheran Hymnary (ELH)</em>'s
-topical description for hymns on that day, as well as the liturgical color for
-paraments.</p>
+and occurrence of the service and liturgical day name.
+(The Occurrence of a service allows you to distinguish different locations
+or service times when the same essential service plan will be in use.)
+If the service is flagged as one where communion is offered, a boxed C appears
+after the liturgical day name.  Below that line appear the <em>Evangelical
+Lutheran Hymnary (ELH)</em>'s topical description for hymns on that day, as
+well as the liturgical color for paraments.</p>
 
     <p>The actual hymns are listed line-by-line, with the abbreviation for the
 hymnbook, the number, any notes for that hymn (verse/stanza numbers, etc.), and
@@ -189,7 +191,7 @@ looked up and displayed within the block rectangle.</p>
 
     <p>On the Modify Service page, each heading line also contains
 buttons for adding more hymns to a service (possibly in a different
-location), editing the service as it is currently entered, adding a
+occurrence), editing the service as it is currently entered, adding a
 sermon, or printing just that one service with its hymns (handy for
 organists!). A checkbox appears to the left of the date in each service
 heading line, for the purpose of deleting whole services, with all their
@@ -293,11 +295,10 @@ matches will be placed automatically into the Liturgical Name field.</li>
     <li>Caution: If you press Enter or Return in a data field, your browser
 will submit the form as it stands. If the service is incomplete, you can then
 delete it and start over, or edit the incomplete service to finish it.</li>
-    <li>Hymns from multiple locations may be associated with the same
-service, since one service may be repeated at multiple places.</li>
-    <li>Even if you generally plan services for only one location, it's a good
-idea to have something in the location field, even if it's cryptic, like
-GLC.</li>
+    <li>Hymns from multiple occurrences may be associated with the same
+service, since one service may be repeated at multiple places or times.</li>
+    <li>Even if you generally plan services for only one occurrence, it's a good
+idea to have something in the occurrence field, like GLC.</li>
     </ol>
     <li>If no "Liturgical Name" matches were found for the date, perhaps
 because it's an occasional service, I will put the occasion into the Liturgical
@@ -311,7 +312,8 @@ found.  (You can add new liturgical days or adjust their names on the
 like.  This would be a good place to note deviations from the printed
 liturgical rite, plan for extra things like choir pieces, or include the name
 of the organist for that service.  If there are different organists for each
-location, they should all be specified here.</li>
+occurrence, they may be specified here. They may also be specified through
+flags (see Flags).</li>
     <li>After you have set up a block plan that spans the date of this service,
 that block plan will be available as a choice in the Block Plan drop-down
 control.  Choosing one is optional, but they are useful for displaying propers
@@ -336,7 +338,7 @@ include other information, like whether it's a communion distribution
 hymn. (A future version may add a separate field for the use/role of
 each hymn, if it doesn't complicate the whole thing too much.)</li>
     <li>If you wish to avoid confusing your organists and others by including
-an entry for <em>every</em> possible hymn location in your service, even when
+an entry for <em>every</em> possible hymn occurrence in your service, even when
 you don't wish to sing a hymn at that point, then a good practice is to use
 hymn number zero (0) for the liturgical hymn-points that you don't want to
 use.  You can make the hymn title something like "(Info)" and include as a note
@@ -363,18 +365,18 @@ with some abbreviated information about each one.  If you want to add another,
 separate service on the same day, you can safely ignore that list of existing
 services.  However, if you want to add hymns to one of the existing services,
 then you can activate its checkbox.  The form will allow you to specify a
-location (in case your new hymns are for the same service somewhere else), but
-you won't be able to change the Liturgical Name, the Rite or Order, Service
-Notes, or Block Plan.  That's because those things are already saved in the
-service.  (If you want to change them, you can edit the service instead of
-entering new hymns.  See below.)</p>
+service occurrence (in case your new hymns are for the same service somewhere
+else, or at a different time), but you won't be able to change the Liturgical
+Name, the Rite or Order, Service Notes, or Block Plan.  That's because those
+things are already saved in the service.  (If you want to change them, you can
+edit the service instead of entering new hymns.  See below.)</p>
 
     <h3><a name="changing_service">Changing a Service</a></h3>
 
     <p>To edit an existing service, click the Edit button in the heading line
 for the service you want to edit.  The resulting form will allow you to change
 any of the service information, including hymns.  It will include <em>all</em>
-hymns for that service, no matter what location is associated with them.  The
+hymns for that service, no matter what occurrence is associated with them.  The
 form will also allow you to change the sequence of the hymns by changing the
 numbers in the Seq column.  The only significance of the numbers is that the
 hymns will be listed sequentially, from the lowest to highest numbers.  It
@@ -389,7 +391,7 @@ button to enact all of the changes you wish to make.</p>
 <em>or</em> through the Add button, the "Add" page gives you an advantage you
 may consider important.  When when you enter a hymn number to add, the system
 will not only look up the title automatically, but it will also list the last
-few dates when you have used that particular hymn, along with the location
+few dates when you have used that particular hymn, along with the occurrence
 where you used it each time.  This should help you to see when you are
 choosing the same hymn more often than you would like, before you actually
 save the new hymns into that service.</p>

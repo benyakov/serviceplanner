@@ -120,7 +120,7 @@ function rawQuery($where=array(), $order="", $limit="") {
     $q = $dbh->prepare("SELECT d.pkey AS serviceid,
     DATE_FORMAT(d.caldate, '%c/%e/%Y') AS date,
     DATE_FORMAT(d.caldate, '%Y-%m-%d') AS browserdate,
-    h.book, h.number, h.note, h.location, d.name AS dayname, d.rite,
+    h.book, h.number, h.note, h.occurrence, d.name AS dayname, d.rite,
     d.servicenotes, n.title, d.block,
     b.label AS blabel, b.notes AS bnotes,
     cyp.color AS color, cyp.theme AS theme, cyp.introit AS introit,
@@ -177,20 +177,20 @@ function rawQuery($where=array(), $order="", $limit="") {
     ON (sms.smlect=b.smlect AND sms.smseries<=>b.smseries AND sms.dayname=d.name)
     {$wherestr}
     ORDER BY d.caldate {$order}, h.service {$order},
-        h.location, h.sequence {$limitstr}");
+        h.occurrence, h.sequence {$limitstr}");
     return $q;
 }
 
-function listthesehymns(&$thesehymns, $rowcount, $location=false) {
+function listthesehymns(&$thesehymns, $rowcount, $occurrence=false) {
     // Display the hymns in $thesehymns, if any.
     $rows = 0;
     if (! $thesehymns) return;
-    if ($location) {
-        $location = " data-loc=\"{$location}\"";
+    if ($occurrence) {
+        $occurrence = " data-occ=\"{$occurrence}\"";
     } else {
-        $location = "";
+        $occurrence = "";
     }
-    echo "<tr{$location}><td colspan=3>\n";
+    echo "<tr{$occurrence}><td colspan=3>\n";
     echo "<table class=\"hymn-listing\">";
     foreach ($thesehymns as $ahymn) {
         // Display this hymn
@@ -216,36 +216,36 @@ function display_records_table($q) {
     // Show a table of the data in the query $result
     ?><table id="records-listing"><?
     $serviceid = "";
-    $location = "";
+    $occurrence = "";
     $rowcount = 1;
     $thesehymns = array();
-    $hymnlocation = "";
+    $hymnoccurrence = "";
     $cfg = getConfig(false);
     while ($row = $q->fetch(PDO::FETCH_ASSOC)) {
         if (! ($row['serviceid'] == $serviceid
-            && $row['location'] == $location))
+            && $row['occurrence'] == $occurrence))
         {
-            $rowcount += listthesehymns($thesehymns, $rowcount, $hymnlocation);
+            $rowcount += listthesehymns($thesehymns, $rowcount, $hymnoccurrence);
             // Display the heading line
             if (is_within_week($row['date'])) {
                 $datetext = "<a name=\"now\">{$row['date']}</a>";
             } else {
                 $datetext = $row['date'];
             }
-            $urllocation = urlencode($row['location']);
-            echo "<tr data-loc=\"{$row['location']}\" class=\"heading servicehead\"><td class=\"heavy\">{$datetext} {$row['location']}</td>
+            $urloccurrence = urlencode($row['occurrence']);
+            echo "<tr data-occ=\"{$row['occurrence']}\" class=\"heading servicehead\"><td class=\"heavy\">{$datetext} {$row['occurrence']}</td>
                 <td colspan=2><a name=\"service_{$row['serviceid']}\">{$row['dayname']}</a>: {$row['rite']}".
             ((3==$auth)?
             "<a class=\"menulink\" href=\"sermon.php?id={$row['serviceid']}\">Sermon</a>\n"
             :"").
             (($auth)?
-            " <a class=\"menulink\" title=\"Edit flags for this service.\" href=\"flags.php?id={$row['serviceid']}&location={$urllocation}\">Flags</a>"
+            " <a class=\"menulink\" title=\"Edit flags for this service.\" href=\"flags.php?id={$row['serviceid']}&occurrence={$urloccurrence}\">Flags</a>"
             :"").
             "<a class=\"menulink\" href=\"export.php?service={$row['serviceid']}\">CSV Data</a>\n".
             " <a class=\"menulink\" href=\"print.php?id={$row['serviceid']}\" title=\"print\">Print</a> ".
             "</td></tr>\n";
-            echo "<tr class=\"service-flags\" data-loc=\"{$row['location']}\" data-service=\"{$row['serviceid']}\"><td colspan=3></td></tr>\n";
-            echo "<tr data-loc=\"{$row['location']}\" class=\"heading\"><td class=\"propers\" colspan=3>\n";
+            echo "<tr class=\"service-flags\" data-occ=\"{$row['occurrence']}\" data-service=\"{$row['serviceid']}\"><td colspan=3></td></tr>\n";
+            echo "<tr data-occ=\"{$row['occurrence']}\" class=\"heading\"><td class=\"propers\" colspan=3>\n";
             echo "<table><tr><td class=\"heavy smaller\">{$row['theme']}</td>";
             echo "<td colspan=2>{$row['color']}</td></tr>";
             if ($row['introit'] || $row['gradual']) {
@@ -264,7 +264,7 @@ function display_records_table($q) {
             echo "\n</table></td></tr>\n";
             if ($row['block'])
             { ?>
-                <tr data-loc="<?=$row['location']?>"><td colspan=3 class="blockdisplay">
+                <tr data-occ="<?=$row['occurrence']?>"><td colspan=3 class="blockdisplay">
                     <h4>Block: <?=$row['blabel']?></h4>
                     <div class="blocknotes maxcolumn">
                         <?=translate_markup($row['bnotes'])?>
@@ -291,17 +291,17 @@ function display_records_table($q) {
                 </tr>
             <? }
             if ($row['servicenotes']) {
-                echo "<tr data-loc=\"{$row['location']}\"><td colspan=3 class=\"servicenote\">".
+                echo "<tr data-occ=\"{$row['occurrence']}\"><td colspan=3 class=\"servicenote\">".
                      translate_markup($row['servicenotes'])."</td></tr>\n";
             }
             $serviceid = $row['serviceid'];
-            $location = $row['location'];
+            $occurrence = $row['occurrence'];
         }
         // Collect hymns
         $thesehymns[] = $row;
-        $hymnlocation = $row['location'];
+        $hymnoccurrence = $row['occurrence'];
     }
-    if ($thesehymns) listthesehymns($thesehymns, $rowcount, $hymnlocation);
+    if ($thesehymns) listthesehymns($thesehymns, $rowcount, $hymnoccurrence);
     echo "</article>\n";
     echo "</table>\n";
     unset($cfg);
@@ -320,26 +320,26 @@ function modify_records_table($q, $action) {
       <table id="modify-listing">
     <?
     $serviceid = "";
-    $location = "";
+    $occurrence = "";
     $rowcount = 1;
     $thesehymns = array();
-    $hymnlocation = "";
+    $hymnoccurrence = "";
     $cfg = getConfig(false);
     while ($row = $q->fetch(PDO::FETCH_ASSOC)) {
-        if (! ($row['serviceid'] == $serviceid
-            && $row['location'] == $location))
-        {
-            $rowcount += listthesehymns($thesehymns, $rowcount, $hymnlocation);
+        if (! ($row['serviceid'] == $serviceid))
+//            && $row['occurrence'] == $occurrence))
+        { // Create Service Block
+            $rowcount += listthesehymns($thesehymns, $rowcount, $hymnoccurrence);
             if (is_within_week($row['date'])) {
                 $datetext = "<a name=\"now\">{$row['date']}</a>";
             } else {
                 $datetext = $row['date'];
             }
             $urldate=urlencode($row['browserdate']);
-            $urllocation=urlencode($row['location']);
-            echo "<tr data-loc=\"{$row['location']}\" class=\"heading servicehead\"><td>
-            <input form=\"delete-service\" type=\"checkbox\" name=\"{$row['serviceid']}_{$row['location']}\" id=\"check_{$row['serviceid']}_{$row['location']}\">
-            <span class=\"heavy\">{$datetext} {$row['location']}</span>
+            $urloccurrence=urlencode($row['occurrence']);
+            echo "<tr data-occ=\"{$row['occurrence']}\" class=\"heading servicehead\"><td>
+            <input form=\"delete-service\" type=\"checkbox\" name=\"{$row['serviceid']}_{$row['occurrence']}\" id=\"check_{$row['serviceid']}_{$row['occurrence']}\">
+            <span class=\"heavy\">{$datetext} {$row['occurrence']}</span>
             <div class=\"menublock\">";
             if (3 == $auth) {
                 echo "
@@ -350,14 +350,14 @@ function modify_records_table($q, $action) {
             }
             echo "
             <a class=\"menulink\" href=\"print.php?id={$row['serviceid']}\" title=\"Show a printable format of this service.\">Print</a>
-            <a class=\"menulink\" title=\"Edit flags for this service.\" href=\"flags.php?id={$row['serviceid']}&location={$urllocation}\">Flags</a>
+            <a class=\"menulink\" title=\"Edit flags for this service.\" href=\"flags.php?id={$row['serviceid']}&occurrence={$urloccurrence}\">Flags</a>
             </div>
             </td>
             <td colspan=2>
             <a name=\"service_{$row['serviceid']}\">{$row['dayname']}</a>: {$row['rite']}
             </td></tr>\n";
-            echo "<tr class=\"service-flags\" data-loc=\"{$row['location']}\" data-service=\"{$row['serviceid']}\"><td colspan=3></td></tr>\n";
-            echo "<tr data-loc=\"{$row['location']}\" class=\"heading\"><td colspan=3 class=\"propers\">\n";
+            echo "<tr class=\"service-flags\" data-occ=\"{$row['occurrence']}\" data-service=\"{$row['serviceid']}\"><td colspan=3></td></tr>\n";
+            echo "<tr data-occ=\"{$row['occurrence']}\" class=\"heading\"><td colspan=3 class=\"propers\">\n";
             echo "<table><tr><td class=\"heavy smaller\">{$row['theme']}</td>";
             echo "<td colspan=2>{$row['color']}</td></tr>";
             if ($row['introit'] || $row['gradual']) {
@@ -376,7 +376,7 @@ function modify_records_table($q, $action) {
             echo "\n</tr></table></td>\n";
             if ($row['block'])
             { ?>
-                <tr data-loc="<?=$row['location']?>"><td colspan=3 class="blockdisplay">
+                <tr data-occ="<?=$row['occurrence']?>"><td colspan=3 class="blockdisplay">
                     <h4>Block: <?=$row['blabel']?></h4>
                     <div class="blocknotes">
                         <?=translate_markup($row['bnotes'])?>
@@ -404,17 +404,17 @@ function modify_records_table($q, $action) {
                 </tr>
             <? }
             if ($row['servicenotes']) {
-                echo "<tr data-loc=\"{$row['location']}\"><td colspan=3 class=\"servicenote\">".
+                echo "<tr data-occ=\"{$row['occurrence']}\"><td colspan=3 class=\"servicenote\">".
                      translate_markup($row['servicenotes'])."</td></tr>\n";
             }
             $serviceid = $row['serviceid'];
-            $location = $row['location'];
+            $occurrence = $row['occurrence'];
         }
         // Collect hymns
         $thesehymns[] = $row;
-        $hymnlocation = $row['location'];
+        $hymnoccurrence = $row['occurrence'];
     }
-    if ($thesehymns) listthesehymns($thesehymns, $rowcount, $hymnlocation);
+    if ($thesehymns) listthesehymns($thesehymns, $rowcount, $hymnoccurrence);
     ?>
     </article>
     </table>
@@ -621,9 +621,9 @@ function getCSSAdjuster() {
         <td><input name="cssblockdisplay" id="cssblockdisplay" type="checkbox"></td></tr>
         <tr><td><label for="csspropers">Show propers?</label></td>
         <td><input name="csspropers" id="csspropers" type="checkbox"></td></tr>
-        <tr id="adjusterlocationchooser" style="display: none;">
-        <td><label for="locations">Show locations:</label></td>
-        <td><ul id="adjusterlocations"></ul></td></tr>
+        <tr id="adjusteroccurrencechooser" style="display: none;">
+        <td><label for="occurrences">Show locations:</label></td>
+        <td><ul id="adjusteroccurrences"></ul></td></tr>
         <tr><td></td>
         <td><button type="button" id="cssreset">Reset to Default</button></td>
         </table>
@@ -634,27 +634,27 @@ function getCSSAdjuster() {
             setupStyleAdjusterLocs();
         });
         function setupStyleAdjusterLocs() {
-            var locations = $("tr[data-loc]").map(function() {
-                return $(this).attr("data-loc");
+            var occurrences = $("tr[data-occ]").map(function() {
+                return $(this).attr("data-occ");
             });
             var locobj = {};
-            for (i=1;i<locations.length;i++) locobj[l=locations[i]] = 1;
-            locations = Array();
-            for (l in locobj) locations.push(l);
+            for (i=1;i<occurrences.length;i++) locobj[l=occurrences[i]] = 1;
+            occurrences = Array();
+            for (l in locobj) occurrences.push(l);
             var stored = false;
             if (typeof(Storage) !== "undefined")
-                stored = $.parseJSON(localStorage.getItem("locations"));
-            for (index in locations) {
-                var loc = locations[index];
+                stored = $.parseJSON(localStorage.getItem("occurrences"));
+            for (index in occurrences) {
+                var loc = occurrences[index];
                 var init = " checked";
                 if (stored && (! stored[loc])) {
                     init = '';
                 }
-                $("#adjusterlocations").append('<li>'+
+                $("#adjusteroccurrences").append('<li>'+
                     '<input name="'+loc+'" class="cssadjusterloc" type="checkbox" '+init+'>'+
                     ' <label for="'+loc+'">'+loc+'</label></li>');
             }
-            $("#adjusterlocationchooser").show();
+            $("#adjusteroccurrencechooser").show();
             $(".cssadjusterloc").change(updateCSS);
         }
         // Initialize vars
@@ -689,7 +689,7 @@ function getCSSAdjuster() {
             localStorage.removeItem("notefont");
             localStorage.removeItem("blockdisplay");
             localStorage.removeItem("propers");
-            localStorage.removeItem("locations");
+            localStorage.removeItem("occurrences");
             location.reload();
         });
     </script>

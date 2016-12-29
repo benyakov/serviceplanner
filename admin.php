@@ -419,11 +419,11 @@ The only tabs accessible to anonymous users are "index", "records",
         "anonymous sitetabs") as $k=>$v)
         echo "$k:$v\n";
     ?></textarea></dd>
-    <dt>Default Service Location</dt>
-    <dd class="explanation">A default location to pre-fill the Location field
+    <dt>Default Service Occurrence</dt>
+    <dd class="explanation">A default occurrence to pre-fill the Occurrence field
     when entering new hymns or services.</dd>
-    <dd><input type="text" id="defaultlocation" name="defaultlocation"
-        value="<?=$options->getDefault("", "defaultlocation")?>" placeholder="Unset">
+    <dd><input type="text" id="defaultoccurrence" name="defaultoccurrence"
+        value="<?=$options->getDefault("", "defaultoccurrence")?>" placeholder="Unset">
     </dd>
     <dt>Maximum Auth Cookie Age</dt>
     <dd class="explanation">The maximum number of days you

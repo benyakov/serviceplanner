@@ -252,7 +252,7 @@ if (checkContentReq()) {
     <a id="thisweek" href="#now">Jump to This Week</a></div>
 <h1>Modify Service Planning Records</h1>
 <p class="explanation">This listing of hymns allows you to delete whole
-services, with all associated hymns at that location. To delete only certain
+services, with all associated hymns in that service occurrence. To delete only certain
 hymns, edit the service using the "Edit" link.  To create or edit a sermon plan
 for that service, use the "Sermon" link.</p>
 <form action="<?=$protocol?>://<?=$this_script?>" method="GET">

@@ -30,7 +30,7 @@ header('Expires: Mon, 01 Jan 1996 00:00:00 GMT');
 header("Content-type: application/json");
 
 $q = $db->prepare("SELECT `names`.`title` as title,
-    `hymns`.`location` as location,
+    `hymns`.`occurrence` as occurrence,
     DATE_FORMAT(`days`.`caldate`, '%e %b %Y') as date
     FROM `{$db->getPrefix()}names` AS `names`
     LEFT OUTER JOIN `{$db->getPrefix()}hymns` AS `hymns`
@@ -49,7 +49,7 @@ while ($row = $q->fetch(PDO::FETCH_ASSOC)) {
     $title = $row['title'];
     $lastusedary[] = array(
         'date' => $row['date'],
-        'location' => $row['location']
+        'occurrence' => $row['occurrence']
     );
 }
 if ($title || $_GET['xref']=="off") {

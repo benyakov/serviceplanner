@@ -77,7 +77,7 @@ $backlink = "index.php";
     <? } ?>
     <table id="print-hymns-table"><tbody>
     <tr class="heading"><th>Book</th><th>#</th><th>Note</th>
-        <th>Location</th><th>Title</th></tr>
+        <th>Occurrence</th><th>Title</th></tr>
     <?
     while ($row) {
         if ('' == $row['number']) {
@@ -89,7 +89,7 @@ $backlink = "index.php";
             <td><?=$row['book']?></td>
             <td><?=$row['number']?></td>
             <td><?=$row['note']?></td>
-            <td><?=$row['location']?></td>
+            <td><?=$row['occurrence']?></td>
             <td><?=$row['title']?></td>
         </tr>
         <?

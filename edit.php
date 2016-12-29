@@ -38,13 +38,13 @@ if (! array_key_exists("stage", $_GET))
         $q = $db->prepare("SELECT
             DATE_FORMAT(days.caldate, '%Y-%m-%d') as date,
             hymns.book, hymns.number, hymns.note,
-            hymns.pkey as hymnid, hymns.location,
+            hymns.pkey as hymnid, hymns.occurrence,
             hymns.sequence, days.name as dayname, days.rite, days.block,
             days.servicenotes
             FROM `{$db->getPrefix()}hymns` AS hymns
             RIGHT OUTER JOIN `{$db->getPrefix()}days` AS days ON (hymns.service=days.pkey)
             WHERE days.pkey = ?
-            ORDER BY days.caldate DESC, hymns.location, hymns.sequence");
+            ORDER BY days.caldate DESC, hymns.occurrence, hymns.sequence");
         $q->execute(array($_GET['id'])) or die(array_pop($q->errorInfo()));
         $row = $q->fetch(PDO::FETCH_ASSOC);
         ?>
@@ -82,7 +82,7 @@ if (! array_key_exists("stage", $_GET))
         </dl>
         <table id="hymnentries"><tbody id="sortablelist">
         <tr class="heading"><td></td><th>Del</th><th>Seq</th><th>Book</th><th>#</th><th>Note</th>
-            <th>Location</th><th>Title</th></tr>
+            <th>Occurrence</th><th>Title</th></tr>
         <?
         while ($row) {
             if ('' == $row['number']) {
@@ -118,9 +118,9 @@ if (! array_key_exists("stage", $_GET))
                      maxlength="100" name="note_<?=$row['hymnid']?>"
                      value="<?=$row['note']?>" class="edit-note">
                 </td>
-                <td><input type="text" id="location_<?=$row['hymnid']?>"
-                    name="location_<?=$row['hymnid']?>"
-                    value="<?=$row['location']?>" class="edit-location">
+                <td><input type="text" id="occurrence_<?=$row['hymnid']?>"
+                    name="occurrence_<?=$row['hymnid']?>"
+                    value="<?=$row['occurrence']?>" class="edit-occurrence">
                 </td>
                 <td><input type="text" id="title_<?=$row['hymnid']?>" size="50"
                      maxlength="50" name="title_<?=$row['hymnid']?>"
@@ -157,9 +157,9 @@ if (! array_key_exists("stage", $_GET))
             <td><input type="text" id="note_new" size="30"
                  maxlength="100" name="note_new" class="edit-note">
             </td>
-            <td><input type="text" id="location_new"
-                value="<?=$options->getDefault("", "defaultlocation")?>"
-                name="location_new" class="edit-location">
+            <td><input type="text" id="occurrence_new"
+                value="<?=$options->getDefault("", "defaultoccurrence")?>"
+                name="occurrence_new" class="edit-occurrence">
             </td>
             <td><input type="text" id="title_new" size="50"
                  maxlength="50" name="title_new" class="edit-title">
@@ -241,12 +241,12 @@ if (! array_key_exists("stage", $_GET))
     // Update hymns
     $q = $db->prepare("UPDATE {$db->getPrefix()}hymns
         SET number=:number,
-        note=:note, location=:location,
+        note=:note, occurrence=:occurrence,
         book=:book, sequence=:sequence
         WHERE pkey=:hymnid");
     $qi = $db->prepare("INSERT INTO {$db->getPrefix()}hymns
-        (service, location, book, number, note, sequence)
-        VALUES (:service, :location, :book, :number, :note, :sequence)");
+        (service, occurrence, book, number, note, sequence)
+        VALUES (:service, :occurrence, :book, :number, :note, :sequence)");
     $qi->bindValue(":service", $_POST['id']);
     foreach ($tohymns as $hymnid => $h) {
         if (in_array($hymnid, $todelete)) { continue; }

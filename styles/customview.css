@@ -37,7 +37,7 @@ td.customerservice-dbfield {
     border-left: 1px solid black;
     border-right: 1px solid black;
 }
-div#servicelisting td.customerservice-hymnlocation,
+div#servicelisting td.customerservice-hymnoccurrence,
 div#servicelisting td.customerservice-hymnnumbers,
 div#servicelisting td.customerservice-hymntitles,
 div#servicelisting td.customerservice-hymnbooks {

@@ -45,7 +45,7 @@ if ("customfields" == $_GET['action']) {
         "hymn numbers",
         "hymn books",
         "hymn notes",
-        "hymn locations",
+        "hymn occurrences",
         "hymn titles"));
     echo json_encode($rec);
     exit(0);
@@ -435,11 +435,11 @@ function displayService($service, $fieldlist) {
             }
             $rv[] = "</div></td>";
             continue;
-        } elseif ("hymn locations" == $field['name']) {
-            $rv[] = "<td class=\"customservice-hymnlocation\">";
+        } elseif ("hymn occurrences" == $field['name']) {
+            $rv[] = "<td class=\"customservice-hymnoccurrence\">";
             $rv[] = "<div style=\"width: {$field['width']}em\">";
             foreach ($service as $hymn) {
-                $rv[] = "{$hymn["location"]}<br>";
+                $rv[] = "{$hymn["occurrence"]}<br>";
             }
             $rv[] = "</div></td>";
             continue;

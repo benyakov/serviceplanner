@@ -71,7 +71,7 @@ input.edit-note {
 input.edit-title {
     width: 15em;
 }
-input.edit-location {
+input.edit-occurrence {
     width: 10em;
 }
 div.hymn-past {
@@ -161,7 +161,7 @@ form#corsform #contents {
 section#existing-services {
     width: 25%;
 }
-input#location,
+input#occurrence,
 input#liturgicalname,
 input#rite {
     width: 15em;
