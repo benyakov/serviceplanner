@@ -234,15 +234,16 @@ function display_records_table($q) {
             }
             $urllocation = urlencode($row['location']);
             echo "<tr data-loc=\"{$row['location']}\" class=\"heading servicehead\"><td class=\"heavy\">{$datetext} {$row['location']}</td>
-                <td colspan=2><span class=\"communicants\"><a name=\"service_{$row['serviceid']}\">{$row['dayname']}</a>: {$row['rite']}</span>".
-            ($auth?
-            "<a class=\"menulink\" href=\"sermon.php?id={$row['serviceid']}\">Sermon</a>
-            <a class=\"menulink\" href=\"export.php?service={$row['serviceid']}\">CSV Data</a>"
+                <td colspan=2><a name=\"service_{$row['serviceid']}\">{$row['dayname']}</a>: {$row['rite']}".
+            ((3==$auth)?
+            "<a class=\"menulink\" href=\"sermon.php?id={$row['serviceid']}\">Sermon</a>\n"
 
             :"").
+                "<a class=\"menulink\" href=\"export.php?service={$row['serviceid']}\">CSV Data</a>\n".
                 " <a class=\"menulink\" href=\"print.php?id={$row['serviceid']}\" ".
                 "title=\"print\">Print</a>
                   <a class=\"menulink\" title=\"See or edit flags for this service.\" href=\"flags.php?id={$row['serviceid']}&location={$urllocation}\">Flags</a></td></tr>\n";
+            echo "<tr class=\"service-flags\" data-loc=\"{$row['location']}\" data-service=\"{$row['serviceid']}\"><td colspan=3></td></tr>\n";
             echo "<tr data-loc=\"{$row['location']}\" class=\"heading\"><td class=\"propers\" colspan=3>\n";
             echo "<table><tr><td class=\"heavy smaller\">{$row['theme']}</td>";
             echo "<td colspan=2>{$row['color']}</td></tr>";
@@ -352,10 +353,9 @@ function modify_records_table($q, $action) {
             </div>
             </td>
             <td colspan=2>
-            <span class=\"communicants\">
             <a name=\"service_{$row['serviceid']}\">{$row['dayname']}</a>: {$row['rite']}
-            </span>
             </td></tr>\n";
+            echo "<tr class=\"service-flags\" data-loc=\"{$row['location']}\" data-service=\"{$row['serviceid']}\"><td colspan=3></td></tr>\n";
             echo "<tr data-loc=\"{$row['location']}\" class=\"heading\"><td colspan=3 class=\"propers\">\n";
             echo "<table><tr><td class=\"heavy smaller\">{$row['theme']}</td>";
             echo "<td colspan=2>{$row['color']}</td></tr>";
