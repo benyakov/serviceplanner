@@ -59,8 +59,7 @@ function addHymnToTable() {
         .attr("name", "sequence_new-"+indexStart);
     $("#hymnentries > tbody > tr").eq(-2).find('[id^=book]')
         .attr("id", "book_new-"+indexStart)
-        .attr("name", "book_new-"+indexStart)
-        .val("");
+        .attr("name", "book_new-"+indexStart);
     $("#hymnentries > tbody > tr").eq(-2).find('[id^=number]')
         .attr("id", "number_new-"+indexStart)
         .attr("name", "number_new-"+indexStart)
