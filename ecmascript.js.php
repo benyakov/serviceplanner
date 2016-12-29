@@ -91,17 +91,17 @@ function addHymnToTable() {
     $("#hymnentries > tbody > tr").eq(-2).find('[id^=savetitle]')
         .attr("id", "savetitle_new-"+indexStart)
         .attr("data-hymn", indexStart)
-        .change(function(evt) {
+        .click(function(evt) {
                 evt.preventDefault();
                 var listingord = $(this).attr("data-hymn");
                 var xhr = $.getJSON("enter.php",
-                        { sethymntitle: $("#title_"+listingord).val(),
-                        number: $("#number_"+listingord).val(),
-                        book: $("#book_"+listingord).val() },
+                        { sethymntitle: $("#title_new-"+listingord).val(),
+                        number: $("#number_new-"+listingord).val(),
+                        book: $("#book_new-"+listingord).val() },
                         function(result) {
                             if (result[0]) {
-                                $("#title_"+listingord).addClass("data-saved");
-                                $("#savetitle_"+listingord).hide();
+                                $("#title_new-"+listingord).addClass("data-saved");
+                                $("#savetitle_new-"+listingord).hide();
                             }
                             setMessage(result[1]);
                         });
