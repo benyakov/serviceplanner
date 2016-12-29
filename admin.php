@@ -396,6 +396,14 @@ Multiple abbreviations may be separated by a semicolon, like "SBLGNT;WLC;NKJV",
 which gives a 3-column Greek/Hebrew/English interlinear.</dd>
     <dd><input type="text" id="biblegwversion" name="biblegwversion"
         value="<?=$config->getDefault("", "biblegwversion")?>" placeholder="Unset">
+    <dt>Should the service listings combine multiple occurrences into one listing?</dt>
+    <dd class="explanation">When not combined, each group of hymns will contain
+    hymns planned for only one service occurrence. When combined, each group of
+    hymns will contain hymns planned for <em>all</em> occurrences of this service,
+    in the order of their sequence numbers. There will also be more than one row of
+    flags, each with a label for the occurrence it describes.</dd>
+    <dd><input type="checkbox" id="combineoccurrences" name="combineoccurrences"
+        <?=($config->getDefault("0", "combineoccurrences") == 1):"checked":""?>>
     <dt>Site Tab Selection & Order</dt>
     <dd class="explanation">Each line represents a single navigation tab. Each tab contains the tab
 name, followed by a colon (:), followed by a label for the tab. Tab names may

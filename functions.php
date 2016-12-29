@@ -327,7 +327,7 @@ function modify_records_table($q, $action) {
     $cfg = getConfig(false);
     while ($row = $q->fetch(PDO::FETCH_ASSOC)) {
         if (! ($row['serviceid'] == $serviceid))
-//            && $row['occurrence'] == $occurrence))
+            && $row['occurrence'] == $occurrence))
         { // Create Service Block
             $rowcount += listthesehymns($thesehymns, $rowcount, $hymnoccurrence);
             if (is_within_week($row['date'])) {

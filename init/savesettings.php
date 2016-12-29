@@ -24,14 +24,22 @@
     USA
  */
 
+if (3 != $auth) {
+    return; // Nothing to see here, execution resumes in prior script.
+}
+
 $config = getConfig(true);
 // Check for set values and store them.
-if (isset($_POST["biblegwversion"]) && $auth) {
+if (isset($_POST['combineoccurrences']) {
+    $config->set("combineoccurrences", $_POST['combineoccurences']);
+    setMessage("Config: Combine Occurrences has been set.");
+}
+if (isset($_POST["biblegwversion"])) {
     $config->set("biblegwversion", $_POST['biblegwversion']);
     setMessage("Config: Bible Gateway version has been set.");
 }
 
-if (isset($_POST['sitetabs-config']) && $auth) {
+if (isset($_POST['sitetabs-config'])) {
     if (! $_POST['sitetabs-config']) {
         $config->del("sitetabs");
         setMessage("Config: Deleted Sitetabs");
@@ -51,7 +59,7 @@ if (isset($_POST['sitetabs-config']) && $auth) {
     }
 }
 
-if (isset($_POST['sitetabs-config-anon']) && $auth) {
+if (isset($_POST['sitetabs-config-anon'])) {
     if (! $_POST['sitetabs-config-anon']) {
         $config->del("anonymous sitetabs");
         setMessage("Config: Deleted Anonymous Sitetabs");
@@ -71,7 +79,7 @@ if (isset($_POST['sitetabs-config-anon']) && $auth) {
     }
 }
 
-if (isset($_POST["cookie-age"]) && $auth) {
+if (isset($_POST["cookie-age"])) {
     $config->set('authcookie_max_age', intval($_POST['cookie-age']));
     setMessage("Config: Set max authorization cookie age.");
 }
@@ -81,32 +89,32 @@ unset($config);
 
 $options = getOptions(True);
 
-if (isset($_POST['defaultoccurrence']) && $auth) {
+if (isset($_POST['defaultoccurrence'])) {
     $options->set('defaultoccurrence', htmlspecialchars($_POST['defaultoccurrence']));
     setMessage("Default Occurence option has been set.");
 }
 
-if (isset($_POST['hymnbooks-option']) && $auth) {
+if (isset($_POST['hymnbooks-option'])) {
     $options->set('hymnbooks', explode("\n", $_POST['hymnbooks-option']));
     setMessage("Hymnbooks available option has been set.");
 }
 
-if (isset($_POST['hymncount-option']) && $auth) {
+if (isset($_POST['hymncount-option'])) {
     $options->set('hymncount', (int) $_POST['hymncount-option']);
     setMessage("Hymn count option has been set.");
 }
 
-if (isset($_POST['usedhistory-option']) && $auth) {
+if (isset($_POST['usedhistory-option'])) {
     $options->set('used_history', (int) $_POST['usedhistory-option']);
     setMessage("Hymn-last-used count option has been set.");
 }
 
-if (isset($_POST['modifyorder-option']) && $auth) {
+if (isset($_POST['modifyorder-option'])) {
     $options->set('modifyorder', $_POST['modifyorder']);
     setMessage("Modify Tab default order option has been set.");
 }
 
-if (isset($_POST['service-flags-option']) && $auth) {
+if (isset($_POST['service-flags-option'])) {
     $options->set('addable_service_flags', explode("\n", $_POST['service-flags-option']));
     setMessage("Addable Service Flags option has been set.");
 }
