@@ -586,6 +586,29 @@ function setupSortableList() {
     });
 }
 
+function setupFlags() {
+    $(".service-flags").each(pullFlags);
+}
+function pullFlags(index, row) {
+    if (! ($(row).data('service')
+        && $(row).data('loc'))) {
+        return true;
+    }
+    var xhr = $.getJSON("flags.php", {
+        action: 'get',
+        service: $(row).data('service'),
+        loc: $(row).data('loc') },
+        function(result) {
+            if (result[0]>0) {
+                $(row).children().eq(0).html(result[1]);
+            } else if (result[0] == 0) {
+                return true;
+            } else {
+                setMessage("Couldn't get flags. "+result[1]);
+            }
+        });
+}
+
 $(document).ready(function() {
     $("#loginform").submit(function(evt) {
         evt.preventDefault();

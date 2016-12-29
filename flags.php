@@ -27,6 +27,31 @@ require("./init.php");
 $now = strftime('%T');
 $this_script = $_SERVER['HTTP_HOST'].$_SERVER['SCRIPT_NAME'] ;
 if (! array_key_exists('step', $_POST)) {
+    if ("get" == $_GET['action'] &&
+        is_numeric($_GET['service']) && $_GET['loc']) // Return a formatted flag.
+    {
+        $q = $db->prepare("SELECT f.flag, f.value,
+            CONCAT(u.fname, ' ', u.lname) AS user
+            FROM `{$db->getPrefix()}service_flags` AS f
+            JOIN `{$db->getPrefix()}users` AS u ON (u.`uid` = f.`uid`)
+            WHERE f.service = :service
+            AND f.location = :location ");
+        $q->bindParam(":service", $_GET['service']);
+        $q->bindParam(":location", $_GET['loc']);
+        $q->execute() or die(json_encode(array(-1, array_pop($q->errorInfo()))));
+        $results = $q->fetchAll(PDO::FETCH_ASSOC);
+        $rv = array();
+        foreach ($results as $flag) {
+            $flag = array_map(function($v) {return htmlspecialchars($v);}, $flag);
+            $rv[] = "<div class=\"flag-repr\">
+                <div class=\"flag-name\">{$flag['flag']}<br><span class=\"flag-creator\">{$flag['user']}</span></div>
+                <div class=\"flag-value\">{$flag['value']}</div>
+                </div>";
+        }
+        $formatted = implode("\n", $rv);
+        echo(json_encode(array(count($results), $formatted)));
+        exit(0);
+    }
     if (! (is_numeric($_GET['id']) and $_GET['location']) ) {
         setMessage("Need both a service and location to see service flags. ".
             "Have you chosen a location by adding hymns?");
@@ -36,7 +61,7 @@ if (! array_key_exists('step', $_POST)) {
         $id = $_GET['id'];
         $location = $_GET['location'];
         $urllocation = urlencode($location);
-        $htmllocation = htmlentities($location);
+        $htmllocation = htmlspecialchars($location);
     }
     ?><!DOCTYPE html>
     <html lang="en">
@@ -44,6 +69,7 @@ if (! array_key_exists('step', $_POST)) {
     <body>
     <script type="text/javascript">
         $(document).ready(function() {
+            setupFlags();
         });
     </script>
     <? pageHeader();

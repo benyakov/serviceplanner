@@ -61,6 +61,7 @@ if ($jsonp = checkJsonpReq()) {
                 $("#content-container").html(rv);
                 setCSSTweaks();
                 setupStyleAdjusterLocs();
+                setupFlags();
             });
     }
     $(document).ready(function() {

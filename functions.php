@@ -237,12 +237,13 @@ function display_records_table($q) {
                 <td colspan=2><a name=\"service_{$row['serviceid']}\">{$row['dayname']}</a>: {$row['rite']}".
             ((3==$auth)?
             "<a class=\"menulink\" href=\"sermon.php?id={$row['serviceid']}\">Sermon</a>\n"
-
             :"").
-                "<a class=\"menulink\" href=\"export.php?service={$row['serviceid']}\">CSV Data</a>\n".
-                " <a class=\"menulink\" href=\"print.php?id={$row['serviceid']}\" ".
-                "title=\"print\">Print</a>
-                  <a class=\"menulink\" title=\"See or edit flags for this service.\" href=\"flags.php?id={$row['serviceid']}&location={$urllocation}\">Flags</a></td></tr>\n";
+            (($auth)?
+            " <a class=\"menulink\" title=\"Edit flags for this service.\" href=\"flags.php?id={$row['serviceid']}&location={$urllocation}\">Flags</a>"
+            :"").
+            "<a class=\"menulink\" href=\"export.php?service={$row['serviceid']}\">CSV Data</a>\n".
+            " <a class=\"menulink\" href=\"print.php?id={$row['serviceid']}\" title=\"print\">Print</a> ".
+            "</td></tr>\n";
             echo "<tr class=\"service-flags\" data-loc=\"{$row['location']}\" data-service=\"{$row['serviceid']}\"><td colspan=3></td></tr>\n";
             echo "<tr data-loc=\"{$row['location']}\" class=\"heading\"><td class=\"propers\" colspan=3>\n";
             echo "<table><tr><td class=\"heavy smaller\">{$row['theme']}</td>";
@@ -349,7 +350,7 @@ function modify_records_table($q, $action) {
             }
             echo "
             <a class=\"menulink\" href=\"print.php?id={$row['serviceid']}\" title=\"Show a printable format of this service.\">Print</a>
-            <a class=\"menulink\" title=\"See or edit flags for this service.\" href=\"flags.php?id={$row['serviceid']}&location={$urllocation}\">Flags</a>
+            <a class=\"menulink\" title=\"Edit flags for this service.\" href=\"flags.php?id={$row['serviceid']}&location={$urllocation}\">Flags</a>
             </div>
             </td>
             <td colspan=2>

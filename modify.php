@@ -142,6 +142,7 @@ if (checkContentReq()) {
                     setCSSTweaks();
                     setupStyleAdjusterLocs();
                     setupButtons();
+                    setupFlags();
                 });
         }
         function setupButtons() {

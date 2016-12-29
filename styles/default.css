@@ -451,8 +451,7 @@ a.menulink {
     border: 2px solid #811;
     border-top-color: #D66;
     border-left-color: #D66;
-    margin-left: 2px;
-    margin-right: 2px;
+    margin-left: 8px;
     display: inline-block;
 }
 
@@ -796,3 +795,32 @@ dl.flags dd {
     padding: 0 0 .5em .5em;
 }
 
+div.flag-repr {
+    margin: 2px 1em 0;
+    display: block;
+    float: left;
+    border: 1px solid black;
+}
+
+div.flag-name {
+    font-weight: bold;
+    background-color: white;
+    border: 3px solid #eee;
+    text-align: center;
+    width: 10em;
+    float: left;
+    text-align: left;
+    margin: 0;
+}
+
+span.flag-creator {
+    font-weight: normal;
+    font-size: 70%;
+    font-style: italic;
+}
+
+div.flag-value {
+    margin: 0;
+    padding: 10px;
+    background-color: #eee;
+}
