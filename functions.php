@@ -212,6 +212,15 @@ function listthesehymns(&$thesehymns, $rowcount, $occurrence=false) {
 }
 
 function display_records_table($q) {
+    $cfg = getConfig(false);
+    if (0 == $cfg->getDefault(0, "combineoccurrences")) {
+        display_occurrences_separately($q);
+    } else {
+        display_occurrences_together($q);
+    }
+}
+
+function display_occurrences_separately($q) {
     global $auth;
     // Show a table of the data in the query $result
     ?><table id="records-listing"><?

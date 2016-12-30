@@ -30,10 +30,12 @@ if (3 != $auth) {
 
 $config = getConfig(true);
 // Check for set values and store them.
-if (isset($_POST['combineoccurrences']) {
-    $config->set("combineoccurrences", $_POST['combineoccurences']);
-    setMessage("Config: Combine Occurrences has been set.");
+if (isset($_POST['combineoccurrences'])) {
+    $config->set("combineoccurrences", 1);
+} else {
+    $config->set("combineoccurrences", 0);
 }
+setMessage("Config: Combine Occurrences has been set.");
 if (isset($_POST["biblegwversion"])) {
     $config->set("biblegwversion", $_POST['biblegwversion']);
     setMessage("Config: Bible Gateway version has been set.");

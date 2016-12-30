@@ -28,7 +28,7 @@ $now = strftime('%T');
 $this_script = $_SERVER['HTTP_HOST'].$_SERVER['SCRIPT_NAME'] ;
 if (! array_key_exists('step', $_POST)) {
     if ("get" == $_GET['action'] &&
-        is_numeric($_GET['service']) && $_GET['occurence']) // Return a formatted flag.
+        is_numeric($_GET['service']) && $_GET['occurrence']) // Return a formatted flag.
     {
         $q = $db->prepare("SELECT f.flag, f.value,
             CONCAT(u.fname, ' ', u.lname) AS user
@@ -37,7 +37,7 @@ if (! array_key_exists('step', $_POST)) {
             WHERE f.service = :service
             AND f.occurrence = :occurrence ");
         $q->bindParam(":service", $_GET['service']);
-        $q->bindParam(":occurrence", $_GET['occurence']);
+        $q->bindParam(":occurrence", $_GET['occurrence']);
         $q->execute() or die(json_encode(array(-1, array_pop($q->errorInfo()))));
         $results = $q->fetchAll(PDO::FETCH_ASSOC);
         $rv = array();

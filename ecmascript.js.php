@@ -597,7 +597,7 @@ function pullFlags(index, row) {
     var xhr = $.getJSON("flags.php", {
         action: 'get',
         service: $(row).data('service'),
-        occ: $(row).data('occ') },
+        occurrence: $(row).data('occ') },
         function(result) {
             if (result[0]>0) {
                 $(row).children().eq(0).html(result[1]);
