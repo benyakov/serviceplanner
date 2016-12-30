@@ -326,7 +326,7 @@ function modify_records_table($q, $action) {
     $hymnoccurrence = "";
     $cfg = getConfig(false);
     while ($row = $q->fetch(PDO::FETCH_ASSOC)) {
-        if (! ($row['serviceid'] == $serviceid))
+        if (! ($row['serviceid'] == $serviceid
             && $row['occurrence'] == $occurrence))
         { // Create Service Block
             $rowcount += listthesehymns($thesehymns, $rowcount, $hymnoccurrence);

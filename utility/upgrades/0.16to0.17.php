@@ -67,7 +67,7 @@ $rm[] = "Removed communion column from days table.";
 
 // Change "location" to "occurrence"
 $db->beginTransaction();
-$q = >db->prepare("ALTER TABLE `{$db->getPrefix()}hymns`
+$q = $db->prepare("ALTER TABLE `{$db->getPrefix()}hymns`
     CHANGE `location` `occurrence` varchar(50) default NULL");
 $q->execute() or die(array_pop($q->errorInfo()));
 $db->commit();
