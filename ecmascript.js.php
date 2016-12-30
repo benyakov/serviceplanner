@@ -498,9 +498,9 @@ function updateCSS() {
     for (domitem in occboxes) {
         var name = $(occboxes[domitem]).attr('name');
         var checked = $(occboxes[domitem]).is(':checked');
-        occarray[name] = checked;
+        locarray[name] = checked;
     }
-    localStorage.setItem("occurrences", JSON.stringify(occarray));
+    localStorage.setItem("occurrences", JSON.stringify(locarray));
     setCSSTweaks();
 }
 

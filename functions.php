@@ -181,29 +181,30 @@ function rawQuery($where=array(), $order="", $limit="") {
     return $q;
 }
 
-function listthesehymns(&$thesehymns, $rowcount, $occurrence=false) {
+function listthesehymns(&$thesehymns, $rowcount, $showocc=false) {
     // Display the hymns in $thesehymns, if any.
     $rows = 0;
     if (! $thesehymns) return;
-    if ($occurrence) {
-        $occurrence = " data-occ=\"{$occurrence}\"";
-    } else {
-        $occurrence = "";
-    }
-    echo "<tr{$occurrence}><td colspan=3>\n";
+    echo "<tr data-occ=\"{$thesehymns[0]['occurrence']}\"><td colspan=3>\n";
     echo "<table class=\"hymn-listing\">";
     foreach ($thesehymns as $ahymn) {
+        $occurrence = " data-occ=\"{$ahymn['occurrence']}\"";
         // Display this hymn
         if (0 == ($rowcount+$rows) % 2) {
             $oddness = " class=\"even\"";
         } else {
             $oddness = "";
         }
-        echo "<tr{$oddness}>";
+        echo "<tr{$oddness}{$occurrence}>";
         if (intval($ahymn['number'])) {
             echo "<td class=\"hymn-number\">{$ahymn['book']} {$ahymn['number']}</td>";
         } else echo "<td></td>";
         echo "<td class=\"note\">{$ahymn['note']}</td><td class=\"title\">{$ahymn['title']}</td>";
+        if ($showocc) {
+            echo "<td class=\"hymn-occurrence\">{$ahymn['occurrence']}</td>";
+        }
+        //echo "<td>{$ahymn['date']}</td>"; // For debugging our looping
+        echo "</tr>";
         $rows += 1;
     }
     echo "</table></td></tr>\n";
@@ -214,13 +215,17 @@ function listthesehymns(&$thesehymns, $rowcount, $occurrence=false) {
 function display_records_table($q) {
     $cfg = getConfig(false);
     if (0 == $cfg->getDefault(0, "combineoccurrences")) {
-        display_occurrences_separately($q);
+        display_occurrences_separately($cfg, $q);
     } else {
-        display_occurrences_together($q);
+        display_occurrences_together($cfg, $q);
     }
 }
 
-function display_occurrences_separately($q) {
+/**
+ * Show a table of the data in the query $q,
+ * grouping hymns into separate sections for each service occurrence.
+ **/
+function display_occurrences_separately($cfg, $q) {
     global $auth;
     // Show a table of the data in the query $result
     ?><table id="records-listing"><?
@@ -278,14 +283,14 @@ function display_occurrences_separately($q) {
                     <div class="blocknotes maxcolumn">
                         <?=translate_markup($row['bnotes'])?>
                     </div>
-<?
+    <?
             if (! ($row['blesson1'] || $row['blesson2'] || $row['bgospel']
                 || $row['bpsalm'] || $row['bsermon'] || $row['bcollect']) )
             {
                 echo "No block data found. "
                 ."Is the liturgical day name set to a single day?";
             }
-?>
+    ?>
                     <dl class="blocklessons">
                     <dt>Lesson 1</dt><dd><?=linkbgw($cfg, $row['blesson1'], $row['l1link'])?></dd>
                     <dt>Lesson 2</dt><dd><?=linkbgw($cfg, $row['blesson2'], $row['l2link'])?></dd>
@@ -314,6 +319,116 @@ function display_occurrences_separately($q) {
     echo "</article>\n";
     echo "</table>\n";
     unset($cfg);
+}
+
+/**
+ * Show a table of the data in the query $q,
+ * grouping hymns into one section for all occurrances of each service.
+ **/
+function display_occurrences_together($cfg, $q) {
+    global $auth;
+    // Show a table of the data in the query $result
+    ?><table id="records-listing"><?
+    $thesehymns = array();
+    $rowcount = 1;
+    $serviceid = "";
+    while ($row = $q->fetch(PDO::FETCH_ASSOC)) {
+        if ($serviceid && $row['serviceid'] != $serviceid)
+        {
+            serviceHeaderCombined($cfg, $thesehymns);
+            $rowcount += listthesehymns($thesehymns, $rowcount, true);
+        }
+        // Collect hymns
+        $thesehymns[] = $row;
+        $serviceid = $row['serviceid'];
+    }
+    if ($thesehymns) {
+        serviceHeaderCombined($cfg, $thesehymns);
+        listthesehymns($thesehymns, $rowcount, true);
+    }
+    echo "</article>\n";
+    echo "</table>\n";
+    unset($cfg);
+}
+
+function serviceHeaderCombined($cfg, $thesehymns) {
+    $occurrences = array();
+    foreach ($thesehymns as $row) {
+        $occurrences[$row['occurrence']] = 1;
+    }
+    $occurrences = array_keys($occurrences);
+    $urloccurrences = array_map(function($x){return rawurlencode($x);}, $occurrences);
+    $row = $thesehymns[0];
+    if (is_within_week($row['date'])) {
+        $datetext = "<a name=\"now\">{$row['date']}</a>";
+    } else {
+        $datetext = $row['date'];
+    }
+    // Heading line
+    echo "<tr class=\"heading servicehead\"><td class=\"heavy\">{$datetext}</td>
+        <td colspan=2><a name=\"service_{$row['serviceid']}\">{$row['dayname']}</a>: {$row['rite']}".
+    ((3==$auth)?
+    "<a class=\"menulink\" href=\"sermon.php?id={$row['serviceid']}\">Sermon</a>\n"
+    :"").
+    "<a class=\"menulink\" href=\"export.php?service={$row['serviceid']}\">CSV Data</a>\n".
+    " <a class=\"menulink\" href=\"print.php?id={$row['serviceid']}\" title=\"print\">Print</a> ".
+    "</td></tr>\n";
+    for ($i=0; $i<=count($occurrences); $i++) {
+    echo "<tr class=\"service-flags\" data-occ=\"{$occurrences[$i]}\" data-service=\"{$row['serviceid']}\"><td colspan=2></td><td>".
+    (($auth)?
+    " <a class=\"menulink\" title=\"Edit flags for this service.\" href=\"flags.php?id={$row['serviceid']}&occurrence={$urloccurrence}\">Flags</a><br>"
+    :"").
+        "{$occurrences[$i]}</td></tr>\n";
+    }
+    echo "<tr class=\"heading\"><td class=\"propers\" colspan=3>\n";
+    echo "<table><tr><td class=\"heavy smaller\">{$row['theme']}</td>";
+    echo "<td colspan=2>{$row['color']}</td></tr>";
+    if ($row['introit'] || $row['gradual']) {
+        echo "<tr class=\"heading propers\"><td colspan=3>";
+        if ($row['introit'])
+            echo "<p class=\"sbspar maxcolumn smaller\">{$row['introit']}</p>";
+        if ($row['gradual'])
+            echo "<p class=\"sbspar halfcolumn smaller\">{$row['gradual']}</p>";
+        echo "</td></tr>";
+    }
+    if ($row['propersnote']) {
+        echo "<tr class=\"heading propers\"><td colspan=3>
+            <p class=\"maxcolumn\">".
+            translate_markup($row['propersnote'])."</p></td></tr>";
+    }
+    echo "\n</table></td></tr>\n";
+    if ($row['block'])
+    { ?>
+        <tr data-occ="<?=$row['occurrence']?>"><td colspan=3 class="blockdisplay">
+            <h4>Block: <?=$row['blabel']?></h4>
+            <div class="blocknotes maxcolumn">
+                <?=translate_markup($row['bnotes'])?>
+            </div>
+    <?
+    if (! ($row['blesson1'] || $row['blesson2'] || $row['bgospel']
+        || $row['bpsalm'] || $row['bsermon'] || $row['bcollect']) )
+    {
+        echo "No block data found. "
+        ."Is the liturgical day name set to a single day?";
+    }
+    ?>
+            <dl class="blocklessons">
+            <dt>Lesson 1</dt><dd><?=linkbgw($cfg, $row['blesson1'], $row['l1link'])?></dd>
+            <dt>Lesson 2</dt><dd><?=linkbgw($cfg, $row['blesson2'], $row['l2link'])?></dd>
+            <dt>Gospel</dt><dd><?=linkbgw($cfg, $row['bgospel'], $row['golink'])?></dd>
+            <dt>Psalm</dt><dd><?=linkbgw($cfg, $row['bpsalm']?"Ps ".$row['bpsalm']:'', $row['pslink'])?></dd>
+            <dt>Sermon<?=$row['has_sermon']?'*':''?></dt><dd><?=linkbgw($cfg, $row['bsermon'], $row['smlink'])?></dd>
+            </dl>
+            <h5>Collect (<?=$row['bcollectclass']?>)</h5>
+            <div class="collecttext maxcolumn">
+                <?=$row['bcollect']?>
+            </div>
+        </tr>
+    <? }
+    if ($row['servicenotes']) {
+        echo "<tr data-occ=\"{$row['occurrence']}\"><td colspan=3 class=\"servicenote\">".
+             translate_markup($row['servicenotes'])."</td></tr>\n";
+    }
 }
 
 /**
@@ -616,6 +731,7 @@ function getUserActions($bare=false) {
 }
 
 function getCSSAdjuster() {
+    $cfg = getConfig(false);
 ?>
     <form name="cssadjuster" id="cssadjuster">
     <div id="cssadjuster">
@@ -630,9 +746,11 @@ function getCSSAdjuster() {
         <td><input name="cssblockdisplay" id="cssblockdisplay" type="checkbox"></td></tr>
         <tr><td><label for="csspropers">Show propers?</label></td>
         <td><input name="csspropers" id="csspropers" type="checkbox"></td></tr>
+    <? if (0 == $cfg->get("combineoccurrences")) { ?>
         <tr id="adjusteroccurrencechooser" style="display: none;">
-        <td><label for="occurrences">Show locations:</label></td>
+        <td><label for="occurrences">Show occurrences:</label></td>
         <td><ul id="adjusteroccurrences"></ul></td></tr>
+    <? } ?>
         <tr><td></td>
         <td><button type="button" id="cssreset">Reset to Default</button></td>
         </table>
