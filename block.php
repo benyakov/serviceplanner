@@ -242,6 +242,8 @@ if ($_POST['label']) {
  */
 if ($_GET['action'] == "new") {
     requireAuth("index.php", 3);
+    echo authLevel();
+    exit(0);
     blockPlanForm();
     exit(0);
 }

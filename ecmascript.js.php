@@ -282,8 +282,7 @@ function logout(evt) {
         action: 'logout',
         ajax: true },
         function(result) {
-            setupLogin(result);
-            setMessage("Logged out.");
+            window.location.href="index.php";
         });
 }
 

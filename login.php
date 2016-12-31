@@ -28,8 +28,6 @@ require("./init.php");
 if (array_key_exists('action', $_GET) && $_GET['action'] == 'logout') {
     session_destroy();
     authcookie(False);
-    require("./setup-session.php");
-    $auth = false;
 } else {
     $auth = auth($_POST['username'], $_POST['password']) ;
 }
@@ -46,9 +44,12 @@ if (array_key_exists('ajax', $_POST) || array_key_exists('ajax', $_GET)) {
         unset($rv['password']);
         $rv['actions'] = getUserActions($bare=true);
         $rv['loginform'] = getLoginForm($bare=true);
-        $st = $config->getDefault($options->get('sitetabs'), 'sitetabs');
     } else {
         $rv = array('userlevel' => 0);
+    }
+    if (2 <= $rv['userlevel']) {
+        $st = $config->getDefault($options->get('sitetabs'), 'sitetabs');
+    } else {
         $st = $config->getDefault($options->get('anonymous sitetabs'),
             'anonymous sitetabs');
     }

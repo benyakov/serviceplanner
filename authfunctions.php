@@ -254,7 +254,7 @@ function checkCorsAuth() {
 }
 
 function requireAuth($location="index.php", $level=1, $message="Access denied.") {
-    if (! auth() && $level <= authLevel()) {
+    if (! (auth() && $level <= authLevel())) {
         setMessage($message);
         header("Location: {$location}");
         exit(0);
