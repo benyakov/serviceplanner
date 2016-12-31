@@ -29,13 +29,6 @@ if (3 != authLevel()) {
 }
 
 $config = getConfig(true);
-// Check for set values and store them.
-if (isset($_POST['combineoccurrences'])) {
-    $config->set("combineoccurrences", 1);
-} else {
-    $config->set("combineoccurrences", 0);
-}
-setMessage("Config: Combine Occurrences has been set.");
 if (isset($_POST["biblegwversion"])) {
     $config->set("biblegwversion", $_POST['biblegwversion']);
     setMessage("Config: Bible Gateway version has been set.");
@@ -90,6 +83,13 @@ $config->save();
 unset($config);
 
 $options = getOptions(True);
+
+if (isset($_POST['combineoccurrences'])) {
+    $options->set("combineoccurrences", 1);
+} else {
+    $options->set("combineoccurrences", 0);
+}
+setMessage("Config: Combine Occurrences has been set.");
 
 if (isset($_POST['defaultoccurrence'])) {
     $options->set('defaultoccurrence', htmlspecialchars($_POST['defaultoccurrence']));

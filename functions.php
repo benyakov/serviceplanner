@@ -213,19 +213,20 @@ function listthesehymns(&$thesehymns, $rowcount, $showocc=false) {
 }
 
 function display_records_table($q) {
-    $cfg = getConfig(false);
-    if (0 == $cfg->getDefault(0, "combineoccurrences")) {
-        display_occurrences_separately($cfg, $q);
+    $options = getOptions(false);
+    if (0 == $options->getDefault(0, "combineoccurrences")) {
+        display_occurrences_separately($q);
     } else {
-        display_occurrences_together($cfg, $q);
+        display_occurrences_together($q);
     }
+    unset($options);
 }
 
 /**
  * Show a table of the data in the query $q,
  * grouping hymns into separate sections for each service occurrence.
  **/
-function display_occurrences_separately($cfg, $q) {
+function display_occurrences_separately($q) {
     $auth = authLevel();
     // Show a table of the data in the query $result
     ?><table id="records-listing"><?
@@ -325,16 +326,17 @@ function display_occurrences_separately($cfg, $q) {
  * Show a table of the data in the query $q,
  * grouping hymns into one section for all occurrances of each service.
  **/
-function display_occurrences_together($cfg, $q) {
+function display_occurrences_together($q) {
     // Show a table of the data in the query $result
     ?><table id="records-listing"><?
+    $cfg = getConfig(false);
     $thesehymns = array();
     $rowcount = 1;
     $serviceid = "";
     while ($row = $q->fetch(PDO::FETCH_ASSOC)) {
         if ($serviceid && $row['serviceid'] != $serviceid)
         {
-            displayServiceHeaderCombined($cfg, $thesehymns);
+            displayServiceHeaderCombined($thesehymns);
             $rowcount += listthesehymns($thesehymns, $rowcount, true);
         }
         // Collect hymns
@@ -342,15 +344,14 @@ function display_occurrences_together($cfg, $q) {
         $serviceid = $row['serviceid'];
     }
     if ($thesehymns) {
-        displayServiceHeaderCombined($cfg, $thesehymns);
+        displayServiceHeaderCombined($thesehymns);
         listthesehymns($thesehymns, $rowcount, true);
     }
     echo "</article>\n";
     echo "</table>\n";
-    unset($cfg);
 }
 
-function displayServiceHeaderCombined($cfg, $thesehymns) {
+function displayServiceHeaderCombined($thesehymns) {
     $auth = authLevel();
     $occurrences = array();
     foreach ($thesehymns as $row) {
@@ -430,6 +431,7 @@ function displayServiceHeaderCombined($cfg, $thesehymns) {
         echo "<tr data-occ=\"{$row['occurrence']}\"><td colspan=3 class=\"servicenote\">".
              translate_markup($row['servicenotes'])."</td></tr>\n";
     }
+    unset($cfg);
 }
 
 /**
@@ -437,21 +439,23 @@ function displayServiceHeaderCombined($cfg, $thesehymns) {
  * with links to edit each record, and checkboxes to delete records.
  */
 function modify_records_table($q, $action) {
-    $cfg = getConfig(false);
     ?><form id="delete-service" action="<?=$action?>" method="post">
       <button class="deletesubmit" type="submit" value="Delete">Delete</button>
       <button type="reset" value="Clear">Clear</button>
       </form>
     <?
-    if (0 == $cfg->getDefault(0, "combineoccurrences")) {
-        modify_occurrences_separately($cfg, $q);
+    $options = getOptions(false);
+    if (0 == $options->getDefault(0, "combineoccurrences")) {
+        modify_occurrences_separately($q);
     } else {
-        modify_occurrences_together($cfg, $q);
+        modify_occurrences_together($q);
     }
+    unset($options);
 }
 
-function modify_occurrences_separately($cfg, $q) {
+function modify_occurrences_separately($q) {
     $auth = authLevel();
+    $cfg = getConfig(false);
     $serviceid = "";
     $occurrence = "";
     $rowcount = 1;
@@ -555,9 +559,10 @@ function modify_occurrences_separately($cfg, $q) {
     <button form="delete-service" type="reset" value="Clear">Clear</button>
     </form>
     <?
+    unset($cfg);
 }
 
-function modify_occurrences_together($cfg, $q) {
+function modify_occurrences_together($q) {
     ?> <table id="modify-listing"> <?
     $serviceid = "";
     $rowcount = 1;
@@ -565,7 +570,7 @@ function modify_occurrences_together($cfg, $q) {
     while ($row = $q->fetch(PDO::FETCH_ASSOC)) {
         if ($serviceid && $row['serviceid'] != $serviceid)
         {
-            modifyServiceHeaderCombined($cfg, $thesehymns);
+            modifyServiceHeaderCombined($thesehymns);
             listthesehymns($thesehymns, $rowcount, true);
         }
         // Collect hymns
@@ -573,7 +578,7 @@ function modify_occurrences_together($cfg, $q) {
         $serviceid = $row['serviceid'];
     }
     if ($thesehymns) {
-        modifyServiceHeaderCombined($cfg, $thesehymns);
+        modifyServiceHeaderCombined($thesehymns);
         listthesehymns($thesehymns, $rowcount, true);
     }
     ?>
@@ -585,8 +590,9 @@ function modify_occurrences_together($cfg, $q) {
     <?
 }
 
-function modifyServiceHeaderCombined($cfg, $thesehymns) {
+function modifyServiceHeaderCombined($thesehymns) {
     $auth = authLevel();
+    $cfg = getConfig(false);
     $occurrences = array();
     foreach ($thesehymns as $row) {
         if ($row['occurrence'])
@@ -673,6 +679,7 @@ function modifyServiceHeaderCombined($cfg, $thesehymns) {
         echo "<tr><td colspan=3 class=\"servicenote\">".
              translate_markup($row['servicenotes'])."</td></tr>\n";
     }
+    unset($cfg);
 }
 
 function html_head($title, $xstylesheets=Array()) {
@@ -858,7 +865,7 @@ function getUserActions($bare=false) {
 }
 
 function getCSSAdjuster() {
-    $cfg = getConfig(false);
+    $options = getOptions(false);
 ?>
     <form name="cssadjuster" id="cssadjuster">
     <div id="cssadjuster">
@@ -873,7 +880,7 @@ function getCSSAdjuster() {
         <td><input name="cssblockdisplay" id="cssblockdisplay" type="checkbox"></td></tr>
         <tr><td><label for="csspropers">Show propers?</label></td>
         <td><input name="csspropers" id="csspropers" type="checkbox"></td></tr>
-    <? if (0 == $cfg->get("combineoccurrences")) { ?>
+    <? if (0 == $options->get("combineoccurrences")) { ?>
         <tr id="adjusteroccurrencechooser" style="display: none;">
         <td><label for="occurrences">Show occurrences:</label></td>
         <td><ul id="adjusteroccurrences"></ul></td></tr>
@@ -948,6 +955,7 @@ function getCSSAdjuster() {
         });
     </script>
 <?
+    unset($options);
 }
 
 function jsString($s, $q="'") {

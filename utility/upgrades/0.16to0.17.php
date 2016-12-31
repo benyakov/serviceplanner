@@ -84,9 +84,12 @@ $addable_service_flags = array(
     "Acolyte Available",
     "Assistant Available");
 $options->set('addable_service_flags', $addable_service_flags);
+
+// This is used to set whether service occurrences should be aggregated in the listing
+$options->set('combineoccurrences', 0);
 $options->save();
 unset($options);
-$rm[] = "Created default addable flags in options. (Adjust on Housekeeping page.)";
+$rm[] = "Updated options";
 
 $dbstate = getDBState(true);
 $newversion = "{$version['major']}.{$version['minor']}.{$version['tick']}";
