@@ -353,6 +353,7 @@ function display_occurrences_together($q) {
 
 function displayServiceHeaderCombined($thesehymns) {
     $auth = authLevel();
+    $cfg = getConfig(false);
     $occurrences = array();
     foreach ($thesehymns as $row) {
         if ($row['occurrence'])

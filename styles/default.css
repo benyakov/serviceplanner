@@ -453,6 +453,7 @@ a.menulink {
     border-left-color: #D66;
     margin-left: 8px;
     display: inline-block;
+    text-decoration: none;
 }
 
 div.quicklinks a:active,
@@ -828,6 +829,7 @@ div.flag-value {
 
 a.delete-flag {
     float: right;
+    text-decoration: none;
 }
 
 a.delete-flag:before {
@@ -837,7 +839,6 @@ a.delete-flag:before {
 a.delete-flag:link,
 a.delete-flag:active,
 a.delete-flag:visited, {
-    text-decoration: none;
     color: black;
     background-color: transparent;
 }
