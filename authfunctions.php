@@ -253,10 +253,17 @@ function checkCorsAuth() {
     } else return false;
 }
 
-function requireAuth($location="index.php", $message="Access denied.") {
-    if (! auth()) {
+function requireAuth($location="index.php", $level=1, $message="Access denied.") {
+    if (! auth() && $level <= authLevel()) {
         setMessage($message);
         header("Location: {$location}");
+        exit(0);
+    }
+}
+
+function requireAuthJSON($level=1, $payload="Access denied.") {
+    if (! (auth() && $level <= authLevel())) {
+        echo json_encode($payload);
         exit(0);
     }
 }

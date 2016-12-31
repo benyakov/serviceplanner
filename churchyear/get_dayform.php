@@ -24,10 +24,7 @@
     USA
    */
 
-    if (! $auth) {
-        echo "Access denied.  Please log in.";
-        exit(0);
-    }
+    requireAuthJSON();
     $q = $db->prepare("SELECT `season`, `base`, `offset`, `month`, `day`,
         `observed_month`, `observed_sunday`
         FROM `{$db->getPrefix()}churchyear`

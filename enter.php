@@ -25,11 +25,7 @@
  */
 require("./init.php");
 $options = getOptions();
-if (! $auth) {
-    setMessage("Access denied.  Please log in.");
-    header("location: index.php");
-    exit(0);
-}
+requireAuth("index.php", 3, "Access denied.  Please log in.");
 $this_script = $_SERVER['HTTP_HOST'].$_SERVER['SCRIPT_NAME'] ;
 
 if (array_key_exists("date", $_GET)) {
@@ -163,7 +159,7 @@ if (array_key_exists("date", $_POST)) {
     auth = "<?=authId()?>";
     </script>
     <? pageHeader();
-    siteTabs($auth, "modify"); ?>
+    siteTabs("modify"); ?>
     <div id="content-container">
     <header>
     <h1>Service Entry Form</h1>

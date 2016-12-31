@@ -25,11 +25,7 @@
  */
 
 require("./init.php");
-if (! $auth) {
-    setMessage("Access denied.");
-    header("Location: index.php");
-    exit(0);
-}
+requireAuth();
 $tabledescfiles = array(
     "./utility/createtables.sql",
 );

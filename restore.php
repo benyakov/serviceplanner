@@ -24,11 +24,7 @@
     USA
  */
 require("./init.php");
-if (! $auth) {
-    setMessage("Access denied.");
-    header("location: index.php");
-    exit(0);
-}
+requireAuth("index.php", 3);
 $dumpfile = "./restore-{$db->getName()}.txt";
 $fnmatches = array();
 if (! preg_match('/^(services|churchyear)-(\d+\.\d+\.\d+)_(\d+[[:alpha:]]{3}\d{4}-\d{4}).dump$/',

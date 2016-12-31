@@ -1,5 +1,5 @@
-<? /* Javascript library
-    Copyright (C) 2012 Jesse Jacobsen
+<?php /* Javascript library
+    Copyright (C) 2016 Jesse Jacobsen
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -589,6 +589,7 @@ function setupSortableList() {
 function setupFlags() {
     $(".service-flags").each(pullFlags);
 }
+
 function pullFlags(index, row) {
     if (! ($(row).data('service')
         && $(row).data('occ'))) {
@@ -601,6 +602,24 @@ function pullFlags(index, row) {
         function(result) {
             if (result[0]>0) {
                 $(row).children().eq(0).html(result[1]);
+                $(row).find(".delete-flag").click(function(evt) {
+                    evt.preventDefault();
+                    var c = confirm("Are you sure you want to delete this flag?");
+                    var flagid = $(this).data('flagid');
+                    var userid = $(this).data('userid');
+                    var deleteval = flagid + "_delete";
+                    var params = { 'step': "change_flags",
+                            'json': 1,
+                            'user': userid };
+                    params[deleteval] = 'on';
+                    if (c == true) {
+                        $.post('flags.php', params,
+                            function(response) {
+                                setMessage(response[1]);
+                                refreshContent();
+                            }, 'json');
+                    }
+                });
             } else if (result[0] == 0) {
                 return true;
             } else {

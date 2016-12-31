@@ -71,7 +71,7 @@ if ($jsonp = checkJsonpReq()) {
 </script>
 <?
 pageHeader($displayonly);
-siteTabs($auth, False, $displayonly);
+siteTabs(False, $displayonly);
 if ($jsonp) {
     ob_clean();
 } ?>

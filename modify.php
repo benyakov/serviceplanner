@@ -24,11 +24,7 @@
     USA
  */
 require("./init.php");
-if (! $auth) {
-    setMessage("Access denied.  Please log in.");
-    header("location: index.php");
-    exit(0);
-}
+requireAuth("index.php", 3);
 /** For debugging
 unset($_SESSION[$sprefix]["lowdate"]);
 unset($_SESSION[$sprefix]["highdate"]);
@@ -246,7 +242,7 @@ if (checkContentReq()) {
         });
     </script>
     <? pageHeader();
-    siteTabs($auth); ?>
+    siteTabs(); ?>
     <div id="content-container">
     <div class="quicklinks"><a href="enter.php" title="New Service">New Service</a>
     <a id="thisweek" href="#now">Jump to This Week</a></div>

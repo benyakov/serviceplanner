@@ -49,6 +49,7 @@ if (array_key_exists('manuscript', $_GET)) {
     }
 }
 if (! array_key_exists('stage', $_GET)) {
+    requireAuth("index.php", 2);
     if (! is_numeric($_GET['id'])) {
         setMessage("Need a service first to edit a sermon plan.");
         header("Location: modify.php");
@@ -79,7 +80,7 @@ if (! array_key_exists('stage', $_GET)) {
         });
     </script>
     <? pageHeader();
-    siteTabs($auth, "sermons"); ?>
+    siteTabs("sermons"); ?>
         <div id="content-container">
         <div class="quicklinks"><a href="sermonreport.php?id=<?=${id}?>">Printable Sermon Report</a>
         <a href="sermons.php">Browse All Sermon Plans</a></div>
@@ -132,6 +133,7 @@ if (! array_key_exists('stage', $_GET)) {
 <?
 } elseif (2 == $_GET["stage"])
 {
+    requireAuth("{$protocol}://{$this_script}?id={$service}", 2);
     if (is_digits($_POST['service'])) {
         $service = str_pad($_POST['service'], 4, '0', STR_PAD_LEFT);
     } else {

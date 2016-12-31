@@ -25,6 +25,7 @@
     */
 
 require("./init.php");
+requireAuth("index.php", 3, "Access denied. Please log in as Admin.");
 $this_script = $_SERVER['HTTP_HOST'].$_SERVER['SCRIPT_NAME'] ;
 $ajax = $_GET['ajaxconfirm'];
 if ((! array_key_exists("stage", $_GET)) || $ajax) {

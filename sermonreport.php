@@ -24,10 +24,7 @@
     USA
  */
 require("./init.php");
-if (! $auth) {
-    header("location: index.php");
-    exit(0);
-}
+requireAuth();
 ?>
     <!DOCTYPE html>
     <html lang="en">

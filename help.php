@@ -24,17 +24,14 @@
     USA
  */
 require("./init.php");
-if (! $auth) {
-    setMessage("Access denied.  Please log in.");
-    header("location: index.php");
-    exit(0);
-} ?>
+requireAuth();
+?>
 <!DOCTYPE html>
 <html lang="en">
 <?=html_head("Help")?>
 <body>
 <?pageHeader();
-  siteTabs($auth, "admin");?>
+  siteTabs("admin");?>
     <div id="content-container">
     <div class="maxcolumn">
     <h1>Help Contents</h1>

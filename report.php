@@ -310,11 +310,11 @@ $(document).ready(function() {
 });
 </script>
 <? pageHeader();
-siteTabs($auth); ?>
+siteTabs(); ?>
 <div id="content-container">
 <?
 $config = getConfig();
-if ($auth) {
+if (3 == authLevel()) {
     echo customViewConfig($config);
     echo "<div id=\"fieldcontainer\"></div>";
 }

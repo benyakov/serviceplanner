@@ -24,17 +24,21 @@
     USA
  */
 
+if (! $auth) {
+    return; // Back to including script.
+}
+
 $dbstate = getDBState(true);
 // Churchyear data; holds the fill-step completed (of 6)
 if (($dbstate->getDefault(0, "churchyear-filled") < 6) or
-    ($_GET['flag'] == 'fill-churchyear' && $auth))
+    ($_GET['flag'] == 'fill-churchyear'))
 {
     fillServiceTables();
 }
 
 // Churchyear db functions
 if ((! $dbstate->getDefault(false, "has-churchyear-functions")) or
-    ($_GET['flag'] == 'create-churchyear-functions' && $auth))
+    ($_GET['flag'] == 'create-churchyear-functions'))
 {
     $functionsfile = "./utility/churchyearfunctions.sql";
     $functionsfh = fopen($functionsfile, "rb");

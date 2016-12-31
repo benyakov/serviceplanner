@@ -29,6 +29,8 @@ $flag = $_GET['flag'];
 $authdata = $_SESSION[$sprefix]['authdata'];
 $auth = auth();
 
+$userlevels_text = array("", "Basic User", "Advanced User", "Admin");
+
 if ( $flag=="edit" ) {
     adminOnly($authdata['userlevel']);
     $id = $_GET['id'];
@@ -96,7 +98,7 @@ if ( $flag=="edit" ) {
     editUserForm();
 } elseif ( $flag=="insert" ) {
     $ulevel = intval($_POST['userlevel']);
-    if ($ulevel > 0 && $auth < 3) {
+    if ($ulevel > 0 && $authdata['userlevel'] < 3) {
         setMessage("Access Denied");
         header("location:index.php");
         exit(0);
@@ -280,8 +282,9 @@ function changePW($flag) {
 }
 
 function editUserForm($elementValues="", $mode="Add",
-    $unameerror = "", $emailerror = "") {
-    global $authdata;
+    $unameerror = "", $emailerror = "")
+{
+    global $authdata, $userlevels_text;
     if ($mode=="Edit") {
         $uid = $elementValues['uid'];
         $username = $elementValues['username'];
@@ -336,9 +339,9 @@ function editUserForm($elementValues="", $mode="Add",
     <tr>
         <td align="right"><label for="userlevel">User Level</label></td>
         <td><select name="userlevel">
-            <option value="1" <?=$userlevel_selected[1]?>>User</option>
-            <option value="2" <?=$userlevel_selected[2]?>>User</option>
-            <option value="3" <?=$userlevel_selected[3]?>>Admin</option>
+            <option value="1" <?=$userlevel_selected[1]?>><?=$userlevels_text[1]?></option>
+            <option value="2" <?=$userlevel_selected[2]?>><?=$userlevels_text[2]?></option>
+            <option value="3" <?=$userlevel_selected[3]?>><?=$userlevels_text[3]?></option>
             </select>
         </td>
     </tr>
@@ -371,7 +374,7 @@ function editUserForm($elementValues="", $mode="Add",
 
 
 function userList() {
-    global $authdata;
+    global $authdata, $userlevels_text;
     $db = new DBConnection();
     $dbp = $db->getPrefix();
 ?>
@@ -421,7 +424,7 @@ function userList() {
             <td><?=htmlentities($row[1])?></td>
             <td><?=$row[3]?> <?=$row[4]?></td>
             <td><?=htmlentities($row[6])?></td>
-            <td><?=$userlevel?></td>
+            <td><?=$userlevels_text[$userlevel]?></td>
             <td><a href="useradmin.php?flag=edit&id=<?=$row[0]?>">Edit</a></td>
             <td><a href="#" onClick="deleteConfirm('<?=$row[1]?>', '<?=$row[0]?>');">Delete</a></td>
         </tr>

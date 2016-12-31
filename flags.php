@@ -24,13 +24,15 @@
     USA
  */
 require("./init.php");
+$uid = authUid();
 $now = strftime('%T');
 $this_script = $_SERVER['HTTP_HOST'].$_SERVER['SCRIPT_NAME'] ;
 if (! array_key_exists('step', $_POST)) {
     if ("get" == $_GET['action'] &&
-        is_numeric($_GET['service']) && $_GET['occurrence']) // Return a formatted flag.
+        is_numeric($_GET['service']) && $_GET['occurrence'])
     {
-        $q = $db->prepare("SELECT f.flag, f.value,
+        // Return a json-formatted flag list snippet.
+        $q = $db->prepare("SELECT f.flag, f.value, f.pkey AS flagid,
             CONCAT(u.fname, ' ', u.lname) AS user
             FROM `{$db->getPrefix()}service_flags` AS f
             JOIN `{$db->getPrefix()}users` AS u ON (u.`uid` = f.`uid`)
@@ -43,8 +45,11 @@ if (! array_key_exists('step', $_POST)) {
         $rv = array();
         foreach ($results as $flag) {
             $flag = array_map(function($v) {return htmlspecialchars($v);}, $flag);
+            if (3 == authLevel()) {
+                $deletelink = "<a class=\"delete-flag\" href=\"#\" data-flagid=\"{$flag['flagid']}\" data-userid=\"{$uid}\"></a>";
+            } else { $deletelink = ""; }
             $rv[] = "<div class=\"flag-repr\">
-                <div class=\"flag-name\">{$flag['flag']}<br><span class=\"flag-creator\">{$flag['user']}</span></div>
+                <div class=\"flag-name\">{$deletelink}{$flag['flag']}<br><span class=\"flag-creator\">{$flag['user']}</span></div>
                 <div class=\"flag-value\">{$flag['value']}</div>
                 </div>";
         }
@@ -52,6 +57,8 @@ if (! array_key_exists('step', $_POST)) {
         echo(json_encode(array(count($results), $formatted)));
         exit(0);
     }
+
+    // Display flags modification page
     if (! (is_numeric($_GET['id']) and $_GET['occurrence']) ) {
         setMessage("Need both a service and occurrence to see service flags. ".
             "Have you chosen a occurrence by adding hymns?");
@@ -73,7 +80,7 @@ if (! array_key_exists('step', $_POST)) {
         });
     </script>
     <? pageHeader();
-    siteTabs($auth, "modify"); ?>
+    siteTabs("modify"); ?>
         <div id="content-container">
         <div class="quicklinks"><a href="modify.php">Back to Service Listing</a>
         </div>
@@ -112,7 +119,6 @@ service and either add to them or change them.</p>
       <h2>Current Flags</h2><?
 
     $authlevel = authLevel();
-    $uid = authUid();
     if ($has_flags) {
         if (3 == $authlevel) { // Is Admin
         // Display a form of service flags for privileged users to edit
@@ -242,11 +248,7 @@ service and either add to them or change them.</p>
 } elseif ("change_flags" == $_POST["step"]) {
 
     $uid = checkPostUser();
-    if (3 != authLevel()) {
-        setMessage("Access denied for non-admin user.");
-        header("Location: index.php");
-        exit(0);
-    }
+    requireAuth("index.php", 3);
     unset($_POST['step']); unset($_POST['user']);
     $message = array();
     $matches = array();
@@ -299,6 +301,10 @@ service and either add to them or change them.</p>
     }
     $message[] = "{$updatecount} service flags updated.";
     $db->commit();
+    if ($_POST['json']) {
+        echo json_encode(array("true", implode("<br>", $message)));
+        exit(0);
+    }
     setMessage(implode("<br>", $message));
     header("Location: {$protocol}://{$this_script}?id={$_POST['service']}&occurrence={$_POST['occurrence']}");
 

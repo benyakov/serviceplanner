@@ -25,11 +25,7 @@
  */
 
 require("./init.php");
-if (! $auth) {
-    setMessage("Access denied.  Please log in.");
-    header('Location: index.php');
-    exit(0);
-}
+requireAuth("index.php", 3);
 $this_script = "{$protocol}://".$_SERVER['HTTP_HOST'].$_SERVER['SCRIPT_NAME'] ;
 if ('dellect' == $_POST['action']) {
     $db = new DBConnection();
@@ -110,7 +106,7 @@ if ('dellect' == $_POST['action']) {
     });
 </script>
     <?pageHeader();
-    siteTabs($auth); ?>
+    siteTabs(); ?>
     <div id="content-container">
     <h1>Housekeeping</h1>
     <p class="explanation">Back up, restore, export, import, and configure your

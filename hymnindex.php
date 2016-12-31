@@ -41,7 +41,7 @@ function togglebg($current) {
     }
 }
 
-if ($_GET['drop'] == 'yes' && $auth) {
+if ($_GET['drop'] == 'yes' && 3 == authLevel()) {
     $db->query("DROP TABLE `{$db->getPrefix()}xref`");
     setMessage("Cross-reference table repopulated.");
 }
@@ -105,7 +105,7 @@ if (!$q->execute()) die(array_pop($q->errorInfo()));
 <?=html_head("Hymn Cross Reference")?>
 <body>
     <?  pageHeader();
-    siteTabs($auth); ?>
+    siteTabs(); ?>
 <div id="content-container">
 <h1>Cross Reference Table</h1>
 <table id="xref-listing" cols="8">

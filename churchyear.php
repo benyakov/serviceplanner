@@ -25,7 +25,6 @@
    */
 require("./init.php");
 require("./churchyear/functions.php");
-$auth = auth();
 $dbp = $db->getPrefix();
 
 /* churchyear.php?dropfunctions=1
@@ -62,11 +61,8 @@ if ($_GET['request'] == 'dropfunctions') {
  * them again.
  */
 if ($_GET['request'] == 'purgetables') {
-    if (! $auth) {
-        setMessage("Access denied.  Please log in.");
-        header("location: index.php");
-        exit(0);
-    } elseif (! 'password' == $_SESSION[$sprefix]['authdata']['authtype']) {
+    requireAuth("index.php", 3);
+    if (! 'password' == $_SESSION[$sprefix]['authdata']['authtype']) {
         authcookie(False);
         session_destroy();
         require("./setup-session.php");
@@ -103,10 +99,7 @@ if ($_GET['daysfordate']) {
  * Returns the db parameters for dayname in the church year as json.
  */
 if ($_GET['request'] == "params") {
-    if (! $auth) {
-        echo json_encode("Access denied.  Please log in.");
-        exit(0);
-    }
+    requireAuthJSON(3);
     header('Cache-Control: no-cache, must-revalidate');
     header('Expires: Mon, 01 Jan 1996 00:00:00 GMT');
     header("Content-type: application/json");
@@ -138,10 +131,7 @@ if ($_GET['requestform'] == 'dayname') {
  * Deletes the specified dayname from the churchyear table.
  */
 if ($_POST['del']) {
-    if (! $auth) {
-        echo json_encode(array(0, "Access denied. Please log in."));
-        exit(0);
-    }
+    requireAuthJSON(3, array(0, "Access denied. Please log in."));
     header('Cache-Control: no-cache, must-revalidate');
     header('Expires: Mon, 01 Jan 1996 00:00:00 GMT');
     header("Content-type: application/json");
@@ -162,10 +152,7 @@ if ($_POST['del']) {
  * Saves the submitted POST data to the included dayname.
  */
 if ($_POST['submit_day']==1) {
-    if (! $auth) {
-        echo json_encode(array(false, "Access denied. Please log in."));
-        exit(0);
-    }
+    requireAuthJSON(3, array(false, "Access denied. Please log in."));
     // Update/save supplied values for the given day
     unset($_POST['submit_day']);
     if ("None" == $_POST['base']) {
@@ -259,10 +246,7 @@ function updateSynonyms($oldlist, $newlist, $canonical, $confirmed=array()) {
  * Pulls the list of items for comfirmed deletion from the $_SESSION.
  */
 if ($_POST['commitsynonyms']) {
-    if (! $auth) {
-        echo json_encode(array(false));
-        exit(0);
-    }
+    requireAuthJSON(3, array(false));
     list($new, $del) = $_SESSION[$sprefix]['commitsynonyms'];
     $canonical = $_POST['commitsynonyms'];
     $db->beginTransaction();
@@ -289,10 +273,7 @@ if ($_POST['commitsynonyms']) {
  * Update synonyms for canonical.
  */
 if ($_POST['submitsynonyms']) {
-    if (! $auth) {
-        echo json_encode(array(false));
-        exit(0);
-    }
+    requireAuthJSON(3, array(false));
     $synonyms = explode("\n", $_POST['synonyms']);
     $canonical = $_POST['canonical'];
     $delsynonyms = array();
@@ -342,10 +323,7 @@ if ($_POST['submitsynonyms']) {
  * Get synonyms for dayname.
  */
 if ($_GET['request'] == "synonyms") {
-    if (! $auth) {
-        echo json_encode(array(false));
-        exit(0);
-    }
+    requireAuthJSON(3, array(false));
     $q = $db->prepare("SELECT `synonym` FROM `{$dbp}churchyear_synonyms`
         WHERE `canonical` = ? ORDER BY `synonym` ASC");
     if ($q->execute(array($_GET['name']))) {
@@ -374,10 +352,7 @@ if ($_GET['request'] == "collect") {
  * Process the collect form (below) & create/update the collect.
  */
 if ($_POST['existing-collect']) {
-    if (! $auth) {
-        echo json_encode(false, "Access denied. Please log in first.");
-        exit(0);
-    }
+    requireAuthJSON(3, array(false, "Access denied. Please log in first."));
     $db->beginTransaction();
     if ($_POST['existing-collect'] == "new") {
         $q = $db->prepare("INSERT INTO `{$dbp}churchyear_collects`
@@ -429,10 +404,7 @@ if ($_POST['existing-collect']) {
  * Return a form for the new collect dialog.
  */
 if ($_GET['requestform'] == "collect") {
-    if (! $auth) {
-        echo "Access denied.  Please log in.";
-        exit(0);
-    }
+    requireAuth(3);
     $q = $db->prepare("SELECT c.class, i.dayname, i.lectionary, i.id
         FROM `{$dbp}churchyear_collect_index` AS i
         JOIN `{$dbp}churchyear_collects` AS c ON (c.id = i.id)
@@ -473,10 +445,7 @@ if ($_GET['requestform'] == "collect") {
  * Supply a form for confirming the deletion of collect with given id
  */
 if ($_GET['requestform'] == "delete-collect") {
-    if (! $auth) {
-        echo "Access denied.  Please log in.";
-        exit(0);
-    }
+    requireAuth(3);
     // Show collect, lectionaries using it, and daynames when used
     $q = $db->prepare("SELECT
         c.collect, c.class, i.lectionary, i.dayname, i.id
@@ -511,10 +480,7 @@ if ($_GET['requestform'] == "delete-collect") {
  * Delete the collect with the given id
  */
 if ($_POST['deletecollect']) {
-    if (! $auth) {
-        echo json_encode("Access denied.  Please log in.");
-        exit(0);
-    }
+    requireAuthJSON(3, "Access denied.  Please log in.");
     $q = $db->prepare("DELETE i, c FROM `{$dbp}churchyear_collect_index` AS i
         JOIN `{$dbp}churchyear_collects` AS c
         ON (i.id = c.id)
@@ -534,10 +500,7 @@ if ($_POST['deletecollect']) {
  * Detach the collect from the given day in the given lectionary
  */
 if ($_GET['detachcollect']) {
-    if (! $auth) {
-        echo json_encode("Access denied.  Please log in.");
-        exit(0);
-    }
+    requireAuthJSON(3, "Access denied.  Please log in.");
     $q = $db->prepare("DELETE FROM `{$dbp}churchyear_collect_index`
         WHERE dayname = ? AND lectionary = ? AND id = ?");
     if (! $q->execute(array($_GET['dayname'], $_GET['lectionary'],
@@ -559,10 +522,7 @@ if ($_GET['detachcollect']) {
  * Show populated form for the propers of the given dayname
  */
 if ($_GET['propers']) {
-    if (! $auth) {
-        echo json_encode(array(false));
-        exit(0);
-    }
+    requireAuthJSON(3);
     require("./churchyear/get_propersform.php");
     echo json_encode(array(true, propersForm($_GET['propers'])));
     exit(0);
@@ -572,10 +532,7 @@ if ($_GET['propers']) {
  * Submit provided changes to propers.
  */
 if ($_POST['propers']) {
-    if (! $auth) {
-        echo json_encode(array(false, "Access denied.  Please log in."));
-        exit(0);
-    }
+    requireAuthJSON(3, array(false, "Access denied.  Please log in."));
     $q = $db->prepare("UPDATE `{$dbp}churchyear_propers` SET
         color=?, theme=?, introit=?, gradual=?, note=? WHERE dayname = ?");
     $q->bindValue(1, $_POST['color']);
@@ -601,10 +558,7 @@ if ($_POST['propers']) {
  * Update lessons for the day/lectionary with the provided lessons.
  */
 if ($_POST['lessontype'] == "historic") {
-    if (! $auth) {
-        echo json_encode(array(false, "Access denied.  Please log in."));
-        exit(0);
-    }
+    requireAuthJSON(3, array(false, "Access denied.  Please log in."));
     $q = $db->prepare("UPDATE `{$dbp}churchyear_lessons` SET
        lectionary='historic', lesson1=?, lesson2=?, gospel=?, psalm=?,
        s2lesson=?, s2gospel=?, s3lesson=?, s3gospel=?, hymnabc='', hymn=''
@@ -626,10 +580,7 @@ if ($_POST['lessontype'] == "historic") {
  * Update lessons for the day/lectionary with the provided lessons.
  */
 if ($_POST['lessontype'] == "ilcw") {
-    if (! $auth) {
-        echo json_encode(array(false, "Access denied.  Please log in."));
-        exit(0);
-    }
+    requireAuthJSON(3, array(false, "Access denied.  Please log in."));
     $q = $db->prepare("UPDATE `{$dbp}churchyear_lessons` SET
        lesson1=?, lesson2=?, gospel=?, psalm=?,
        s2lesson='', s2gospel='', s3lesson='', s3gospel='',
@@ -651,10 +602,7 @@ if ($_POST['lessontype'] == "ilcw") {
  * Save the propers in the indicated lectionary
  */
 if ($_POST['lessons'] == "New") {
-    if (! $auth) {
-        echo json_encode(array(false, "Access denied.  Please log in."));
-        exit(0);
-    }
+    requireAuthJSON(3, array(false, "Access denied.  Please log in."));
     $q = $db->prepare("INSERT INTO `{$dbp}churchyear_lessons`
         (dayname, lectionary, lesson1, lesson2, gospel, psalm, hymnabc, hymn, note)
         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
@@ -680,10 +628,7 @@ if ($_POST['lessons'] == "New") {
  * Delete the lessons with the given id
  */
 if ($_GET['delpropers']) {
-    if (! $auth) {
-        echo json_encode(array(false, "Access denied. Please log in."));
-        exit(0);
-    }
+    requireAuthJSON(3, array(false, "Access denied. Please log in."));
     $db->beginTransaction();
     $q = $db->prepare("SELECT dayname FROM `{$dbp}churchyear_lessons` AS l
         WHERE l.id = ?");
@@ -711,11 +656,7 @@ if ($_GET['delpropers']) {
     exit(0);
 }
 
-if (! $auth) {
-    setMessage("Access denied.  Please log in.");
-    header("location: index.php");
-    exit(0);
-}
+requireAuth("index.php", 3);
 
 if ($_GET['request'] == 'purgetables') fillServiceTables();
 
@@ -730,7 +671,7 @@ if ($_GET['request'] == 'purgetables') fillServiceTables();
 
 <?
 pageHeader();
-siteTabs($auth);?>
+siteTabs();?>
 <div id="content-container">
 <h1>Church Year Configuration</h1>
 

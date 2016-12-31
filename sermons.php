@@ -24,11 +24,7 @@
     USA
  */
 require("./init.php");
-if (! $auth) {
-    setMessage("Access denied.  Please log in.");
-    header("location: index.php");
-    exit(0);
-}
+requireAuth("index.php", 2);
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -46,7 +42,7 @@ $q = $db->query("SELECT sermons.bibletext, sermons.outline,
 $q->execute() or die(array_pop($q->errorInfo));
 ?>
     <? pageHeader();
-    siteTabs($auth); ?>
+    siteTabs(); ?>
     <div id="content-container">
     <h1>Sermon Plans</h1>
     <p class="explanation">This is a listing of sermon plans you have created.

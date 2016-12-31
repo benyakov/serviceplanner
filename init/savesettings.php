@@ -24,7 +24,7 @@
     USA
  */
 
-if (3 != $auth) {
+if (3 != authLevel()) {
     return; // Nothing to see here, execution resumes in prior script.
 }
 

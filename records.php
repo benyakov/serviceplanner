@@ -40,7 +40,7 @@ $this_script = $_SERVER['HTTP_HOST'].$_SERVER['SCRIPT_NAME'] ;
         });
     </script>
 <?  pageHeader();
-    siteTabs($auth);?>
+    siteTabs();?>
     <div id="content-container">
     <div class="quicklinks"><a id="thisweek" href="#now">Jump to This Week</a></div>
     <?

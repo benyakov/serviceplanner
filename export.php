@@ -27,7 +27,7 @@
 require("./init.php");
 require("./utility/csv.php");
 
-// Exports here don't require $auth
+// Exports here don't require auth
 if (is_numeric($_GET["service"])) {
     $q = queryService($_GET['service']);
     $q->setFetchMode(PDO::FETCH_ASSOC);
@@ -143,12 +143,8 @@ if ('collectassignments' == $_GET['export']) {
     $csvex->export();
 }
 
-// Below here requires $auth
-if (! $auth) {
-    setMessage("Access denied.");
-    header("Location: index.php");
-    exit(0);
-}
+// Below here requires auth
+requireAuth();
 
 if ($_GET['lectionary']) {
     $lectname = $_GET['lectionary'];

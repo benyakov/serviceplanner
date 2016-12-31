@@ -31,7 +31,7 @@ function bibleLinkOrHelp($text, $output)
     else return "Bible text not found. Have you entered a single day name?";
 }
 require("init.php");
-$auth = auth();
+$auth = authLevel();
 
 /* Show the lesson choice in the block plan display
  */
@@ -197,11 +197,7 @@ function blockPlanForm($vals=array()) {
  * Process the submitted block form
  */
 if ($_POST['label']) {
-    if (! $auth) {
-        setMessage("Access denied.  Please log in.");
-        header("location: index.php");
-        exit(0);
-    }
+    requireAuth("index.php", 3);
     $_POST['startdate'] = date('Y-m-d', strtotime($_POST['startdate']));
     $_POST['enddate'] = date('Y-m-d', strtotime($_POST['enddate']));
     if ("custom" == $_POST['l1lect']) $_POST['l1series'] = $_POST['l1custom'];
@@ -245,11 +241,7 @@ if ($_POST['label']) {
  * Show an empty block edit form
  */
 if ($_GET['action'] == "new") {
-    if (! $auth) {
-        setMessage("Access denied.  Please log in.");
-        header("location:index.php");
-        exit(0);
-    }
+    requireAuth("index.php", 3);
     blockPlanForm();
     exit(0);
 }
@@ -258,11 +250,7 @@ if ($_GET['action'] == "new") {
  * Edit the block indicated by the id
  */
 if ($_GET['action'] == "edit" && $_GET['id']) {
-    if (! $auth) {
-        setMessage("Access denied.  Please log in.");
-        header("location:index.php");
-        exit(0);
-    }
+    requireAuth("index.php", 3);
     $q = $db->prepare("SELECT
         DATE_FORMAT(blockstart, '%Y-%m-%d') AS blockstart,
         DATE_FORMAT(blockend, '%Y-%m-%d') AS blockend, label, notes, weeklygradual,
@@ -281,11 +269,7 @@ if ($_GET['action'] == "edit" && $_GET['id']) {
  * Delete the block with id N
  */
 if ($_GET['delete']) {
-    if (! $auth) {
-        setMessage("Access denied.  Please log in.");
-        header("location:index.php");
-        exit(0);
-    }
+    requireAuth("index.php", 3);
     $q = $db->prepare("DELETE FROM `{$db->getPrefix()}blocks` WHERE id = ?");
     if ($q->execute(array($_GET['delete']))) {
         setMessage($q->rowCount() . " blocks deleted.");
@@ -339,11 +323,7 @@ if ($_GET['overlapstart'] && $_GET['overlapend']) {
  * Return a list of items
  */
 if ("blockitems" == $_GET['get'] && is_numeric($_GET['id']) && $_GET['day']) {
-    if (! $auth) {
-        setMessage("Access denied.  Please log in.");
-        header("location:index.php");
-        exit(0);
-    }
+    requireAuth("index.php", 2);
     $q = $db->prepare("SELECT b.notes,
         `{$db->getPrefix()}get_selected_lesson`(b.l1lect, b.l1series,
             'lesson1', :dayname) AS blesson1,
@@ -412,10 +392,7 @@ if ("blockitems" == $_GET['get'] && is_numeric($_GET['id']) && $_GET['day']) {
 }
 
 // Display the block planning table
-if (! $auth) {
-    setMessage("Access denied.  Please log in.");
-    header("location: index.php");
-}
+requireAuth("index.php", 3);
 
 ?><!DOCTYPE html>
 <html lang="en">
@@ -583,7 +560,7 @@ if (! $auth) {
     });
     </script>
     <?pageHeader();
-    siteTabs($auth); ?>
+    siteTabs(); ?>
     <div id="content-container">
     <div class="quicklinks"><a href="block.php?action=new" title="New Block" id="new-block">New Block</a></div>
     <h1>Block Plans</h1>

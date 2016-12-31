@@ -25,10 +25,8 @@
     */
 
 require("./init.php");
-if (! $auth) {
-    echo json_encode(array(False, "Access denied.  Please log in."));
-    exit(0);
-}
+requireAuthJSON(3, array(False, "Access denied.  Please log in as Admin."));
+
 $this_script = $_SERVER['HTTP_HOST'].$_SERVER['SCRIPT_NAME'] ;
 $dbh = new DBConnection();
 $dbh->beginTransaction();

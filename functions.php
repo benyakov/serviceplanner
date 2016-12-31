@@ -226,7 +226,7 @@ function display_records_table($q) {
  * grouping hymns into separate sections for each service occurrence.
  **/
 function display_occurrences_separately($cfg, $q) {
-    global $auth;
+    $auth = authLevel();
     // Show a table of the data in the query $result
     ?><table id="records-listing"><?
     $serviceid = "";
@@ -326,7 +326,6 @@ function display_occurrences_separately($cfg, $q) {
  * grouping hymns into one section for all occurrances of each service.
  **/
 function display_occurrences_together($cfg, $q) {
-    global $auth;
     // Show a table of the data in the query $result
     ?><table id="records-listing"><?
     $thesehymns = array();
@@ -335,7 +334,7 @@ function display_occurrences_together($cfg, $q) {
     while ($row = $q->fetch(PDO::FETCH_ASSOC)) {
         if ($serviceid && $row['serviceid'] != $serviceid)
         {
-            serviceHeaderCombined($cfg, $thesehymns);
+            displayServiceHeaderCombined($cfg, $thesehymns);
             $rowcount += listthesehymns($thesehymns, $rowcount, true);
         }
         // Collect hymns
@@ -343,7 +342,7 @@ function display_occurrences_together($cfg, $q) {
         $serviceid = $row['serviceid'];
     }
     if ($thesehymns) {
-        serviceHeaderCombined($cfg, $thesehymns);
+        displayServiceHeaderCombined($cfg, $thesehymns);
         listthesehymns($thesehymns, $rowcount, true);
     }
     echo "</article>\n";
@@ -351,13 +350,15 @@ function display_occurrences_together($cfg, $q) {
     unset($cfg);
 }
 
-function serviceHeaderCombined($cfg, $thesehymns) {
+function displayServiceHeaderCombined($cfg, $thesehymns) {
+    $auth = authLevel();
     $occurrences = array();
     foreach ($thesehymns as $row) {
-        $occurrences[$row['occurrence']] = 1;
+        if ($row['occurrence'])
+            $occurrences[$row['occurrence']] = 1;
     }
     $occurrences = array_keys($occurrences);
-    $urloccurrences = array_map(function($x){return rawurlencode($x);}, $occurrences);
+    $urloccurrences=array_map(function($o) {return rawurlencode($o);}, $occurrences);
     $row = $thesehymns[0];
     if (is_within_week($row['date'])) {
         $datetext = "<a name=\"now\">{$row['date']}</a>";
@@ -373,10 +374,10 @@ function serviceHeaderCombined($cfg, $thesehymns) {
     "<a class=\"menulink\" href=\"export.php?service={$row['serviceid']}\">CSV Data</a>\n".
     " <a class=\"menulink\" href=\"print.php?id={$row['serviceid']}\" title=\"print\">Print</a> ".
     "</td></tr>\n";
-    for ($i=0; $i<=count($occurrences); $i++) {
+    for ($i=0, $limit=count($occurrences); $i<$limit; $i++) {
     echo "<tr class=\"service-flags\" data-occ=\"{$occurrences[$i]}\" data-service=\"{$row['serviceid']}\"><td colspan=2></td><td>".
     (($auth)?
-    " <a class=\"menulink\" title=\"Edit flags for this service.\" href=\"flags.php?id={$row['serviceid']}&occurrence={$urloccurrence}\">Flags</a><br>"
+    " <a class=\"menulink\" title=\"Edit flags for this service.\" href=\"flags.php?id={$row['serviceid']}&occurrence={$urloccurrences[$i]}\">Flags</a> "
     :"").
         "{$occurrences[$i]}</td></tr>\n";
     }
@@ -436,24 +437,32 @@ function serviceHeaderCombined($cfg, $thesehymns) {
  * with links to edit each record, and checkboxes to delete records.
  */
 function modify_records_table($q, $action) {
-    global $auth;
+    $cfg = getConfig(false);
     ?><form id="delete-service" action="<?=$action?>" method="post">
       <button class="deletesubmit" type="submit" value="Delete">Delete</button>
       <button type="reset" value="Clear">Clear</button>
       </form>
-      <table id="modify-listing">
     <?
+    if (0 == $cfg->getDefault(0, "combineoccurrences")) {
+        modify_occurrences_separately($cfg, $q);
+    } else {
+        modify_occurrences_together($cfg, $q);
+    }
+}
+
+function modify_occurrences_separately($cfg, $q) {
+    $auth = authLevel();
     $serviceid = "";
     $occurrence = "";
     $rowcount = 1;
     $thesehymns = array();
     $hymnoccurrence = "";
-    $cfg = getConfig(false);
+    ?> <table id="modify-listing"> <?
     while ($row = $q->fetch(PDO::FETCH_ASSOC)) {
         if (! ($row['serviceid'] == $serviceid
             && $row['occurrence'] == $occurrence))
         { // Create Service Block
-            $rowcount += listthesehymns($thesehymns, $rowcount, $hymnoccurrence);
+            $rowcount += listthesehymns($thesehymns, $rowcount);
             if (is_within_week($row['date'])) {
                 $datetext = "<a name=\"now\">{$row['date']}</a>";
             } else {
@@ -505,14 +514,14 @@ function modify_records_table($q, $action) {
                     <div class="blocknotes">
                         <?=translate_markup($row['bnotes'])?>
                     </div>
-<?
+    <?
             if (! ($row['blesson1'] || $row['blesson2'] || $row['bgospel']
                 || $row['bpsalm'] || $row['bsermon'] || $row['bcollect']) )
             {
                 echo "No block data found. "
                 ."Is the liturgical day name set to a single day?";
             }
-?>
+    ?>
 
                     <dl class="blocklessons">
                     <dt>Lesson 1</dt><dd><?=linkbgw($cfg, $row['blesson1'], $row['l1link'])?></dd>
@@ -538,7 +547,7 @@ function modify_records_table($q, $action) {
         $thesehymns[] = $row;
         $hymnoccurrence = $row['occurrence'];
     }
-    if ($thesehymns) listthesehymns($thesehymns, $rowcount, $hymnoccurrence);
+    if ($thesehymns) listthesehymns($thesehymns, $rowcount);
     ?>
     </article>
     </table>
@@ -546,6 +555,124 @@ function modify_records_table($q, $action) {
     <button form="delete-service" type="reset" value="Clear">Clear</button>
     </form>
     <?
+}
+
+function modify_occurrences_together($cfg, $q) {
+    ?> <table id="modify-listing"> <?
+    $serviceid = "";
+    $rowcount = 1;
+    $thesehymns = array();
+    while ($row = $q->fetch(PDO::FETCH_ASSOC)) {
+        if ($serviceid && $row['serviceid'] != $serviceid)
+        {
+            modifyServiceHeaderCombined($cfg, $thesehymns);
+            listthesehymns($thesehymns, $rowcount, true);
+        }
+        // Collect hymns
+        $thesehymns[] = $row;
+        $serviceid = $row['serviceid'];
+    }
+    if ($thesehymns) {
+        modifyServiceHeaderCombined($cfg, $thesehymns);
+        listthesehymns($thesehymns, $rowcount, true);
+    }
+    ?>
+    </article>
+    </table>
+    <button class="deletesubmit" form="delete-service" type="submit" value="Delete">Delete</button>
+    <button form="delete-service" type="reset" value="Clear">Clear</button>
+    </form>
+    <?
+}
+
+function modifyServiceHeaderCombined($cfg, $thesehymns) {
+    $auth = authLevel();
+    $occurrences = array();
+    foreach ($thesehymns as $row) {
+        if ($row['occurrence'])
+            $occurrences[$row['occurrence']] = 1;
+    }
+    $occurrences = array_keys($occurrences);
+    $urloccurrences=array_map(function($o) {return rawurlencode($o);}, $occurrences);
+    if (is_within_week($row['date'])) {
+        $datetext = "<a name=\"now\">{$row['date']}</a>";
+    } else {
+        $datetext = $row['date'];
+    }
+    $urldate=urlencode($row['browserdate']);
+    echo "<tr class=\"heading servicehead\"><td>
+    <input form=\"delete-service\" type=\"checkbox\" name=\"{$row['serviceid']}\" id=\"check_{$row['serviceid']}\">
+    <span class=\"heavy\">{$datetext}</span>
+    <div class=\"menublock\">";
+    if (3 == $auth) {
+        echo "
+    <a class=\"menulink\" href=\"enter.php?date={$urldate}\" title=\"Add another occurrence or hymns on {$row['date']}.\">Add</a>
+    <a class=\"menulink\" title=\"See or edit sermon plans for this service.\" href=\"sermon.php?id={$row['serviceid']}\">Sermon</a>
+    <a class=\"menulink copy-service\" data-id=\"{$row['serviceid']}\" href=\"#\" title=\"Copy this to another date.\">Copy</a>
+    <a href=\"#\" class=\"edit-service menulink\" title=\"Edit this service.\" data-id=\"{$row['serviceid']}\">Edit</a>";
+    }
+    echo "
+    <a class=\"menulink\" href=\"print.php?id={$row['serviceid']}\" title=\"Show a printable format of this service.\">Print</a>
+    </div>
+    </td>
+    <td colspan=2>
+    <a name=\"service_{$row['serviceid']}\">{$row['dayname']}</a>: {$row['rite']}
+    </td></tr>\n";
+    for ($i=0, $limit=count($occurrences); $i<$limit; $i++) {
+        echo "<tr class=\"service-flags\" data-occ=\"{$occurrences[$i]}\" data-service=\"{$row['serviceid']}\"><td colspan=2></td>
+            <td><a class=\"menulink\" title=\"Edit flags for this service.\" href=\"flags.php?id={$row['serviceid']}&occurrence={$urloccurrences[$i]}\">Flags</a> {$occurrences[$i]}</td>
+        </tr>\n";
+    }
+    echo "<tr class=\"heading\"><td colspan=3 class=\"propers\">\n";
+    echo "<table><tr><td class=\"heavy smaller\">{$row['theme']}</td>";
+    echo "<td colspan=2>{$row['color']}</td></tr>";
+    if ($row['introit'] || $row['gradual']) {
+        echo "<tr><td colspan=3>";
+        if ($row['introit'])
+            echo "<p class=\"sbspar maxcolumn smaller\">{$row['introit']}</p>";
+        if ($row['gradual'])
+            echo "<p class=\"sbspar halfcolumn smaller\">{$row['gradual']}</p>";
+        echo "</td></tr>";
+    }
+    if ($row['propersnote']) {
+        echo "<tr><td colspan=3>
+            <p class=\"maxcolumn\">".
+            translate_markup($row['propersnote'])."</p></td></tr>";
+    }
+    echo "\n</tr></table></td>\n";
+    if ($row['block'])
+    { ?>
+        <tr><td colspan=3 class="blockdisplay">
+            <h4>Block: <?=$row['blabel']?></h4>
+            <div class="blocknotes">
+                <?=translate_markup($row['bnotes'])?>
+            </div>
+    <?
+    if (! ($row['blesson1'] || $row['blesson2'] || $row['bgospel']
+        || $row['bpsalm'] || $row['bsermon'] || $row['bcollect']) )
+    {
+        echo "No block data found. "
+        ."Is the liturgical day name set to a single day?";
+    }
+    ?>
+
+            <dl class="blocklessons">
+            <dt>Lesson 1</dt><dd><?=linkbgw($cfg, $row['blesson1'], $row['l1link'])?></dd>
+            <dt>Lesson 2</dt><dd><?=linkbgw($cfg, $row['blesson2'], $row['l2link'])?></dd>
+            <dt>Gospel</dt><dd><?=linkbgw($cfg, $row['bgospel'], $row['golink'])?></dd>
+            <dt>Psalm</dt><dd><?=linkbgw($cfg, $row['bpsalm']?"Ps ".$row['bpsalm']:'', $row['pslink'])?></dd>
+            <dt>Sermon<?=$row['has_sermon']?'*':''?></dt><dd><?=linkbgw($cfg, $row['bsermon'], $row['smlink'])?></dd>
+            </dl>
+            <h5>Collect (<?=$row['bcollectclass']?>)</h5>
+            <div class="collecttext maxcolumn">
+                <?=$row['bcollect']?>
+            </div>
+        </tr>
+    <? }
+    if ($row['servicenotes']) {
+        echo "<tr><td colspan=3 class=\"servicenote\">".
+             translate_markup($row['servicenotes'])."</td></tr>\n";
+    }
 }
 
 function html_head($title, $xstylesheets=Array()) {
@@ -894,13 +1021,13 @@ function pageHeader($displayonly=false) { ?>
     <div id="msgdialog"></div>
     </header> <?
 }
-function siteTabs($auth, $basename=false, $displayonly=false) {
+function siteTabs($basename=false, $displayonly=false) {
     global $script_basename;
     $options = getOptions();
     $config = getConfig(false);
     if (! $basename) $basename=$script_basename;
     if (! $displayonly) {
-        if ($auth) {
+        if (2 <= authLevel()) {
             echo gensitetabs(
                 $config->getDefault($options->get("sitetabs"), "sitetabs"),
                 $basename);

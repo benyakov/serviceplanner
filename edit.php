@@ -25,10 +25,7 @@
  */
 require("./init.php");
 $options = getOptions();
-if (! $auth) {
-    header("location: index.php");
-    exit(0);
-}
+requireAuth("index.php", 3);
 $this_script = $_SERVER['HTTP_HOST'].$_SERVER['SCRIPT_NAME'] ;
 if (! array_key_exists("stage", $_GET))
 {

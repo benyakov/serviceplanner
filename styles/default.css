@@ -824,3 +824,21 @@ div.flag-value {
     padding: 10px;
     background-color: #eee;
 }
+
+
+a.delete-flag {
+    float: right;
+}
+
+a.delete-flag:before {
+    content: "\2612";
+}
+
+a.delete-flag:link,
+a.delete-flag:active,
+a.delete-flag:visited, {
+    text-decoration: none;
+    color: black;
+    background-color: transparent;
+}
+
