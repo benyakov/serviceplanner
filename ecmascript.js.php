@@ -105,6 +105,9 @@ function addHymnToTable() {
                             setMessage(result[1]);
                         });
         });
+    $("#hymnentries > tbody > tr").eq(-2).find('[id^=past]')
+        .attr("id", "past_new-"+indexStart)
+        .attr("data-hymn", indexStart)
     $("#hymnentries > tbody > tr").eq(-2).removeClass("table-template");
 }
 
