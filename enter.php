@@ -193,8 +193,6 @@ if (array_key_exists("date", $_POST)) {
     <li>
         <label for="rite">Rite or Order:</label><br>
         <input tabindex="27" type="text" id="rite" name="rite" value="">
-        <input tabindex="28" type="checkbox" id="communion" name="communion">
-        <label for="communion">Communion Offered</label>
     </li>
     <li class="vcenter">
         <label for="servicenotes">Service Notes:</label><br>
@@ -267,17 +265,12 @@ function processFormData() {
     }
     if (! $serviceid) { // Create a new service
         $q = $dbh->prepare("INSERT INTO `{$dbp}days`
-            (caldate, name, rite, servicenotes, block, communion)
-            VALUES (:date, :dayname, :rite, :servicenotes, :block, :communion)");
+            (caldate, name, rite, servicenotes, block)
+            VALUES (:date, :dayname, :rite, :servicenotes, :block)");
         $q->bindParam(':date', $date);
         $q->bindParam(':dayname', $_POST['liturgicalname']);
         $q->bindParam(':rite', $_POST['rite']);
         $q->bindParam(':servicenotes', $_POST['servicenotes']);
-        if ($_POST['communion']) {
-            $q->bindValue(":communion", 1);
-        } else {
-            $q->bindValue(":communion", 0);
-        }
         if (is_numeric($_POST['block'])) {
             $q->bindParam(':block', $_POST['block']);
         } else {
