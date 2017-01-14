@@ -32,15 +32,7 @@ if (! array_key_exists('step', $_POST)) {
         is_numeric($_GET['service']) && $_GET['occurrence'])
     {
         // Return a json-formatted flag list snippet.
-        $q = $db->prepare("SELECT f.flag, f.value, f.pkey AS flagid,
-            CONCAT(u.fname, ' ', u.lname) AS user
-            FROM `{$db->getPrefix()}service_flags` AS f
-            JOIN `{$db->getPrefix()}users` AS u ON (u.`uid` = f.`uid`)
-            WHERE f.service = :service
-            AND f.occurrence = :occurrence ");
-        $q->bindParam(":service", $_GET['service']);
-        $q->bindParam(":occurrence", $_GET['occurrence']);
-        $q->execute() or die(json_encode(array(-1, array_pop($q->errorInfo()))));
+        $q = getFlagsFor($_GET['service'], $_GET['occurrence']);
         $results = $q->fetchAll(PDO::FETCH_ASSOC);
         $rv = array();
         foreach ($results as $flag) {

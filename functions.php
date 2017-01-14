@@ -181,6 +181,20 @@ function rawQuery($where=array(), $order="", $limit="") {
     return $q;
 }
 
+function getFlagsFor($serviceid, $occurrence) {
+    $db = new DBConnection();
+    $q = $db->prepare("SELECT f.flag, f.value, f.pkey AS flagid,
+        CONCAT(u.fname, ' ', u.lname) AS user
+        FROM `{$db->getPrefix()}service_flags` AS f
+        JOIN `{$db->getPrefix()}users` AS u ON (u.`uid` = f.`uid`)
+        WHERE f.service = :service
+        AND f.occurrence = :occurrence ");
+    $q->bindParam(":service", $serviceid);
+    $q->bindParam(":occurrence", $occurrence);
+    $q->execute() or die("Couldn't get flag for {$serviceid}/{$occurrence}");
+    return $q;
+}
+
 function listthesehymns(&$thesehymns, $rowcount, $showocc=false) {
     // Display the hymns in $thesehymns, if any.
     $rows = 0;
@@ -1083,6 +1097,7 @@ function is_digits($item) {
     // For checking web input
     return !preg_match("/[^0-9]/", $item);
 }
+
 
 // vim: set foldmethod=indent :
 ?>
