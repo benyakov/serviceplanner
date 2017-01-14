@@ -43,6 +43,7 @@ if (is_numeric($_GET["service"])) {
         'book', 'number', 'note', 'occurrence', 'title'));
     $csvex->setFilebaseIndex("dayname");
     $csvex->export();
+    exit(0);
 }
 
 if ('synonyms' == $_GET['export']) {
@@ -67,6 +68,7 @@ if ('synonyms' == $_GET['export']) {
     $filebase = "synonyms";
     $csvex = new CSVExporter(new ArrayIterator($out), $filebase);
     $csvex->export();
+    exit(0);
 }
 
 if ('churchyear' == $_GET['export']) {
@@ -89,6 +91,7 @@ if ('churchyear' == $_GET['export']) {
     $csvex->setFieldselection(array("dayname", "season", "base", "offset",
         "month", "day", "observed_month", "observed_sunday"));
     $csvex->export();
+    exit(0);
 }
 
 if ('churchyear-propers' == $_GET['export']) {
@@ -109,6 +112,7 @@ if ('churchyear-propers' == $_GET['export']) {
     $csvex->setFieldselection(array("dayname", "color", "theme", "introit",
         "gradual", "note"));
     $csvex->export();
+    exit(0);
 }
 
 if ('collects' == $_GET['export']) {
@@ -124,6 +128,7 @@ if ('collects' == $_GET['export']) {
     $csvex->setFieldnames(array("ID", "Class", "Collect"));
     $csvex->setFieldselection(array("id", "class", "collect"));
     $csvex->export();
+    exit(0);
 }
 
 if ('collectassignments' == $_GET['export']) {
@@ -141,6 +146,7 @@ if ('collectassignments' == $_GET['export']) {
     $csvex->setFieldnames(array("ID", "Lectionary", "Dayname"));
     $csvex->setFieldselection(array("id", "lectionary", "dayname"));
     $csvex->export();
+    exit(0);
 }
 
 // Below here requires auth
