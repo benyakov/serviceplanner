@@ -621,9 +621,13 @@ function modifyServiceHeaderCombined($thesehymns) {
         $datetext = $row['date'];
     }
     $urldate=urlencode($row['browserdate']);
-    echo "<tr class=\"heading servicehead\"><td>
-    <input form=\"delete-service\" type=\"checkbox\" name=\"{$row['serviceid']}\" id=\"check_{$row['serviceid']}\">
-    <span class=\"heavy\">{$datetext}</span>
+    echo "<tr class=\"heading servicehead\"><td>";
+    echo "<div class=\"deletion-block\">";
+    foreach ($occurrences as $occ) {
+        echo "<input form=\"delete-service\" type=\"checkbox\" name=\"{$row['serviceid']}_{$occ}\" id=\"check_{$row['serviceid']}_{$occ}\"> <label for=\"check_{$row['serviceid']}_{$occ}\">{$occ}</label><br>";
+    }
+    echo "</div>";
+    echo "<span class=\"heavy\">{$datetext}</span>
     <div class=\"menublock\">";
     if (3 == $auth) {
         echo "

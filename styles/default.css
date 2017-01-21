@@ -843,3 +843,8 @@ a.delete-flag:visited, {
     background-color: transparent;
 }
 
+div.deletion-block {
+    display: inline-block;
+    margin-right: 1em;
+    font-size: 90%;
+}
