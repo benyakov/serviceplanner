@@ -369,7 +369,7 @@ function displayServiceHeaderCombined($thesehymns) {
     }
     // Heading line
     echo "<tr class=\"heading servicehead\"><td class=\"heavy\">{$datetext}</td>
-        <td colspan=2><a name=\"service_{$row['serviceid']}\">{$row['dayname']}</a>: {$row['rite']}".
+        <td><a name=\"service_{$row['serviceid']}\">{$row['dayname']}</a>: {$row['rite']}".
     ((3==$auth)?
     "<a class=\"menulink\" href=\"sermon.php?id={$row['serviceid']}\">Sermon</a>\n"
     :"").
@@ -622,7 +622,7 @@ function modifyServiceHeaderCombined($thesehymns) {
     <a class=\"menulink\" href=\"print.php?id={$row['serviceid']}\" title=\"Show a printable format of this service.\">Print</a>
     </div>
     </td>
-    <td colspan=2>
+    <td>
     <a name=\"service_{$row['serviceid']}\">{$row['dayname']}</a>: {$row['rite']}
     </td></tr>\n";
     for ($i=0, $limit=count($occurrences); $i<$limit; $i++) {
