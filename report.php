@@ -46,7 +46,8 @@ if ("customfields" == $_GET['action']) {
         "hymn books",
         "hymn notes",
         "hymn occurrences",
-        "hymn titles"));
+        "hymn titles",
+        "service flags"));
     echo json_encode($rec);
     exit(0);
 } elseif ("left" == $_GET['move-field']) {
@@ -449,6 +450,29 @@ function displayService($service, $fieldlist) {
             foreach ($service as $hymn) {
                 $rv[] = "{$hymn["title"]}<br>";
             }
+            $rv[] = "</div></td>";
+            continue;
+        } elseif ("service flags" == $field['name']) {
+            $rv[] = "<td class=\"customservice-flags\">";
+            $rv[] = "<div style=\"width: {$field['width']}em\">";
+            $grouped = array();
+            foreach ($service as $s) {
+                $grouped[$s['serviceid']][$s['occurrence']] = 1;
+            }
+            $allflags = array();
+            foreach ($grouped as $sid => $occurrences) {
+                foreach ($occurrences as $o => $v) {
+                    $q = getFlagsFor($sid, $o);
+                    while ($f = $q->fetch(PDO::FETCH_ASSOC)) {
+                        if ($f['value']) $ftext = ": {$f['value']}";
+                        else $ftext = "";
+                        if ($f['user']) $fuser = " [{$f['user']}]";
+                        else $fuser = "";
+                        $allflags[] = "{$f['flag']}{$fuser}{$ftext} ({$o})";
+                    }
+                }
+            }
+            $rv[] = implode("<br>\n", $allflags);
             $rv[] = "</div></td>";
             continue;
         }

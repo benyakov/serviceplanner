@@ -79,7 +79,7 @@ if (! array_key_exists("stage", $_GET))
         </dl>
         <table id="hymnentries"><tbody id="sortablelist">
         <tr class="heading"><td></td><th>Del</th><th>Seq</th><th>Book</th><th>#</th><th>Note</th>
-            <th>Occurrence</th><th>Title</th></tr>
+            <th>Occurrence</th><th>Title</th><th>Recent Uses</th></tr>
         <?
         while ($row) {
             if ('' == $row['number']) {
@@ -127,6 +127,7 @@ if (! array_key_exists("stage", $_GET))
                      class="hidden save-title command-link"
                      id="savetitle_<?=$row['hymnid']?>">Save</a>
                 </td>
+                <td id="past_<?=$row['hymnid']?>"></td>
             </tr>
             <?
             $row = $q->fetch(PDO::FETCH_ASSOC);
@@ -164,6 +165,7 @@ if (! array_key_exists("stage", $_GET))
                  class="hidden save-title command-link"
                  id="savetitle_new">Save</a>
             </td>
+            <td id="past_new"></td>
         </tr>
         </tbody></table>
         <a id="addHymn" class="jsonly command-link" tabindex="200"
