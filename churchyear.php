@@ -533,6 +533,7 @@ if ($_GET['propers']) {
  */
 if ($_POST['propers']) {
     requireAuthJSON(3, array(false, "Access denied.  Please log in."));
+    // FIXME: Check to see if this dayname exists, and if not, create it.
     $q = $db->prepare("UPDATE `{$dbp}churchyear_propers` SET
         color=?, theme=?, introit=?, gradual=?, note=? WHERE dayname = ?");
     $q->bindValue(1, $_POST['color']);
