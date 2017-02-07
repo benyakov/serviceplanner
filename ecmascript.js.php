@@ -482,7 +482,7 @@ function openMsgViewer() {
         $("#msgdialog").dialog({title: "Message Viewer",
             width: $(window).width()*0.5,
             maxHeight: $(window).height()*0.9,
-            position: "center"
+            position: { my: "center", at: "center", of: window}
         });
     }
 }

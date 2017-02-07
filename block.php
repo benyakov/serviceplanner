@@ -529,7 +529,7 @@ requireAuth("index.php", 3);
             evt.preventDefault();
             $("#dialog").load(encodeURI("block.php?action=new"), function() {
                 $("#dialog").dialog({modal: true,
-                            position: "center",
+                            position: { my: "center", at: "center", of: window},
                             title: "New Block Plan",
                             width: $(window).width()*0.7,
                             maxHeight: $(window).height()*0.7,
@@ -543,7 +543,7 @@ requireAuth("index.php", 3);
                 encodeURI("block.php?action=edit&id="+$(this).attr("data-id")),
                 function() {
                     $("#dialog").dialog({modal: true,
-                                position: "center",
+                                position: { my: "center", at: "center", of: window},
                                 title: "Edit Block Plan",
                                 width: $(window).width()*0.7,
                                 maxHeight: $(window).height()*0.7,

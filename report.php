@@ -257,7 +257,7 @@ function setupFields() {
             +"</table>"
             +"</form>")
             .dialog({modal: true,
-                position: "center",
+                position: { my: "center", at: "center", of: window},
                 title: "Insert Field At "+order,
                 width: $(window).width()*0.4,
                 open: function() { setupInsertDialog(order); },

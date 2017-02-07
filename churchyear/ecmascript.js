@@ -89,7 +89,7 @@ function setupPropers() {
                         width: $(window).width()*0.7,
                         height: "auto",
                         maxHeight: $(window).height()*0.9,
-                        position: "center"
+                        position: { my: "center", at: "center", of: window}
                     });
             });
     });
@@ -171,7 +171,7 @@ function setupEdit() {
             .load(encodeURI("churchyear.php?requestform=dayname&dayname="
                 +$(this).attr("data-day")), function() {
                     $("#dialog").dialog({modal: true,
-                        position: "center",
+                        position: { my: "center", at: "center", of: window},
                         title: dtitle,
                         width: $(window).width()*0.7,
                         height: "auto",
@@ -333,7 +333,7 @@ function setupPropersDialog() {
                 $("#dialog2").html(rv);
                 $("#dialog2").dialog({modal: true,
                     stack: true,
-                    position: "center",
+                    position: { my: "center", at: "center", of: window},
                     title: "New Collect",
                     width: $(window).width()*0.65,
                     height: "auto",
@@ -355,7 +355,7 @@ function setupPropersDialog() {
                 }
                 $("#dialog2").html(rv);
                 $("#dialog2").dialog({modal: true,
-                    position: "center",
+                    position: { my: "center", at: "center", of: window},
                     title: "Confirm Delete Collect?",
                     width: $(window).width()*0.65,
                     height: "auto",
