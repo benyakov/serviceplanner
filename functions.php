@@ -199,7 +199,12 @@ function listthesehymns(&$thesehymns, $rowcount, $showocc=false) {
     // Display the hymns in $thesehymns, if any.
     $rows = 0;
     if (! $thesehymns) return;
-    echo "<tr data-occ=\"{$thesehymns[0]['occurrence']}\"><td colspan=3>\n";
+    if (! $showocc) {
+        $hymnblock_occ = " data-occ=\"{$thesehymns[0]['occurrence']}\"";
+    } else {
+        $hymnblock_occ = "";
+    }
+    echo "<tr{$hymnblock_occ} data-service=\"{$thesehymns[0]['serviceid']}\"><td colspan=3>\n";
     echo "<table class=\"hymn-listing\">";
     foreach ($thesehymns as $ahymn) {
         $occurrence = " data-occ=\"{$ahymn['occurrence']}\"";
@@ -254,7 +259,7 @@ function display_occurrences_separately($q) {
         if (! ($row['serviceid'] == $serviceid
             && $row['occurrence'] == $occurrence))
         {
-            $rowcount += listthesehymns($thesehymns, $rowcount, $hymnoccurrence);
+            $rowcount += listthesehymns($thesehymns, $rowcount);
             // Display the heading line
             if (is_within_week($row['date'])) {
                 $datetext = "<a name=\"now\">{$row['date']}</a>";
@@ -262,7 +267,8 @@ function display_occurrences_separately($q) {
                 $datetext = $row['date'];
             }
             $urloccurrence = urlencode($row['occurrence']);
-            echo "<tr data-occ=\"{$row['occurrence']}\" class=\"heading servicehead\"><td class=\"heavy\">{$datetext} {$row['occurrence']}</td>
+            echo "<tr data-occ=\"{$row['occurrence']}\" data-service=\"{$row['serviceid']}\" class=\"heading servicehead\">".
+                "<td class=\"heavy\">{$datetext} {$row['occurrence']}</td>
                 <td colspan=2><a name=\"service_{$row['serviceid']}\">{$row['dayname']}</a>: {$row['rite']}".
             ((3==$auth)?
             "<a class=\"menulink\" href=\"sermon.php?id={$row['serviceid']}\">Sermon</a>\n"
@@ -274,7 +280,7 @@ function display_occurrences_separately($q) {
             " <a class=\"menulink\" href=\"print.php?id={$row['serviceid']}\" title=\"print\">Print</a> ".
             "</td></tr>\n";
             echo "<tr class=\"service-flags\" data-occ=\"{$row['occurrence']}\" data-service=\"{$row['serviceid']}\"><td colspan=3></td></tr>\n";
-            echo "<tr data-occ=\"{$row['occurrence']}\" class=\"heading\"><td class=\"propers\" colspan=3>\n";
+            echo "<tr data-occ=\"{$row['occurrence']}\" class=\"heading\" data-service=\"{$row['serviceid']}\"><td class=\"propers\" colspan=3>\n";
             echo "<table><tr><td class=\"heavy smaller\">{$row['theme']}</td>";
             echo "<td colspan=2>{$row['color']}</td></tr>";
             if ($row['introit'] || $row['gradual']) {
@@ -293,7 +299,7 @@ function display_occurrences_separately($q) {
             echo "\n</table></td></tr>\n";
             if ($row['block'])
             { ?>
-                <tr data-occ="<?=$row['occurrence']?>"><td colspan=3 class="blockdisplay">
+                    <tr data-occ="<?=$row['occurrence']?>" data-service="<?=$row['serviceid']?>"><td colspan=3 class="blockdisplay">
                     <h4>Block: <?=$row['blabel']?></h4>
                     <div class="blocknotes maxcolumn">
                         <?=translate_markup($row['bnotes'])?>
@@ -320,7 +326,7 @@ function display_occurrences_separately($q) {
                 </tr>
             <? }
             if ($row['servicenotes']) {
-                echo "<tr data-occ=\"{$row['occurrence']}\"><td colspan=3 class=\"servicenote\">".
+                echo "<tr data-occ=\"{$row['occurrence']}\" data-service=\"{$row['serviceid']}\"><td colspan=3 class=\"servicenote\">".
                      translate_markup($row['servicenotes'])."</td></tr>\n";
             }
             $serviceid = $row['serviceid'];
@@ -330,7 +336,7 @@ function display_occurrences_separately($q) {
         $thesehymns[] = $row;
         $hymnoccurrence = $row['occurrence'];
     }
-    if ($thesehymns) listthesehymns($thesehymns, $rowcount, $hymnoccurrence);
+    if ($thesehymns) listthesehymns($thesehymns, $rowcount);
     echo "</article>\n";
     echo "</table>\n";
     unset($cfg);
@@ -382,7 +388,7 @@ function displayServiceHeaderCombined($thesehymns) {
         $datetext = $row['date'];
     }
     // Heading line
-    echo "<tr class=\"heading servicehead\"><td class=\"heavy\">{$datetext}</td>
+    echo "<tr class=\"heading servicehead\" data-service=\"{$row["serviceid"]}\"><td class=\"heavy\">{$datetext}</td>
         <td><a name=\"service_{$row['serviceid']}\">{$row['dayname']}</a>: {$row['rite']}".
     ((3==$auth)?
     "<a class=\"menulink\" href=\"sermon.php?id={$row['serviceid']}\">Sermon</a>\n"
@@ -397,7 +403,7 @@ function displayServiceHeaderCombined($thesehymns) {
     :"").
         "{$occurrences[$i]}</td></tr>\n";
     }
-    echo "<tr class=\"heading\"><td class=\"propers\" colspan=3>\n";
+    echo "<tr class=\"heading\" data-service=\"{$row['serviceid']}\"><td class=\"propers\" colspan=3>\n";
     echo "<table><tr><td class=\"heavy smaller\">{$row['theme']}</td>";
     echo "<td colspan=2>{$row['color']}</td></tr>";
     if ($row['introit'] || $row['gradual']) {
@@ -416,7 +422,7 @@ function displayServiceHeaderCombined($thesehymns) {
     echo "\n</table></td></tr>\n";
     if ($row['block'])
     { ?>
-        <tr data-occ="<?=$row['occurrence']?>"><td colspan=3 class="blockdisplay">
+        <tr data-service="<?=$row['serviceid']?>"><td colspan=3 class="blockdisplay">
             <h4>Block: <?=$row['blabel']?></h4>
             <div class="blocknotes maxcolumn">
                 <?=translate_markup($row['bnotes'])?>
@@ -443,7 +449,7 @@ function displayServiceHeaderCombined($thesehymns) {
         </tr>
     <? }
     if ($row['servicenotes']) {
-        echo "<tr data-occ=\"{$row['occurrence']}\"><td colspan=3 class=\"servicenote\">".
+        echo "<tr data-service=\"{$row['serviceid']}\"><td colspan=3 class=\"servicenote\">".
              translate_markup($row['servicenotes'])."</td></tr>\n";
     }
     unset($cfg);
@@ -489,7 +495,7 @@ function modify_occurrences_separately($q) {
             }
             $urldate=urlencode($row['browserdate']);
             $urloccurrence=urlencode($row['occurrence']);
-            echo "<tr data-occ=\"{$row['occurrence']}\" class=\"heading servicehead\"><td>
+            echo "<tr data-occ=\"{$row['occurrence']}\" data-service=\"{$row['serviceid']}\" class=\"heading servicehead\"><td>
             <input form=\"delete-service\" type=\"checkbox\" name=\"{$row['serviceid']}_{$row['occurrence']}\" id=\"check_{$row['serviceid']}_{$row['occurrence']}\">
             <span class=\"heavy\">{$datetext} {$row['occurrence']}</span>
             <div class=\"menublock\">";
@@ -509,7 +515,7 @@ function modify_occurrences_separately($q) {
             <a name=\"service_{$row['serviceid']}\">{$row['dayname']}</a>: {$row['rite']}
             </td></tr>\n";
             echo "<tr class=\"service-flags\" data-occ=\"{$row['occurrence']}\" data-service=\"{$row['serviceid']}\"><td colspan=3></td></tr>\n";
-            echo "<tr data-occ=\"{$row['occurrence']}\" class=\"heading\"><td colspan=3 class=\"propers\">\n";
+            echo "<tr data-occ=\"{$row['occurrence']}\" data-service=\"{$row['serviceid']}\" class=\"heading\"><td colspan=3 class=\"propers\">\n";
             echo "<table><tr><td class=\"heavy smaller\">{$row['theme']}</td>";
             echo "<td colspan=2>{$row['color']}</td></tr>";
             if ($row['introit'] || $row['gradual']) {
@@ -528,7 +534,7 @@ function modify_occurrences_separately($q) {
             echo "\n</tr></table></td>\n";
             if ($row['block'])
             { ?>
-                <tr data-occ="<?=$row['occurrence']?>"><td colspan=3 class="blockdisplay">
+                <tr data-occ="<?=$row['occurrence']?>" data-service="<?=$row['serviceid']?>"><td colspan=3 class="blockdisplay">
                     <h4>Block: <?=$row['blabel']?></h4>
                     <div class="blocknotes">
                         <?=translate_markup($row['bnotes'])?>
@@ -556,7 +562,7 @@ function modify_occurrences_separately($q) {
                 </tr>
             <? }
             if ($row['servicenotes']) {
-                echo "<tr data-occ=\"{$row['occurrence']}\"><td colspan=3 class=\"servicenote\">".
+                echo "<tr data-occ=\"{$row['occurrence']}\" data-service=\"{$row['serviceid']}\"><td colspan=3 class=\"servicenote\">".
                      translate_markup($row['servicenotes'])."</td></tr>\n";
             }
             $serviceid = $row['serviceid'];
@@ -615,13 +621,14 @@ function modifyServiceHeaderCombined($thesehymns) {
     }
     $occurrences = array_keys($occurrences);
     $urloccurrences=array_map(function($o) {return rawurlencode($o);}, $occurrences);
+    $row = $thesehymns[0];
     if (is_within_week($row['date'])) {
         $datetext = "<a name=\"now\">{$row['date']}</a>";
     } else {
         $datetext = $row['date'];
     }
     $urldate=urlencode($row['browserdate']);
-    echo "<tr class=\"heading servicehead\"><td>";
+    echo "<tr class=\"heading servicehead\" data-service=\"{$row['serviceid']}\"><td>";
     echo "<div class=\"deletion-block\">";
     foreach ($occurrences as $occ) {
         echo "<input form=\"delete-service\" type=\"checkbox\" name=\"{$row['serviceid']}_{$occ}\" id=\"check_{$row['serviceid']}_{$occ}\"> <label for=\"check_{$row['serviceid']}_{$occ}\">{$occ}</label><br>";
@@ -648,7 +655,7 @@ function modifyServiceHeaderCombined($thesehymns) {
             <td><a class=\"menulink\" title=\"Edit flags for this service.\" href=\"flags.php?id={$row['serviceid']}&occurrence={$urloccurrences[$i]}\">Flags</a> {$occurrences[$i]}</td>
         </tr>\n";
     }
-    echo "<tr class=\"heading\"><td colspan=3 class=\"propers\">\n";
+    echo "<tr class=\"heading\" data-service=\"{$row['serviceid']}\"><td colspan=3 class=\"propers\">\n";
     echo "<table><tr><td class=\"heavy smaller\">{$row['theme']}</td>";
     echo "<td colspan=2>{$row['color']}</td></tr>";
     if ($row['introit'] || $row['gradual']) {
@@ -667,7 +674,7 @@ function modifyServiceHeaderCombined($thesehymns) {
     echo "\n</tr></table></td>\n";
     if ($row['block'])
     { ?>
-        <tr><td colspan=3 class="blockdisplay">
+        <tr data-service="<?=$row['serviceid']?>"><td colspan=3 class="blockdisplay">
             <h4>Block: <?=$row['blabel']?></h4>
             <div class="blocknotes">
                 <?=translate_markup($row['bnotes'])?>
@@ -695,7 +702,7 @@ function modifyServiceHeaderCombined($thesehymns) {
         </tr>
     <? }
     if ($row['servicenotes']) {
-        echo "<tr><td colspan=3 class=\"servicenote\">".
+        echo "<tr data-service=\"{$row['serviceid']}\"><td colspan=3 class=\"servicenote\">".
              translate_markup($row['servicenotes'])."</td></tr>\n";
     }
     unset($cfg);
