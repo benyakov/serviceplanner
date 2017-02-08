@@ -70,6 +70,7 @@ else
 unset($options);
 ?>
 <h1>Service Planning Records</h1>
+<div id="service-filter"></div>
 <form action="<?=$protocol?>://<?=$this_script?>" method="GET">
 <label for="allfuture">Include all future services:</label>
 <input type="checkbox" id="allfuture" name="allfuture" <?=$allfuture?>>

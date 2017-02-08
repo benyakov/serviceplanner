@@ -848,3 +848,9 @@ div.deletion-block {
     margin-right: 1em;
     font-size: 90%;
 }
+
+.disabled-input {
+    background-color: #AAA;
+    color: #000;
+}
+

@@ -630,6 +630,56 @@ function pullFlags(index, row) {
         });
 }
 
+function setupFilterForm() {
+    $("#service-filter")
+        .empty()
+        .html('<p><form id="filterform" data-filtered="0">'
+        +'<input type="text" name="filterstring" id="filterinput" placeholder="Filter by flag text">'
+        +'<button type="submit" id="filtersubmit">Set Flag Filter</button></form></p>');
+    $("#filterform").submit(toggleFilter);
+}
+
+function toggleFilter(evt) {
+    evt.preventDefault;
+    if ($("#records-listing").length) {
+        var table = "records-listing";
+    } else if ($("#modify-listing").length) {
+        var table = "modify-listing";
+    } else {
+        return false;
+    }
+    if ("0" == $("#filterform").data("filtered")) {
+        $("#"+table+">tbody>tr").hide()
+        var filter_text = $('#filterinput').val();
+        var services = $("tr.service-flags div:contains('"+filter_text+"')")
+            .parents("tr[data-service]")
+            .map(function(){return $(this).data('service');})
+            .get();
+        services = Array.from(new Set(services)); // Make unique
+        $(services)
+            .each(
+                function(index){
+                    var selector = "#"+table+">tbody>tr[data-service="
+                        +this+"]";
+                    $(selector).show();
+        });
+        $("#filterform").data("filtered", 1);
+        $("#filterinput")
+            .prop("disabled", true)
+            .addClass("disabled-input");
+        $("#filtersubmit").html("Remove Flag Filter");
+    } else {
+        $("#filterform").data("filtered", true);
+            $("#"+table+">tbody>tr").show();
+        $("#filterform").data("filtered", 0);
+        $("#filterinput")
+            .prop('disabled', false)
+            .removeClass("disabled-input");
+        $("#filtersubmit").html("Set Flag Filter");
+    }
+    return false;
+}
+
 $(document).ready(function() {
     $("#loginform").submit(function(evt) {
         evt.preventDefault();

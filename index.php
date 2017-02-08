@@ -34,7 +34,7 @@ if (is_link($_SERVER['SCRIPT_FILENAME']) || $cors ) {
 // Get the main content
 ob_start();
 ?>
-<h1>Upcoming Hymns</h1>
+<h1>Upcoming Hymns</h1> <div id="service-filter"></div>
 <?php
 $q = queryFutureHymns();
 display_records_table($q);
@@ -62,6 +62,7 @@ if ($jsonp = checkJsonpReq()) {
                 setCSSTweaks();
                 setupStyleAdjusterLocs();
                 setupFlags();
+                setupFilterForm(true);
             });
     }
     $(document).ready(function() {

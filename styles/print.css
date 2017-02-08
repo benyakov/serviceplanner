@@ -49,3 +49,6 @@ div#content-container {
     color: black;
 }
 
+div#service-filter {
+    display: none;
+}

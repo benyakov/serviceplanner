@@ -239,6 +239,7 @@ if (checkContentReq()) {
         $(document).ready(function() {
             refreshContent();
             setupMasterButtons();
+            setupFilterForm();
         });
     </script>
     <? pageHeader();
@@ -248,18 +249,20 @@ if (checkContentReq()) {
     <a id="thisweek" href="#now">Jump to This Week</a></div>
 <h1>Modify Service Planning Records</h1>
 <p class="explanation">This listing of hymns allows you to delete whole
-services, with all associated hymns in that service occurrence. To delete only certain
-hymns, edit the service using the "Edit" link.  To create or edit a sermon plan
-for that service, use the "Sermon" link.</p>
+services, with all associated hymns in the chosen service occurrence. To create
+or edit a sermon plan for that service, use the "Sermon" link.  You can copy a
+service to a new date using the "Copy" link. To delete only certain hymns in a
+service occurrence, edit the service using the "Edit" link.</p>
+<div id="service-filter"></div>
 <form action="<?=$protocol?>://<?=$this_script?>" method="GET">
 <input type="checkbox" id="allfuture" name="allfuture" value="checked" <?=$allfuture?>>
 <label for="allfuture">Include all future services.</label>
 <label for="lowdate">From</label>
 <input type="date" id="lowdate" name="lowdate"
-    value="<?=$lowdate->format("m/d/Y")?>">
+    value="<?=$lowdate->format("Y-m-d")?>">
 <label for="highdate">To</label>
 <input type="date" id="highdate" name="highdate"
-    value="<?=$highdate->format("m/d/Y")?>">
+    value="<?=$highdate->format("Y-m-d")?>">
 <button type="submit" name="submit" value="Apply">Apply</button>
 <br>
 <?

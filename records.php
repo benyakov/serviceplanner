@@ -37,6 +37,7 @@ $this_script = $_SERVER['HTTP_HOST'].$_SERVER['SCRIPT_NAME'] ;
                 scrollTarget("now");
             });
             setupFlags();
+            setupFilterForm();
         });
     </script>
 <?  pageHeader();
