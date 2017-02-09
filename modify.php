@@ -139,6 +139,7 @@ if (checkContentReq()) {
                     setupStyleAdjusterLocs();
                     setupButtons();
                     setupFlags();
+                    setupFilterForm();
                 });
         }
         function setupButtons() {
@@ -239,7 +240,6 @@ if (checkContentReq()) {
         $(document).ready(function() {
             refreshContent();
             setupMasterButtons();
-            setupFilterForm();
         });
     </script>
     <? pageHeader();

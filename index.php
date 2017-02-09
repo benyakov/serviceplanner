@@ -84,6 +84,7 @@ if ($jsonp) {
         echo $jsonp . '(' . $output . ')';
         ob_start();
 } ?>
+<div id="dialog"></div>
 </body>
 </html>
 <?  if ($jsonp) {

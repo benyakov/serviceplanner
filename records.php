@@ -48,5 +48,6 @@ $this_script = $_SERVER['HTTP_HOST'].$_SERVER['SCRIPT_NAME'] ;
     include("records-table.php");
     ?>
     </div>
+<div id="dialog"></div>
 </body>
 </html>

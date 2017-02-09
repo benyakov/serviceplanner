@@ -592,6 +592,44 @@ function setupFlags() {
     $(".service-flags").each(pullFlags);
 }
 
+function flagFormSubmit(evt) {
+    evt.preventDefault();
+    var data = $(this).serializeArray();
+    data.push({name: "json", value: 1});
+    data.push({name: "submit", value: 1});
+    $.post(this.action, $.param(data), function(rv) {
+        var returnval = $.parseJSON(rv);
+        $('#dialog').dialog('close');
+        setMessage(returnval[1]);
+        refreshContent();
+    });
+    return false;
+}
+
+function onFlagButtonClick(evt) {
+    evt.preventDefault();
+    $.post("flags.php", { 'json': 1,
+        'service': $(this).parents('tr').data('service'),
+        'occurrence': $(this).parents('tr').data('occ')
+    }, function (rv) {
+        var returnval = $.parseJSON(rv);
+        $('#dialog').html(returnval[1]);
+        // Set up dialog to submit json
+        $('#dialog').find('#service_flags')
+            .submit(flagFormSubmit);
+        $('#dialog').find('#add_flag')
+            .submit(flagFormSubmit);
+    });
+    $("#dialog").dialog({title: "Service Occurrence Flags",
+        width: $(window).width()*0.9,
+        maxHeight: $(window).height()*0.9,
+        position: { my: "center", at: "center", of: window}
+    })
+        .on('dialogclose', function(event) {
+            $('#dialog').html('');
+        });
+}
+
 function pullFlags(index, row) {
     if (! ($(row).data('service')
         && $(row).data('occ'))) {
@@ -622,6 +660,7 @@ function pullFlags(index, row) {
                             }, 'json');
                     }
                 });
+                $(row).find(".flagbutton").click(onFlagButtonClick);
             } else if (result[0] == 0) {
                 return true;
             } else {
@@ -679,6 +718,7 @@ function toggleFilter(evt) {
     }
     return false;
 }
+
 
 $(document).ready(function() {
     $("#loginform").submit(function(evt) {

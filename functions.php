@@ -274,7 +274,7 @@ function display_occurrences_separately($q) {
             "<a class=\"menulink\" href=\"sermon.php?id={$row['serviceid']}\">Sermon</a>\n"
             :"").
             (($auth)?
-            " <a class=\"menulink\" title=\"Edit flags for this service.\" href=\"flags.php?id={$row['serviceid']}&occurrence={$urloccurrence}\">Flags</a>"
+            " <a class=\"menulink flagbutton\" title=\"Edit flags for this service.\" href=\"flags.php?id={$row['serviceid']}&occurrence={$urloccurrence}\">Flags</a>"
             :"").
             "<a class=\"menulink\" href=\"export.php?service={$row['serviceid']}\">CSV Data</a>\n".
             " <a class=\"menulink\" href=\"print.php?id={$row['serviceid']}\" title=\"print\">Print</a> ".
@@ -399,7 +399,7 @@ function displayServiceHeaderCombined($thesehymns) {
     for ($i=0, $limit=count($occurrences); $i<$limit; $i++) {
     echo "<tr class=\"service-flags\" data-occ=\"{$occurrences[$i]}\" data-service=\"{$row['serviceid']}\"><td colspan=2></td><td>".
     (($auth)?
-    " <a class=\"menulink\" title=\"Edit flags for this service.\" href=\"flags.php?id={$row['serviceid']}&occurrence={$urloccurrences[$i]}\">Flags</a> "
+    " <a class=\"menulink flagbutton\" title=\"Edit flags for this service.\" href=\"flags.php?id={$row['serviceid']}&occurrence={$urloccurrences[$i]}\">Flags</a> "
     :"").
         "{$occurrences[$i]}</td></tr>\n";
     }
@@ -508,7 +508,7 @@ function modify_occurrences_separately($q) {
             }
             echo "
             <a class=\"menulink\" href=\"print.php?id={$row['serviceid']}\" title=\"Show a printable format of this service.\">Print</a>
-            <a class=\"menulink\" title=\"Edit flags for this service.\" href=\"flags.php?id={$row['serviceid']}&occurrence={$urloccurrence}\">Flags</a>
+            <a class=\"menulink flagbutton\" title=\"Edit flags for this service.\" href=\"flags.php?id={$row['serviceid']}&occurrence={$urloccurrence}\">Flags</a>
             </div>
             </td>
             <td colspan=2>
@@ -652,7 +652,7 @@ function modifyServiceHeaderCombined($thesehymns) {
     </td></tr>\n";
     for ($i=0, $limit=count($occurrences); $i<$limit; $i++) {
         echo "<tr class=\"service-flags\" data-occ=\"{$occurrences[$i]}\" data-service=\"{$row['serviceid']}\"><td colspan=2></td>
-            <td><a class=\"menulink\" title=\"Edit flags for this service.\" href=\"flags.php?id={$row['serviceid']}&occurrence={$urloccurrences[$i]}\">Flags</a> {$occurrences[$i]}</td>
+            <td><a class=\"menulink flagbutton\" title=\"Edit flags for this service.\" href=\"flags.php?id={$row['serviceid']}&occurrence={$urloccurrences[$i]}\">Flags</a> {$occurrences[$i]}</td>
         </tr>\n";
     }
     echo "<tr class=\"heading\" data-service=\"{$row['serviceid']}\"><td colspan=3 class=\"propers\">\n";

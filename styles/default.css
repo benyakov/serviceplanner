@@ -766,6 +766,10 @@ img.spinner {
     opacity: 1.0;
 }
 
+tr.service-flags > td {
+    border-bottom: thin dotted black;
+}
+
 dl.flags {
     margin: 2em 0;
     padding: 0;
@@ -781,19 +785,18 @@ input[type="text"].flag-value {
 }
 
 dl.flags dt {
-    position: relative;
-    top: 1.5em;
-    left: 0;
-    width: 11em;
+    float: left;
+    clear: left;
+    width: 1.5in;
+    text-align: right;
     font-weight: bold;
+    color: green;
+    border-bottom: 2px solid black;
 }
 
 dl.flags dd {
-    position: relative;
-    left: 10em;
-    top: -1.5em;
-    border-left: 1px solid black;
-    padding: 0 0 .5em .5em;
+    margin: 0 0 0 110px;
+    padding: 0 0 0.5em 0;
 }
 
 div.flag-repr {
@@ -801,6 +804,7 @@ div.flag-repr {
     display: block;
     float: left;
     border: 1px solid black;
+    font-size: 90%;
 }
 
 div.flag-name {
