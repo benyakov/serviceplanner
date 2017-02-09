@@ -161,29 +161,40 @@ function updateExisting(dateitem) {
                     if ($(this).prop('checked')) {
                         $('.existingservice').not(this)
                             .prop('checked', false)
-                            .prop('disabled', true);
+                            .prop('disabled', true)
+                            .addClass('disabled-input');
                         var details = sessionStorage.getItem("ExistingServices");
                         details = $.parseJSON(details);
                         var option = $(this).data('option');
                         $("#liturgicalname")
                             .val(details[option]['dayname'])
-                            .prop('disabled', true);
+                            .prop('disabled', true)
+                            .addClass('disabled-input');
                         $("#rite")
                             .val(details[option]['rite'])
-                            .prop('disabled', true);
+                            .prop('disabled', true)
+                            .addClass('disabled-input');
                         $("#servicenotes")
                             .val(details[option]['servicenotes'])
-                            .prop('disabled', true);
+                            .prop('disabled', true)
+                            .addClass('disabled-input');
                         $("#block")
                             .val(details[option]['block'])
-                            .prop('disabled', true);
+                            .prop('disabled', true)
+                            .addClass('disabled-input');
                     } else {
-                        $('.existingservice').prop('disabled', false);
-                        $("#liturgicalname").prop('disabled', false);
-                        $("#rite").prop('disabled', false);
-                        $("#servicenotes").prop('disabled', false);
+                        $('.existingservice')
+                            .prop('disabled', false)
+                            .removeClass('disabled-input');
+                        $("#liturgicalname").prop('disabled', false)
+                            .removeClass('disabled-input');
+                        $("#rite").prop('disabled', false)
+                            .removeClass('disabled-input');
+                        $("#servicenotes").prop('disabled', false)
+                            .removeClass('disabled-input');
                         $("#block").val('None')
-                            .prop('disabled', false);
+                            .prop('disabled', false)
+                            .removeClass('disabled-input');
                     }
                 })
             })
