@@ -1,8 +1,0 @@
-- Make sure click handler on entry page is applied to new added hymn lines
-- Add feature to copy a planned service to a new date
-
-Filter by flags in JQuery:
-
-l = $("tr.service-flags div:contains('Katy')");
-$("table#records-listing>tbody>tr").hide()
-l.parents("tr[data-service]").each(function(index){$("table#records-listing > tbody > tr[data-service="+$(this).data('service')+"]").show()})

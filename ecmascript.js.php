@@ -600,6 +600,7 @@ function setupSortableList() {
 }
 
 function setupFlags() {
+    $(".flagbutton").click(onFlagButtonClick);
     $(".service-flags").each(pullFlags);
 }
 
