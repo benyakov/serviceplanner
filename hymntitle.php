@@ -52,6 +52,9 @@ while ($row = $q->fetch(PDO::FETCH_ASSOC)) {
         'occurrence' => $row['occurrence']
     );
 }
+if (0 == $_GET['number']) {
+    $lastusedary = array();
+}
 if ($title || $_GET['xref']=="off") {
     echo json_encode(array($title, $lastusedary, false));
     exit(0);
