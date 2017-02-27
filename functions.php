@@ -268,7 +268,7 @@ function display_occurrences_separately($q) {
             }
             $urloccurrence = urlencode($row['occurrence']);
             echo "<tr data-occ=\"{$row['occurrence']}\" data-service=\"{$row['serviceid']}\" class=\"heading servicehead\">".
-                "<td class=\"heavy\">{$datetext} {$row['occurrence']}</td>
+                "<td class=\"heavy\"><a href=\"#\" class=\"expandservice\">+</a> {$datetext} {$row['occurrence']}</td>
                 <td colspan=2><a name=\"service_{$row['serviceid']}\">{$row['dayname']}</a>: {$row['rite']}".
             ((3==$auth)?
             "<a class=\"menulink\" href=\"sermon.php?id={$row['serviceid']}\">Sermon</a>\n"
@@ -388,7 +388,7 @@ function displayServiceHeaderCombined($thesehymns) {
         $datetext = $row['date'];
     }
     // Heading line
-    echo "<tr class=\"heading servicehead\" data-service=\"{$row["serviceid"]}\"><td class=\"heavy\">{$datetext}</td>
+    echo "<tr class=\"heading servicehead\" data-service=\"{$row["serviceid"]}\"><td class=\"heavy\"><a href=\"#\" class=\"expandservice\">+</a> {$datetext}</td>
         <td><a name=\"service_{$row['serviceid']}\">{$row['dayname']}</a>: {$row['rite']}".
     ((3==$auth)?
     "<a class=\"menulink\" href=\"sermon.php?id={$row['serviceid']}\">Sermon</a>\n"
@@ -495,7 +495,7 @@ function modify_occurrences_separately($q) {
             }
             $urldate=urlencode($row['browserdate']);
             $urloccurrence=urlencode($row['occurrence']);
-            echo "<tr data-occ=\"{$row['occurrence']}\" data-service=\"{$row['serviceid']}\" class=\"heading servicehead\"><td>
+            echo "<tr data-occ=\"{$row['occurrence']}\" data-service=\"{$row['serviceid']}\" class=\"heading servicehead\"><td><a href=\"#\" class=\"expandservice\">+</a>
             <input form=\"delete-service\" type=\"checkbox\" name=\"{$row['serviceid']}_{$row['occurrence']}\" id=\"check_{$row['serviceid']}_{$row['occurrence']}\">
             <span class=\"heavy\">{$datetext} {$row['occurrence']}</span>
             <div class=\"menublock\">";
@@ -629,6 +629,7 @@ function modifyServiceHeaderCombined($thesehymns) {
     }
     $urldate=urlencode($row['browserdate']);
     echo "<tr class=\"heading servicehead\" data-service=\"{$row['serviceid']}\"><td>";
+    echo "<a href=\"#\" class=\"expandservice\">+</a> ";
     echo "<div class=\"deletion-block\">";
     foreach ($occurrences as $occ) {
         echo "<input form=\"delete-service\" type=\"checkbox\" name=\"{$row['serviceid']}_{$occ}\" id=\"check_{$row['serviceid']}_{$occ}\"> <label for=\"check_{$row['serviceid']}_{$occ}\">{$occ}</label><br>";

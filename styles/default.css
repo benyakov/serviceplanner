@@ -836,7 +836,7 @@ a.delete-flag {
     text-decoration: none;
 }
 
-a.delete-flag:before {
+a.delete-flag::before {
     content: "\2612";
 }
 

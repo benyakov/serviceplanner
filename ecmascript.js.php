@@ -731,6 +731,29 @@ function toggleFilter(evt) {
     return false;
 }
 
+function setupExpansion() {
+    $('.expandservice').click(expandContractListing);
+}
+
+function contractAllListings() {
+    var rows = $('#records-listing tr');
+    $(rows).hide();
+    $(rows).filter('tr.servicehead').firstChild()
+        .addClass("contracted")
+        .show();
+    $(rows).filter('tr.service-flags').show();
+}
+
+function expandContractListing(evt) {
+    evt.preventDefault();
+    // Check text in this
+    // If +, expand:
+    //      Change + to -
+    //      show nonessentials
+    // If -, contract:
+    //      Change - to +
+    //      hide nonessentials
+}
 
 $(document).ready(function() {
     $("#loginform").submit(function(evt) {
