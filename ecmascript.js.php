@@ -746,13 +746,27 @@ function contractAllListings() {
 
 function expandContractListing(evt) {
     evt.preventDefault();
-    // Check text in this
-    // If +, expand:
-    //      Change + to -
-    //      show nonessentials
-    // If -, contract:
-    //      Change - to +
-    //      hide nonessentials
+    if ($(this).html() == "+") {
+        $(this).html('-');
+        showExtras($(this).parents('tr').data("service"));
+    } else {
+        $(this).html('+');
+        hideExtras($(this).parents('tr').data("service"));
+    }
+}
+
+function showExtras(serviceid) {
+    $("tr[data="+serviceid+"]").removeClass("contracted")
+        .show();
+}
+
+function hideExtras(serviceid) {
+    var serviceLines = $("tr[data="+serviceid"]");
+    serviceLines.hide();
+    $(serviceLines).filter('tr.servicehead').firstChild()
+        .addClass("contracted")
+        .show();
+    $(serviceLines).filter('tr.service-flags').show();
 }
 
 $(document).ready(function() {
