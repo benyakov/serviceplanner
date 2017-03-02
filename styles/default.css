@@ -858,3 +858,18 @@ div.deletion-block {
     color: #000;
 }
 
+a.expandservice {
+    display: block;
+    border: thin solid black;
+    width: .5em;
+    padding: 0 .25em;
+    text-align: center;
+}
+
+a.expandservice:link,
+a.expandservice:active,
+a.expandservice:visited {
+    color: red;
+    background-color: transparent;
+    text-decoration: none;
+}
