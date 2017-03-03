@@ -140,6 +140,8 @@ if (checkContentReq()) {
                     setupButtons();
                     setupFlags();
                     setupFilterForm();
+                    contractAllListings('modify-listing');
+                    setupListingExpansion('modify-listing');
                 });
         }
         function setupButtons() {

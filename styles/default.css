@@ -859,17 +859,23 @@ div.deletion-block {
 }
 
 a.expandservice {
-    display: block;
+    display: inline-block;
     border: thin solid black;
     width: .5em;
     padding: 0 .25em;
     text-align: center;
+    background-color: #9F9;
+    font-weight: bold;
 }
 
 a.expandservice:link,
 a.expandservice:active,
 a.expandservice:visited {
     color: red;
-    background-color: transparent;
     text-decoration: none;
 }
+
+a.expandservice.contracted {
+    background-color: #BBB;
+}
+

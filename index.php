@@ -63,7 +63,7 @@ if ($jsonp = checkJsonpReq()) {
                 setupStyleAdjusterLocs();
                 setupFlags();
                 setupFilterForm(true);
-                contractAllListings();
+                contractAllListings('records-listing');
                 setupListingExpansion();
             });
     }

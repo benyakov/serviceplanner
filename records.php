@@ -36,6 +36,8 @@ $this_script = $_SERVER['HTTP_HOST'].$_SERVER['SCRIPT_NAME'] ;
                 evt.preventDefault();
                 scrollTarget("now");
             });
+            contractAllListings('records-listing');
+            setupListingExpansion();
             setupFlags();
             setupFilterForm();
         });
