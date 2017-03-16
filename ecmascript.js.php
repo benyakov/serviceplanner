@@ -728,6 +728,7 @@ function toggleFilter(evt) {
             .removeClass("disabled-input");
         $("#filtersubmit").html("Set Flag Filter");
     }
+    contractAllListings(table);
     return false;
 }
 
