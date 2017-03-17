@@ -866,6 +866,8 @@ a.expandservice {
     text-align: center;
     background-color: #9F9;
     font-weight: bold;
+    line-height: 1.5ex;
+    padding-bottom: .4435ex;
 }
 
 a.expandservice:link,
