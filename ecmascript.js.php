@@ -733,6 +733,10 @@ function toggleFilter(evt) {
     }
     if (! $('#expandfiltered').is(':checked')) {
         contractAllListings(table);
+    } else {
+        $('.expandservice').filter(":visible")
+            .removeClass("contracted")
+            .html('-');
     }
     return false;
 }
@@ -741,7 +745,9 @@ function contractAllListings(tableId) {
     var rows = $('#'+tableId+' > tbody > tr').not('tr.servicehead')
         .not('tr.service-flags')
         .hide();
-    $('a.expandservice').addClass("contracted");
+    $('a.expandservice')
+        .addClass("contracted")
+        .html('+');
 }
 
 function setupListingExpansion() {
@@ -751,17 +757,16 @@ function setupListingExpansion() {
 function toggleListing(evt) {
     evt.preventDefault();
     if ($(this).html() == "+") {
-        $(this).html('-');
         showExtras($(this).parents('tr').data("service"));
     } else {
-        $(this).html('+');
         hideExtras($(this).parents('tr').data("service"));
     }
 }
 
 function showExtras(serviceid) {
     $("tr[data-service="+serviceid+"].servicehead a.expandservice")
-        .removeClass("contracted");
+        .removeClass("contracted")
+        .html("-");
     $("tr[data-service="+serviceid+"]").show();
 }
 
@@ -770,7 +775,9 @@ function hideExtras(serviceid) {
     if (! serviceLines.length) {
         serviceLines = $("#modify-listing > tbody > tr[data-service="+serviceid+"]");
     }
-    $(serviceLines).find('a.expandservice').addClass("contracted");
+    $(serviceLines).find('a.expandservice')
+        .addClass("contracted")
+        .html("+");
     serviceLines.not('tr.servicehead').not('tr.service-flags').hide();
 }
 
