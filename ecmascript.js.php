@@ -686,7 +686,10 @@ function setupFilterForm() {
         .empty()
         .html('<p><form id="filterform" data-filtered="0">'
         +'<input type="text" name="filterstring" id="filterinput" placeholder="Filter by flag text">'
-        +'<button type="submit" id="filtersubmit">Set Flag Filter</button></form></p>');
+        +'<label for="expandfiltered">Expand</label>'
+        +'<input type="checkbox" name="expandfiltered" id="expandfiltered" value="checked">'
+        +'<button type="submit" id="filtersubmit">Set Flag Filter</button>'
+        +'</form></p>');
     $("#filterform").submit(toggleFilter);
 }
 
@@ -728,7 +731,9 @@ function toggleFilter(evt) {
             .removeClass("disabled-input");
         $("#filtersubmit").html("Set Flag Filter");
     }
-    contractAllListings(table);
+    if (! $('#expandfiltered').is(':checked')) {
+        contractAllListings(table);
+    }
     return false;
 }
 
