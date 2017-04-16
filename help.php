@@ -39,7 +39,7 @@ requireAuth();
     <p>To return to the regular Housekeeping tab, just click on it.</p>
     <h2>Introductory Tour</h2>
     <ol>
-    <li><a href="#anonymous_tabs">Anonymous Access Tabs</a> (Upcoming Hymns, Service Records, Cross Ref, and Report)</li>
+    <li><a href="#anonymous_tabs">Anonymous Access</a> (Upcoming Hymns, Service Records, Cross Ref, and Report)</li>
     <li><a href="#report">Report</a></li>
     <li><a href="#modify_services">Modify Services</a></li>
     <li><a href="#block_plans">Block Plans</a></li>
@@ -66,11 +66,6 @@ requireAuth();
 
     <h1><a name="tour">Introductory Tour</a></h1>
 
-    <p>So you have your own installation of the service planner, and now
-you'd like to know how to use it.  This introduction should help.  I'll
-try to keep it brief, at the risk of leaving out some important or
-advanced things.  Feel free to skim to the part(s) you want to read.</p>
-
     <p>It will help to have a web browser window open to the service
 planner beside this introduction, so you can try things yourself as you
 read.</p>
@@ -81,23 +76,24 @@ and you need to save any changes there may be in one tab before switching to
 another.  Anyone can use the service planner, but unless you log in, you will
 only see a limited number of tabs.  Login links and related information are at
 the very top of the page on the left side.  Privileged users will also see a
-"User Administration" link at the center of the very top when they are logged
-in.  That's where you manage other users, if you need any.</p>
+<a href="#user-administration">User Administration</a> link at the top when
+they are logged in.  That's where you manage other users, if you need any.</p>
 
-    <p>On the right of the very top is an Adjust Styles link, which opens a
-dialog box on the screen allowing you to make some adjustments to the
-layout of the service listing.  Unless you are dissatisfied with the
-listing at some point, just ignore that link.  If you click it anyway,
-clicking it again will make the style adjuster dialog disappear again.</p>
+    <p>On the right of the very top is an <a href="#style-adjuster">Adjust
+Styles</a> link, which opens a dialog box on the screen allowing you to make
+some adjustments to the layout of the service listing.  Unless you are
+dissatisfied with the listing at some point, just ignore that link.  If you
+click it anyway, clicking it again will make the style adjuster dialog
+disappear again.</p>
 
     <h2><a name="tabs">Tabs</a></h2>
 
-    <h3><a name="anonymous_tabs">Anonymous Access Tabs</a></h3>
+    <h3><a name="anonymous_tabs">Anonymous Access</a></h3>
 
     <p>There are four tabs available to anonymous (not logged-in) users:
 Upcoming Hymns, Service Records, Cross Ref, and Report.  The first simply
 lists all hymns in their services from this day forward, in chronological
-order.  The very next service is at the top of the list.  "Service Records"
+order.  The very next service is at the top of the list.  Service Records
 is similar, but it shows <em>all</em> services that have been planned, with
 the latest (farthest in the future) at the top of the list.  The Cross Ref
 tab displays a cross-reference table of hymn numbers from various books.
@@ -107,11 +103,11 @@ may be customized by privileged users. It's available for those who need
 to print a simpler sheet of information, or one showing custom
 fields.</p>
 
-    <p>On the Service Records page and the soon-to-be-introduced Modify
-Services page, for your convenience, there is a <a name="thisweek">Jump to
-This Week</a> link-button at the top right of the page, which will scroll the
-page to contemporary planned services.  (That's different from planned
-contemporary services, which the service planner does not support.)</p>
+    <p>On the Service Records page (and the Modify Services page), for your
+convenience, there is a <a name="thisweek">Jump to This Week</a> link-button at
+the top right of the page, which will scroll the page to contemporary planned
+services.  (That's different from planned contemporary services, which the
+service planner does not support.)</p>
 
     <p>Under the main heading is a form allowing you to adjust the time
 window for which services will be displayed.  Two buttons below that
@@ -424,6 +420,26 @@ the installed Service Planner to an older version (and I can do that for you)
 in order to restore an outdated backup file, nobody likes extra work.</p>
 
     <h1>Advanced Features</h1>
+
+    <h2><a name="style-adjuster">Style Adjuster</a></h2>
+    <p>Clicking the Adjust Styles link in the top right corner opens (and closes) the Style Adjuster dialog box. This allows you to make the following changes to the way pages are presented. The changes are saved in your local browser either until they are cleared from memory or you click the button labeled Reset to Default.</p>
+
+    <dl>
+    <dt>Base font size (pixels)</dt><dd>The base font size affects all text on the page. The default value depends on the platform and screen you're using, but you can adjust the value here to tweak <em>everything</em> at once.</dt>
+    <dt>Hymn font size (%)</dt><dd>The hymn listing text can be resized as a percentage of the base font size. You could use this to make the hymn listing text smaller (numbers less than 100) or larger (numbers greater than 100) than surrounding text.</dd>
+    <dt>Note font size (%)</dt><dd>The font size of service notes can be adjusted in the same way, as a percentage of the base font size.</dd>
+    <dt>Show block info?</dt><dd>This hides or shows the section of services relating to their planning block. This only applies to service that are connected to a block plan.</dd>
+    <dt>Show propers?</dt><dd>This hides or shows the section of services containing the propers for the day. Organists, for example, may care to see only the hymns.</dd>
+    <dt>Reset to Default</dt><dd>This button is the easiest way to remove any custom style adjustments.</dd>
+    </dl>
+
+    <h2><a name="user-administration">User Administration</a></h2>
+
+    <p>This link at the top of the page opens a different page for user
+administration. It's mostly self-explanatory, but the User Level setting may
+bear some explanation. The system requires at least one Admin user to exist.
+Basic users can create flags on services from a list configurable on the
+Housekeeping tab. Advanced users have no additional privileges at this time.</p>
 
     <h2><a name="coinstallation">Populating Hymn Titles from a
 Co-installation</a></h2>
