@@ -205,10 +205,16 @@ $(document).ready(function(){var a="<?=$protocol?>://<?=$_SERVER['SERVER_NAME']?
 
     <h2>The Broom Closet</h2>
     <h3>Backups</h3>
-    <ol>
-    <li><a href="dump.php">Save a Backup of the Database</a>
+    <h4>Database</h4>
+    <p class="explanation">
         When restoring, be sure to restore into a Services installation
-        with the same version listed below.</li>
+        with the same version. The first and second numbers are the most important.
+        You are using Service Planner version
+        <?= "{$version['major']}.{$version['minor']}.{$version['tick']}" ?>.
+    </p>
+    <ol>
+    <li><a href="dump.php">Save a Backup of the Database</a></li>
+    <li><a href="dump.php?only=churchyear">Save a Backup of Your Church Year Modifications</a></li>
     <li><form id="restore-backup" action="restore.php" method="post"
         enctype="multipart/form-data">
         <label for="backup_file">Upload a backup (dump) file to restore.</label>
@@ -216,7 +222,23 @@ $(document).ready(function(){var a="<?=$protocol?>://<?=$_SERVER['SERVER_NAME']?
             required placeholder="Select local file">
         <button type="submit">Send</button>
     </form>  (Caution: This will replace all current data, and things could go wrong.  Test before relying upon it!)</li>
-    <li><a href="dump.php?only=churchyear">Save a Backup of Your Church Year Modifications</a>  See the note above about restoring to the same version.  Use the field above to install a backup of your church year data.</li>
+    </ol>
+    <h4>Uploaded Files</h4>
+    <p class="explanation">At this time, these are sermon manuscripts in
+directories/folders located through the database. That means the service
+planner won't know anything about new files you may upload this way.  You can
+use this to restore uploaded files if they have been corrupted or lost on the
+web server.</p>
+    <ol>
+    <li><a href="uploads.php">Save a Backup of Uploaded Files</a> </li>
+    <li><form id="restore-uploads" action="uploads.php" method="post"
+        enctype="multipart/form-data">
+        <input type="hidden" name="restore_backup_file" value="true">
+        <label for="backup_file">Upload a files-backup (tar) file to restore.</label>
+        <input id="backup_file" type="file" name="backup_file"
+            required placeholder="Select local file">
+        <button type="submit">Send</button>
+    </form> (Caution: This will overwrite existing uploads if they occupy the same location in the archive, and the existing file is older than the archived version.)</li>
     </ol>
 
     <h3>Exporting and Importing Church Year Data</h3>
@@ -373,9 +395,9 @@ to have a recent backup first, at least of your church year data.</p>
         tried unless needed.</li>
     <li>Manually re-create <a href="admin.php?flag=create-views">synonym coordination views</a> in the database.  This should also happen automatically when needed.</li>
     <li><a href="hymnindex.php?drop=yes">Drop and re-create hymn cross-reference table</a>.  This is needed when the table has been changed in a new version.</li>
-    <li>You are using Services version <?
-        echo "{$version['major']}.{$version['minor']}.{$version['tick']}";
-?>.  Refer to this version number, and include the address
+    <li>You are using Service Planner version
+        <?= "{$version['major']}.{$version['minor']}.{$version['tick']}" ?>.
+        Refer to this version number, and include the address
     <?=$_SERVER['SERVER_NAME'].$_SERVER['PHP_SELF']?> when writing bug reports.  You may send them via
     email to <a href="mailto: jesse@ma-amad.com">the author</a>.
     </li>
