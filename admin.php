@@ -408,7 +408,7 @@ to have a recent backup first, at least of your church year data.</p>
     <h3>Config Settings</h2><? $config = getConfig(false); ?>
     <form id="configsettings" action="<?=$_SERVER['PHP_SELF']?>?flag=savesettings" method="post">
     <dl>
-    <dt>Preferred Bible Abbreviation from <a href="http://www.biblegateway.com/versions/" title="BibleGateway.com">Bible Gateway</a></dt>
+    <dt><a name="biblegateway-abbreviation">Preferred Bible Abbreviation</a> from <a href="http://www.biblegateway.com/versions/" title="BibleGateway.com">Bible Gateway</a></dt>
     <dd class="explanation">All-caps version abbreviations as used by the Bible Gateway web site. This is used to generate links for lectionary texts.
 Multiple abbreviations may be separated by a semicolon, like "SBLGNT;WLC;NKJV",
 which gives a 3-column Greek/Hebrew/English interlinear.</dd>
@@ -427,12 +427,13 @@ they appear here.</dd>
         "sitetabs") as $k=>$v)
         echo "$k:$v\n";
     ?></textarea></dd>
-    <dt>Should the service listings combine multiple occurrences into one listing?</dt>
+    <dt><a name="combine-occurrences">Should</a> the service listings combine multiple occurrences into one listing?</dt>
     <dd class="explanation">When not combined, each group of hymns will contain
     hymns planned for only one service occurrence. When combined, each group of
     hymns will contain hymns planned for <em>all</em> occurrences of this service,
     in the order of their sequence numbers. There will also be more than one row of
-    flags, each with a label for the occurrence it describes.</dd>
+    flags, each with a label for the occurrence it describes.
+    <a href="help.php#two-occurrence-formats">See the help for more.</a></dd>
     <dd><input type="checkbox" id="combineoccurrences" name="combineoccurrences"
         <?=($options->getDefault("0", "combineoccurrences") == 1)?"checked":""?>>
         <label for="combineoccurrences">Combine Occurrences</label></dd>

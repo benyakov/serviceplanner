@@ -1,5 +1,5 @@
 <? /* Interface for modifying services from the listing
-    Copyright (C) 2012 Jesse Jacobsen
+    Copyright (C) 2017 Jesse Jacobsen
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -41,7 +41,7 @@ requireAuth();
     <ol>
     <li><a href="#anonymous_tabs">Anonymous Access</a> (Upcoming Hymns, Service Records, Cross Ref, and Report)</li>
     <li><a href="#report">Report</a></li>
-    <li><a href="#modify_services">Modify Services</a></li>
+    <li><a href="#modify-services">Modify Services</a></li>
     <li><a href="#block_plans">Block Plans</a></li>
     <li><a href="#sermon_plans">Sermon Plans</a></li>
     <li><a href="#church_year">Church Year</a></li>
@@ -91,28 +91,68 @@ disappear again.</p>
     <h3><a name="anonymous_tabs">Anonymous Access</a></h3>
 
     <p>There are four tabs available to anonymous (not logged-in) users:
-Upcoming Hymns, Service Records, Cross Ref, and Report.  The first simply
-lists all hymns in their services from this day forward, in chronological
-order.  The very next service is at the top of the list.  Service Records
-is similar, but it shows <em>all</em> services that have been planned, with
-the latest (farthest in the future) at the top of the list.  The Cross Ref
-tab displays a cross-reference table of hymn numbers from various books.
-Clicking on a blue heading causes the page to reload, sorted on that
-column. The Report tab shows a simple listing of services and hymns that
-may be customized by privileged users. It's available for those who need
-to print a simpler sheet of information, or one showing custom
-fields.</p>
+Upcoming Hymns, Service Records, Cross Ref, and Report.</p>
 
-    <p>On the Service Records page (and the Modify Services page), for your
-convenience, there is a <a name="thisweek">Jump to This Week</a> link-button at
-the top right of the page, which will scroll the page to contemporary planned
-services.  (That's different from planned contemporary services, which the
-service planner does not support.)</p>
+    <h4><a name="upcoming-hymns">Upcoming Hymns</a></h4>
+    <p>This tab simply lists lists all services with their hymns from this day
+forward, in chronological order.  It's a convenient place to answer the
+question, "What's coming up?" Anyone in the church might be interested in this
+page as a resource for the upcoming Sunday. Organists, choir directors, and
+altar guilds can plan their preparations with it, and church attendees or
+school teachers can use it to synchronize their daily devotions with the church
+year, upcoming hymns, and the Sunday propers.  The very next service always
+appears at the top of the list.</p>
 
-    <p>Under the main heading is a form allowing you to adjust the time
-window for which services will be displayed.  Two buttons below that
-switch the display mode from showing only future services (like the
-Upcoming Hymns tab) and showing all services (the default behavior).</p>
+    <p>As with other views, the Upcoming Hymns tab is first loaded with
+services contracted to save space and make it easier to find something in a
+long list. See the section on <a href="#expand-contract">expanding and
+contracting the service listing</a> for more information. When expanded, the
+service listings show service information in <a href="#service-format">standard
+format</a>.</p>
+
+    <p>People contributing to services can set informational
+<a href="#flags">flags</a> on the services. The service listing can be
+<a href="#flag-filters">filtered</a> on the basis of text found in the flags.</p>
+
+    <h4><a name="service-records">Service Records</a></h4>
+    <p>The Service Records tab is similar to the Upcoming Hymns tab, but the
+listing is configurable, and can show <em>all</em> services that have been
+planned.  By default, it has the latest (farthest in the future) at the top of
+the list.</p>
+
+    <p><a name="range-config"></a>Above the listing are a checkbox, two date
+entry boxes, and an Apply button. The From and To date boxes allow a user to
+limit the range of time for which planned services are listed. The checkbox
+alters the limits, so that all services following the "From" date will be
+listed, ignoring the "To" date. The new settings take effect with the Apply
+button.</p>
+
+    <p><a name="sorting-config"></a>Sandwiched between the date range boxes and
+the services themselves are two buttons that can set the chronological sort
+order of the services listed. The disabled button indicates the order in use.
+The default order when the page loads is reverse chronological order, so that
+the "most future" service is listed at the top. This is the opposite of the <a
+href="#upcoming-hymns">Upcoming Hymns</a> tab. Chronological order is like the
+Upcoming Hymns tab, except the listing can begin at any date set in the From
+box, and can be limited to services falling before the one in the To box.</a>
+
+    <p><a name="jump-this-week"></a>For convenience, there is a
+<a name="thisweek">Jump to This Week</a> link-button at the top right of the page,
+which will scroll the page to contemporary planned services.  (That's different
+from planned contemporary services, which the service planner does not
+support.)</p>
+
+    <h4><a name="cross-reference">Cross Ref</a></h4>
+    <p>The Cross Ref tab displays a cross-reference table of hymn numbers from
+various books.  Clicking on a blue heading causes the page to reload, sorted on
+that column. This listing is based on a database table, but it's purely for
+reference, and there is no configuration beyond sorting. It may be helpful to
+load it in a separate browser window or tab when planning a service.<p>
+
+    <h4>Report</h4>
+    <p>The Report tab shows a simple listing of services and hymns that may be
+customized by privileged users. It's available for those who need to see or
+print a simpler sheet of information, or one showing custom fields.</p>
 
     <h3><a name="user_tabs">Privileged User Tabs</a></h3>
 
@@ -124,8 +164,8 @@ Privileged users can configure the display using the blue form that
 appears on that page.</p>
 
     <p>Instead of a time span, this tab will list only up to a certain
-number of hymns, regardless of their assignment to services. The Limit
-setting controls this, but when set to zero, the limit is disabled.</p>
+number of hymns. The Limit setting controls this, but when set to zero, the
+limit is disabled.</p>
 
     <p>Checking the Future box configures the page to show Future hymns,
 in chronological order, instead of all planned hymns in
@@ -134,51 +174,105 @@ reverse-chronological order.</p>
     <p>The Start HTML and End HTML text boxes allow privileged
 users to modify the way the list is displayed. If you would
 like a certain kind of heading, for example, you could put
-<pre><?=htmlspecialchars("<h1>Hymns at St. Peter Lutheran Church</h1>")?></pre> at the beginning of the Start HTML field. You may
-wish to consult a reference on simple HTML markup, but be cautious about
-pasting bits of code in there from the Internet, unless you know what
-you are doing. Some code can be malicious.</p>
+<pre><?=htmlspecialchars("<h1>Hymns at St. Peter Lutheran Church</h1>")?></pre>
+at the beginning of the Start HTML field. You may wish to consult a reference
+on simple HTML markup, but be cautious about pasting bits of code in there from
+the Internet, unless you know what you are doing. Some code can be malicious.
+Admin users are assumed to be cautious and wise enough not to foolishly include
+code they don't understand. At a minimum, the Start HTML box should include the text
+<code><?=htmlspecialchars("<table>")?></code> and the End HTML box should include the text
+<code><?=htmlspecialchars("</table>")?></code>.</p>
 
-    <p>A line showing currently-selected fields appears below the
-configuration form. Each field is configured with a name and a width for
-display purposes. The red characters are links for moving fields
-relative to each other (&lt; and &gt;), for deleting fields (-), and for
-adding new fields (+).  The fields configured there will appear in the
-Report tab listing.  Please note that you will need at least one service
-planned before you can add fields to the Report tab.</p>
+    <p>A line showing active fields appears below the configuration form. Each
+field is configured with a name and a width for display purposes. The red
+characters are links for moving fields relative to each other (&lt; and &gt;),
+for deleting fields (-), and for adding new fields (+).  The fields configured
+there will appear in the Report tab listing.  You will need at least one
+service planned before you can add fields to the Report tab.</p>
 
-    <h4><a name="modify_services">Modify Services</a></h4>
+    <p>When adding a field, a drop-down list shows possible fields
+that can be chosen. Many of them are straight from the database, and their names
+may seem a little cryptic. It doesn't hurt to try one, and see what kind of
+data it contains.</p>
+
+    <p>To configure this listing effectively, it's important to realize that
+every row in the table represents a large array of data from the database. Each
+row contains data from only one hymn. In order to make the listing appear more
+friendly, some of the fields available are <em>not</em> strictly from the
+database, but are list values aggregated from the service associated with that
+line.  This allows the table to show something like the date, location, or day
+name only once, alongside a listing of <em>all</em> hymn numbers, hymn names,
+locations, or flags in that service. The aggregated field values are toward the
+bottom of the drop-down list.</p>
+
+    <p>Once a field has been added, it can only be moved or deleted, but not
+modified.</p>
+
+    <h4><a name="modify-services">Modify Services</a></h4>
 
     <p>When you log in, the Service Records page is replaced with the
 much more powerful Modify Services page. This is where you add new
 services or change ones you've already planned.</p>
 
-    <h5><a name="service_format">Standard Service Format</h5>
+    <h5><a name="service-format">Standard Service Format</h5>
 
-    <p>The Upcoming Hymns, Service Records, and Modify Services tabs
-share the same basic format for displaying each service.</p>
+    <p>The Upcoming Hymns, Service Records, and Modify Services tabs share the
+same basic format for displaying each service. There are really two formats
+available. The one used on all these pages can be selected in the Housekeeping
+tab, using the <a href="admin.php#combine-occurrences">Combine Occurrences
+checkbox</a>.</p>
+
+    <p><a name="two-occurrence-formats"></a>The hymns entered in the service
+planner are associated with a service <em>and</em> an occurrence of that
+service. That way the same basic service can be planned and reused in different
+times or places, each with its own set of hymns. The two formats available for
+service listings treat these occurrences in two different ways.</p>
+
+    <ol><li>The original way lists each occurrence as a separate service. The
+advantage of this is that someone interested in only that occurrence will not
+be bothered by other occurrences.</li>
+    <li>The combined way lists all occurrences under one service heading and
+with one set of propers and notes. Hymns for all occurrences are grouped
+together, and the occurrence name appears with each hymn. Each occurrence gets
+its own row of flags, and the button for modifying flags appears to its right,
+instead of in the heading with other buttons.</li>
+    </ol>
 
     <p>Each service is listed under its own heading line containing the date
-and occurrence of the service and liturgical day name.
-(The Occurrence of a service allows you to distinguish different locations
-or service times when the same essential service plan will be in use.)
-If the service is flagged as one where communion is offered, a boxed C appears
-after the liturgical day name.  Below that line appear the <em>Evangelical
-Lutheran Hymnary (ELH)</em>'s topical description for hymns on that day, as
-well as the liturgical color for paraments.</p>
+and occurrence(s) of the service and liturgical day name. Check boxes in that
+line allow the user to delete the selected service occurrence(s) using the
+Delete button above or below the listing. If any informational flags are set
+for this service, they will appear beneath the heading line. When a service
+listing is contracted, only these parts will be visible. When it is expanded,
+the following sections also appear, as long as they are not suppressed by the
+<a href="#style-adjuster">Style Adjuster</a>.</p>
+
+    <p>Beneath the flags and heading line, a gray section with general propers for
+the day appears.  The <em>Evangelical Lutheran Hymnary (ELH)</em>'s topical
+description for hymns on that day, as well as the liturgical color for
+paraments is at the top. Below them are the gradual and introit. Most of this
+information comes from the <em>Hymnary</em>, but a weekly responsive gradual is
+also available when using a <a href="#block_plan">block plan</a>.</p>
+
+    <p>Some services may be assigned to <a href="#block_plan">named blocks</a>
+for planning purposes. They will also contain a light green rectangle with a
+heading inside that says "Block: " and the name of the block to which the
+service belongs. The block specifies which propers will be used for that
+service, and they are automatically looked up and displayed within the block
+rectangle. This can include two lessons, the Gospel, the Psalm, the sermon
+text, and the text of the Collect. Depending on the block plan, some of these
+may not contain information. The biblical text references will be links to
+those texts on Bible Gateway, using the Bible version(s) configured
+<a href="admin.php#biblegateway-abbreviation">on the Housekeeping page.</a></p>
+
+    <p>After the general propers and block sections, a white section shows any
+general notes that the planner has written for the service. These can be short
+or lengthy, and may include any kind of text, including links.</p>
 
     <p>The actual hymns are listed line-by-line, with the abbreviation for the
 hymnbook, the number, any notes for that hymn (verse/stanza numbers, etc.), and
-the title.</p>
-
-    <p>Between the heading line and the list of hymns, there is service
-information, including any special notes about that service, the
-Introit, and the gradual. Some services may be assigned to named blocks
-(introduced below) for planning purposes. Those associated with blocks
-also contain a rectangle with a heading inside that says "Block: " and
-the name of the block to which the service belongs. The block specifies
-which propers will be used for that service, and they are automatically
-looked up and displayed within the block rectangle.</p>
+the title. If <a href="#two-occurrence-formats">occurrences are combined</a>,
+the occurrence for each hymn is listed in the rightmost column.</p>
 
     <h5>Buttons For Each Service</h5>
 
@@ -204,7 +298,7 @@ block at all.</p>
 default propers available are those specified in the <em>Evangelical Lutheran
 Hymnary (ELH)</em>.  A set of notes may also be included in each block, which
 will be displayed alongside the propers on the Upcoming Hymns, Service Records,
-or <a href="#modify_services">Modify Services</a> tabs.
+or <a href="#modify-services">Modify Services</a> tabs.
 
     <p>If a new user doesn't see an immediate application for service blocks,
 I'd recommend not using them at all.  Just ignore this tab, in that case.  You
@@ -217,7 +311,7 @@ once you have created them. The Service Planner is organized around
 the whole service, so in order to create a sermon plan, you will
 need to have a service already in the system for that particular
 day. It need not have any hymns, but it must exist. Then, on the <a
-href="#modify_services">Modify Services</a> page, where the service is
+href="#modify-services">Modify Services</a> page, where the service is
 listed, you can add a sermon by clicking the Sermon link in the heading
 for that service.</p>
 
@@ -422,7 +516,11 @@ in order to restore an outdated backup file, nobody likes extra work.</p>
     <h1>Advanced Features</h1>
 
     <h2><a name="style-adjuster">Style Adjuster</a></h2>
-    <p>Clicking the Adjust Styles link in the top right corner opens (and closes) the Style Adjuster dialog box. This allows you to make the following changes to the way pages are presented. The changes are saved in your local browser either until they are cleared from memory or you click the button labeled Reset to Default.</p>
+    <p>Clicking the Adjust Styles link in the top right corner opens (and
+closes) the Style Adjuster dialog box. This allows you to make the following
+changes to the way pages are presented. The changes are saved in your local
+browser either until they are cleared from memory or you click the button
+labeled Reset to Default.</p>
 
     <dl>
     <dt>Base font size (pixels)</dt><dd>The base font size affects all text on the page. The default value depends on the platform and screen you're using, but you can adjust the value here to tweak <em>everything</em> at once.</dt>

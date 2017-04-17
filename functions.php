@@ -1073,6 +1073,16 @@ function siteTabs($basename=false, $displayonly=false) {
                     $basename);
         }
     }
+?>  <script type="text/javascript">
+    $(document).ready(function() {
+        if (location.hash) {
+            location.hash=location.hash.replace('#', '');
+            var loc = $("html,body").scrollTop()-200;
+            $("html,body").animate({scrollTop:loc}, 1000);
+            console.log("Scrolled by -200 for "+location.hash);
+        }
+    });
+    </script><?
 }
 
 /**
