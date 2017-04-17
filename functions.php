@@ -1074,14 +1074,18 @@ function siteTabs($basename=false, $displayonly=false) {
         }
     }
 ?>  <script type="text/javascript">
+    function fixhash() {
+        var loc = $("html,body").scrollTop()-200;
+        $("html,body").animate({scrollTop:loc}, 1000);
+        console.log("Scrolled by -200 for "+location.hash);
+    }
     $(document).ready(function() {
         if (location.hash) {
             location.hash=location.hash.replace('#', '');
-            var loc = $("html,body").scrollTop()-200;
-            $("html,body").animate({scrollTop:loc}, 1000);
-            console.log("Scrolled by -200 for "+location.hash);
+            fixhash();
         }
     });
+    $(window).bind('hashchange', fixhash);
     </script><?
 }
 
