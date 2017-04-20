@@ -33,7 +33,7 @@ requireAuth();
 <?pageHeader();
   siteTabs("admin");?>
     <div id="content-container">
-    <div class="maxcolumn">
+    <div class="maxcolumn centered">
     <h1>Help Contents</h1>
 
     <p>To return to the regular Housekeeping tab, just click on it.</p>
@@ -110,9 +110,10 @@ contracting the service listing</a> for more information. When expanded, the
 service listings show service information in <a href="#service-format">standard
 format</a>.</p>
 
-    <p>People contributing to services can set informational
-<a href="#flags">flags</a> on the services. The service listing can be
-<a href="#flag-filters">filtered</a> on the basis of text found in the flags.</p>
+    <p>Users who are logged in can set informational <a href="#flags">flags</a>
+on the services from here. The service listing can be
+<a href="#flag-filters">filtered</a> by anyone on the basis of text found in
+those flags.</p>
 
     <h4><a name="service-records">Service Records</a></h4>
     <p>The Service Records tab is similar to the Upcoming Hymns tab, but the
@@ -122,9 +123,9 @@ the list.</p>
 
     <p><a name="range-config"></a>Above the listing are a checkbox, two date
 entry boxes, and an Apply button. The From and To date boxes allow a user to
-limit the range of time for which planned services are listed. The checkbox
-alters the limits, so that all services following the "From" date will be
-listed, ignoring the "To" date. The new settings take effect with the Apply
+limit the range of time for which planned services are listed. When checked,
+the checkbox alters the limits, so that all services after the "From" date will be
+listed, and the "To" date is ignored. The new settings take effect with the Apply
 button.</p>
 
     <p><a name="sorting-config"></a>Sandwiched between the date range boxes and
@@ -210,11 +211,11 @@ modified.</p>
 
     <h4><a name="modify-services">Modify Services</a></h4>
 
-    <p>When you log in, the Service Records page is replaced with the
-much more powerful Modify Services page. This is where you add new
+    <p>When you log in, the Service Records tab is replaced with the
+much more powerful Modify Services tab. This is where you add new
 services or change ones you've already planned.</p>
 
-    <h5><a name="service-format">Standard Service Format</h5>
+    <h5><a name="service-format">Service Format and Occurrences</h5>
 
     <p>The Upcoming Hymns, Service Records, and Modify Services tabs share the
 same basic format for displaying each service. There are really two formats
@@ -234,25 +235,27 @@ be bothered by other occurrences.</li>
     <li>The combined way lists all occurrences under one service heading and
 with one set of propers and notes. Hymns for all occurrences are grouped
 together, and the occurrence name appears with each hymn. Each occurrence gets
-its own row of flags, and the button for modifying flags appears to its right,
-instead of in the heading with other buttons.</li>
+its own row of <a href="#flags">flags</a>, and the button for modifying flags
+appears to its right, instead of in the heading with other buttons.</li>
     </ol>
 
     <p>Each service is listed under its own heading line containing the date
 and occurrence(s) of the service and liturgical day name. Check boxes in that
 line allow the user to delete the selected service occurrence(s) using the
-Delete button above or below the listing. If any informational flags are set
+Delete button above or below the listing. If any informational
+<a href="#flags">flags</a> are set
 for this service, they will appear beneath the heading line. When a service
 listing is contracted, only these parts will be visible. When it is expanded,
 the following sections also appear, as long as they are not suppressed by the
 <a href="#style-adjuster">Style Adjuster</a>.</p>
 
-    <p>Beneath the flags and heading line, a gray section with general propers for
-the day appears.  The <em>Evangelical Lutheran Hymnary (ELH)</em>'s topical
-description for hymns on that day, as well as the liturgical color for
-paraments is at the top. Below them are the gradual and introit. Most of this
-information comes from the <em>Hymnary</em>, but a weekly responsive gradual is
-also available when using a <a href="#block_plan">block plan</a>.</p>
+    <p>Beneath the <a href="#flags">flags</a> and heading line, a gray section
+with general propers for the day appears.  The <em>Evangelical Lutheran Hymnary
+(ELH)</em>'s topical description for hymns on that day, as well as the
+liturgical color for paraments is at the top. Below them are the gradual and
+introit. Most of this information comes from the <em>Hymnary</em>, but a weekly
+responsive gradual is also available when using a <a href="#block_plan">block
+plan</a>.</p>
 
     <p>Some services may be assigned to <a href="#block_plan">named blocks</a>
 for planning purposes. They will also contain a light green rectangle with a
@@ -263,7 +266,12 @@ rectangle. This can include two lessons, the Gospel, the Psalm, the sermon
 text, and the text of the Collect. Depending on the block plan, some of these
 may not contain information. The biblical text references will be links to
 those texts on Bible Gateway, using the Bible version(s) configured
-<a href="admin.php#biblegateway-abbreviation">on the Housekeeping page.</a></p>
+<a href="admin.php#biblegateway-abbreviation">on the Housekeeping page.</a>.
+If a pastor chooses a sermon text other than what may be provided in the block
+plan, he can indicate the text by clicking the
+<a href="#service-buttons">Sermon button</a> for this service and entering the
+text. It will be displayed in the Block section of the service listing, with an
+asterisk on the "Sermon" label.</p>
 
     <p>After the general propers and block sections, a white section shows any
 general notes that the planner has written for the service. These can be short
@@ -274,16 +282,56 @@ hymnbook, the number, any notes for that hymn (verse/stanza numbers, etc.), and
 the title. If <a href="#two-occurrence-formats">occurrences are combined</a>,
 the occurrence for each hymn is listed in the rightmost column.</p>
 
-    <h5>Buttons For Each Service</h5>
+    <h5><a name="#service-buttons">Buttons For Each Service</a></h5>
 
     <p>On the Modify Service page, each heading line also contains
-buttons for adding more hymns to a service (possibly in a different
-occurrence), editing the service as it is currently entered, adding a
-sermon, or printing just that one service with its hymns (handy for
-organists!). A checkbox appears to the left of the date in each service
-heading line, for the purpose of deleting whole services, with all their
-hymn selections. The checkboxes are used in conjunction with the Delete
-button above or below the service listing.</p>
+buttons for adding more hymns to a service (in any
+occurrence), editing the service as it is currently entered, adding a sermon,
+or printing just that one service with its hymns (handy for organists or social
+media postings). A checkbox appears to the left of the date in each service
+heading line, for the purpose of deleting whole services, with all their hymn
+selections. The checkboxes are used with the Delete button above or below the
+service listing.</p>
+
+    <h5><a name="flags">Informational Service Flags</a></h5>
+
+    <p>Flags provide a convenient way to add small pieces of information about
+a service that can be used to distinguish that service from others. They
+include three pieces of information: a name, a value, and the user who created
+the flag. A flag is attached to <em>an occurrence of a service</em> rather than
+a service without an occurrence. That means a service must have at least one
+hymn chosen in order to have flags added to it, since the hymns of a service
+establish its occurrences. (The hymn may be hymn 0, which is used for information
+and place-holding.)</p>
+
+    <p>Any signed-in user can create a flag, but only administrative users can
+create flags with arbitrary names and values. Other users can add flags named
+from a list configurable <a href="admin#addable-flags">on the Housekeeping
+page</a>. Administrative users can delete any flag by clicking the boxed X that
+appears in its top right corner in any service listing.</p>
+
+    <h5><a name="expand-contract">Expanding and Contracting Service Listings</a></h5>
+
+    <p>When a service listing is first loaded, each service is contracted to
+show only the heading line and flags line. A red + appears in a box on the left
+side of the heading line to show that the service is contracted. Clicking that
+will expand the listing and change the + to a -. Clicking the box again will
+contract the listing and hide the extra information.</p>
+
+    <h5><a name="flag-filters">Filtering a Service Listing on Flags</a></h5>
+
+    <p>A large service listing can be a lot to pore through when looking for
+one or more particular services. When flags are used consistently to provide
+the relevant information about those services, a long service listing may be
+easily reduced to exactly the services of interest, using the "Filter by flag
+text" box at the top of the listing page. Enter the exact text to search for,
+and either press Enter or click the Set Flag Filter button. If the "Expand"
+check box is checked when you press Enter or click, the filtered services will
+be automatically expanded to show all of their information. When a filter has
+been set, the Set Flag Filter button becomes a Remove Flag Filter button, so
+that you can see the unfiltered service listing. Flag filters are not saved or
+remembered in any way when a page is reloaded.</p>
+
 
     <h4><a name="block_plans">Block Plans</a></h4>
 

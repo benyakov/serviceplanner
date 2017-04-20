@@ -209,7 +209,6 @@ div#content-container {
 
 table#block-listing,
 table#churchyear-listing,
-table#xref-listing,
 table#modify-listing,
 table#records-listing,
 table#sermonplan-listing {
@@ -217,6 +216,12 @@ table#sermonplan-listing {
     color: black;
     border-collapse: collapse;
     width: 100%;
+}
+
+table#xref-listing {
+    border-collapse: collapse;
+    margin-left: auto;
+    margin-right: auto;
 }
 
 table#block-listing th,
@@ -361,8 +366,9 @@ div.propersbox {
 }
 
 table#userlist {
-    margin: 1em;
+    margin: 1em auto 1em auto;
     background-color: #999;
+
 }
 
 table#userlist td {
@@ -666,6 +672,11 @@ dl.blocklessons dt {
 
 .maxcolumn {
     width: 42em;
+}
+
+.centered {
+    margin-left: auto;
+    margin-right: auto;
 }
 
 .halfcolumn {

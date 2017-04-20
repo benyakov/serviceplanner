@@ -108,6 +108,7 @@ if ('dellect' == $_POST['action']) {
     <?pageHeader();
     siteTabs(); ?>
     <div id="content-container">
+    <div class="maxcolumn centered">
     <h1>Housekeeping</h1>
     <p class="explanation">Back up, restore, export, import, and configure your
 service planner here.  Keeping frequent backups is always highly
@@ -465,7 +466,7 @@ The only tabs accessible to anonymous users are "index", "records",
 available for specifying hymns. The first will be the default book.</dd>
     <dd><textarea id="hymnbooks-option" class="hymnbooksconfig"
         name="hymnbooks-option"><?
-    foreach ($options->get('hymnbooks') as $book) echo "$book\n";
+    echo implode("\n", $options->get('hymnbooks'));
     ?></textarea></dd>
     <dt>Hymn Count</dt>
     <dd class="explanation">The number of hymn slots available when entering a
@@ -492,17 +493,18 @@ available for specifying hymns. The first will be the default book.</dd>
         echo "<option name='$moopt'$selected>$moopt</option>\n";
     }?>
         </select></dd>
-    <dt>Addable Service Flags</dt>
+    <dt><a name="addable-flags">Addable Service Flags</a></dt>
     <dd class="explanation">Users with admin privileges can add any service
     flags they like other logged-in users can only add the service flags listed
     here. Write one per line.</dd>
     <dd><textarea id="service-flags-option" class="serviceflagsconfig"
         name="service-flags-option"><?
-    foreach ($options->get('addable_service_flags') as $flag) echo "$flag\n";
+    echo implode("\n", $options->get('addable_service_flags'));
     ?></textarea></dd>
     </dl>
     <button type="submit">Submit</button><button type="reset">Reset</button>
     </form>
+    </div>
     </div>
 </body>
 </html>

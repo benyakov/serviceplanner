@@ -31,15 +31,42 @@ $this_script = $_SERVER['HTTP_HOST'].$_SERVER['SCRIPT_NAME'] ;
 <?=html_head("Service Planning Records")?>
 <body>
     <script type="text/javascript">
-        $(document).ready(function() {
+        function setupMasterButtons() {
             $('#thisweek').click(function(evt) {
                 evt.preventDefault();
                 scrollTarget("now");
+                var dest1 = $("html").scrollTop();
+                $("html").scrollTop(dest1-75);
             });
+            if (! Modernizr.inputtypes.date) {
+                $("#lowdate").datepicker({showOn:"both",
+                    numberOfMonths: [1,2],
+                    stepMonths: 2});
+                $("#highdate").datepicker({showOn:"both",
+                    numberOfMonths: [1,2],
+                    stepMonths: 2});
+            };
+            $('#allfuture').change(function() {
+                if (this.checked) {
+                    $('#highdate').prop('disabled', true)
+                        .addClass('disabled-input');
+                } else {
+                    $('#highdate').prop('disabled', false)
+                        .removeClass('disabled-input');
+                }
+            });
+            if ($('#allfuture').is(':checked')) {
+                $('#highdate').prop('disabled', true)
+                    .addClass('disabled-input');
+
+            }
+        }
+        $(document).ready(function() {
             contractAllListings('records-listing');
             setupListingExpansion();
             setupFlags();
             setupFilterForm();
+            setupMasterButtons();
         });
     </script>
 <?  pageHeader();

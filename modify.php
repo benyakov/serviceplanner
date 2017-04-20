@@ -238,6 +238,20 @@ if (checkContentReq()) {
                     numberOfMonths: [1,2],
                     stepMonths: 2});
             };
+            $('#allfuture').change(function() {
+                if (this.checked) {
+                    $('#highdate').prop('disabled', true)
+                        .addClass('disabled-input');
+                } else {
+                    $('#highdate').prop('disabled', false)
+                        .removeClass('disabled-input');
+                }
+            });
+            if ($('#allfuture').is(':checked')) {
+                $('#highdate').prop('disabled', true)
+                    .addClass('disabled-input');
+
+            }
         }
         $(document).ready(function() {
             refreshContent();
@@ -271,12 +285,12 @@ service occurrence, edit the service using the "Edit" link.</p>
     $disabled = "";
     if ("Future" == $_SESSION[$sprefix]['modifyorder']) $disabled = "disabled";
 ?>
-<button id="futurebutton" type="submit" name="submit" value="Future" <?=$disabled?>>Show Future Only (Chron.)</button>
+<button id="futurebutton" type="submit" name="submit" value="Future" <?=$disabled?>>Chronological</button>
 <?
     $disabled = "";
     if ("All" == $_SESSION[$sprefix]['modifyorder']) $disabled = "disabled";
 ?>
-<button id="allbutton" type="submit" name="submit" value="All" <?=$disabled?>>Show All (Rev. Chron.)</button>
+<button id="allbutton" type="submit" name="submit" value="All" <?=$disabled?>>Reverse Chronological</button>
 </form>
 <hr>
 <div id="refreshable">

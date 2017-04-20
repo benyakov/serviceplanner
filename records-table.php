@@ -86,12 +86,12 @@ unset($options);
     $disabled = "";
     if ("Future" == $_SESSION[$sprefix]['modifyorder']) $disabled = "disabled";
 ?>
-<button id="futurebutton" type="submit" name="submit" value="Future" <?=$disabled?>>Show Future Only (Chron.)</button>
+<button id="futurebutton" type="submit" name="submit" value="Future" <?=$disabled?>>Chronological</button>
 <?
     $disabled = "";
     if ("All" == $_SESSION[$sprefix]['modifyorder']) $disabled = "disabled";
 ?>
-<button id="allbutton" type="submit" name="submit" value="All" <?=$disabled?>>Show All (Rev. Chron.)</button>
+<button id="allbutton" type="submit" name="submit" value="All" <?=$disabled?>>Reverse Chronological</button>
 </form>
 <?php
 if ("Future" == $_SESSION[$sprefix]['modifyorder']) $order = "ASC";
