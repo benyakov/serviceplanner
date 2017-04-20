@@ -180,6 +180,14 @@ function setAuthCookie($user, $series, $age) {
     setcookie('auth[token]', $token, $timestamp);
     setcookie('auth[user]', $user, $timestamp);
     file_put_contents("authcookies/{$user}/{$series}", $token);
+    setLastAdminLogin($user);
+}
+
+function setLastAdminLogin($user) {
+    $userlevel = authLevel();
+    if (3 == $userlevel) {
+        file_put_contents("authcookies/{$user}/last_login", time());
+    }
 }
 
 function getAuthCookieMaxAge() {
