@@ -224,7 +224,7 @@ $(document).ready(function(){var a="<?=$protocol?>://<?=$_SERVER['SERVER_NAME']?
         <button type="submit">Send</button>
     </form>  (Caution: This will replace all current data, and things could go wrong.  Test before relying upon it!)</li>
     </ol>
-    <h4>Uploaded Files</h4>
+    <h4><a name="uploaded-files">Uploaded Files</a></h4>
     <p class="explanation">At this time, these are sermon manuscripts in
 directories/folders located through the database. That means the service
 planner won't know anything about new files you may upload this way.  You can
@@ -253,7 +253,7 @@ then make all of your changes in the CSV file. Later, you could upload it with
 a new name for the lectionary or collect series. When importing data, be sure
 to have a recent backup first, at least of your church year data.</p>
     <dl>
-    <dt>Lectionary</dt><dd><form id="export-lectionary" action="export.php" method="get">
+    <dt><a name="lectionary-export">Lectionary</a></dt><dd><form id="export-lectionary" action="export.php" method="get">
     <label for="lectionary">Export single lectionary as CSV.</label>
     <select name="lectionary" id="exported-lect">
     <? foreach (getLectionaryNames() as $lname) { ?>
@@ -384,7 +384,7 @@ to have a recent backup first, at least of your church year data.</p>
         required placeholder="Database Prefix of Source Installation">
     <button type="submit" id="submit">Import Titles</button>
     </form></li>
-    <li>Restore church year to default:
+    <li><a name="restore-church-year">Restore church year to default:</a>
     <a href="" id="purge-churchyear"
         title="Purge Church Year Tables">Church Year Data</a> or
     <a href="churchyear.php?request=dropfunctions"

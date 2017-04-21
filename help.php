@@ -57,6 +57,8 @@ requireAuth();
     </ul>
     <h2>Advanced Features</h2>
     <ul>
+    <li><a href="#markdown">Markdown Formatting Markup</a></li>
+    <li><a href="#style-adjuster">Style Adjuster</a></li>
     <li><a href="#coinstallation">Populating Hymn Titles from a Co-installation</a></li>
     <li><a href="#mashups">Inserting a Service Listing into Another Web Page</a></li>
     <li><a href="#restoring_defaults">Restoring Defaults</a></li>
@@ -116,10 +118,10 @@ on the services from here. The service listing can be
 those flags.</p>
 
     <h4><a name="service-records">Service Records</a></h4>
-    <p>The Service Records tab is similar to the Upcoming Hymns tab, but the
-listing is configurable, and can show <em>all</em> services that have been
-planned.  By default, it has the latest (farthest in the future) at the top of
-the list.</p>
+    <p>The Service Records tab is similar to the <a
+href="#upcoming-hymns">Upcoming Hymns</a> tab, but the listing is configurable,
+and can show <em>all</em> services that have been planned.  By default, it has
+the latest (farthest in the future) at the top of the list.</p>
 
     <p><a name="range-config"></a>Above the listing are a checkbox, two date
 entry boxes, and an Apply button. The From and To date boxes allow a user to
@@ -185,7 +187,7 @@ code they don't understand. At a minimum, the Start HTML box should include the 
 <code><?=htmlspecialchars("</table>")?></code>.</p>
 
     <p>A line showing active fields appears below the configuration form. Each
-field is configured with a name and a width for display purposes. The red
+field is configured with a name and a width for its column in the table. The red
 characters are links for moving fields relative to each other (&lt; and &gt;),
 for deleting fields (-), and for adding new fields (+).  The fields configured
 there will appear in the Report tab listing.  You will need at least one
@@ -340,16 +342,39 @@ together, falling within a particular span of time.  The timespan of multiple
 blocks may overlap, so that you might have one block for Lent Sundays and
 another for Lent midweek services, and perhaps another for nonspecific services
 throughout the year.  Each service can be associated with one block, or with no
-block at all.</p>
+block at all. The association with a block is made via a drop-down list of
+available blocks on the <a href="#entry-page">entry page</a> and the service <a
+href="#edit-page">edit page</a>.</p>
 
-    <p>Each block associates a set of propers to be used in its services.  The
-default propers available are those specified in the <em>Evangelical Lutheran
-Hymnary (ELH)</em>.  A set of notes may also be included in each block, which
-will be displayed alongside the propers on the Upcoming Hymns, Service Records,
-or <a href="#modify-services">Modify Services</a> tabs.
+    <p>Each block specifies a set of propers to be used in its services.  The
+default propers available are those found in the <em>Evangelical Lutheran
+Hymnary (ELH)</em> lectionaries.  (Select "historic", "ilcwa", "ilcwb", or
+"ilcwc" from the Lectionary column.)  When using the historic lectionary, the
+series may also be selected. Note that these were not published with the intent
+that they be alternative lections, but alternative sermon texts. However, they
+may be set as alternative lections for a block of services. If the "custom"
+lectionary is chosen, a description of the lectionary should be entered in the
+Custom Readings field. A lectionary may specify a psalm and one or more
+collects for a particular day. The two sets of collects in the <em>Hymnary</em>
+are included under the labels "historic" and "Dietrich".  The sermon text may
+be specified as the Old Testament, Epistle, or Gospel lesson from the
+lectionary (and series) of your choice. (This can be overridden by specifying a
+sermon text in a <a href="#sermon_plan">sermon plan</a> for that service.) The
+service planner may be supplemented with additional lectionaries by entering
+individual sets of readings for the days on the <a href="#church-year">Church
+Year</a> tab or by uploading a complete set on the <a
+href="#housekeeping">Housekeeping</a> tab.</p>
 
-    <p>If a new user doesn't see an immediate application for service blocks,
-I'd recommend not using them at all.  Just ignore this tab, in that case.  You
+<p>The <em>Hymnary</em> includes seasonal graduals, but one of the editors has
+since developed a set of weekly responsive graduals as a supplement. A check
+box on the block plan page allows for the display of the latter, rather than
+the former gradual.</p>
+
+<p>A set of notes may also be included in each block, which will be displayed
+alongside the propers in the service listing.</p>
+
+    <p>If a new user doesn't see an immediate need or use for service blocks,
+they may be considered optional. Just ignore this tab, in that case.  You
 can always add blocks later.</p>
 
     <h4><a name="sermon_plans">Sermon Plans</a></h4>
@@ -359,31 +384,70 @@ once you have created them. The Service Planner is organized around
 the whole service, so in order to create a sermon plan, you will
 need to have a service already in the system for that particular
 day. It need not have any hymns, but it must exist. Then, on the <a
-href="#modify-services">Modify Services</a> page, where the service is
-listed, you can add a sermon by clicking the Sermon link in the heading
-for that service.</p>
+href="#modify-services">Modify Services</a> listing, you can add a sermon by
+clicking the Sermon link in the heading for that service.</p>
 
-    <p>The only thing that may not be obvious here is that when a manuscript
-file has been uploaded and saved in the Service planner, a link with the
-letters "mss" appears in the listing of sermon plans right next to the text.
-Clicking that link will download the saved file.</p>
+    <p>If a manuscript file has been uploaded for a sermon plan, a link with
+the letters "mss" appears in the listing of sermon plans right next to the
+text.  Clicking that link will download the saved file. The set of uploaded
+files are not saved in the database. If work will be done on the server
+installation, these should be backed up separately in case they are
+accidentally deleted. If an adminstrative user wishes to keep his own archive
+of these uploaded files, it may be downloaded in the <a
+href="admin.php#uploaded-files">Uploaded Files</a> section of the Housekeeping
+tab.</p>
+
+    <p>The Edit page for a serman plan shows two button links at the very top
+of the page, one to show a printable report, and one to browse all sermon
+plans. The Printable Report contains all the fields for this sermon plan, but
+does not include the service listing or the manuscript. The Outline field is
+shown in a way that retains the spacing in the way it was entered, and the
+Notes field is formatting using <a href="#markdown">Markdown</a>.
+
+    <p>When a sermon text is entered in a sermon plan, it will override the
+sermon text listed in the <a href="#block_plans">block plan</a> for that
+service (if one has been chosen).  When this happens, an asterisk will appear
+with the Sermon label.</p>
+
+    <p>When a sermon plan is selected, the related service is displayed at the
+bottom of the page for reference. (The control for <a
+href="#expand-contract">contracting</a> it is disabled.)</p>
 
     <h4><a name="church_year">Church Year</a></h4>
 
     <p>The Church Year tab is magical (figuratively).  This is where
 you can alter the Service Planner's knowledge of the church year and the
 propers assigned to each day.  I wouldn't advise changing anything here until
-you're pretty sure you understand what you want to do and how to do it.  Not
-that you can break anything, but the system is somewhat sophisticated.  If you
-do manage to break something and want to restore it to its original form,
-that's always possible on the Housekeeping tab.</p>
+you're sure you understand what you want to do and how to do it.  Not that you
+can permanently break anything, but the system is sophisticated.  If you do
+manage to break something and want to restore it to its original form, that's
+always possible <a href="admin.php#restore-church-year">on the Housekeeping
+tab</a>.</p>
 
-    <p>One of the interesting possibilities here is that you can add new sets of propers that will become available to your block plans.</p>
+    <p>The second column on the Church Year tab tells when the next occurrence
+falls for each of the computed days in the Church Year.   So if you want to
+know the date of Lent 2 next time around, just find that row on the Church Year
+tab.</p>
 
-    <p>Another feature of more obvious usefulness is that the second column
-on the Church Year tab tells you when the next occurrence falls for
-each of the computed days in the Church Year.   So if you want to know the date
-of Lent 2 next time around, just find that row on the Church Year tab.</p>
+    <p>One of the interesting possibilities here is that you can add new sets
+of propers that will become available to your block plans. Click the name of a
+day to see the propers that apply to that day. Choose the New Propers tab, and
+specify the information for this day in your new lectionary. When you do this,
+it's important to be perfectly consistent in your name for the lectionary. Any
+time you like, the new lectionary <a href="admin.php#lectionary-export">may be
+downloaded</a> as a CSV (comma-separated value) file, which is editable in a
+spreadsheet and can be uploaded to the service planner again.</p>
+
+    <p>The dialog box for editing propers also allows the editing or creation
+of associated collects. These are collected under names like "historic" or
+"Dietrich". Each collect may be linked to more than one set of propers in a
+lectionary. This makes the series of collects available in <a
+href="#block_plans">block plans</a>.</p>
+
+    <p>The left-most tab when editing propers contains basic propers for the
+day, which don't depend on a lectionary. These include the liturgical color,
+theme, a note, the Introit, and the weekly gradual.</p>
+
 
     <h4><a name="housekeeping">Housekeeping</a></h4>
 
@@ -562,6 +626,16 @@ the installed Service Planner to an older version (and I can do that for you)
 in order to restore an outdated backup file, nobody likes extra work.</p>
 
     <h1>Advanced Features</h1>
+
+    <h2><a name="markdown">Markdown Formatting Markup</a></h2>
+    <p>Several data fields on various pages support <a
+href="https://michelf.ca/projects/php-markdown/extra/">Markdown</a> markup.
+Markdown is a simple, quick, but powerful way to include all of the basic
+formatting provided in a web page, without having to learn to code in HTML. The
+markup itself is designed to make sense to humans when read. For example,
+<code>writing *emphasized* text this way</code> will be processed into
+something that looks like "writing <em>emphasized</em> text this way". Most
+fields containing "notes" in the service planner support Markdown.</p>
 
     <h2><a name="style-adjuster">Style Adjuster</a></h2>
     <p>Clicking the Adjust Styles link in the top right corner opens (and
