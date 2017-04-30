@@ -68,6 +68,7 @@ $backlink = "index.php";
             <dt>Lesson 2</dt><dd><?=$row['blesson2']?></dd>
             <dt>Gospel</dt><dd><?=$row['bgospel']?></dd>
             <dt>Psalm</dt><dd><?=$row['bpsalm']?></dd>
+            <dt>Sermon<?=$row['has_sermon']?'*':''?></dt><dd><?=$row['bsermon']?></dd>
         </dl>
         <h5>Collect: (<?=$row['bcollectclass']?>)</h5>
         <div class="collecttext maxcolumn">
