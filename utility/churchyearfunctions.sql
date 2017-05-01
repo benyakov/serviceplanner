@@ -90,7 +90,11 @@ BEGIN
     END IF;
     SET oct1 = CONCAT_WS('-', p_year, 10, 1);
     SET oct1wd = DAYOFWEEK(oct1);
-    RETURN oct1 + INTERVAL 8-oct1wd DAY;
+    IF oct1wd = 1 THEN
+        RETURN oct1;
+    ELSE
+        RETURN oct1 + INTERVAL 8-oct1wd DAY;
+    END IF;
 END;
 
 DROP FUNCTION IF EXISTS `{{DBP}}epiphany1_in_year`;

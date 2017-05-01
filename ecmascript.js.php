@@ -398,14 +398,15 @@ function calcEpiphany1(year) {
     }
 }
 function calcMichaelmas1(year) {
-    var michaelmas = new Date(year, 8, 29);
+    var michaelmas = new Date(year, 8, 29); // Sep 30
     if (sessionStorage.michaelmasObserved != -1 && michaelmas.getDay == 6) {
         return new Date(year, 8, 30);
     } else {
-        var base = new Date(year, 9, 1); // Oct 1
-        var offset = new Number(7-base.getDay());
-        base.setDate(base.getDate() + offset);
-        return base
+        var m1 = new Date(year, 9, 1); // Oct 1
+        var offset = new Number(7-m1.getDay());
+        if (offset == 7) offset = 0;
+        m1.setDate(m1.getDate() + offset);
+        return m1;
     }
 }
 function getDayFor(datestr, target) {
