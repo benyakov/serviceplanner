@@ -47,15 +47,25 @@ if ($q->rowCount()) {
             "rite" => $row['rite'],
             "servicenotes" => $row['servicenotes'],
             "block" => $row['block']);
-        $qh = $db->prepare("SELECT h.book, h.number
+        $qh = $db->prepare("SELECT h.book, h.number, h.occurrence
             FROM `{$db->getPrefix()}hymns` AS h
             WHERE h.service = ?
             ORDER BY h.occurrence, h.sequence");
         $qh->execute(array($row['service'])) or die(array_pop($qh->errorInfo()));
         $hymns = array();
-        while ($hrow = $qh->fetch(PDO::FETCH_ASSOC))
-            $hymns[] = "{$hrow['book']} {$hrow['number']}";
-        if ($hymns) echo "(".implode(", ", $hymns).")";
+        if ($hrow = $qh->fetch(PDO::FETCH_ASSOC)) {
+            $occ = $hrow['occurrence'];
+            $hymns[] = "'{$occ}':";
+            do {
+                if ($occ != $hrow['occurrence']) {
+                    $occ = $hrow['occurrence'];
+                    $hymns[] = "<br>'{$occ}': {$hrow['book']} {$hrow['number']}";
+                } else {
+                    $hymns[] = "{$hrow['book']} {$hrow['number']}";
+                }
+            } while ($hrow = $qh->fetch(PDO::FETCH_ASSOC));
+        }
+        if ($hymns) echo "".implode(" ", $hymns)."";
         echo "</li>";
         if ($tabindex < 25) $tabindex++;
     }

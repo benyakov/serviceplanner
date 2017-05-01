@@ -375,7 +375,7 @@ to have a recent backup first, at least of your church year data.</p>
     </fieldset></form></dd>
     </dl>
 
-    <h3>Tweaking Your Installation</h3>
+    <h3><a name="tweaking">Tweaking Your Installation</a></h3>
     <ol>
     <li><form id="import-hymns" action="import.php" method="post">
     <input type="hidden" name="import" value="hymnnames">
@@ -406,7 +406,7 @@ to have a recent backup first, at least of your church year data.</p>
 
     <? // Use standard lookup function, providing default and returning seconds
     $akmax = floor(getAuthCookieMaxAge()/(24*60*60));  ?>
-    <h3>Config Settings</h2><? $config = getConfig(false); ?>
+    <h3><a name="config-settings">Config Settings</a></h2><? $config = getConfig(false); ?>
     <form id="configsettings" action="<?=$_SERVER['PHP_SELF']?>?flag=savesettings" method="post">
     <dl>
     <dt><a name="biblegateway-abbreviation">Preferred Bible Abbreviation</a> from <a href="http://www.biblegateway.com/versions/" title="BibleGateway.com">Bible Gateway</a></dt>
@@ -448,7 +448,7 @@ The only tabs accessible to anonymous users are "index", "records",
         "anonymous sitetabs") as $k=>$v)
         echo "$k:$v\n";
     ?></textarea></dd>
-    <dt>Default Service Occurrence</dt>
+    <dt><a name="default-occurrence">Default Service Occurrence</a></dt>
     <dd class="explanation">A default occurrence to pre-fill the Occurrence field
     when entering new hymns or services.</dd>
     <dd><input type="text" id="defaultoccurrence" name="defaultoccurrence"
