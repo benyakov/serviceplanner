@@ -336,7 +336,7 @@ function generateFlagsForm($id, $occurrence) {
                <dd><?=htmlspecialchars($row['value'])?>
     <?
                 if ($uid == $row['uid']) {
-                  ?><br><button name="delete_flag"
+                  ?><br><input type="checkbox" name="delete_flag"
                         data-id="<?=$row['flag_id']?>"
                         value="<?=$row['flag_id']?>">Delete</button><?
                 } ?>
@@ -344,6 +344,7 @@ function generateFlagsForm($id, $occurrence) {
     <?      } ?>
             </dl>
             </table>
+            <button name="delete_flag">Delete Selected Flags</button>
             </form>
     <?
         }
