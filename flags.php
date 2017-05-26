@@ -330,12 +330,14 @@ function generateFlagsForm($id, $occurrence) {
             <input type="hidden" name="service" value="<?=$id?>">
             <input type="hidden" name="occurrence" value="<?=htmlspecialchars($occurrence)?>">
             <dl class="flags">
-    <?      foreach ($rows as $row) {
+<?          $user_has_flags = false;
+            foreach ($rows as $row) {
     ?>         <dt><?=htmlspecialchars($row['flag'])?> <br>
                 [<?=htmlspecialchars($row['user'])?>] </dt>
                <dd><?=htmlspecialchars($row['value'])?>
     <?
                 if ($uid == $row['uid']) {
+                    $user_has_flags = true;
                   ?><br><input type="checkbox" name="delete_flag"
                         data-id="<?=$row['flag_id']?>"
                         value="<?=$row['flag_id']?>">Delete</button><?
@@ -344,7 +346,9 @@ function generateFlagsForm($id, $occurrence) {
     <?      } ?>
             </dl>
             </table>
+    <?      if ($user_has_flags) { ?>
             <button name="delete_flag">Delete Selected Flags</button>
+    <?      } ?>
             </form>
     <?
         }
