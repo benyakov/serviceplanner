@@ -5,6 +5,15 @@ serviceApp.controller('indexCtrl', function ($scope){
 .controller('servicesCtrl', function($scope) {
 })
 .controller('reportCtrl', function($scope) {
+    $scope.admin = true;
+    $scope.config_open = false;
+    $scope.toggleConfig = function(open) {
+        if (open) {
+            $scope.config_open = false;
+        } else {
+            $scope.config_open = true;
+        }
+    };
 })
 .controller('blocksCtrl', function($scope) {
 })
@@ -22,7 +31,7 @@ serviceApp.config(function($routeProvider, $locationProvider) {
         controller: 'indexCtrl',
         templateUrl: 'partials/index.html'
     })
-    .when('services', {
+    .when('/services', {
         controller: 'servicesCtrl',
         templateUrl: 'partials/services.html'
     })
