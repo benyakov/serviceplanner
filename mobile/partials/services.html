@@ -6,10 +6,24 @@
                     <input type="text" class="form-control" placeholder="Filter On Tags"></input>
                 </form>
 
+                <div ng-if="admin">
+                    <form id="rangeform">
+                        <label for="include_future">Include all Future Services</label>
+                        <input type="checkbox" name="include_future" id="include_future">
+                        <label for="from">From</label>
+                        <input type="date" name="from" id="from" value="{fromdate}">
+                        <label for="to">To</label>
+                        <input type="date" name="to" id="to" value="{todate}">
+                        <button type="submit">Apply</button>
+                    </form>
+                    <a href="" ng-click="toggleSort()">{other_sort_order}</a>
+                </div>
+
                 <table class="table">
-                    <tr><th>Date</th><th>Day: Order</th><th>Options</th></tr>
-                    <tr><td></td><td></td><td>[buttons]</td></tr>
+                    <tr><th>Date</th><th>Day: Order</th><th>View</th></tr>
+                    <tr><td></td><td></td><td>[View]</td></tr>
                 </table>
             </div>
         </div>
+        <!-- From View: [Sermon] [Data] [Print] [Flags] [Copy] [Edit] [Add]
     </div>

@@ -3,6 +3,7 @@ var serviceApp = angular.module('serviceApp', ['ngRoute']);
 serviceApp.controller('indexCtrl', function ($scope){
 })
 .controller('servicesCtrl', function($scope) {
+    $scope.admin = true;
 })
 .controller('reportCtrl', function($scope) {
     $scope.admin = true;
