@@ -105,6 +105,32 @@ school teachers can use it to synchronize their daily devotions with the church
 year, upcoming hymns, and the Sunday propers.  The very next service always
 appears at the top of the list.</p>
 
+    <p>Anonymous users (i.e. not signed in) will see two buttons for each
+service on this page. The one labeled "Print" simply opens a page suitable for
+printing the information on that service from the web browser. The one labeled
+"CSV Data" is more powerful, but bears some explanation.  (If you are a simple
+soul when it comes to technology, you may want to skip to the next paragraph
+now.) CSV stands for "comma separated value," and represents a file format
+usable on any computer system for representing data in a table (with columns and
+rows, or in this case records and fields). A CSV file can be imported into any
+spreadsheet, but in this case, it's provided as a way of automating
+time-consuming tasks — especially bulletin creation. The Service Planner author
+has written a script in the Python language that will use the file obtained from
+this "CSV Data" link to <em>automatically</em> fill out a bulletin template with
+hymn numbers, names, associated service occurrences, text of the propers, etc.
+It even grabs the texts of the lections and inserts them.  Besides saving labor
+and time, it ensures that these parts of the bulletin will be as accurate as the
+data in the service planner with no extra effort. A large opportunity for human
+error is removed.  Since the bulletin does have limited space, the filled
+template always requires some tweaking, but most of the work is finished in an
+instant. The author's bulletins are typeset using plain text files as input
+(using <a href="http://latex-project.org">LaTeX</a>, which makes things like
+this easy to do with a scripting language like Python.  What if you find
+yourself locked into an application like MS Word? <a href="https://blogs.technet.microsoft.com/heyscriptingguy/2014/09/14/weekend-scripter-manipulating-word-and-excel-with-powershell/">You
+can do something similar using Microsoft's Powershell.</a> LibreOffice has its
+own scripting facility, but there are also libraries for languages like Python for
+automating processes with the OpenDocument (LibreOffice) format.</p>
+
     <p>As with other views, the Upcoming Hymns tab is first loaded with
 services contracted to save space and make it easier to find something in a
 long list. See the section on <a href="#expand-contract">expanding and
