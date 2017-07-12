@@ -3,7 +3,8 @@
             <div class="col-sm-12">
                 <h2>Services</h2>
                 <form class="navbar-form navbar-right" role="search">
-                    <input type="text" class="form-control" placeholder="Filter On Tags"></input>
+                    <input type="text" class="form-control" placeholder="Filter On Tags"
+                        ng-model="tagFilter.text"></input>
                 </form>
 
                 <div ng-if="admin">
@@ -19,9 +20,19 @@
                     <a href="" ng-click="toggleSort()">{other_sort_order}</a>
                 </div>
 
-                <table class="table">
+                <table class="table" ng-repeat="service in services | filter: tagFilter">
                     <tr><th>Date</th><th>Day: Order</th><th>View</th></tr>
-                    <tr><td></td><td></td><td>[View]</td></tr>
+                    <tr>{{service.date}}<td></td>{{service.day}: {{service.order}}<td></td><td><a href="" ng-click="viewService({{service.id}})"</td></tr>
+                    <tr ng-show="{{show_details[{{service.id}}]}}">
+                        <td>
+                            <table class="table"><!-- TODO: Swipe between these? -->
+                                <tr class="flags"></tr>
+                                <tr class="propers"></tr>
+                                <tr class="block"></tr>
+                                <tr class="hymns"></tr>
+                            </table>
+                        </td>
+                    </tr>
                 </table>
             </div>
         </div>
