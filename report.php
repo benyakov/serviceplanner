@@ -47,7 +47,8 @@ if ("customfields" == $_GET['action']) {
         "hymn notes",
         "hymn occurrences",
         "hymn titles",
-        "service flags"));
+        "service flags",
+        "flags-abbr"));
     echo json_encode($rec);
     exit(0);
 } elseif ("left" == $_GET['move-field']) {
@@ -457,8 +458,8 @@ function displayService($service, $fieldlist) {
             $rv[] = "<div style=\"width: {$field['width']}em\">";
             $grouped = array();
             foreach ($service as $s) {
-                $grouped[$s['serviceid']][$s['occurrence']] = 1;
-            }
+                    $grouped[$s['serviceid']][$s['occurrence']] = 1;
+                }
             $allflags = array();
             foreach ($grouped as $sid => $occurrences) {
                 foreach ($occurrences as $o => $v) {
@@ -468,12 +469,42 @@ function displayService($service, $fieldlist) {
                         else $ftext = "";
                         if ($f['user']) $fuser = " [{$f['user']}]";
                         else $fuser = "";
-                        $allflags[] = "{$f['flag']}{$fuser}{$ftext} ({$o})";
+                        $allflags[] = "<li>{$f['flag']}{$fuser}{$ftext} ({$o})</li>";
                     }
                 }
             }
-            $rv[] = implode("<br>\n", $allflags);
-            $rv[] = "</div></td>";
+            $rv[] = "<ul class=\"flaglist\">\n".implode("\n", $allflags);
+            $rv[] = "</ul></div></td>";
+            continue;
+        } elseif ("flags-abbr" == $field['name']) {
+            $rv[] = "<td class=\"customservice-flags\">";
+            $rv[] = "<div style=\"width: {$field['width']}em\">";
+            $grouped = array();
+            foreach ($service as $s) {
+                $grouped[$s['serviceid']][$s['occurrence']] = 1;
+            }
+            $allflags = array();
+            foreach ($grouped as $sid => $occurrences) {
+                foreach ($occurrences as $o => $v) {
+                    $q = getFlagsFor($sid, $o);
+                    while ($f = $q->fetch(PDO::FETCH_ASSOC)) {
+                        if ($f['value']) $ftext = "{$f['value']}";
+                        else $ftext = "";
+                        if ($f['user']) {
+                            // take supposed first initials only
+                            $initials = implode(".",
+                                array_map(function ($str) {
+                                    return substr($str, 0, 1);
+                                }, explode(" ", $f['user'])));
+                            $fuser = " {$initials}.";
+                        } else $fuser = "";
+                        $occurrence = substr($o, 0, 2);
+                        $allflags[] = "<tr><th>{$f['flag']}</th><td>{$fuser}/{$ftext}</td><td>{$occurrence}</td></tr>";
+                    }
+                }
+            }
+            $rv[] = "<table class=\"flaglist\">".implode("\n", $allflags);
+            $rv[] = "</table></div></td>";
             continue;
         }
         // DB fields

@@ -33,6 +33,10 @@ div#servicelisting td {
     border-collapse: collapse;
 }
 
+div#servicelisting td.customservice-flags table.flaglist td {
+    border-bottom: none;
+}
+
 td.customerservice-dbfield {
     border-left: 1px solid black;
     border-right: 1px solid black;
