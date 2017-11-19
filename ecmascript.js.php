@@ -182,6 +182,7 @@ function updateExisting(dateitem) {
                             .val(details[option]['block'])
                             .prop('disabled', true)
                             .addClass('disabled-input');
+                        $("#block").trigger("change");
                     } else {
                         $('.existingservice')
                             .prop('disabled', false)
@@ -195,6 +196,7 @@ function updateExisting(dateitem) {
                         $("#block").val('None')
                             .prop('disabled', false)
                             .removeClass('disabled-input');
+                        $("#block").trigger("change");
                     }
                 })
             })
