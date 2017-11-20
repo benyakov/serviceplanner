@@ -108,9 +108,9 @@ service and either add to them or change them.</p>
     $q->bindParam(":uid", $uid);
     $q->execute() or die(array_pop($q->errorInfo()));
 
-    $message = "Service flag added.";
+    $message = htmlspecialchars("Service flag {$_POST['flag']} added with value '{$_POST['value']}'.");
     if (isset($_POST['json'])) {
-        echo json_encode(array(true, $message));
+        echo json_encode("<p>{$message}");
         exit(0);
     }
     setMessage($message);
@@ -356,7 +356,7 @@ function generateFlagsForm($id, $occurrence) {
     ?><hr><h2>Set a New Flag</h2><?
     // Display a form for privileged and less-privileged users to add flags
 ?>
-    <form id="add_flag" action="<?= $_SERVER['PHP_SELF'] ?>" method="post">
+    <form id="add_flag">
         <input type="hidden" name="step" value="add_flag">
         <input type="hidden" name="user" value="<?=$uid?>">
         <input type="hidden" name="service" value="<?=$id?>">
@@ -375,7 +375,8 @@ function generateFlagsForm($id, $occurrence) {
     ?>
         <input class="flag-value" type="text" id="value" name="value"
             placeholder="Flag value (optional)">
-        <button id="submit" name="submit">Submit New Flag</button>
+        <button id="new_flag_submit" name="submit">Submit New Flag</button>
+        <div id="add_flag_report"></div>
         </form> <br><?
     return ob_get_clean();
 }

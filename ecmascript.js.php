@@ -1,5 +1,5 @@
-<?php /* Javascript library
-    Copyright (C) 2016 Jesse Jacobsen
+/* Javascript library
+    Copyright (C) 2017 Jesse Jacobsen
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -22,9 +22,7 @@
     2323 E. 12th St.
     The Dalles, OR 97058
     USA
-    */
-require('functions.php');
-header('Content-type: application/javascript'); ?>
+*/
 
 function addHymn() {
     if ($("#hymnentries").is("table")) {
@@ -632,16 +630,20 @@ function onFlagButtonClick(evt) {
         // Set up dialog to submit json
         $('#dialog').find('#service_flags')
             .submit(flagFormSubmit);
-        $('#dialog').find('#add_flag')
+        $('#dialog').find('#new_flag_submit')
+            .click(newFlagSubmit);
+        /*$('#dialog').find('#add_flag')
             .submit(flagFormSubmit);
+        */
     });
     $("#dialog").dialog({title: "Service Occurrence Flags",
         width: $(window).width()*0.9,
         maxHeight: $(window).height()*0.9,
-        position: { my: "center", at: "center", of: window}
+        position: { my: "top", at: "top", of: window}
     })
         .on('dialogclose', function(event) {
             $('#dialog').html('');
+            refreshContent();
         });
 }
 
@@ -684,6 +686,18 @@ function pullFlags(index, row) {
         });
 }
 
+function newFlagSubmit(evt) {
+    evt.preventDefault();
+    var data = $('#add_flag').serializeArray();
+    data.push({name: "json", value: 1});
+    $.post('flags.php', data,
+        function(result) {
+            var r = $.parseJSON(result);
+            var prev = $('#add_flag_report').html();
+            $('#add_flag_report').html(prev+r);
+        });
+}
+
 function setupFilterForm() {
     $("#service-filter")
         .empty()
@@ -697,7 +711,7 @@ function setupFilterForm() {
 }
 
 function toggleFilter(evt) {
-    evt.preventDefault;
+    evt.preventDefault();
     if ($("#records-listing").length) {
         var table = "records-listing";
     } else if ($("#modify-listing").length) {
