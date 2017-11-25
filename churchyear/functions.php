@@ -88,4 +88,73 @@ function churchyear_listing($rows) {
 <?
     return ob_get_clean();
 }
+
+function reconfigureNonfestival($type) {
+    /* Given either "Historic", "ILCW", or "RCL", reconfigure the settings for
+     * the affected days in the Church Year to skip Sundays at the appropriate
+     * times.
+     */
+    $dbh = new DBConnection();
+    $dbp = $dbh->getPrefix();
+    $dbh->beginTransaction();
+    $q = $dbh->prepare("UPDATE `{$dbp}churchyear` SET
+        `base` = :base,
+        `offset` = :offset,
+        WHERE `dayname` = :dayname");
+    $base = $offset = $dayname = "";
+    $q->bindParam(":base", $base);
+    $q->bindParam(":offset", $offset);
+    $q->bindParam(":dayname", $dayname);
+    if ("Historic" == $type) {
+        $base = "Easter";
+        for ($i = 1; $i <= 24; $i++) {
+            $offset = 56 + $i * 7;
+            $dayname = "Trinity {$i}";
+            $q->execute() or die(array_pop($q->errorInfo()));
+        }
+        $base = "Christmas 1";
+        $offset = -49;
+        $dayname = "Third Last";
+        $q->execute() or die(array_pop($q->errorInfo()));
+        $offset = -42;
+        $dayname = "Second Last";
+        $q->execute() or die(array_pop($q->errorInfo()));
+        $offset = -35;
+        $dayname = "Last";
+        $q->execute() or die(array_pop($q->errorInfo()));
+        $base = "Michaelmas 1";
+        for ($i = 1; $i <= 7; $i++) {
+            $offset = ($i-1) * 7;
+            $dayname = "Michaelmas {$i}";
+            $q->execute() or die(array_pop($q->errorInfo()));
+        }
+    } elseif ("ILCW" == $type) {
+        $base = "Easter";
+        for ($i = 1; $i <= 24; $i++) {
+            $offset = 56 + $i * 7;
+            $dayname = "Trinity {$i}";
+            $q->execute() or die(array_pop($q->errorInfo()));
+        }
+        $offset = ++$i * 7;
+        $dayname = "Third Last";
+        $q->execute() or die(array_pop($q->errorInfo()));
+        $offset = ++$i * 7;
+        $dayname = "Second Last";
+        $q->execute() or die(array_pop($q->errorInfo()));
+        $offset = -35;
+        $base = "Christmas 1";
+        $dayname = "Last";
+        $q->execute() or die(array_pop($q->errorInfo()));
+    } elseif ("RCL" == $type) {
+        $base = "Christmas 1";
+        $offset = -35;
+        $dayname = "Last";
+        $q->execute() or die(array_pop($q->errorInfo()));
+        for ($i = 26, $offset = -42; $i >= 1; $i--, $offset-=7) {
+            $dayname = "Trinity {$i}";
+            $q->execute() or die(array_pop($q->errorInfo()));
+        }
+    }
+    $dbh->commit();
+}
 ?>

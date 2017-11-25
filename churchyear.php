@@ -190,6 +190,14 @@ if ($_POST['submit_day']==1) {
     exit(0);
 }
 
+/* Reconfigure the nonfestival half to skip Sundays in the chosen pattern.
+ */
+if ("nonfestivalskip" == $_POST['reconfigure']) {
+    reconfigureNonfestival($_POST["nonfestivalskip-option"]);
+    setMessage("Reconfigured non-festival church year to ".
+        htmlspecialchars($_POST['reconfigure']));
+}
+
 /* Do the work of updating existing synonyms from a new list.
  * Called by the next two options.
  */

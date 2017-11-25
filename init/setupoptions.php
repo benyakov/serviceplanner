@@ -83,6 +83,9 @@ $addable_service_flags = array(
 // May be "Future" or "All".
 $modifyorder = "All";
 
+// Default choice for when to skip Sundays in the non-festival half of the year.
+$nonfestival_skip = "Historic";
+
 if (file_exists("./options.php")) {
     require("./options.php");
     unlink("./options.php");
@@ -97,6 +100,7 @@ foreach ($sitetabs as $k=>$v)
 foreach ($sitetabs_anonymous as $k=>$v)
     $options->set('anonymous sitetabs', $k, $v);
 $options->set('modifyorder', $modifyorder);
+$options->set('nonfestival-skip', $nonfestival_skip);
 $options->set('addable_service_flags', $addable_service_flags);
 $options->save();
 unset($options);

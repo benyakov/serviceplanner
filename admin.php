@@ -77,6 +77,73 @@ if ('dellect' == $_POST['action']) {
                 $(this).html("[-]");
             }
         }).click();
+        $("#minimizesettings").click(function(evt) {
+            evt.preventDefault();
+            if ($(this).html() == "[-]") {
+                $("#configsettings").hide();
+                $(this).html("[+]");
+            } else if ($(this).html() == "[+]") {
+                $("#configsettings").show();
+                $(this).html("[-]");
+            } else {
+                $(this).html("[-]");
+            }
+        })
+        $("#minimizecydata").click(function(evt) {
+            evt.preventDefault();
+            if ($(this).html() == "[-]") {
+                $("#cydata").hide();
+                $(this).html("[+]");
+            } else if ($(this).html() == "[+]") {
+                $("#cydata").show();
+                $(this).html("[-]");
+            } else {
+                $(this).html("[-]");
+            }
+        })
+        $("#minimizebackups").click(function(evt) {
+            evt.preventDefault();
+            if ($(this).html() == "[-]") {
+                $("#backups").hide();
+                $(this).html("[+]");
+            } else if ($(this).html() == "[+]") {
+                $("#backups").show();
+                $(this).html("[-]");
+            } else {
+                $(this).html("[-]");
+            }
+        })
+        $("#minimizetweaks").click(function(evt) {
+            evt.preventDefault();
+            if ($(this).html() == "[-]") {
+                $("#tweaks").hide();
+                $(this).html("[+]");
+            } else if ($(this).html() == "[+]") {
+                $("#tweaks").show();
+                $(this).html("[-]");
+            } else {
+                $(this).html("[-]");
+            }
+        })
+        $("#minimizeautochurchyear").click(function(evt) {
+            evt.preventDefault();
+            if ($(this).html() == "[-]") {
+                $("#autochurchyear").hide();
+                $(this).html("[+]");
+            } else if ($(this).html() == "[+]") {
+                $("#autochurchyear").show();
+                $(this).html("[-]");
+            } else {
+                $(this).html("[-]");
+            }
+        })
+        if (! window.location.hash) {
+            $("#minimizetweaks").click();
+            $("#minimizebackups").click();
+            $("#minimizecydata").click();
+            $("#minimizesettings").click();
+            $("#minimizeautochurchyear").click();
+        }
         $("#delete-lectionary").submit(function(evt) {
             evt.preventDefault();
             var lectname = $("#deleted-lect").val();
@@ -146,9 +213,9 @@ recommended!</p>
 
     <p>Since pages that modify the database are now login-restricted,
     it's also possible to allow the whole world to see the whole
-    installation with less risk that anyone would mess with your data.  You
-    may have to explain to your organist or secretary why they don't need to
-    log in.</p>
+    installation with less risk that anyone would mess with your data.
+    For users that might contribute flags to services, you can create
+    limited access "Basic User" accounts.</p>
 
     <h3>Mashing up pages from here into your own web site.</h3>
 
@@ -160,7 +227,7 @@ recommended!</p>
     <dl>
         <dt>In the page header (if it's not already there), insert:</dt>
         <dd class="honorspaces">
-&lt;script type="text/javascript" src="<?=$protocol?>://ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery.min.js"&gt;&lt;/script&gt;
+&lt;script type="text/javascript" src="<?=$protocol?>://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"&gt;&lt;/script&gt;
         </dd>
         <dt>Where you want the listing of all records to appear in the page body, insert:</dt>
         <dd class="honorspaces">
@@ -206,6 +273,9 @@ $(document).ready(function(){var a="<?=$protocol?>://<?=$_SERVER['SERVER_NAME']?
 
     <h2>The Broom Closet</h2>
     <h3>Backups</h3>
+
+    <a href="javascript:void(0);" id="minimizebackups">[-]</a>
+    <div id="backups">
     <h4>Database</h4>
     <p class="explanation">
         When restoring, be sure to restore into a Services installation
@@ -241,8 +311,12 @@ web server.</p>
         <button type="submit">Send</button>
     </form> (Caution: This will overwrite existing uploads if they occupy the same location in the archive, and the existing file is older than the archived version.)</li>
     </ol>
+    </div>
 
     <h3>Exporting and Importing Church Year Data</h3>
+
+    <a href="javascript:void(0);" id="minimizecydata">[-]</a>
+    <div id="cydata">
     <p class="explanation">There are several parts to the church year data, and
 you can export many of them to CSV (comma-separated value) files, which are
 editable in a text editor or spreadsheet.  Files of the same format can then be
@@ -260,7 +334,7 @@ to have a recent backup first, at least of your church year data.</p>
         <option name="<?=$lname?>"><?=$lname?></option>
     <? } ?>
     </select>
-    <button type="submit" id="submit">Export Lectionary</button>
+    <button type="submit">Export Lectionary</button>
     </form></dd>
     <dd><form id="delete-lectionary" action="<?=$this_script?>" method="post">
     <label for="lectionary">Delete single lectionary (use caution).</label>
@@ -269,7 +343,7 @@ to have a recent backup first, at least of your church year data.</p>
         <option name="<?=$lname?>"><?=$lname?></option>
     <? } ?>
     </select>
-    <button type="submit" id="submit">Delete All Days In Lectionary</button>
+    <button type="submit">Delete All Days In Lectionary</button>
     </form></dd>
     <dd> <form id="import-lectionary" action="import.php" method="post"
             enctype="multipart/form-data">
@@ -374,15 +448,19 @@ to have a recent backup first, at least of your church year data.</p>
         <button type="submit">Import Collects Series</button>
     </fieldset></form></dd>
     </dl>
+    </div>
 
     <h3><a name="tweaking">Tweaking Your Installation</a></h3>
+
+    <a href="javascript:void(0);" id="minimizetweaks">[-]</a>
+    <div id="tweaks">
     <ol>
     <li><form id="import-hymns" action="import.php" method="post">
     <input type="hidden" name="import" value="hymnnames">
     <label for="prefix">Merge hymn titles from a co-installation.</label>
     <input type="text" name="prefix" pattern="[\w\d]+" id="prefix"
         required placeholder="Database Prefix of Source Installation">
-    <button type="submit" id="submit">Import Titles</button>
+    <button type="submit">Import Titles</button>
     </form></li>
     <li><a name="restore-church-year">Restore church year to default:</a>
     <a href="" id="purge-churchyear"
@@ -406,7 +484,11 @@ to have a recent backup first, at least of your church year data.</p>
 
     <? // Use standard lookup function, providing default and returning seconds
     $akmax = floor(getAuthCookieMaxAge()/(24*60*60));  ?>
+    </div>
+
     <h3><a name="config-settings">Config Settings</a></h2><? $config = getConfig(false); ?>
+    <a href="javascript:void(0);" id="minimizesettings">[-]</a>
+    <div id="configsettings">
     <form id="configsettings" action="<?=$_SERVER['PHP_SELF']?>?flag=savesettings" method="post">
     <dl>
     <dt><a name="biblegateway-abbreviation">Preferred Bible Abbreviation</a> from <a href="http://www.biblegateway.com/versions/" title="BibleGateway.com">Bible Gateway</a></dt>
@@ -504,6 +586,36 @@ available for specifying hymns. The first will be the default book.</dd>
     </dl>
     <button type="submit">Submit</button><button type="reset">Reset</button>
     </form>
+    </div>
+    <h3><a name="churchyear_setup">Automatic Church Year Setup</a></h3>
+
+    <a href="javascript:void(0);" id="minimizeautochurchyear">[-]</a>
+    <div id="autochurchyear">
+    <dl>
+    <dt><a name="nonfestival-skip">When should we skip Sundays in the non-festival half of the church year?</a></dt>
+    <dd class="explanation">Select which system should be used to skip
+    Sundays/propers in the non-festival half of the year. Note: This will
+    reconfigure the affected days listed on the Church Year tab. "Historic" means
+    the season will observe Michaelmas on the last Sunday of September, then skip
+    to Trinity 19 as Michaelmas 1, and afterward skip remaining Sundays after the
+    fourth-last Sunday to observe Trinity 25, 26, and 27 at the end. "ILCW" means
+    the season will not skip any Sundays until just before the last Sunday of the
+    Church Year (Pentecost 28 or Trinity 27). "RCL" means the season will skip a
+    series of propers immediately after Trinity, so that the remaining propers will
+    fit weekly through the end.</dd>
+    <dd><form id="nonfestival-setup" action="churchyear.php?flag=savesettings" method="post">
+        <input type="hidden" name="reconfigure" value="nonfestivalskip">
+        <select id="nonfestivalskip-option" name="nonfestivalskip-option">
+    <?foreach (array("Historic", "ILCW", "RCL") as $nfsopt) {
+        if ($nfsopt == $options->getDefault('Historic', 'nonfestival_skip'))
+            $selected = " selected";
+            else $selected = "";
+        echo "<option name='$nfsopt'$selected>$nfsopt</option>\n";
+    }?>
+    </select> <button type="submit">Reconfigure Church Year</button> </dd>
+    </dl>
+    </div>
+
     </div>
     </div>
 </body>

@@ -112,8 +112,13 @@ if (isset($_POST['usedhistory-option'])) {
 }
 
 if (isset($_POST['modifyorder-option'])) {
-    $options->set('modifyorder', $_POST['modifyorder']);
+    $options->set('modifyorder', $_POST['modifyorder-option']);
     setMessage("Modify Tab default order option has been set.");
+}
+
+if (isset($_POST['nonfestivalskip-option'])) {
+    $options->set('nonfestival_skip', $_POST['nonfestivalskip-option']);
+    setMessage("Nonfestival skip option has been set.");
 }
 
 if (isset($_POST['service-flags-option'])) {
