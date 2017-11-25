@@ -99,7 +99,7 @@ function reconfigureNonfestival($type) {
     $dbh->beginTransaction();
     $q = $dbh->prepare("UPDATE `{$dbp}churchyear` SET
         `base` = :base,
-        `offset` = :offset,
+        `offset` = :offset
         WHERE `dayname` = :dayname");
     $base = $offset = $dayname = "";
     $q->bindParam(":base", $base);
@@ -130,15 +130,15 @@ function reconfigureNonfestival($type) {
         }
     } elseif ("ILCW" == $type) {
         $base = "Easter";
-        for ($i = 1; $i <= 24; $i++) {
+        for ($i = 1; $i < 25; $i++) {
             $offset = 56 + $i * 7;
             $dayname = "Trinity {$i}";
             $q->execute() or die(array_pop($q->errorInfo()));
         }
-        $offset = ++$i * 7;
+        $offset = 56 + ++$i * 7;
         $dayname = "Third Last";
         $q->execute() or die(array_pop($q->errorInfo()));
-        $offset = ++$i * 7;
+        $offset = 56 + ++$i * 7;
         $dayname = "Second Last";
         $q->execute() or die(array_pop($q->errorInfo()));
         $offset = -35;
@@ -150,7 +150,13 @@ function reconfigureNonfestival($type) {
         $offset = -35;
         $dayname = "Last";
         $q->execute() or die(array_pop($q->errorInfo()));
-        for ($i = 26, $offset = -42; $i >= 1; $i--, $offset-=7) {
+        $offset = -42;
+        $dayname = "Second Last";
+        $q->execute() or die(array_pop($q->errorInfo()));
+        $offset = -49;
+        $dayname = "Third Last";
+        $q->execute() or die(array_pop($q->errorInfo()));
+        for ($i = 24, $offset = -56; $i >= 1; $i--, $offset-=7) {
             $dayname = "Trinity {$i}";
             $q->execute() or die(array_pop($q->errorInfo()));
         }

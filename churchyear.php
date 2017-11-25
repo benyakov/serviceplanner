@@ -195,7 +195,7 @@ if ($_POST['submit_day']==1) {
 if ("nonfestivalskip" == $_POST['reconfigure']) {
     reconfigureNonfestival($_POST["nonfestivalskip-option"]);
     setMessage("Reconfigured non-festival church year to ".
-        htmlspecialchars($_POST['reconfigure']));
+        htmlspecialchars($_POST['nonfestivalskip-option']));
 }
 
 /* Do the work of updating existing synonyms from a new list.
