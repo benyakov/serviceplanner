@@ -148,6 +148,7 @@ function rawQuery($where=array(), $order="", $limit="") {
             LIMIT 1)
         END)
         AS bpsalm,
+    synl.note AS sermonlessonnote,
     b.l1lect != 'custom' AS l1link,
     b.l2lect != 'custom' AS l2link,
     b.golect != 'custom' AS golink,
@@ -175,6 +176,8 @@ function rawQuery($where=array(), $order="", $limit="") {
     ON (gos.golect=b.golect AND gos.goseries<=>b.goseries AND gos.dayname=d.name)
     LEFT JOIN `{$dbp}sermonselections` AS sms
     ON (sms.smlect=b.smlect AND sms.smseries<=>b.smseries AND sms.dayname=d.name)
+    LEFT JOIN `{$dbp}synlessons` AS synl
+    ON (synl.dayname=d.name AND synl.lectionary=b.smlect)
     {$wherestr}
     ORDER BY d.caldate {$order}, h.service {$order},
         h.occurrence, h.sequence {$limitstr}");
@@ -323,6 +326,12 @@ function display_occurrences_separately($q) {
                     <div class="collecttext maxcolumn">
                         <?=$row['bcollect']?>
                     </div>
+                    <? if ($row['sermonlessonnote']) { ?>
+                    <h5>Sermon Lesson Note</h5>
+                    <div class="sermonlessonnote maxcolumn">
+                        <?=translate_markup($row['sermonlessonnote'])?>
+                    </div>
+                    <? } ?>
                 </tr>
             <? }
             if ($row['servicenotes']) {
@@ -446,6 +455,12 @@ function displayServiceHeaderCombined($thesehymns) {
             <div class="collecttext maxcolumn">
                 <?=$row['bcollect']?>
             </div>
+            <? if ($row['sermonlessonnote']) { ?>
+            <h5>Sermon Lesson Note</h5>
+            <div class="sermonlessonnote maxcolumn">
+                <?=translate_markup($row['sermonlessonnote'])?>
+            </div>
+            <? } ?>
         </tr>
     <? }
     if ($row['servicenotes']) {
@@ -559,6 +574,12 @@ function modify_occurrences_separately($q) {
                     <div class="collecttext maxcolumn">
                         <?=$row['bcollect']?>
                     </div>
+                    <? if ($row['sermonlessonnote']) { ?>
+                    <h5>Sermon Lesson Note</h5>
+                    <div class="sermonlessonnote maxcolumn">
+                        <?=translate_markup($row['sermonlessonnote'])?>
+                    </div>
+                    <? } ?>
                 </tr>
             <? }
             if ($row['servicenotes']) {
@@ -668,7 +689,7 @@ function modifyServiceHeaderCombined($thesehymns) {
         echo "</td></tr>";
     }
     if ($row['propersnote']) {
-        echo "<tr><td colspan=3>
+        echo "<tr class=\"propersnote\"><td colspan=3>
             <p class=\"maxcolumn\">".
             translate_markup($row['propersnote'])."</p></td></tr>";
     }
@@ -700,6 +721,12 @@ function modifyServiceHeaderCombined($thesehymns) {
             <div class="collecttext maxcolumn">
                 <?=$row['bcollect']?>
             </div>
+            <? if ($row['sermonlessonnote']) { ?>
+            <h5>Sermon Lesson Note</h5>
+            <div class="sermonlessonnote maxcolumn">
+                <?=translate_markup($row['sermonlessonnote'])?>
+            </div>
+            <? } ?>
         </tr>
     <? }
     if ($row['servicenotes']) {
