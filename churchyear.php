@@ -607,7 +607,7 @@ if ($_POST['lessontype'] == "ilcw") {
        hymnabc=?, hymn=?, note=?  WHERE id=?");
     if (! $q->execute(array($_POST['l1'], $_POST['l2'], $_POST['go'],
         $_POST['ps'], $_POST['hymnabc'], $_POST['hymn'],
-        $_POST['note'], $_POST['lessons'])))
+        $_POST['lesson_note'], $_POST['lessons'])))
     {
         $rv = array(false, "Problem updating propers: ".
             array_pop($q->errorInfo()));
