@@ -1,0 +1,19 @@
+    <div class="container">
+        <div class="row">
+            <div class="col-sm-12">
+                <h2>Report</h2>
+
+                <a class="btn btn-default btn-xs" href="" ng-if="admin" ng-click="toggleConfig(config_open)">Configure</a>
+
+                <div id="configuration" class="configuration" ng-if="config_open">
+                    Configuration Block
+                </div>
+
+                <table class="table">
+                    <tr><th>Configured Header</th></tr>
+                    <tr><td>Configured Data</td></tr>
+                </table>
+
+            </div>
+        </div>
+    </div>
