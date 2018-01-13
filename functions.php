@@ -80,7 +80,15 @@ function checkContentReq() {
 }
 
 function queryService($id) {
-    $q = rawQuery(array("d.pkey = :id"));
+    $where = array("d.pkey = :id");
+    $options = getOptions();
+    $combine_occ_option = $options->get("combineoccurrences");
+    unset($options);
+    if (1 == $combine_occ_option) {
+        $q = rawQuery($where, "", "", true);
+    } else {
+        $q = rawQuery($where, "", "", false);
+    }
     if ($id) $q->bindParam(":id", $id);
     if (! $q->execute())
         die("<p>".array_pop($q->errorInfo()).'</p><p style="white-space: pre;">'.$q->queryString."</p>");
@@ -88,7 +96,15 @@ function queryService($id) {
 }
 
 function queryFutureHymns() {
-    $q = rawQuery(array("d.caldate >= CURDATE()"));
+    $where = array("d.caldate >= CURDATE()");
+    $options = getOptions();
+    $combine_occ_option = $options->get("combineoccurrences");
+    unset($options);
+    if (1 == $combine_occ_option) {
+        $q = rawQuery($where, "", "", true);
+    } else {
+        $q = rawQuery($where, "", "", false);
+    }
     if (! $q->execute())
         die("<p>".array_pop($q->errorInfo()).'</p><p style="white-space: pre;">'.$q->queryString."</p>");
     return $q;
@@ -104,7 +120,14 @@ function querySomeHymns($limit) {
 function queryServiceDateRange($lowdate, $highdate, $allfuture=false, $order="DESC") {
     $where = array("d.caldate >= :lowdate");
     if (! $allfuture) $where[] = "d.caldate <= :highdate";
-    $q = rawQuery($where, $order);
+    $options = getOptions();
+    $combine_occ_option = $options->get("combineoccurrences");
+    unset($options);
+    if (1 == $combine_occ_option) {
+        $q = rawQuery($where, $order, "", true);
+    } else {
+        $q = rawQuery($where, $order, "", false);
+    }
     $q->bindParam(":lowdate", $lowdate->format("Y-m-d"));
     if (! $allfuture) $q->bindParam(":highdate", $highdate->format("Y-m-d"));
     if (! $q->execute())
@@ -112,9 +135,14 @@ function queryServiceDateRange($lowdate, $highdate, $allfuture=false, $order="DE
     return $q;
 }
 
-function rawQuery($where=array(), $order="", $limit="") {
+function rawQuery($where=array(), $order="", $limit="", $blend_occurrences=false) {
     if ($where) $wherestr = "WHERE ".implode(" AND ", $where);
     if ($limit) $limitstr = "LIMIT {$limit}";
+    if ($blend_occurrences) {
+        $occ_seq = "h.sequence, h.occurrence";
+    } else {
+        $occ_seq = "h.occurrence, h.sequence";
+    }
     $dbh = new DBConnection();
     $dbp = $dbh->getPrefix();
     $q = $dbh->prepare("SELECT d.pkey AS serviceid,
@@ -180,7 +208,7 @@ function rawQuery($where=array(), $order="", $limit="") {
     ON (synl.dayname=d.name AND synl.lectionary=b.smlect)
     {$wherestr}
     ORDER BY d.caldate {$order}, h.service {$order},
-        h.occurrence, h.sequence {$limitstr}");
+        {$occ_seq} {$limitstr}");
     return $q;
 }
 
