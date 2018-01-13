@@ -379,7 +379,11 @@ function showServiceListing($config) {
         $where = array();
         $order = "DESC";
     }
-    $q = rawQuery($where, $order, $config->get("custom view", "limit"));
+    $options = getOptions();
+    $combine_occ_option = (bool) $options->get("combineoccurrences");
+    unset($options);
+    $q = rawQuery($where, $order, $config->get("custom view", "limit"),
+        $combine_occ_option);
     if (! $q->execute())
         die("<p>".array_pop($q->errorInfo()).'</p><p style="white-space: pre;">'.$q->queryString."</p>");
     // Group by service
