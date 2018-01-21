@@ -226,6 +226,25 @@ function getFlagsFor($serviceid, $occurrence) {
     return $q;
 }
 
+function findFlagsUpcoming($flag_text, $days_upcoming) {
+    $db = new DBConnection();
+    $days_upcoming = (int)$days_upcoming;
+    $q = $db->prepare("SELECT f.flag, f.value, f.service, f.occurrence,
+        f.pkey AS flag_key,
+        u.email, CONCAT(u.fname, ' ', u.lname) AS user,
+        DATE_FORMAT(d.caldate, '%c/%e/%Y') AS date
+        FROM `{$db->getPrefix()}service_flags` AS f
+        JOIN `{$db->getPrefix()}users` AS u ON (u.`uid` = f.`uid`)
+        JOIN `{$db->getPrefix()}days` AS d
+        WHERE DATEDIFF(d.caldate, CURDATE()) <= {$days_upcoming}
+            AND DATEDIFF(d.caldate, CURDATE()) > 0
+            AND f.flag = :flagText
+        GROUP BY f.pkey");
+    $q->bindParam(":flagText", $flag_text);
+    $q->execute() or die("<p>In findFlagsUpcoming ".array_pop($q->errorInfo())."</p>");
+    return $q;
+}
+
 function listthesehymns(&$thesehymns, $rowcount, $showocc=false) {
     // Display the hymns in $thesehymns, if any.
     $rows = 0;

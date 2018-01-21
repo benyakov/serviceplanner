@@ -71,6 +71,7 @@ $sitetabs_anonymous = array(
 // These services flags can be set by less privileged users to indicate possibilities
 // that may have to be approved by someone overseeing the service.
 $addable_service_flags = array(
+    "Remind",
     "Organist Available",
     "Altar Guild Available",
     "Choir Available",
