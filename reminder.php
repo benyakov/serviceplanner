@@ -31,24 +31,29 @@ $query = findFlagsUpcoming("Remind", 6);
 $host = $_SERVER['HTTP_HOST'];
 while ($row = $query->fetch(PDO::FETCH_ASSOC)) {
     $m=<<<EOM
-You or someone on your behalf has set up a reminder for a church service
-planned at {$row['occurrence']} on {$row['date']}. This is your reminder, and
-it is the only one you will receive for this particular occurrence of this
-service until next week.
+Dear {$user},
 
-You can see and print the details of the service on the page linked here:
-{$protocol}://{$host}{$serverdir}/print.php?id={$row['service']}. To print, simply
-use your web browser's print function. (Usually Ctrl-P on a Linux/Windows PC or
-Cmd-P on a Mac)
+You or someone on your behalf has set up a reminder for a church
+service planned at {$row['occurrence']} on {$row['date']}. This is
+your reminder, and it is the only one you will receive for this
+particular occurrence of this service until next week.
+
+You can see and print the details of the service on the page linked
+here:
+{$protocol}://{$host}{$serverdir}/print.php?id={$row['service']}.
+To print, simply use your web browser's print function. (Usually
+Ctrl-P on a Linux/Windows PC or Cmd-P on a Mac)
 
 <a href="{$protocol}://{$host}{$serverdir}/print.php?id={$row['service']}" title="Click here">Here's that address formatted as a web link</a>
 
-To set or remove these automated reminders, you can create or remove "Remind"
-flags at the service planner at {$protocol}://{$host}{$serverdir}.
-Enter your exact login name as the flag value.  It's the name you use to sign
-into the service planner.
+To set or remove these automated reminders, you can create or remove
+"Remind" flags at the service planner at
+{$protocol}://{$host}{$serverdir}.
+Enter your exact login name as the flag value.  It's the name you
+use to sign into the service planner.
 
-God bless you and your church family through His service of word and sacrament.
+God bless you and your church family through His service of word and
+sacrament.
 EOM;
     $mailresult = mail($row['email'],
         "Service Planner Reminder for Upcoming Service: {$row['date']} at {$_SERVER['HTTP_HOST']}",

@@ -229,13 +229,14 @@ function getFlagsFor($serviceid, $occurrence) {
 function findFlagsUpcoming($flag_text, $days_upcoming) {
     $db = new DBConnection();
     $days_upcoming = (int)$days_upcoming;
-    $q = $db->prepare("SELECT f.flag, f.value, f.service, f.occurrence,
+    $q = $db->prepare("SELECT
+        f.flag, f.value, f.service, f.occurrence,
         f.pkey AS flag_key,
         u.email, CONCAT(u.fname, ' ', u.lname) AS user,
         DATE_FORMAT(d.caldate, '%c/%e/%Y') AS date
         FROM `{$db->getPrefix()}service_flags` AS f
-        JOIN `{$db->getPrefix()}users` AS u ON (u.`uid` = f.`uid`)
-        JOIN `{$db->getPrefix()}days` AS d
+        JOIN `{$db->getPrefix()}users` AS u ON (u.`username` = f.`value`)
+        JOIN `{$db->getPrefix()}days` AS d ON (f.`service` = d.`pkey`)
         WHERE DATEDIFF(d.caldate, CURDATE()) <= {$days_upcoming}
             AND DATEDIFF(d.caldate, CURDATE()) > 0
             AND f.flag = :flagText
