@@ -31,7 +31,7 @@ $query = findFlagsUpcoming("Remind", 6);
 $host = $_SERVER['HTTP_HOST'];
 while ($row = $query->fetch(PDO::FETCH_ASSOC)) {
     $m=<<<EOM
-Dear {$user},
+Dear {$row['user']},
 
 You or someone on your behalf has set up a reminder for a church
 service planned at {$row['occurrence']} on {$row['date']}. This is
