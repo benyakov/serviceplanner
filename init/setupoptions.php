@@ -87,6 +87,9 @@ $modifyorder = "All";
 // Default choice for when to skip Sundays in the non-festival half of the year.
 $nonfestival_skip = "Historic";
 
+// Should we combine service occurrences in the listing?
+$combine_occurrences = 0;
+
 if (file_exists("./options.php")) {
     require("./options.php");
     unlink("./options.php");
@@ -103,6 +106,7 @@ foreach ($sitetabs_anonymous as $k=>$v)
 $options->set('modifyorder', $modifyorder);
 $options->set('nonfestival-skip', $nonfestival_skip);
 $options->set('addable_service_flags', $addable_service_flags);
+$options->set('combineoccurrences', $combine_occurrences);
 $options->save();
 unset($options);
 
