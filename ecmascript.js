@@ -601,7 +601,6 @@ function setupSortableList() {
 }
 
 function setupFlags() {
-    $(".flagbutton").click(onFlagButtonClick);
     $(".service-flags").each(pullFlags);
 }
 
@@ -610,11 +609,14 @@ function flagFormSubmit(evt) {
     var data = $(this).serializeArray();
     data.push({name: "json", value: 1});
     data.push({name: "submit", value: 1});
+    var service = $(this).find("[name='service']").val();
+    var these_flags = $("[class='service-flags'][data-service='"+service+"']");
     $.post(this.action, $.param(data), function(rv) {
         var returnval = $.parseJSON(rv);
         $('#dialog').dialog('close');
         setMessage(returnval[1]);
-        refreshContent();
+        $(these_flags).each(pullFlags);
+        return false;
     });
     return false;
 }
@@ -632,9 +634,6 @@ function onFlagButtonClick(evt) {
             .submit(flagFormSubmit);
         $('#dialog').find('#new_flag_submit')
             .click(newFlagSubmit);
-        /*$('#dialog').find('#add_flag')
-            .submit(flagFormSubmit);
-        */
     });
     $("#dialog").dialog({title: "Service Occurrence Flags",
         width: $(window).width()*0.9,
@@ -643,7 +642,7 @@ function onFlagButtonClick(evt) {
     })
         .on('dialogclose', function(event) {
             $('#dialog').html('');
-            refreshContent();
+            /*refreshContent();*/
         });
 }
 
@@ -669,11 +668,12 @@ function pullFlags(index, row) {
                             'json': 1,
                             'user': userid };
                     params[deleteval] = 'on';
+                    var these_flags = $(this).parents('tr.service-flags');
                     if (c == true) {
                         $.post('flags.php', params,
                             function(response) {
                                 setMessage(response[1]);
-                                refreshContent();
+                                $(these_flags).each(pullFlags);
                             }, 'json');
                     }
                 });
@@ -690,11 +690,14 @@ function newFlagSubmit(evt) {
     evt.preventDefault();
     var data = $('#add_flag').serializeArray();
     data.push({name: "json", value: 1});
+    var service = $("#add_flag [name='service']").val();
+    var these_flags = $("[class='service-flags'][data-service='"+service+"']");
     $.post('flags.php', data,
         function(result) {
             var r = $.parseJSON(result);
             var prev = $('#add_flag_report').html();
             $('#add_flag_report').html(prev+r);
+            $(these_flags).each(pullFlags);
         });
 }
 
