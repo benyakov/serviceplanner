@@ -1,26 +1,36 @@
+# Ma-amad Service Planner
+
+The Ma-amad Service Planner is an online browser-based application for
+planning, archiving, and disseminating information needed for church
+services. It's oriented around the western-rite Christian church year as
+used by the Lutheran church and expressed in the Evangelical Lutheran
+Hymnary of the Evangelical Lutheran Synod, based in Mankato, Minnesota,
+USA.
+
+
 This service planning web application is Copyright (c) 2017 Jesse Jacobsen.
 It is licensed under the GNU General Public License, version 2.
 For restrictions on distribution, see the file COPYING.
 
-Installation and Use
---------------------
+## Installation and Use
+
 
 1. Note that there is no guarantee.  Make backups.  See COPYING.
 2. Procure a webserver with PHP and mysql database access.
 3. Upload and extract the application files to their own directory
 4. Point your web browser to the installation and configure.
-5. Enjoy.  Be sure to check the Housekeeping page.
+5. Enjoy.  Be sure to check the Housekeeping page and online docs.
 6. Email the author with your feedback.
 
-Notes
------
+If you prefer, you can have a Service Planner installation hosted for
+you at ma-amad.com for a small monthly fee.
+
+## Notes
 
 Setup, backups and restores are done with mysql utilities that should be
 available on the web server.
 
 More docs inside.
-
-
 
 Copyright (C) 2017 Jesse Jacobsen
 
