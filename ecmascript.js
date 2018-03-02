@@ -678,7 +678,7 @@ function pullFlags(index, row) {
                             }, 'json');
                     }
                 });
-                $(row).find(".flagbutton").click(onFlagButtonClick);
+                //$(row).find(".flagbutton").click(onFlagButtonClick);
             } else if (result[0] == 0) {
                 return true;
             } else {
