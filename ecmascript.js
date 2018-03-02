@@ -601,7 +601,7 @@ function setupSortableList() {
 }
 
 function setupFlags() {
-    $(row).find(".flagbutton").click(onFlagButtonClick);
+    $(".flagbutton").click(onFlagButtonClick);
     $(".service-flags").each(pullFlags);
 }
 
