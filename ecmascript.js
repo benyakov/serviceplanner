@@ -678,13 +678,12 @@ function pullFlags(index, row) {
                             }, 'json');
                     }
                 });
-                //$(row).find(".flagbutton").click(onFlagButtonClick);
             } else if (result[0] == 0) {
                 $(row).children().eq(0).html("");
-                return true;
             } else {
                 setMessage("Couldn't get flags. "+result[1]);
             }
+            $(row).find(".flagbutton").unbind('click').click(onFlagButtonClick);
         });
 }
 
