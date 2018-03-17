@@ -726,7 +726,10 @@ function toggleFilter(evt) {
     if ("0" == $("#filterform").data("filtered")) {
         $("#"+table+">tbody>tr").hide()
         var filter_text = $('#filterinput').val();
-        var services = $("tr.service-flags div:contains('"+filter_text+"')")
+        var filter_reg = new RegExp(filter_text, "i");
+        var services = $("tr.service-flags div").filter(function() {
+                return filter_reg.test($(this).text());
+        })
             .parents("tr[data-service]")
             .map(function(){return $(this).data('service');})
             .get();

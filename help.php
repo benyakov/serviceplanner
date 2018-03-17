@@ -328,9 +328,9 @@ a service that can be used to distinguish that service from others. They
 include three pieces of information: a name, a value, and the user who created
 the flag. A flag is attached to <em>an occurrence of a service</em> rather than
 a service without an occurrence. That means a service must have at least one
-hymn chosen in order to have flags added to it, since the hymns of a service
-establish its occurrences. (The hymn may be hymn 0, which is used for information
-and place-holding.)</p>
+hymn chosen in order to have flags added to it, since for our purposes, the
+hymns of a service establish its occurrences. (The hymn may be hymn 0, which is
+used for information and place-holding.)</p>
 
     <p>Any signed-in user can create a flag, but only administrative users can
 create flags with arbitrary names and values. Other users can add flags named
@@ -352,14 +352,14 @@ contract the listing and hide the extra information.</p>
 one or more particular services. When flags are used consistently to provide
 the relevant information about those services, a long service listing may be
 easily reduced to exactly the services of interest, using the "Filter by flag
-text" box at the top of the listing page. Enter the exact text to search for,
-and either press Enter or click the Set Flag Filter button. If the "Expand"
-check box is checked when you press Enter or click, the filtered services will
-be automatically expanded to show all of their information. When a filter has
-been set, the Set Flag Filter button becomes a Remove Flag Filter button, so
-that you can see the unfiltered service listing. Flag filters are not saved or
-remembered in any way when a page is reloaded.</p>
-
+text" box at the top of the listing page. Enter the exact text to search for
+(case insensitive), and either press Enter or click the Set Flag Filter button.
+If the "Expand" check box is checked when you press Enter or click, the
+filtered services will be automatically expanded to show all of their
+information. When a filter has been set, the Set Flag Filter button becomes a
+Remove Flag Filter button, so that you can see the unfiltered service listing.
+Flag filters are not saved or remembered in any way when a page is
+reloaded.</p>
 
     <h4><a name="block_plans">Block Plans</a></h4>
 
