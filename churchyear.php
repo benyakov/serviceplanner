@@ -31,7 +31,7 @@ $dbp = $db->getPrefix();
  * Drops all the churchyear functions and sets a message about
  * creating them again.
  */
-if ($_GET['request'] == 'dropfunctions') {
+if (getGET('request') == 'dropfunctions') {
     $db->beginTransaction();
     $db->exec("DROP FUNCTION IF EXISTS `{$dbp}easter_in_year`;
     DROP FUNCTION IF EXISTS `{$dbp}christmas1_in_year`;
@@ -60,7 +60,7 @@ if ($_GET['request'] == 'dropfunctions') {
  * Purge the churchyear tables and set a message about populating
  * them again.
  */
-if ($_GET['request'] == 'purgetables') {
+if (getGET('request') == 'purgetables') {
     requireAuth("index.php", 3);
     if (! 'password' == $_SESSION[$sprefix]['authdata']['authtype']) {
         authcookie(False);
@@ -90,15 +90,15 @@ if ($_GET['request'] == 'purgetables') {
 /* churchyear.php?daysfordate=date
  * Returns a comma-separated list of daynames that match the date given.
  */
-if ($_GET['daysfordate']) {
-    echo json_encode(daysForDate($_GET['daysfordate']));
+if (getGET('daysfordate')) {
+    echo json_encode(daysForDate(getGET('daysfordate')));
     exit(0);
 }
 
 /* churchyear.php?params=dayname
  * Returns the db parameters for dayname in the church year as json.
  */
-if ($_GET['request'] == "params") {
+if (getGET('request') == "params") {
     requireAuthJSON(3);
     header('Cache-Control: no-cache, must-revalidate');
     header('Expires: Mon, 01 Jan 1996 00:00:00 GMT');
@@ -107,7 +107,7 @@ if ($_GET['request'] == "params") {
         `observed_month`, `observed_sunday`
         FROM `{$dbp}churchyear`
         WHERE `dayname` = :dayname");
-    $q->bindParam(":dayname", $_GET['params']);
+    $q->bindParam(":dayname", getGET('params'));
     if ($q->execute()) {
         if ($row = $q->fetch(PDO::FETCH_ASSOC)) {
             echo json_encode($row);
@@ -123,21 +123,21 @@ if ($_GET['request'] == "params") {
 /* churchyear.php?requestform=dayname
  * Returns a form for modifying the db parameters of dayname.
  */
-if ($_GET['requestform'] == 'dayname') {
+if (getGET('requestform') == 'dayname') {
     require("./churchyear/get_dayform.php");
 }
 
 /* churchyear.php with POST of [del=>dayname]
  * Deletes the specified dayname from the churchyear table.
  */
-if ($_POST['del']) {
+if (getPOST('del')) {
     requireAuthJSON(3, array(0, "Access denied. Please log in."));
     header('Cache-Control: no-cache, must-revalidate');
     header('Expires: Mon, 01 Jan 1996 00:00:00 GMT');
     header("Content-type: application/json");
     $q = $db->prepare("DELETE FROM `{$dbp}churchyear`
         WHERE `dayname` = :dayname");
-    $q->bindValue(":dayname", $_POST['del']);
+    $q->bindValue(":dayname", getPOST('del'));
     if ($q->execute()) {
         echo json_encode(array(true,
             churchyear_listing(query_churchyear(true))));
@@ -151,11 +151,11 @@ if ($_POST['del']) {
 /* churchyear.php with POST of [submitday=>1]
  * Saves the submitted POST data to the included dayname.
  */
-if ($_POST['submit_day']==1) {
+if (getPOST('submit_day')==1) {
     requireAuthJSON(3, array(false, "Access denied. Please log in."));
     // Update/save supplied values for the given day
     unset($_POST['submit_day']);
-    if ("None" == $_POST['base']) {
+    if ("None" == getPOST('base')) {
         $_POST['base'] = "";
         $_POST['offset'] = 0;
     }
@@ -163,10 +163,10 @@ if ($_POST['submit_day']==1) {
         (season, base, offset, month, day,
         observed_month, observed_sunday, dayname)
         VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
-    $bound = array($_POST['season'], $_POST['base'],
-        $_POST['offset'], $_POST['month'], $_POST['day'],
-        $_POST['observed-month'], $_POST['observed-sunday'],
-        $_POST['dayname']);
+    $bound = array(getPOST('season'), getPOST('base'),
+        getPOST('offset'), getPOST('month'), getPOST('day'),
+        getPOST('observed-month'), getPOST('observed-sunday'),
+        getPOST('dayname'));
     if (! $q->execute($bound)) {
         $q = $db->prepare("UPDATE `{$dbp}churchyear`
             SET season=?, base=?, offset=?, month=?, day=?,
@@ -176,12 +176,12 @@ if ($_POST['submit_day']==1) {
             $rv = array(false, "Problem saving: ". array_pop($q->errorInfo()));
         } elseif ($q->rowCount() > 0) {
             $rv = array(true,
-                "Saved parameters for existing day {$_POST['dayname']}");
+                "Saved parameters for existing day ".getPOST('dayname'));
         } else {
             $rv = array(false, "No changes made.");
         }
     } else {
-        $rv = array(true, "Saved parameters for new day {$_POST['dayname']}.");
+        $rv = array(true, "Saved parameters for new day ".getPOST('dayname'));
     }
     if ($rv[0]) {
         array_push($rv, churchyear_listing(query_churchyear()));
@@ -192,10 +192,10 @@ if ($_POST['submit_day']==1) {
 
 /* Reconfigure the nonfestival half to skip Sundays in the chosen pattern.
  */
-if ("nonfestivalskip" == $_POST['reconfigure']) {
-    reconfigureNonfestival($_POST["nonfestivalskip-option"]);
+if ("nonfestivalskip" == getPOST('reconfigure')) {
+    reconfigureNonfestival(getPOST('nonfestivalskip-option'));
     setMessage("Reconfigured non-festival church year to ".
-        htmlspecialchars($_POST['nonfestivalskip-option']));
+        htmlspecialchars(getPOST('nonfestivalskip-option')));
 }
 
 /* Do the work of updating existing synonyms from a new list.
@@ -253,10 +253,10 @@ function updateSynonyms($oldlist, $newlist, $canonical, $confirmed=array()) {
 /* churchyear.php with $_POST of commitsynonyms (canonical dayname)
  * Pulls the list of items for comfirmed deletion from the $_SESSION.
  */
-if ($_POST['commitsynonyms']) {
+if (getPOST('commitsynonyms')) {
     requireAuthJSON(3, array(false));
     list($new, $del) = $_SESSION[$sprefix]['commitsynonyms'];
-    $canonical = $_POST['commitsynonyms'];
+    $canonical = getPOST('commitsynonyms');
     $db->beginTransaction();
     $q = $db->prepare("SELECT `synonym` FROM `{$dbp}churchyear_synonyms`
         WHERE `canonical` = ? ORDER BY `synonym` ASC");
@@ -280,10 +280,10 @@ if ($_POST['commitsynonyms']) {
 /* churchyear.php with $_POST of synonyms (lines) and canonical (dayname)
  * Update synonyms for canonical.
  */
-if ($_POST['submitsynonyms']) {
+if (getPOST('submitsynonyms')) {
     requireAuthJSON(3, array(false));
-    $synonyms = explode("\n", $_POST['synonyms']);
-    $canonical = $_POST['canonical'];
+    $synonyms = explode("\n", getPOST('synonyms'));
+    $canonical = getPOST('canonical');
     $delsynonyms = array();
     $db->beginTransaction();
     $q = $db->prepare("SELECT `synonym` FROM `{$dbp}churchyear_synonyms`
@@ -330,11 +330,11 @@ if ($_POST['submitsynonyms']) {
 /* churchyear.php?synonyms=dayname
  * Get synonyms for dayname.
  */
-if ($_GET['request'] == "synonyms") {
+if (getGET('request') == "synonyms") {
     requireAuthJSON(3, array(false));
     $q = $db->prepare("SELECT `synonym` FROM `{$dbp}churchyear_synonyms`
         WHERE `canonical` = ? ORDER BY `synonym` ASC");
-    if ($q->execute(array($_GET['name']))) {
+    if ($q->execute(array(getGET('name')))) {
         $rv = array();
         while ($aval = $q->fetch(PDO::FETCH_NUM)) {
             array_push($rv, $aval[0]);
@@ -348,10 +348,10 @@ if ($_GET['request'] == "synonyms") {
 /* churchyear.php?collect=get&id=[id]
  * Return the collect text for the given collect id
  */
-if ($_GET['request'] == "collect") {
+if (getGET('request') == "collect") {
     $q = $db->prepare("SELECT collect, class FROM `{$dbp}churchyear_collects`
         WHERE id = ?");
-    $q->execute(array($_GET['id']));
+    $q->execute(array(getGET('id')));
     echo json_encode($q->fetch(PDO::FETCH_NUM));
     exit(0);
 }
@@ -359,14 +359,14 @@ if ($_GET['request'] == "collect") {
 /* churchyear.php with _POST from the collect form below
  * Process the collect form (below) & create/update the collect.
  */
-if ($_POST['existing-collect']) {
+if (getPOST('existing-collect')) {
     requireAuthJSON(3, array(false, "Access denied. Please log in first."));
     $db->beginTransaction();
-    if ($_POST['existing-collect'] == "new") {
+    if (getPOST('existing-collect') == "new") {
         $q = $db->prepare("INSERT INTO `{$dbp}churchyear_collects`
             (class, collect) VALUES (?, ?)");
-        if (!$q->execute(array($_POST['collect-class'],
-            $_POST['collect-text'])))
+        if (!$q->execute(array(getPOST('collect-class'),
+            getPOST('collect-text'))))
         {
             $rv = array(false, "Problem inserting new collect text: ".
                 array_pop($q->errorInfo()));
@@ -375,34 +375,34 @@ if ($_POST['existing-collect']) {
             $qid = $qid->fetchColumn(0);
             $q = $db->prepare("INSERT INTO `{$dbp}churchyear_collect_index`
                 (`dayname`, `lectionary`, `id`) VALUES (?, ?, ?)");
-            if (! $q->execute(array($_POST['dayname'],
-                $_POST['lectionary'], $qid)))
+            if (! $q->execute(array(getPOST('dayname'),
+                getPOST('lectionary'), $qid)))
             {
                 $rv = array(false, "Problem inserting new collect: ".
                     array_pop($q->errorInfo()));
             } else {
                 $db->commit();
                 $rv = array(true,
-                    "New collect inserted for {$_POST['dayname']}");
+                    "New collect inserted for ".getPOST('dayname'));
             }
         }
     } else {
         $q = $db->prepare("INSERT INTO `{$dbp}churchyear_collect_index`
             (`dayname`, `lectionary`, `id`) VALUES (?, ?, ?)");
-        if (! $q->execute(array($_POST['dayname'], $_POST['lectionary'],
-            $_POST['existing-collect'])))
+        if (! $q->execute(array(getPOST('dayname'), getPOST('lectionary'),
+            getPOST('existing-collect'))))
         {
             $rv = array(false, "Problem inserting collect: ".
                 array_pop($q->errorInfo()));
         } else {
             $db->commit();
             $rv = array(true,
-                "Existing collect attached to {$_POST['dayname']}");
+                "Existing collect attached to ".getPOST('dayname'));
         }
     }
     if ($rv[0]) {
         require("./churchyear/get_propersform.php");
-        array_push($rv, propersForm($_POST['dayname']));
+        array_push($rv, propersForm(getPOST('dayname')));
     }
     echo json_encode($rv);
     exit(0);
@@ -411,25 +411,25 @@ if ($_POST['existing-collect']) {
 /* churchyear.php?requestform=collect&lectionary=[lect]&dayname=[name]
  * Return a form for the new collect dialog.
  */
-if ($_GET['requestform'] == "collect") {
+if (getGET('requestform') == "collect") {
     requireAuth(3);
     $q = $db->prepare("SELECT c.class, i.dayname, i.lectionary, i.id
         FROM `{$dbp}churchyear_collect_index` AS i
         JOIN `{$dbp}churchyear_collects` AS c ON (c.id = i.id)
         WHERE i.dayname != ? OR i.lectionary != ?
         ORDER BY i.dayname, i.lectionary, c.class");
-    if (! $q->execute(array($_GET['dayname'], $_GET['lectionary']))) {
+    if (! $q->execute(array(getGET('dayname'), getGET('lectionary')))) {
         echo "Problem getting available collects: " .
             array_pop($q->errorInfo());
         exit(0);
     }
     ?>
     <form action="churchyear.php" id="collect-form" method="post">
-        <h3>Collect used by "<?=$_GET['lectionary']?>" for
-        "<?=$_GET['dayname']?>"</h3>
+        <h3>Collect used by "<?=getGET('lectionary')?>" for
+        "<?=getGET('dayname')?>"</h3>
         <div class="fullwidth">
-        <input type="hidden" name="lectionary" value="<?=$_GET['lectionary']?>">
-        <input type="hidden" name="dayname" value="<?=$_GET['dayname']?>">
+        <input type="hidden" name="lectionary" value="<?=getGET('lectionary')?>">
+        <input type="hidden" name="dayname" value="<?=getGET('dayname')?>">
         <select name="existing-collect" id="collect-dropdown">
         <option value="new">New</option>
         <? while ($row = $q->fetch(PDO::FETCH_ASSOC)) {
@@ -452,7 +452,7 @@ if ($_GET['requestform'] == "collect") {
 /* churchyear.php?requestform=delete-collect&cid=id
  * Supply a form for confirming the deletion of collect with given id
  */
-if ($_GET['requestform'] == "delete-collect") {
+if (getGET('requestform') == "delete-collect") {
     requireAuth(3);
     // Show collect, lectionaries using it, and daynames when used
     $q = $db->prepare("SELECT
@@ -461,7 +461,7 @@ if ($_GET['requestform'] == "delete-collect") {
         RIGHT OUTER JOIN `{$dbp}churchyear_collects` AS c ON (c.id = i.id)
         WHERE c.id = ?
         GROUP BY i.lectionary, i.dayname");
-    if (! $q->execute(array($_GET['cid']))) {
+    if (! $q->execute(array(getGET('cid')))) {
         echo array_pop($q->errorInfo());
     } else {
         $row = $q->fetch(PDO::FETCH_ASSOC);
@@ -470,14 +470,14 @@ if ($_GET['requestform'] == "delete-collect") {
     <p><?=$row['collect']?></p>
     <h4>Used:</h4>
     <ul>
-    <li><?=$row['dayname']?> (<?=$row['lectionary']?>) <a href="#" class="detach-collect" data-cid="<?=$_GET['cid']?>" data-lectionary="<?=$row['lectionary']?>" data-dayname="<?=$row['dayname']?>">Detach from this day and lectionary</a></li>
+    <li><?=$row['dayname']?> (<?=$row['lectionary']?>) <a href="#" class="detach-collect" data-cid="<?=getGET('cid')?>" data-lectionary="<?=$row['lectionary']?>" data-dayname="<?=$row['dayname']?>">Detach from this day and lectionary</a></li>
     <? while ($row = $q->fetch(PDO::FETCH_ASSOC)) {?>
-    <li><?=$row['dayname']?> (<?=$row['lectionary']?>) <a href="#" class="detach-collect" data-cid="<?=$_GET['cid']?>" data-lectionary="<?=$row['lectionary']?>" data-dayname="<?=$row['dayname']?>">Detach from this day and lectionary</a></li>
+    <li><?=$row['dayname']?> (<?=$row['lectionary']?>) <a href="#" class="detach-collect" data-cid="<?=getGET('cid')?>" data-lectionary="<?=$row['lectionary']?>" data-dayname="<?=$row['dayname']?>">Detach from this day and lectionary</a></li>
     <?}?>
     </ul>
     <form id="delete-collect-confirm" method="post" action="churchyear.php">
-    <input type="hidden" name="deletecollect" value="<?=$_GET['cid']?>">
-    <input type="hidden" name="dayname" value="<?=$_GET['dayname']?>">
+    <input type="hidden" name="deletecollect" value="<?=getGET('cid')?>">
+    <input type="hidden" name="dayname" value="<?=getGET('dayname')?>">
     <button type="submit" name="submit">Delete Collect Entirely</button>
     </form>
 <?  }
@@ -487,18 +487,18 @@ if ($_GET['requestform'] == "delete-collect") {
 /* churchyear.php with $_POST of deletecollect=collectid
  * Delete the collect with the given id
  */
-if ($_POST['deletecollect']) {
+if (getPOST('deletecollect')) {
     requireAuthJSON(3, "Access denied.  Please log in.");
     $q = $db->prepare("DELETE i, c FROM `{$dbp}churchyear_collect_index` AS i
         JOIN `{$dbp}churchyear_collects` AS c
         ON (i.id = c.id)
         WHERE i.id = :index");
-    if (! $q->execute(array('index'=>$_POST['deletecollect']))) {
+    if (! $q->execute(array('index'=>getPOST('deletecollect')))) {
         $rv = array(false,
             "Problem deleting collect: ".array_pop($q->errorInfo()));
     } else {
         require("./churchyear/get_propersform.php");
-        $rv = array(true, "Collect deleted.", propersForm($_POST['dayname']));
+        $rv = array(true, "Collect deleted.", propersForm(getPOST('dayname')));
     }
     echo json_encode($rv);
     exit(0);
@@ -507,12 +507,12 @@ if ($_POST['deletecollect']) {
 /* churchyear.php?detachcollect=id&lectionary=name&dayname=day
  * Detach the collect from the given day in the given lectionary
  */
-if ($_GET['detachcollect']) {
+if (getGET('detachcollect')) {
     requireAuthJSON(3, "Access denied.  Please log in.");
     $q = $db->prepare("DELETE FROM `{$dbp}churchyear_collect_index`
         WHERE dayname = ? AND lectionary = ? AND id = ?");
-    if (! $q->execute(array($_GET['dayname'], $_GET['lectionary'],
-        $_GET['detachcollect'])))
+    if (! $q->execute(array(getGET('dayname'), getGET('lectionary'),
+        getGET('detachcollect'))))
     {
         $rv = array(false, "Problem detaching collect: ".
             array_pop($q->errorInfo()));
@@ -520,7 +520,7 @@ if ($_GET['detachcollect']) {
         require("./churchyear/get_propersform.php");
         $rv = array(true, "Collect detached from lectionary ".
             "'{$_GET['lectionary']}' on {$_GET['dayname']}.",
-            propersForm($_GET['dayname']));
+            propersForm(getGET('dayname')));
     }
     echo json_encode($rv);
     exit(0);
@@ -529,20 +529,20 @@ if ($_GET['detachcollect']) {
 /* churchyear.php?propers=dayname
  * Show populated form for the propers of the given dayname
  */
-if ($_GET['propers']) {
+if (getGET('propers')) {
     requireAuthJSON(3);
     require("./churchyear/get_propersform.php");
-    echo json_encode(array(true, propersForm($_GET['propers'])));
+    echo json_encode(array(true, propersForm(getGET('propers'))));
     exit(0);
 }
 
 /* churchyear.php with $_POST containing propers = dayname
  * Submit provided changes to propers.
  */
-if ($_POST['propers']) {
+if (getPOST('propers')) {
     requireAuthJSON(3, array(false, "Access denied.  Please log in."));
     $q = $db->prepare("SELECT 1 FROM `{$dbp}churchyear_propers` WHERE dayname = ?");
-    $q->bindValue (1, $_POST['propers']);
+    $q->bindValue (1, getPOST('propers'));
     if (! $q->execute()) {
         echo json_encode(array(false, array_pop($q->errorInfo())));
         die();
@@ -555,15 +555,15 @@ if ($_POST['propers']) {
         $q = $db->prepare("UPDATE `{$dbp}churchyear_propers` SET
             color=?, theme=?, introit=?, gradual=?, note=? WHERE dayname = ?");
     }
-    $q->bindValue(1, $_POST['color']);
-    $q->bindValue(2, $_POST['theme']);
-    $q->bindValue(3, $_POST['introit']);
-    if ($_POST['gradual'] === "") // To avoid trumping the seasonal gradual
+    $q->bindValue(1, getPOST('color'));
+    $q->bindValue(2, getPOST('theme'));
+    $q->bindValue(3, getPOST('introit'));
+    if (getPOST('gradual') === "") // To avoid trumping the seasonal gradual
         $q->bindValue(4, null, PDO::PARAM_NULL);
     else
-        $q->bindValue(4, $_POST['gradual']);
-    $q->bindValue(5, $_POST['note']);
-    $q->bindValue(6, $_POST['propers']);
+        $q->bindValue(4, getPOST('gradual'));
+    $q->bindValue(5, getPOST('note'));
+    $q->bindValue(6, getPOST('propers'));
     if (! $q->execute()) {
         $rv = array(false, "Problem updating propers: ".
             array_pop($q->errorInfo()));
@@ -577,15 +577,15 @@ if ($_POST['propers']) {
 /* churchyear.php with $_POST of "lessontype" = "historic"
  * Update lessons for the day/lectionary with the provided lessons.
  */
-if ($_POST['lessontype'] == "historic") {
+if (getPOST('lessontype') == "historic") {
     requireAuthJSON(3, array(false, "Access denied.  Please log in."));
     $q = $db->prepare("UPDATE `{$dbp}churchyear_lessons` SET
        lectionary='historic', lesson1=?, lesson2=?, gospel=?, psalm=?,
        s2lesson=?, s2gospel=?, s3lesson=?, s3gospel=?, hymnabc='', hymn=''
        WHERE id=?");
-    if (! $q->execute(array($_POST['l1'], $_POST['l2'], $_POST['go'],
-        $_POST['ps'], $_POST['s2l'], $_POST['s2g'], $_POST['s3l'],
-        $_POST['s3g'], $_POST['lessons'])))
+    if (! $q->execute(array(getPOST('l1'), getPOST('l2'), getPOST('go'),
+        getPOST('ps'), getPOST('s2l'), getPOST('s2g'), getPOST('s3l'),
+        getPOST('s3g'), getPOST('lessons'))))
     {
         $rv = array(false, "Problem updating propers: ".
             array_pop($q->errorInfo()));
@@ -599,15 +599,15 @@ if ($_POST['lessontype'] == "historic") {
 /* churchyear.php with $_POST of "lessontype" = "ilcw"
  * Update lessons for the day/lectionary with the provided lessons.
  */
-if ($_POST['lessontype'] == "ilcw") {
+if (getPOST('lessontype') == "ilcw") {
     requireAuthJSON(3, array(false, "Access denied.  Please log in."));
     $q = $db->prepare("UPDATE `{$dbp}churchyear_lessons` SET
        lesson1=?, lesson2=?, gospel=?, psalm=?,
        s2lesson='', s2gospel='', s3lesson='', s3gospel='',
        hymnabc=?, hymn=?, note=?  WHERE id=?");
-    if (! $q->execute(array($_POST['l1'], $_POST['l2'], $_POST['go'],
-        $_POST['ps'], $_POST['hymnabc'], $_POST['hymn'],
-        $_POST['lesson_note'], $_POST['lessons'])))
+    if (! $q->execute(array(getPOST('l1'), getPOST('l2'), getPOST('go'),
+        getPOST('ps'), getPOST('hymnabc'), getPOST('hymn'),
+        getPOST('lesson_note'), getPOST('lessons'))))
     {
         $rv = array(false, "Problem updating propers: ".
             array_pop($q->errorInfo()));
@@ -621,24 +621,24 @@ if ($_POST['lessontype'] == "ilcw") {
 /* churchyear.php with $_POST of "lessons" = "New"
  * Save the propers in the indicated lectionary
  */
-if ($_POST['lessons'] == "New") {
+if (getPOST('lessons') == "New") {
     requireAuthJSON(3, array(false, "Access denied.  Please log in."));
     $q = $db->prepare("INSERT INTO `{$dbp}churchyear_lessons`
         (dayname, lectionary, lesson1, lesson2, gospel, psalm, hymnabc, hymn, note)
         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
-    if (! $q->execute(array($_POST['dayname'], $_POST['lectionary'],
-        $_POST['l1'], $_POST['l2'], $_POST['go'], $_POST['ps'], $_POST['habc'],
-        $_POST['hymn'], $_POST['note'])))
+    if (! $q->execute(array(getPOST('dayname'), getPOST('lectionary'),
+        getPOST('l1'), getPOST('l2'), getPOST('go'), getPOST('ps'), getPOST('habc'),
+        getPOST('hymn'), getPOST('note'))))
     {
         $rv = array(false,
             "Problem saving new lessons.  "
-            ."Does {$_POST['dayname']} have synonyms set?");
+            ."Does ".getPOST('dayname')." have synonyms set?");
             //.array_pop($q->errorInfo()));
     } else {
         require("./churchyear/get_propersform.php");
         $rv = array(true,
-            "New lessons saved in lectionary '{$_POST['lectionary']}'.",
-            propersForm($_POST['dayname']));
+            "New lessons saved in lectionary '".getPOST('lectionary')."'.",
+            propersForm(getPOST('dayname')));
     }
     echo json_encode($rv);
     exit(0);
@@ -647,12 +647,12 @@ if ($_POST['lessons'] == "New") {
 /* churchyear.php?delpropers=id
  * Delete the lessons with the given id
  */
-if ($_GET['delpropers']) {
+if (getGET('delpropers')) {
     requireAuthJSON(3, array(false, "Access denied. Please log in."));
     $db->beginTransaction();
     $q = $db->prepare("SELECT dayname FROM `{$dbp}churchyear_lessons` AS l
         WHERE l.id = ?");
-    if (! $q->execute(array($_GET['delpropers']))) {
+    if (! $q->execute(array(getGET('delpropers')))) {
         echo json_encode(array(false,
             "Could not get dayname for the lessons."));
         exit(0);
@@ -664,7 +664,7 @@ if ($_GET['delpropers']) {
         LEFT OUTER JOIN `{$dbp}churchyear_collect_index` AS i
         ON (i.dayname = l.dayname AND  i.lectionary = l.lectionary)
         WHERE l.id = ?");
-    if (! $q->execute(array($_GET['delpropers']))) {
+    if (! $q->execute(array(getGET('delpropers')))) {
         $rv = array(false,
             "Problem deleting propers: ".array_pop($q->errorInfo()));
     } else {
@@ -678,7 +678,7 @@ if ($_GET['delpropers']) {
 
 requireAuth("index.php", 3);
 
-if ($_GET['request'] == 'purgetables') fillServiceTables();
+if (getGET('request') == 'purgetables') fillServiceTables();
 
 ?>
 <!DOCTYPE html>

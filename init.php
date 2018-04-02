@@ -38,11 +38,11 @@ require("./utility/configfile.php");
 require("./utility/dbconnection.php");
 $script_basename = basename($_SERVER['PHP_SELF'], '.php');
 
-if ($_GET['flag'] == 'dbinit') {
+if ('dbinit' == getGET('flag')) {
     require("./init/dbinit.php");
 }
 
-if ($_GET['flag'] == 'inituser') {
+if ('inituser' == getGET('flag')) {
     $db = new DBConnection();
     require("./init/inituser.php");
 }
@@ -68,7 +68,7 @@ require("./init/checkuser.php");
 if (! array_key_exists('username', $_POST)) $auth = auth();
 
 // Save settings in request
-if ($_GET['flag'] == 'savesettings') {
+if ('savesettings' == getGET('flag')) {
     require("./init/savesettings.php");
 }
 

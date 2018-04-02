@@ -29,19 +29,19 @@ unset($_SESSION[$sprefix]["highdate"]);
 unset($_SESSION[$sprefix]["allfuture"]);
  */
 $this_script = $_SERVER['HTTP_HOST'].$_SERVER['SCRIPT_NAME'] ;
-if ($_GET['submit'] == "Apply") {
-    if ($_GET['allfuture']) {
+if ("Apply" == getGET("Submit")) {
+    if (getGET('allfuture')) {
         $allfuture = "checked";
         $_SESSION[$sprefix]["allfuture"] = $allfuture;
     } else {
         $allfuture = "";
         $_SESSION[$sprefix]["allfuture"] = $allfuture;
     }
-} elseif (isset($_SESSION[$sprefix]["allfuture"]))
+} elseif (getIndexOr($_SESSION[$sprefix],"allfuture"))
     $allfuture = $_SESSION[$sprefix]["allfuture"];
 else $allfuture = "checked";
-if (array_key_exists('lowdate', $_GET)) {
-    $lowdate = new DateTime($_GET['lowdate']);
+if (getGET('lowdate')) {
+    $lowdate = new DateTime(getGET('lowdate'));
     $_SESSION[$sprefix]["lowdate"] = $lowdate;
 } elseif (!$_SESSION[$sprefix]["lowdate"]) {
     $lowdate = new DateTime();
@@ -49,17 +49,17 @@ if (array_key_exists('lowdate', $_GET)) {
     $_SESSION[$sprefix]["lowdate"] = $lowdate;
 } else $lowdate = $_SESSION[$sprefix]['lowdate'];
 
-if (array_key_exists('highdate', $_GET)) {
-    $highdate = new DateTime($_GET['highdate']);
+if (getGET('highdate')) {
+    $highdate = new DateTime(getGET('highdate'));
     $_SESSION[$sprefix]["highdate"] = $highdate;
-} elseif (!$_SESSION[$sprefix]["highdate"]) {
+} elseif (!getIndexOr($_SESSION[$sprefix], "highdate")) {
     $highdate = new DateTime();
     $_SESSION[$sprefix]["highdate"] = $highdate;
 } else $highdate = $_SESSION[$sprefix]['highdate'];
 
-if ($_GET['submit'] == "All")
+if ("All" == getGET('submit'))
     $_SESSION[$sprefix]['modifyorder'] = "All";
-elseif ($_GET['submit'] == "Future")
+elseif ("Future" == getGET('submit'))
     $_SESSION[$sprefix]['modifyorder'] = "Future";
 $options = getOptions(true);
 if (! array_key_exists('modifyorder', $_SESSION[$sprefix]))

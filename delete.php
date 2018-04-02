@@ -27,8 +27,8 @@
 require("./init.php");
 requireAuth("index.php", 3, "Access denied. Please log in as Admin.");
 $this_script = $_SERVER['HTTP_HOST'].$_SERVER['SCRIPT_NAME'] ;
-$ajax = $_GET['ajaxconfirm'];
-if ((! array_key_exists("stage", $_GET)) || $ajax) {
+$ajax = getGET('ajaxconfirm');
+if ((! isset($_GET['stage'])) || $ajax) {
     // Put items to delete into an array.
     $todelete = array();
     foreach ($_POST as $posted=>$value) {
@@ -87,7 +87,7 @@ if ((! array_key_exists("stage", $_GET)) || $ajax) {
     </body>
     </html>
     <?  }
-} elseif ("2" == $_GET['stage']) {
+} elseif ("2" == getGET('stage')) {
     //// Delete and acknowledge deletion.
     $db->beginTransaction();
     foreach ($_SESSION[$sprefix]['stage1'] as $loc => $deletions) {

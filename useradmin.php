@@ -25,7 +25,7 @@
  */
 require_once('./init.php');
 
-$flag = $_GET['flag'];
+$flag = getGET('flag');
 $authdata = $_SESSION[$sprefix]['authdata'];
 $auth = auth();
 
@@ -33,7 +33,7 @@ $userlevels_text = array("", "Basic User", "Advanced User", "Admin");
 
 if ( $flag=="edit" ) {
     adminOnly($authdata['userlevel']);
-    $id = $_GET['id'];
+    $id = getGET('id');
     $q = $db->prepare("SELECT * FROM `{$db->getPrefix()}users` WHERE `uid`=:id");
     $q->bindParam(":id", $id);
     $q->execute();
@@ -85,7 +85,7 @@ if ( $flag=="edit" ) {
     header("location:useradmin.php");
 } elseif ( $flag=="delete" ) {
     adminOnly($authdata['userlevel']);
-    $id = $_GET['id'];
+    $id = getGET('id');
     if ($authdata['uid'] != $id) {
         $q = $db->prepare("DELETE FROM `{$db->getPrefix()}users`
             WHERE `uid`=:id");
@@ -134,7 +134,7 @@ if ( $flag=="edit" ) {
             SET `username`=:uname, `password`=:pw, `fname`=:fname,
             `lname`=:lname, `userlevel`=:ulevel, `email`=:email");
         $q->bindParam(":uname", $uname);
-        $q->bindParam(":pw", hashPassword($_POST['pw']));
+        $q->bindValue(":pw", hashPassword(getPOST('pw')));
         $q->bindParam(":fname", $fname);
         $q->bindParam(":lname", $lname);
         $q->bindParam(":ulevel", $ulevel);
@@ -146,8 +146,8 @@ if ( $flag=="edit" ) {
 } elseif ( $flag=="add" ) {
     editUserForm();
 } elseif ( $flag=="changepw" || $flag=="reset") {
-    if (! array_key_exists('auth', $_GET)
-        || $flag == "changepw") authOnly($authdata['userlevel']);
+    if (! isset($_GET['auth']) || $flag == "changepw")
+        authOnly($authdata['userlevel']);
     changePW($flag);
 } elseif ($flag=="updatepw" && array_key_exists('auth', $_POST)) {
     // Password reset
@@ -192,7 +192,7 @@ if ( $flag=="edit" ) {
     exit(0);
 } elseif ( $flag=="deleteme" ) {
     authOnly($authdata['userlevel']);
-    $id = $_GET['id'];
+    $id = getGET('id');
     if ($authdata['uid'] == $id) {
         $q = $db->prepare("DELETE FROM `{$db->getPrefix()}users`
             WHERE `uid`=:id");
@@ -221,7 +221,7 @@ function changePW($flag) {
         $q = $db->prepare("SELECT `uid`, `username` FROM `{$dbp}users`
             WHERE `resetkey` = :resetkey
             AND `resetexpiry` >= NOW() LIMIT 1");
-        $q->bindParam(':resetkey', $_GET['auth']);
+        $q->bindParam(':resetkey', getGET('auth'));
         $q->execute();
         if ($row = $q->fetch(PDO::FETCH_ASSOC)) {
             $username = $row['username'];
@@ -246,7 +246,7 @@ function changePW($flag) {
         autocomplete="off" method="post">
     <input type="hidden" name="id" value="<?= $id ?>">
     <? if ($flag=="reset") { ?>
-    <input type="hidden" name="auth" value="<?= $_GET['auth'] ?>">
+    <input type="hidden" name="auth" value="<?= getGET('auth') ?>">
     <? } ?>
     <table>
     <tr>

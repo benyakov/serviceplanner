@@ -41,8 +41,8 @@ $q = $db->prepare("SELECT `names`.`title` as title,
     WHERE `names`.`book` = :book
     AND `names`.`number` = :number
     ORDER BY `days`.`caldate` DESC LIMIT {$options->get('used_history')}");
-$q->bindParam(':book', $_GET['book']);
-$q->bindParam(':number', $_GET['number']);
+$q->bindValue(':book', getGET('book'));
+$q->bindValue(':number', getGET('number'));
 $q->execute() or die(array_pop($q->errorInfo()));
 $lastusedary = array();
 while ($row = $q->fetch(PDO::FETCH_ASSOC)) {
@@ -52,17 +52,17 @@ while ($row = $q->fetch(PDO::FETCH_ASSOC)) {
         'occurrence' => $row['occurrence']
     );
 }
-if (0 == $_GET['number']) {
+if (0 == getGET('number')) {
     $lastusedary = array();
 }
-if ($title || $_GET['xref']=="off") {
+if ($title || getGET('xref')=="off") {
     echo json_encode(array($title, $lastusedary, false));
     exit(0);
 }
-$bookname = strtolower($_GET['book']);
+$bookname = strtolower(getGET('book'));
 $q = $db->prepare("SELECT `title` from `{$db->getPrefix()}xref`
-    WHERE `{$_GET['book']}` = :number LIMIT 1");
-$q->bindParam(':number', $_GET['number']);
+    WHERE `{getGET('book')}` = :number LIMIT 1");
+$q->bindParam(':number', getGET('number'));
 if ($q->execute() && ($row = $q->fetch())) {
     $title = $row[0];
 } else {

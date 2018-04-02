@@ -27,11 +27,11 @@ require("./init.php");
 $uid = authUid();
 $this_script = $_SERVER['HTTP_HOST'].$_SERVER['SCRIPT_NAME'] ;
 if (! (isset($_POST['step']) || isset($_POST['json']))) {
-    if ("get" == $_GET['action'] &&
-        is_numeric($_GET['service']) && $_GET['occurrence'])
+    if ("get" == getGET('action') &&
+        is_numeric(getGET('service')) && getGET('occurrence'))
     {
         // Return a json-formatted flag list snippet.
-        $q = getFlagsFor($_GET['service'], $_GET['occurrence']);
+        $q = getFlagsFor(getGET('service'), getGET('occurrence'));
         $results = $q->fetchAll(PDO::FETCH_ASSOC);
         $rv = array();
         foreach ($results as $flag) {
@@ -50,14 +50,14 @@ if (! (isset($_POST['step']) || isset($_POST['json']))) {
     }
 
     // Display flags modification page
-    if (! (is_numeric($_GET['id']) and $_GET['occurrence']) ) {
+    if (! (is_numeric(getGET('id')) and getGET('occurrence')) ) {
         setMessage("Need both a service and occurrence to see service flags. ".
             "Have you chosen a occurrence by adding hymns?");
         header("Location: modify.php");
         exit(0);
     } else {
-        $id = $_GET['id'];
-        $occurrence = $_GET['occurrence'];
+        $id = getGET('id');
+        $occurrence = getGET('occurrence');
         $urloccurrence = urlencode($occurrence);
         $htmloccurrence = htmlspecialchars($occurrence);
     }

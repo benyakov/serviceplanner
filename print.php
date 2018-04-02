@@ -32,7 +32,7 @@ $backlink = "index.php";
 <body>
 <div id="content-container">
 <?
-    $q = queryService($_GET['id']);
+    $q = queryService(getGET('id'));
     $row = $q->fetch(PDO::FETCH_ASSOC);
     ?>
     <h1>Service on <?=$row['date']?></h1>

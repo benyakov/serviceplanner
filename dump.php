@@ -55,7 +55,7 @@ $realtablenames = array_map(adddbpfix, $tablenames);
 $dbstate = getDBState(false);
 $dbversion = $dbstate->get('dbversion');
 $timestamp = date("dMY-Hi");
-if ('churchyear' == $_GET['only']) {
+if ('churchyear' == getGET('only')) {
     $finaltablenames = array_filter($realtablenames, 'churchyeartable') ;
     $dlfilename = "churchyear-{$dbversion}_{$timestamp}.dump";
 } else {

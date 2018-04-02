@@ -41,7 +41,7 @@ function togglebg($current) {
     }
 }
 
-if ($_GET['drop'] == 'yes' && 3 == authLevel()) {
+if (getGET('drop') == 'yes' && 3 == authLevel()) {
     $db->query("DROP TABLE `{$db->getPrefix()}xref`");
     setMessage("Cross-reference table repopulated.");
 }
@@ -89,7 +89,7 @@ if (! $db->query("SELECT 1 FROM {$db->getPrefix()}xref")) {
 /* To Display the cross-reference table */
 
 
-if (array_key_exists('sort', $_GET) && strpos($_GET['sort'], ';') == False) {
+if (isset($_GET['sort']) && strpos($_GET['sort'], ';') == False) {
     $sanitized_sort_field = "`{$_GET['sort']}`";
     $sort_by = " ORDER BY ({$sanitized_sort_field} = \"\") DESC, ".
         " {$sanitized_sort_field}";

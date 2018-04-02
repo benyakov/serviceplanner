@@ -72,11 +72,11 @@ function getCollectClasses() {
 }
 
 function checkJsonpReq() {
-    return $_GET['jsonpreq'];
+    return getGET('jsonpreq');
 }
 
 function checkContentReq() {
-    return $_GET['contentonly'];
+    return getGET('contentonly');
 }
 
 function queryService($id) {
@@ -128,7 +128,7 @@ function queryServiceDateRange($lowdate, $highdate, $allfuture=false, $order="DE
     } else {
         $q = rawQuery($where, $order, "", false);
     }
-    $q->bindParam(":lowdate", $lowdate->format("Y-m-d"));
+    $q->bindValue(":lowdate", $lowdate->format("Y-m-d"));
     if (! $allfuture) $q->bindParam(":highdate", $highdate->format("Y-m-d"));
     if (! $q->execute())
         die("<p>".array_pop($q->errorInfo()).'</p><p style="white-space: pre;">'.$q->queryString."</p>");
@@ -138,6 +138,7 @@ function queryServiceDateRange($lowdate, $highdate, $allfuture=false, $order="DE
 function rawQuery($where=array(), $order="", $limit="", $blend_occurrences=false) {
     if ($where) $wherestr = "WHERE ".implode(" AND ", $where);
     if ($limit) $limitstr = "LIMIT {$limit}";
+    else $limitstr = "";
     if ($blend_occurrences) {
         $occ_seq = "h.sequence, h.occurrence";
     } else {
@@ -1200,6 +1201,18 @@ function is_digits($item) {
     return !preg_match("/[^0-9]/", $item);
 }
 
+function getIndexOr($var, $key, $default='') {
+    if (isset($var[$key])) return $var[$key];
+    else return $default;
+}
+
+function getGET($index, $default='') {
+    return getIndexOr($_GET, $index, $default);
+}
+
+function getPOST($index, $default='') {
+    return getIndexOr($_POST, $index, $default);
+}
 
 // vim: set foldmethod=indent :
 ?>

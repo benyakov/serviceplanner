@@ -23,7 +23,7 @@
     The Dalles, OR 97058
     USA
  */
-if ($_GET['flag'] == 'dbinit') {
+if ('dbinit' == getGET('flag')) {
     // Escape string-ending characters to avoid PHP injection
     $post = str_replace('\\', '\\\\', $_POST);
     $post = str_replace('\'', '\\\'', $post);
@@ -52,7 +52,7 @@ if ($_GET['flag'] == 'dbinit') {
     <html lang="en">
     <?=html_head("Initialize Database Connection")?>
     <body>
-        <? if ($_GET['connectionerror']) { ?>
+        <? if (getGET('connectionerror')) { ?>
         <p id="message">Error: Could not connect with given settings.</p>
         <? } ?>
 

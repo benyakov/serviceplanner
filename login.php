@@ -25,15 +25,15 @@
  */
 require("./init.php");
 
-if (array_key_exists('action', $_GET) && $_GET['action'] == 'logout') {
+if ('logout' == getGET('action')) {
     session_destroy();
     authcookie(False);
 } else {
-    $auth = auth($_POST['username'], $_POST['password']) ;
+    $auth = auth(getPOST('username'), getPOST('password')) ;
 }
 
 $authid = authId();
-if (array_key_exists('ajax', $_POST) || array_key_exists('ajax', $_GET)) {
+if (getPOST('ajax') || getGET('ajax')) {
     header('Cache-Control: no-cache, must-revalidate');
     header('Expires: Mon, 01 Jan 1996 00:00:00 GMT');
     header("Content-type: application/json");
@@ -55,17 +55,17 @@ if (array_key_exists('ajax', $_POST) || array_key_exists('ajax', $_GET)) {
     }
     $stkeys = array_keys($st);
     $activated = $stkeys[0];
-    if ($_POST['activated']) {
-        if ($_POST['activated'] == "records") $_POST['activated'] = "modify";
-        $activated = $_POST['activated'];
+    if (getPOST('activated')) {
+        if (getPOST('activated') == "records")
+            $_POST['activated'] = "modify";
+        $activated = getPOST('activated');
     }
     $rv['actions'] = getUserActions($bare=true);
     $rv['loginform'] = getLoginForm($bare=true);
     $rv['sitetabs'] = gensitetabs($st, $activated, $bare=true);
     echo json_encode($rv);
 } else {
-    $redirect = $_SESSION['HTTP_REFERER']?
-            $_SESSION['HTTP_REFERER'] : "index.php";
+    $redirect = getIndexOr($_SESSION,'HTTP_REFERER',"index.php");
     if ($authid) {
         setMessage("You are logged in.");
     } else {

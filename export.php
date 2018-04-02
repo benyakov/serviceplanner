@@ -28,8 +28,8 @@ require("./init.php");
 require("./utility/csv.php");
 
 // Exports here don't require auth
-if (is_numeric($_GET["service"])) {
-    $q = queryService($_GET['service']);
+if (is_numeric(getGET('service'))) {
+    $q = queryService(getGET('service'));
     $q->setFetchMode(PDO::FETCH_ASSOC);
     $csvex = new CSVExporter($q);
     $csvex->setCharset("utf-8");
@@ -46,7 +46,7 @@ if (is_numeric($_GET["service"])) {
     exit(0);
 }
 
-if ('synonyms' == $_GET['export']) {
+if ('synonyms' == getGET('export')) {
     $q = $db->prepare("SELECT canonical, synonym
         FROM `{$db->getPrefix()}churchyear_synonyms`
         ORDER BY canonical");
@@ -71,7 +71,7 @@ if ('synonyms' == $_GET['export']) {
     exit(0);
 }
 
-if ('churchyear' == $_GET['export']) {
+if ('churchyear' == getGET('export')) {
     $q = $db->prepare("SELECT `dayname`, `season`, `base`,
         `offset`, `month`, `day`, `observed_month`, `observed_sunday`
         FROM `{$db->getPrefix()}churchyear` AS cy
@@ -94,7 +94,7 @@ if ('churchyear' == $_GET['export']) {
     exit(0);
 }
 
-if ('churchyear-propers' == $_GET['export']) {
+if ('churchyear-propers' == getGET('export')) {
     $q = $db->prepare("SELECT cp.dayname, color, theme, introit, gradual, note
         FROM `{$db->getPrefix()}churchyear_propers` AS cp
         JOIN `{$db->getPrefix()}churchyear` as cy
@@ -115,12 +115,12 @@ if ('churchyear-propers' == $_GET['export']) {
     exit(0);
 }
 
-if ('collects' == $_GET['export']) {
+if ('collects' == getGET('export')) {
     $q = $db->prepare("SELECT id, class, collect
         FROM `{$db->getPrefix()}churchyear_collects`
         WHERE class = :class
         ORDER BY id");
-    $q->bindParam(":class", $_GET['class']);
+    $q->bindParam(":class", getGET('class'));
     $q->execute() or die(array_pop($q->errorInfo()));
     $csvex = new CSVExporter($q);
     $csvex->setFileBase("churchyear_collects");
@@ -131,14 +131,14 @@ if ('collects' == $_GET['export']) {
     exit(0);
 }
 
-if ('collectassignments' == $_GET['export']) {
+if ('collectassignments' == getGET('export')) {
     $q = $db->prepare("SELECT cci.id, lectionary, dayname
         FROM `{$db->getPrefix()}churchyear_collect_index` AS cci
         JOIN `{$db->getPrefix()}churchyear_collects` AS cc
         ON (cci.id=cc.id)
         WHERE cc.class = :class
         ORDER BY lectionary, cci.id");
-    $q->bindParam(":class", $_GET['class']);
+    $q->bindParam(":class", getGET('class'));
     $q->execute() or die(array_pop($q->errorInfo()));
     $csvex = new CSVExporter($q);
     $csvex->setFileBase("churchyear_collects_assignments");
@@ -152,8 +152,8 @@ if ('collectassignments' == $_GET['export']) {
 // Below here requires auth
 requireAuth();
 
-if ($_GET['lectionary']) {
-    $lectname = $_GET['lectionary'];
+if (getGET('lectionary')) {
+    $lectname = getGET('lectionary');
     $db->beginTransaction();
     $q = $db->prepare("SELECT COUNT(*) as c
         FROM `{$db->getPrefix()}churchyear_lessons`

@@ -30,7 +30,7 @@ function auth($login = '', $passwd = '') {
     global $sprefix;
     $dbh = new DBConnection();
     $dbp = $dbh->getPrefix();
-	$authdata = $_SESSION[$sprefix]['authdata'];
+	$authdata = getIndexOr($_SESSION[$sprefix],'authdata');
     if (is_array($authdata) && empty($login)
         && $authdata["authtype"] == "password")
     {
@@ -192,7 +192,7 @@ function setLastAdminLogin($user) {
 
 function getAuthCookieMaxAge() {
     // Gets the current maximum age of an auth cookie in seconds.
-    $config = getConfig($false);
+    $config = getConfig(false);
     $authcookie_max_age = $config->getDefault(7, 'authcookie_max_age')
         *24*60*60;
     return $authcookie_max_age;
@@ -238,7 +238,7 @@ function validateAuth($require) {
 }
 
 function checkCorsAuth() {
-    if ($_SERVER['HTTP_ORIGIN']) {
+    if (isset($_SERVER['HTTP_ORIGIN'])) {
         $corsfile = explode("\n", file_get_contents("corsfile.txt"));
         if ($_SERVER['HTTP_HOST'] == $_SERVER['HTTP_ORIGIN']) {
             return false;

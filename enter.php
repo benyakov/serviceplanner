@@ -28,13 +28,13 @@ $options = getOptions();
 requireAuth("index.php", 3, "Access denied.  Please log in.");
 $this_script = $_SERVER['HTTP_HOST'].$_SERVER['SCRIPT_NAME'] ;
 
-if (array_key_exists("date", $_GET)) {
-    $date = $_GET['date'];
+if (isset($_GET['date'])) {
+    $date = getGET('date');
 }
 if (array_key_exists("date", $_POST)) {
     processFormData();
     exit(0);
-} elseif (array_key_exists("sethymntitle", $_GET)) {
+} elseif (isset($_GET['sethymntitle'])) {
     setHymnTitle();
     exit(0);
 }
@@ -365,8 +365,8 @@ function setHymnTitle() {
     $dbh->beginTransaction();
     $q = $dbh->prepare("SELECT `title`, `number` FROM `{$dbp}names`
         WHERE `book` = :book AND `number` = :number");
-    $q->bindValue(':book', $_GET['book']);
-    $q->bindValue(':number', $_GET['number']);
+    $q->bindValue(':book', getGET('book'));
+    $q->bindValue(':number', getGET('number'));
     $q->execute() or die(array_pop($q->errorInfo()));
     $row = $q->fetch(PDO::FETCH_ASSOC);
     $oldtitle = $row['title'];
@@ -384,9 +384,9 @@ function setHymnTitle() {
         $message = "Hymn title for {$_GET['book']} {$_GET['number']} set "
             . " to \"{$_GET["sethymntitle"]}\".";
     }
-    $q->bindValue(':book', $_GET['book']);
-    $q->bindValue(':number', $_GET['number']);
-    $q->bindValue(':title', $_GET['sethymntitle']);
+    $q->bindValue(':book', getGET('book'));
+    $q->bindValue(':number', getGET('number'));
+    $q->bindValue(':title', getGET('sethymntitle'));
     if ($q->execute()) {
         $dbh->commit();
         echo json_encode(array(true, $message));

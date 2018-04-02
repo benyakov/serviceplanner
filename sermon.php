@@ -25,16 +25,16 @@
  */
 require("./init.php");
 $this_script = $_SERVER['HTTP_HOST'].$_SERVER['SCRIPT_NAME'] ;
-if (array_key_exists('manuscript', $_GET)) {
+if (isset($_GET['manuscript'])) {
     // Send the sermon manuscript, or a message saying it ain't there
     $q = $db->prepare("SELECT manuscript, mstype FROM `{$db->getPrefix()}sermons`
         WHERE service=:id");
-    $q->bindParam(":id", $_GET['id']);
+    $q->bindParam(":id", getGET('id'));
     $q->execute();
     $row = $q->fetch(PDO::FETCH_ASSOC);
     if (! $row['manuscript']) {
         setMessage("No manuscript has been saved for this sermon.");
-        header("Location: sermon.php?id={$_GET['id']}");
+        header("Location: sermon.php?id={".getGET('id')."}");
         exit(0);
     }
     $mss = fopen("{$row['manuscript']}", 'rb');
@@ -48,14 +48,14 @@ if (array_key_exists('manuscript', $_GET)) {
         setMessage("There was trouble downloading your manuscript.");
     }
 }
-if (! array_key_exists('stage', $_GET)) {
+if (! isset($_GET['stage'])) {
     requireAuth("index.php", 2);
-    if (! is_numeric($_GET['id'])) {
+    if (! is_numeric(getGET('id'))) {
         setMessage("Need a service first to edit a sermon plan.");
         header("Location: modify.php");
         exit(0);
     } else {
-        $id = $_GET['id'];
+        $id = getGET('id');
     }
     ?><!DOCTYPE html>
     <html lang="en">
@@ -131,7 +131,7 @@ if (! array_key_exists('stage', $_GET)) {
     </body>
     </html>
 <?
-} elseif (2 == $_GET["stage"])
+} elseif (2 == getGET('stage'))
 {
     requireAuth("{$protocol}://{$this_script}?id={$service}", 2);
     if (is_digits($_POST['service'])) {

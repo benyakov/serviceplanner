@@ -24,7 +24,7 @@
     USA
  */
 
-if ($_GET['flag'] == 'inituser') {
+if ('inituser' == getGET('flag')) {
     $db->beginTransaction();
     // Check that the table is really empty.
     $q = $db->query("SELECT `username` from `{$db->getPrefix()}users`

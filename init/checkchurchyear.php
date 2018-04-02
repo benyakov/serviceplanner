@@ -24,21 +24,21 @@
     USA
  */
 
-if (! $auth) {
+if (! (isset($auth) && $auth)) {
     return; // Back to including script.
 }
 
 $dbstate = getDBState(true);
 // Churchyear data; holds the fill-step completed (of 6)
 if (($dbstate->getDefault(0, "churchyear-filled") < 6) or
-    ($_GET['flag'] == 'fill-churchyear'))
+    ('fill-churchyear' == getGET('flag')))
 {
     fillServiceTables();
 }
 
 // Churchyear db functions
 if ((! $dbstate->getDefault(false, "has-churchyear-functions")) or
-    ($_GET['flag'] == 'create-churchyear-functions'))
+    ('create-churchyear-functions' == getGET('flag')))
 {
     $functionsfile = "./utility/churchyearfunctions.sql";
     $functionsfh = fopen($functionsfile, "rb");
@@ -54,7 +54,7 @@ if ((! $dbstate->getDefault(false, "has-churchyear-functions")) or
 
 // Churchyear table views
 if ((! $dbstate->getDefault(false, "has-views")) or
-        ($_GET['flag'] == 'create-views'))
+        ('create-views' == getGET('flag')))
 {
     require('./utility/createviews.php');
         $dbstate->set('has-views', 1);

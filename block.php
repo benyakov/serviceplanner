@@ -196,7 +196,7 @@ function blockPlanForm($vals=array()) {
 /* block.php with $_POST
  * Process the submitted block form
  */
-if ($_POST['label']) {
+if (getPOST('label')) {
     requireAuth("index.php", 3);
     $_POST['startdate'] = date('Y-m-d', strtotime($_POST['startdate']));
     $_POST['enddate'] = date('Y-m-d', strtotime($_POST['enddate']));
@@ -240,7 +240,7 @@ if ($_POST['label']) {
 /* block.php?action=new
  * Show an empty block edit form
  */
-if ($_GET['action'] == "new") {
+if (getGET('action') == "new") {
     requireAuth("index.php", 3);
     blockPlanForm();
     exit(0);
@@ -249,7 +249,7 @@ if ($_GET['action'] == "new") {
 /* block.php?action=edit&id=N
  * Edit the block indicated by the id
  */
-if ($_GET['action'] == "edit" && $_GET['id']) {
+if (getGET('action') == "edit" && getGET('id')) {
     requireAuth("index.php", 3);
     $q = $db->prepare("SELECT
         DATE_FORMAT(blockstart, '%Y-%m-%d') AS blockstart,
@@ -257,7 +257,7 @@ if ($_GET['action'] == "edit" && $_GET['id']) {
         l1lect, l1series, l2lect, l2series, golect, goseries, pslect, psseries,
         colect, coclass, smlect, smseries, id FROM `{$db->getPrefix()}blocks`
         WHERE id = ?");
-    if ($q->execute(array($_GET['id'])) && $row = $q->fetch(PDO::FETCH_ASSOC)) {
+    if ($q->execute(array(getGET('id'))) && $row = $q->fetch(PDO::FETCH_ASSOC)) {
         blockPlanForm($row);
     } else {
         echo array_pop($q->errorInfo());
@@ -268,10 +268,10 @@ if ($_GET['action'] == "edit" && $_GET['id']) {
 /* block.php?delete=N
  * Delete the block with id N
  */
-if ($_GET['delete']) {
+if (getGET('delete')) {
     requireAuth("index.php", 3);
     $q = $db->prepare("DELETE FROM `{$db->getPrefix()}blocks` WHERE id = ?");
-    if ($q->execute(array($_GET['delete']))) {
+    if ($q->execute(array(getGET('delete')))) {
         setMessage($q->rowCount() . " blocks deleted.");
     } else {
         setMessage("Problem deleting block: ".array_pop($q->errorInfo()));
@@ -281,10 +281,10 @@ if ($_GET['delete']) {
 /* block.php?available=date
  * Return a json list of blocks available for the date given
  */
-if ($_GET['available']) {
+if (getGET('available')) {
     $q = $db->prepare("SELECT id, label FROM `{$db->getPrefix()}blocks`
         WHERE blockstart <= ? AND blockend >= ?");
-    if ($q->execute(array($_GET['available'], $_GET['available']))) {
+    if ($q->execute(array(getGET('available'), getGET('available')))) {
         $rv = array();
         while ($row = $q->fetch(PDO::FETCH_ASSOC)) {
             $rv[$row['id']] = $row['label'];
@@ -299,13 +299,13 @@ if ($_GET['available']) {
 /* block.php?overlapstart=date&overlapend=date
  * Return whether the dates overlap an existing block
  */
-if ($_GET['overlapstart'] && $_GET['overlapend']) {
+if (getGET('overlapstart') && getGET('overlapend')) {
     $q = $db->prepare("SELECT label FROM `{$db->getPrefix()}blocks`
         WHERE (blockstart < :date1 AND blockend > :date1)
         OR (blockstart < :date2 AND blockend > :date2)
         OR (:date1 < blockstart AND :date2 > blockend)");
-    $q->bindParam(":date1", $_GET['overlapstart']);
-    $q->bindParam(":date2", $_GET['overlapend']);
+    $q->bindParam(":date1", getGET('overlapstart'));
+    $q->bindParam(":date2", getGET('overlapend'));
     if ($q->execute()) {
         $rv = array();
         while ($label = $q->fetchColumn(0)) {
@@ -322,7 +322,7 @@ if ($_GET['overlapstart'] && $_GET['overlapend']) {
 /* block.php?id=N&get=blockitems
  * Return a list of items
  */
-if ("blockitems" == $_GET['get'] && is_numeric($_GET['id']) && $_GET['day']) {
+if ("blockitems" == getGET('get') && is_numeric(getGET('id')) && getGET('day')) {
     requireAuth("index.php", 2);
     $q = $db->prepare("SELECT b.notes,
         `{$db->getPrefix()}get_selected_lesson`(b.l1lect, b.l1series,
@@ -362,8 +362,8 @@ if ("blockitems" == $_GET['get'] && is_numeric($_GET['id']) && $_GET['day']) {
         b.smlect != \"custom\" AS smlink
         FROM `{$db->getPrefix()}blocks` as b
         WHERE id = :block");
-    $q->bindValue(":dayname", $_GET['day']);
-    $q->bindValue(":block", $_GET['id']);
+    $q->bindValue(":dayname", getGET('day'));
+    $q->bindValue(":block", getGET('id'));
     if ($q->execute() && $row = $q->fetch(PDO::FETCH_ASSOC)) {
         $cfg = getConfig(true);
         $rv = array(

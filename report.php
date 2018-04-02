@@ -24,7 +24,7 @@
  */
 require("./init.php");
 
-if ("customfields" == $_GET['action']) {
+if ("customfields" == getGET('action')) {
     // Expecting JSON array of objects {order: X, name: Y}
     $config = getConfig(true);
     if (checkFieldsSetup($config)) $config->save();
@@ -32,12 +32,12 @@ if ("customfields" == $_GET['action']) {
     echo json_encode($config->get('custom view', 'fields'));
     unset($config);
     exit(0);
-} elseif ("servicelisting" == $_GET['action']) {
+} elseif ("servicelisting" == getGET('action')) {
     $config = getConfig();
     echo json_encode(showServiceListing($config));
     unset($config);
     exit(0);
-} elseif ("available" == $_GET['action']) {
+} elseif ("available" == getGET('action')) {
     $q = querySomeHymns(1);
     $record = $q->fetch(PDO::FETCH_ASSOC);
     $rec = array_keys($record);
@@ -51,13 +51,13 @@ if ("customfields" == $_GET['action']) {
         "flags-abbr"));
     echo json_encode($rec);
     exit(0);
-} elseif ("left" == $_GET['move-field']) {
+} elseif ("left" == getGET('move-field')) {
     validateAuth(true);
-    if (1 > $_GET['index']) {
+    if (1 > getGET('index')) {
         echo json_encode(Array(0, "Can't move before the beginning."));
         exit(0);
     }
-    $currentloc = (int) $_GET['index'];
+    $currentloc = (int) getGET('index');
     $config = getConfig(true);
     $tmpary = cfgToFieldlist($config);
     $tmpval = $tmpary[$currentloc];
@@ -68,14 +68,14 @@ if ("customfields" == $_GET['action']) {
     unset($config);
     echo json_encode(Array(1, "Success."));
     exit(0);
-} elseif ("right" == $_GET['move-field']) {
+} elseif ("right" == getGET('move-field')) {
     validateAuth(true);
     $config = getConfig(true);
-    if ((count($config->get('custom view', 'fields'))-2)<$_GET['index']) {
+    if ((count($config->get('custom view', 'fields'))-2)<getGET('index')) {
         echo json_encode(Array(0, "Can't move after the end."));
         exit(0);
     }
-    $currentloc = (int) $_GET['index'];
+    $currentloc = (int) getGET('index');
     $tmpary = cfgToFieldlist($config);
     $tmpval = $tmpary[$currentloc];
     $tmpary[$currentloc] = $tmpary[$currentloc+1];
@@ -88,14 +88,14 @@ if ("customfields" == $_GET['action']) {
 } elseif (isset($_GET['delete-field'])) {
     validateAuth(true);
     $config = getConfig(true);
-    if (0 > $_GET['delete-field'] or
+    if (0 > getGET('delete-field') or
         count($config->get('custom view','fields')) <=
-        $_GET['delete-field'])
+        getGET('delete-field'))
     {
         echo json_encode(Array(0, "Can't delete a nonexistent item."));
         exit(0);
     }
-    $delloc = (int) $_GET['delete-field'];
+    $delloc = (int) getGET('delete-field');
     $tmpary = cfgToFieldlist($config);
     unset($tmpary[$delloc]);
     fieldlistToCfg(normFieldlist($tmpary), $config);
@@ -105,7 +105,7 @@ if ("customfields" == $_GET['action']) {
     exit(0);
 } elseif (isset($_GET['insert'])) {
     validateAuth(true);
-    $newindex = (int) $_GET['insert'];
+    $newindex = (int) getGET('insert');
     $config = getConfig(true);
     $newslot = count($config->get('custom view', 'fields'));
     if (0 > $newindex or $newslot < $newindex) {

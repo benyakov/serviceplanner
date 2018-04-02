@@ -24,7 +24,7 @@
     USA
  */
 require("./init.php");
-$date = date("Y-m-d", $_GET['date']);
+$date = date("Y-m-d", getGET('date'));
 $db->beginTransaction();
 $q = $db->prepare("SELECT d.name AS dayname, d.rite, d.pkey AS service,
     d.servicenotes, d.block

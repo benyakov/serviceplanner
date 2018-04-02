@@ -27,7 +27,7 @@ require("./init.php");
 $options = getOptions();
 requireAuth("index.php", 3);
 $this_script = $_SERVER['HTTP_HOST'].$_SERVER['SCRIPT_NAME'] ;
-if (! array_key_exists("stage", $_GET))
+if (! isset($_GET['stage']))
 {
     ?>
     <h1>Edit a Service</h1>
@@ -42,13 +42,13 @@ if (! array_key_exists("stage", $_GET))
             RIGHT OUTER JOIN `{$db->getPrefix()}days` AS days ON (hymns.service=days.pkey)
             WHERE days.pkey = ?
             ORDER BY days.caldate DESC, hymns.occurrence, hymns.sequence");
-        $q->execute(array($_GET['id'])) or die(array_pop($q->errorInfo()));
+        $q->execute(array(getGET('id'))) or die(array_pop($q->errorInfo()));
         $row = $q->fetch(PDO::FETCH_ASSOC);
         ?>
         <form action="<?=$protocol?>://<?=$this_script?>?stage=2" method="POST">
         <button type="submit" value="Commit">Commit</button>
         <button type="reset">Reset</button>
-        <input type="hidden" id="id" name="id" value="<?=$_GET['id']?>">
+        <input type="hidden" id="id" name="id" value="<?=getGET('id')?>">
         <dl>
             <dt>Date</dt>
             <dd>
@@ -82,52 +82,52 @@ if (! array_key_exists("stage", $_GET))
             <th>Occurrence</th><th>Title</th><th>Recent Uses</th></tr>
         <?
         while ($row) {
-            if ('' == $row['number']) {
+            if ('' == getIndexOr($row, 'number')) {
                 $row = $q->fetch(PDO::FETCH_ASSOC);
                 continue;
             }
             ?>
-                <tr class="ui-state-default" id="hymn-<?=$row['hymnid']?>">
+                <tr class="ui-state-default" id="hymn-<?=getIndexOr($row, 'hymnid')?>">
                 <td><span class="ui-icon ui-icon-arrowthick-2-n-s"></td>
                 <td>
-                    <input type="checkbox" id="delete_<?=$row['hymnid']?>"
-                        name="delete_<?=$row['hymnid']?>">
+                    <input type="checkbox" id="delete_<?=getIndexOr($row, 'hymnid')?>"
+                        name="delete_<?=getIndexOr($row, 'hymnid')?>">
                 </td>
                 <td>
-                    <input type="number" id="sequence_<?=$row['hymnid']?>"
-                        size="2" name="sequence_<?=$row['hymnid']?>"
-                        value="<?=$row['sequence']?>" class="edit-sequence">
+                    <input type="number" id="sequence_<?=getIndexOr($row, 'hymnid')?>"
+                        size="2" name="sequence_<?=getIndexOr($row, 'hymnid')?>"
+                        value="<?=getIndexOr($row, 'sequence')?>" class="edit-sequence">
                 </td>
                 <td>
-                    <select id="book_<?=$row['hymnid']?>" name="book_<?=$row['hymnid']?>">
+                    <select id="book_<?=getIndexOr($row, 'hymnid')?>" name="book_<?=getIndexOr($row, 'hymnid')?>">
                     <? foreach ($options->get('hymnbooks') as $hymnbook) { ?>
                         <option <?
-                            if ($hymnbook == $row['book']) echo "selected";
+                            if ($hymnbook == getIndexOr($row, 'book')) echo "selected";
                                 ?>><?=$hymnbook?></option>
                     <? } ?>
                     </select>
                 </td>
                 <td><input class="edit-number" type="number" min="0"
-                    id="number_<?=$row['hymnid']?>" size="5"
-                    name="number_<?=$row['hymnid']?>" value="<?=$row['number']?>">
+                    id="number_<?=getIndexOr($row, 'hymnid')?>" size="5"
+                    name="number_<?=getIndexOr($row, 'hymnid')?>" value="<?=getIndexOr($row, 'number')?>">
                 </td>
-                <td><input type="text" id="note_<?=$row['hymnid']?>" size="30"
-                     maxlength="100" name="note_<?=$row['hymnid']?>"
-                     value="<?=$row['note']?>" class="edit-note">
+                <td><input type="text" id="note_<?=getIndexOr($row, 'hymnid')?>" size="30"
+                     maxlength="100" name="note_<?=getIndexOr($row, 'hymnid')?>"
+                     value="<?=getIndexOr($row, 'note')?>" class="edit-note">
                 </td>
-                <td><input type="text" id="occurrence_<?=$row['hymnid']?>"
-                    name="occurrence_<?=$row['hymnid']?>"
-                    value="<?=$row['occurrence']?>" class="edit-occurrence">
+                <td><input type="text" id="occurrence_<?=getIndexOr($row, 'hymnid')?>"
+                    name="occurrence_<?=getIndexOr($row, 'hymnid')?>"
+                    value="<?=getIndexOr($row, 'occurrence')?>" class="edit-occurrence">
                 </td>
-                <td><input type="text" id="title_<?=$row['hymnid']?>" size="50"
-                     maxlength="50" name="title_<?=$row['hymnid']?>"
-                     value="<?=$row['title']?>" class="edit-title"
-                     data-hymn="<?=$row['hymnid']?>">
-                    <a href="#" data-hymn="<?=$row['hymnid']?>"
+                <td><input type="text" id="title_<?=getIndexOr($row, 'hymnid')?>" size="50"
+                     maxlength="50" name="title_<?=getIndexOr($row, 'hymnid')?>"
+                     value="<?=getIndexOr($row, 'title')?>" class="edit-title"
+                     data-hymn="<?=getIndexOr($row, 'hymnid')?>">
+                    <a href="#" data-hymn="<?=getIndexOr($row, 'hymnid')?>"
                      class="hidden save-title command-link"
-                     id="savetitle_<?=$row['hymnid']?>">Save</a>
+                     id="savetitle_<?=getIndexOr($row, 'hymnid')?>">Save</a>
                 </td>
-                <td id="past_<?=$row['hymnid']?>"></td>
+                <td id="past_<?=getIndexOr($row, 'hymnid')?>"></td>
             </tr>
             <?
             $row = $q->fetch(PDO::FETCH_ASSOC);
@@ -178,7 +178,7 @@ if (! array_key_exists("stage", $_GET))
         setupSortableList();
     </script>
     <?
-} elseif (2 == $_GET['stage']) {
+} elseif (2 == getGET('stage')) {
     //// Commit changes to db
     // Pull out changes for each table into separate arrays
     $db->beginTransaction();
