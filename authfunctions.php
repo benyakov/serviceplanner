@@ -123,7 +123,7 @@ function authcookie($authorized=null) {
             if (in_array($seriesfile, array('.', '..'))) continue;
             if (time() - filemtime("{$userdir}/{$seriesfile}")
                 > $max_age)
-                unlink("{$userdir}/{$seriesfile}");
+                @unlink("{$userdir}/{$seriesfile}");
         }
         closedir($userdirp);
         // Check against saved auth tokens
@@ -199,7 +199,7 @@ function getAuthCookieMaxAge() {
 }
 
 function delAuthCookie() {
-    unlink("authcookies/{$_COOKIE['auth']['user']}/{$_COOKIE['auth']['series']}");
+    @unlink("authcookies/{$_COOKIE['auth']['user']}/{$_COOKIE['auth']['series']}");
     $timestamp = time()-3600;
     setcookie('auth[user]', '', $timestamp);
     setcookie('auth[series]', '', $timestamp);

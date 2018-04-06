@@ -92,7 +92,7 @@ $combine_occurrences = 0;
 
 if (file_exists("./options.php")) {
     require("./options.php");
-    unlink("./options.php");
+    @unlink("./options.php");
 }
 
 $options = new Configfile("./options.ini", true, true, true);

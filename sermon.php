@@ -162,7 +162,7 @@ if (! isset($_GET['stage'])) {
         if (! file_exists("{$thisdir}/uploads/{$dest1}/{$dest2}/{$service}"))
             mkdir("{$thisdir}/uploads/{$dest1}/{$dest2}/{$service}", 0750, TRUE);
         $dest = "{$thisdir}/uploads/{$dest1}/{$dest2}/{$service}/manuscript";
-        if (file_exists($dest)) unlink($dest);
+        @unlink($dest);
         rename($msfile, $dest);
         $ft = $_FILES['manuscript_file']['type'];
     }
