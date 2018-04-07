@@ -129,7 +129,7 @@ function queryServiceDateRange($lowdate, $highdate, $allfuture=false, $order="DE
         $q = rawQuery($where, $order, "", false);
     }
     $q->bindValue(":lowdate", $lowdate->format("Y-m-d"));
-    if (! $allfuture) $q->bindParam(":highdate", $highdate->format("Y-m-d"));
+    if (! $allfuture) $q->bindValue(":highdate", $highdate->format("Y-m-d"));
     if (! $q->execute())
         die("<p>".array_pop($q->errorInfo()).'</p><p style="white-space: pre;">'.$q->queryString."</p>");
     return $q;
@@ -256,7 +256,7 @@ function listthesehymns(&$thesehymns, $rowcount, $showocc=false) {
     } else {
         $hymnblock_occ = "";
     }
-    echo "<tr{$hymnblock_occ} data-service=\"{$thesehymns[0]['serviceid']}\"><td colspan=3>\n";
+    echo "<tr{$hymnblock_occ} data-service=\"{".getIndexOr($thesehymns[0],'serviceid')."}\"><td colspan=3>\n";
     echo "<table class=\"hymn-listing\">";
     foreach ($thesehymns as $ahymn) {
         $occurrence = " data-occ=\"{$ahymn['occurrence']}\"";
@@ -419,7 +419,7 @@ function display_occurrences_together($q) {
         }
         // Collect hymns
         $thesehymns[] = $row;
-        $serviceid = $row['serviceid'];
+        $serviceid = getIndexOr($row,'serviceid');
     }
     if ($thesehymns) {
         displayServiceHeaderCombined($thesehymns);
@@ -446,41 +446,42 @@ function displayServiceHeaderCombined($thesehymns) {
         $datetext = $row['date'];
     }
     // Heading line
-    echo "<tr class=\"heading servicehead\" data-service=\"{$row["serviceid"]}\"><td class=\"heavy\"><a href=\"#\" class=\"expandservice\">+</a> {$datetext}</td>
-        <td><a name=\"service_{$row['serviceid']}\">{$row['dayname']}</a>: {$row['rite']}".
+    $sid = getIndexOr($row, "serviceid");
+    echo "<tr class=\"heading servicehead\" data-service=\"{$sid}\"><td class=\"heavy\"><a href=\"#\" class=\"expandservice\">+</a> {$datetext}</td>
+        <td><a name=\"service_{$sid}\">{$row['dayname']}</a>: {$row['rite']}".
     ((3==$auth)?
-    "<a class=\"menulink\" href=\"sermon.php?id={$row['serviceid']}\">Sermon</a>\n"
+    "<a class=\"menulink\" href=\"sermon.php?id={$sid}\">Sermon</a>\n"
     :"").
-    "<a class=\"menulink\" href=\"export.php?service={$row['serviceid']}\">CSV Data</a>\n".
-    " <a class=\"menulink\" href=\"print.php?id={$row['serviceid']}\" title=\"print\">Print</a> ".
+    "<a class=\"menulink\" href=\"export.php?service={$sid}\">CSV Data</a>\n".
+    " <a class=\"menulink\" href=\"print.php?id={$sid}\" title=\"print\">Print</a> ".
     "</td></tr>\n";
     for ($i=0, $limit=count($occurrences); $i<$limit; $i++) {
-    echo "<tr class=\"service-flags\" data-occ=\"{$occurrences[$i]}\" data-service=\"{$row['serviceid']}\"><td colspan=2></td><td>".
+    echo "<tr class=\"service-flags\" data-occ=\"{$occurrences[$i]}\" data-service=\"{$sid}\"><td colspan=2></td><td>".
     (($auth)?
-    " <a class=\"menulink flagbutton\" title=\"Edit flags for this service.\" href=\"flags.php?id={$row['serviceid']}&occurrence={$urloccurrences[$i]}\">Flags</a> "
+    " <a class=\"menulink flagbutton\" title=\"Edit flags for this service.\" href=\"flags.php?id={$sid}&occurrence={$urloccurrences[$i]}\">Flags</a> "
     :"").
         "{$occurrences[$i]}</td></tr>\n";
     }
-    echo "<tr class=\"heading\" data-service=\"{$row['serviceid']}\"><td class=\"propers\" colspan=3>\n";
-    echo "<table><tr><td class=\"heavy smaller\">{$row['theme']}</td>";
-    echo "<td colspan=2>{$row['color']}</td></tr>";
-    if ($row['introit'] || $row['gradual']) {
+    echo "<tr class=\"heading\" data-service=\"{$sid}\"><td class=\"propers\" colspan=3>\n";
+    echo "<table><tr><td class=\"heavy smaller\">".getIndexOr($row,'theme')."</td>";
+    echo "<td colspan=2>".getIndexOr($row,'color')."</td></tr>";
+    if (getIndexOr($row,'introit') || getIndexOr($row,'gradual')) {
         echo "<tr class=\"heading propers\"><td colspan=3>";
-        if ($row['introit'])
+        if (getIndexOr($row,'introit'))
             echo "<p class=\"sbspar maxcolumn smaller\">{$row['introit']}</p>";
-        if ($row['gradual'])
+        if (getIndexOr($row,'gradual'))
             echo "<p class=\"sbspar halfcolumn smaller\">{$row['gradual']}</p>";
         echo "</td></tr>";
     }
-    if ($row['propersnote']) {
+    if (getIndexOr($row,'propersnote')) {
         echo "<tr class=\"heading propers\"><td colspan=3>
             <p class=\"maxcolumn\">".
             translate_markup($row['propersnote'])."</p></td></tr>";
     }
     echo "\n</table></td></tr>\n";
-    if ($row['block'])
+    if (getIndexOr($row,'block'))
     { ?>
-        <tr data-service="<?=$row['serviceid']?>"><td colspan=3 class="blockdisplay">
+        <tr data-service="<?=getIndexOr($row,'serviceid')?>"><td colspan=3 class="blockdisplay">
             <h4>Block: <?=$row['blabel']?></h4>
             <div class="blocknotes maxcolumn">
                 <?=translate_markup($row['bnotes'])?>
@@ -513,7 +514,7 @@ function displayServiceHeaderCombined($thesehymns) {
         </tr>
     <? }
     if ($row['servicenotes']) {
-        echo "<tr data-service=\"{$row['serviceid']}\"><td colspan=3 class=\"servicenote\">".
+        echo "<tr data-service=\"{$sid}\"><td colspan=3 class=\"servicenote\">".
              translate_markup($row['servicenotes'])."</td></tr>\n";
     }
     unset($cfg);

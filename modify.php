@@ -54,7 +54,7 @@ if (getGET('lowdate')) {
 if (getGET('highdate')) {
     $highdate = new DateTime(getGET('highdate'));
     $_SESSION[$sprefix]["highdate"] = $highdate;
-} elseif (!$_SESSION[$sprefix]["highdate"]) {
+} elseif (!getIndexOr($_SESSION[$sprefix],"highdate")) {
     $highdate = new DateTime();
     $_SESSION[$sprefix]["highdate"] = $highdate;
 } else $highdate = $_SESSION[$sprefix]['highdate'];

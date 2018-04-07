@@ -230,11 +230,11 @@ if (! isset($_GET['stage']))
         `servicenotes`=:servicenotes, `block`=:block
         WHERE `pkey` = :id");
     $q->bindValue(":date", strftime("%Y-%m-%d", strtotime($todays['date'])));
-    $q->bindValue(":name", $todays['dayname']);
-    $q->bindValue(":rite", $todays['rite']);
+    $q->bindValue(":name", getIndexOr($todays,'dayname'));
+    $q->bindValue(":rite", getIndexOr($todays,'rite'));
     $q->bindValue(":servicenotes", $todays['servicenotes']);
-    $q->bindValue(":block", $todays['block']);
-    $q->bindValue(":id", $_POST['id']);
+    $q->bindValue(":block", getIndexOr($todays,'block'));
+    $q->bindValue(":id", getPOST('id'));
     $q->execute() or dieWithRollback($q, $q->queryString);
 
     // Update hymns
