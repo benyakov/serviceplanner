@@ -256,7 +256,7 @@ function listthesehymns(&$thesehymns, $rowcount, $showocc=false) {
     } else {
         $hymnblock_occ = "";
     }
-    echo "<tr{$hymnblock_occ} data-service=\"{".getIndexOr($thesehymns[0],'serviceid')."}\"><td colspan=3>\n";
+    echo "<tr{$hymnblock_occ} data-service=\"".getIndexOr($thesehymns[0],'serviceid')."\"><td colspan=3>\n";
     echo "<table class=\"hymn-listing\">";
     foreach ($thesehymns as $ahymn) {
         $occurrence = " data-occ=\"{$ahymn['occurrence']}\"";

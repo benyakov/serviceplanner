@@ -791,7 +791,7 @@ function showExtras(serviceid) {
     $("tr[data-service="+serviceid+"].servicehead a.expandservice")
         .removeClass("contracted")
         .html("-");
-    $("tr[data-service="+serviceid+"]").show();
+    $("tr[data-service="+serviceid+"]").show(400);
 }
 
 function hideExtras(serviceid) {
@@ -802,7 +802,7 @@ function hideExtras(serviceid) {
     $(serviceLines).find('a.expandservice')
         .addClass("contracted")
         .html("+");
-    serviceLines.not('tr.servicehead').not('tr.service-flags').hide();
+    serviceLines.not('tr.servicehead').not('tr.service-flags').hide(400);
 }
 
 $(document).ready(function() {
