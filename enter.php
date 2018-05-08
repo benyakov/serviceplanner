@@ -257,6 +257,11 @@ function processFormData() {
     $feedback='<ol>';
     $date = strftime("%Y-%m-%d", strtotime($_POST['date']));
     $existingKey = array_pop(preg_grep('/^existing_/', array_keys($_POST)));
+    /* occasionally, preg_match below complains that $existingKey is an array
+    if (is_array($existingKey)) {
+        $existingKey = $existingKey[0];
+    }
+    */
     if ($existingKey) {
         preg_match('/existing_(\d+)/', $existingKey, $matches);
         $serviceid = $matches[1];

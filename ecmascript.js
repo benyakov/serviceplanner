@@ -781,23 +781,23 @@ function setupListingExpansion() {
 function toggleListing(evt) {
     evt.preventDefault();
     if ($(this).html() == "+") {
-        showExtras($(this).parents('tr').data("service"));
+        showExtras($(this).parents('tr').data("service"), $(this).parents('tr').data("occ"));
     } else {
-        hideExtras($(this).parents('tr').data("service"));
+        hideExtras($(this).parents('tr').data("service"), $(this).parents('tr').data("occ"));
     }
 }
 
-function showExtras(serviceid) {
-    $("tr[data-service="+serviceid+"].servicehead a.expandservice")
+function showExtras(serviceid, serviceocc) {
+    $("tr[data-service="+serviceid+"][data-occ='"+serviceocc+"'].servicehead a.expandservice")
         .removeClass("contracted")
         .html("-");
-    $("tr[data-service="+serviceid+"]").show();
+    $("tr[data-service="+serviceid+"][data-occ='"+serviceocc+"']").show();
 }
 
-function hideExtras(serviceid) {
-    var serviceLines = $("#records-listing > tbody > tr[data-service="+serviceid+"]");
+function hideExtras(serviceid, serviceocc) {
+    var serviceLines = $("#records-listing > tbody > tr[data-service="+serviceid+"][data-occ='"+serviceocc+"']");
     if (! serviceLines.length) {
-        serviceLines = $("#modify-listing > tbody > tr[data-service="+serviceid+"]");
+        serviceLines = $("#modify-listing > tbody > tr[data-service="+serviceid+"][data-occ='"+serviceocc+"']");
     }
     $(serviceLines).find('a.expandservice')
         .addClass("contracted")
