@@ -71,6 +71,9 @@ class DBConnection {
     public function getPrefix() {
         return self::$connection['prefix'];
     }
+    public function quote() {
+        return call_user_func_array(array(self::$handle, "quote"), func_get_args());
+    }
     public function __call($name, $args) {
         if (! self::$handle)
             $this->setupConnection();

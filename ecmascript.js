@@ -791,7 +791,7 @@ function showExtras(serviceid, serviceocc) {
     $("tr[data-service="+serviceid+"][data-occ='"+serviceocc+"'].servicehead a.expandservice")
         .removeClass("contracted")
         .html("-");
-    $("tr[data-service="+serviceid+"][data-occ='"+serviceocc+"']").show();
+    $("tr[data-service="+serviceid+"][data-occ='"+serviceocc+"']").show(400);
 }
 
 function hideExtras(serviceid, serviceocc) {
@@ -802,7 +802,7 @@ function hideExtras(serviceid, serviceocc) {
     $(serviceLines).find('a.expandservice')
         .addClass("contracted")
         .html("+");
-    serviceLines.not('tr.servicehead').not('tr.service-flags').hide();
+    serviceLines.not('tr.servicehead').not('tr.service-flags').hide(400);
 }
 
 $(document).ready(function() {

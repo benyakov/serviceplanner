@@ -55,7 +55,11 @@ if ((! isset($_GET['stage'])) || $ajax) {
             } else {
                 $whereclause = "AND hymns.occurrence = :occurrence";
             }
-            $deletions = implode(", ", array_map($db->quote, $deletions));
+            //$deletions = implode(", ", array_map($db->quote, $deletions));
+            $delphitems = array_map(
+                function($n){return ":d".$n;},
+                range(0, count($deletions)-1));
+            $delplaceholders = implode(",", $delphitems);
             $q = $db->prepare("
                 SELECT DATE_FORMAT(days.caldate, '%e %b %Y') as date,
                 hymns.book, hymns.number, hymns.note,
@@ -67,10 +71,13 @@ if ((! isset($_GET['stage'])) || $ajax) {
                 LEFT OUTER JOIN {$db->getPrefix()}names AS names
                     ON (hymns.number = names.number)
                         AND (hymns.book = names.book)
-                WHERE days.pkey IN({$deletions})
+                WHERE days.pkey IN({$delplaceholders})
                 {$whereclause}
                 ORDER BY days.caldate DESC, hymns.service DESC,
                     hymns.occurrence, hymns.sequence");
+            foreach ($deletions as $k => $v) {
+                $q->bindValue(":d{$k}", $v);
+            }
             if ($whereclause) {
                 $q->bindValue(":occurrence", $loc);
             }
@@ -92,14 +99,20 @@ if ((! isset($_GET['stage'])) || $ajax) {
     $db->beginTransaction();
     foreach ($_SESSION[$sprefix]['stage1'] as $loc => $deletions) {
         // Check to see if service has hymns at another occurrence
-        $deletions = implode(", ", array_map($db->quote, $deletions));
+        $delphitems = array_map(
+            function($n){return ":d".$n;},
+            range(0, count($deletions)-1));
+        $delplaceholders = implode(",", $delphitems);
         $q = $db->prepare("SELECT number
                 FROM {$db->getPrefix()}hymns as hymns
                 JOIN {$db->getPrefix()}days as days
                 ON (hymns.service = days.pkey)
                 WHERE hymns.occurrence != :occurrence
-                    AND days.pkey IN ({$deletions})
+                    AND days.pkey IN ({$delplaceholders})
                 LIMIT 1");
+        foreach ($deletions as $k => $v) {
+            $q->bindValue(":d{$k}", $v);
+        }
         $q->bindValue(":occurrence", $loc);
         $q->execute();
         if ($q->fetch()) {
@@ -109,13 +122,19 @@ if ((! isset($_GET['stage'])) || $ajax) {
                 JOIN `{$db->getPrefix()}days` as days
                 ON (hymns.service = days.pkey)
                 WHERE hymns.occurrence = :occurrence
-                    AND days.pkey IN ({$deletions})");
+                    AND days.pkey IN ({$delplaceholders})");
+            foreach ($deletions as $k => $v) {
+                $q->bindValue(":d{$k}", $v);
+            }
             $q->bindValue(":occurrence", $loc);
             $q->execute();
         } else {
             // If not, delete the service (should cascade to hymns)
             $q = $db->prepare("DELETE FROM `{$db->getPrefix()}days`
-                WHERE `pkey` IN({$deletions})");
+                WHERE `pkey` IN({$delplaceholders})");
+            foreach ($deletions as $k => $v) {
+                $q->bindValue(":d{$k}", $v);
+            }
             $q->execute();
         }
     }

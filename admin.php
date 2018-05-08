@@ -27,11 +27,11 @@
 require("./init.php");
 requireAuth("index.php", 3);
 $this_script = "{$protocol}://".$_SERVER['HTTP_HOST'].$_SERVER['SCRIPT_NAME'] ;
-if ('dellect' == $_POST['action']) {
+if ('dellect' == getPOST('action')) {
     $db = new DBConnection();
     $q = $db->prepare("DELETE FROM `{$db->getPrefix()}churchyear_lessons`
         WHERE `lectionary`=?");
-    if ($q->execute(Array($_POST['lectionary']))) {
+    if ($q->execute(Array(getPOST('lectionary')))) {
         echo json_encode(Array(1, "Lectionary deleted.", getLectionaryNames()));
     } else {
         echo json_encode(Array(0, "Couldn't delete that lectionary"));

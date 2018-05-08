@@ -256,12 +256,16 @@ function processFormData() {
     $dbh->beginTransaction();
     $feedback='<ol>';
     $date = strftime("%Y-%m-%d", strtotime($_POST['date']));
+<<<<<<< HEAD
     $existingKey = array_pop(preg_grep('/^existing_/', array_keys($_POST)));
     /* occasionally, preg_match below complains that $existingKey is an array
     if (is_array($existingKey)) {
         $existingKey = $existingKey[0];
     }
     */
+=======
+    $existingKey = array_slice(preg_grep('/^existing_/', array_keys($_POST)), -1);
+>>>>>>> f57af2356dd4ff6bd5baa3ad9b99849ce9f1fffc
     if ($existingKey) {
         preg_match('/existing_(\d+)/', $existingKey, $matches);
         $serviceid = $matches[1];
@@ -281,10 +285,10 @@ function processFormData() {
         } else {
             $q->bindValue(':block', NULL);
         }
-        $q->execute() or die(array_pop($q->errorInfo()));
+        $q->execute() or die(end($q->errorInfo()));
         // Grab the pkey of the newly inserted row.
         $q = $dbh->prepare("SELECT LAST_INSERT_ID()");
-        $q->execute() or die(array_pop($q->errorInfo()));
+        $q->execute() or die(end($q->errorInfo()));
         $row = $q->fetch();
         $serviceid = $row[0];
         $feedback .= "<li>Saved a new service on '{$date}' for
@@ -340,7 +344,7 @@ function processFormData() {
         $q->bindParam(':occurrence', $_POST['occurrence']);
         $q->bindParam(':serviceid', $serviceid);
         $q->execute() or dieWithRollback($q, ".");
-        $sequenceMax = array_pop($q->fetch());
+        $sequenceMax = (int) array_slice($q->fetch(), -1);
         $q = $dbh->prepare("INSERT INTO `{$dbp}hymns`
             (service, occurrence, book, number, note, sequence)
             VALUES (:service, :occurrence, :book, :number, :note, :sequence)");
@@ -372,7 +376,7 @@ function setHymnTitle() {
         WHERE `book` = :book AND `number` = :number");
     $q->bindValue(':book', getGET('book'));
     $q->bindValue(':number', getGET('number'));
-    $q->execute() or die(array_pop($q->errorInfo()));
+    $q->execute() or die(end($q->errorInfo()));
     $row = $q->fetch(PDO::FETCH_ASSOC);
     $oldtitle = $row['title'];
     if ($row && $row['number']) {
@@ -397,7 +401,7 @@ function setHymnTitle() {
         echo json_encode(array(true, $message));
     } else {
         $dbh->rollBack();
-        echo json_encode(array(false, array_pop($q->errorInfo())));
+        echo json_encode(array(false, end($q->errorInfo())));
     }
 }
 

@@ -29,7 +29,7 @@ if (isset($_GET['manuscript'])) {
     // Send the sermon manuscript, or a message saying it ain't there
     $q = $db->prepare("SELECT manuscript, mstype FROM `{$db->getPrefix()}sermons`
         WHERE service=:id");
-    $q->bindParam(":id", getGET('id'));
+    $q->bindValue(":id", getGET('id'));
     $q->execute();
     $row = $q->fetch(PDO::FETCH_ASSOC);
     if (! $row['manuscript']) {
@@ -190,18 +190,18 @@ if (! isset($_GET['stage'])) {
     $q = $db->prepare("INSERT INTO `{$db->getPrefix()}sermons`
         (bibletext, outline, notes, service)
         VALUES (:bibletext, :outline, :notes, :id)");
-    $q->bindParam(':bibletext', $_POST['bibletext']);
-    $q->bindParam(':outline', $_POST['outline']);
-    $q->bindParam(':notes', $_POST['notes']);
+    $q->bindValue(':bibletext', $_POST['bibletext']);
+    $q->bindValue(':outline', $_POST['outline']);
+    $q->bindValue(':notes', $_POST['notes']);
     $q->bindParam(':id', $service);
     if (! $q->execute()) {
         $q = $db->prepare("UPDATE `{$db->getPrefix()}sermons`
             SET bibletext = :bibletext,
             outline = :outline, notes = :notes
             WHERE service = :id");
-        $q->bindParam(':bibletext', $_POST['bibletext']);
-        $q->bindParam(':outline', $_POST['outline']);
-        $q->bindParam(':notes', $_POST['notes']);
+        $q->bindValue(':bibletext', $_POST['bibletext']);
+        $q->bindValue(':outline', $_POST['outline']);
+        $q->bindValue(':notes', $_POST['notes']);
         $q->bindParam(':id', $service);
         $q->execute() or die(array_pop($q->errorInfo()));
     }

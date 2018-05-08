@@ -153,8 +153,11 @@ function authcookie($authorized=null) {
         return true;
     }
     if ($authorized) {
-        if ($_COOKIE['auth']['series']) $series = $_COOKIE['auth']['series'];
-        else $series = genCookieAuthString();
+        if (isset($_COOKIE['auth']['series'])) {
+            $series = $_COOKIE['auth']['series'];
+        } else {
+            $series = genCookieAuthString();
+        }
         setAuthCookie($_SESSION[$sprefix]["authdata"]["login"], $series,
             $max_age);
     } else {
@@ -199,7 +202,8 @@ function getAuthCookieMaxAge() {
 }
 
 function delAuthCookie() {
-    @unlink("authcookies/{$_COOKIE['auth']['user']}/{$_COOKIE['auth']['series']}");
+    if (isset($_COOKIE['auth']['user']) && isset($_COOKIE['auth']['series']))
+        @unlink("authcookies/{$_COOKIE['auth']['user']}/{$_COOKIE['auth']['series']}");
     $timestamp = time()-3600;
     setcookie('auth[user]', '', $timestamp);
     setcookie('auth[series]', '', $timestamp);
