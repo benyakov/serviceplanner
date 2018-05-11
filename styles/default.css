@@ -460,6 +460,7 @@ a.menulink {
     margin-left: 8px;
     display: inline-block;
     text-decoration: none;
+    float: right;
 }
 
 div.quicklinks a:active,
@@ -480,6 +481,7 @@ div.menublock > a.menulink {
     font-size: 80%;
     padding: 0 3px;
     margin: 0;
+    float: none;
 }
 
 a.sortlink {
