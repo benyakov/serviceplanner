@@ -258,7 +258,7 @@ function processFormData() {
     $date = strftime("%Y-%m-%d", strtotime($_POST['date']));
     $existingKey = array_slice(preg_grep('/^existing_/', array_keys($_POST)), -1);
     if ($existingKey) {
-        preg_match('/existing_(\d+)/', $existingKey, $matches);
+        preg_match('/existing_(\d+)/', $existingKey[0], $matches);
         $serviceid = $matches[1];
     } else {
         $serviceid = false;
