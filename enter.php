@@ -256,16 +256,7 @@ function processFormData() {
     $dbh->beginTransaction();
     $feedback='<ol>';
     $date = strftime("%Y-%m-%d", strtotime($_POST['date']));
-<<<<<<< HEAD
-    $existingKey = array_pop(preg_grep('/^existing_/', array_keys($_POST)));
-    /* occasionally, preg_match below complains that $existingKey is an array
-    if (is_array($existingKey)) {
-        $existingKey = $existingKey[0];
-    }
-    */
-=======
     $existingKey = array_slice(preg_grep('/^existing_/', array_keys($_POST)), -1);
->>>>>>> f57af2356dd4ff6bd5baa3ad9b99849ce9f1fffc
     if ($existingKey) {
         preg_match('/existing_(\d+)/', $existingKey, $matches);
         $serviceid = $matches[1];
