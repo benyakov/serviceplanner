@@ -787,17 +787,35 @@ function toggleListing(evt) {
     }
 }
 
+function getOccSpec(serviceocc) {
+    if ($("#modify-listing").length)
+        var table = $("#modify-listing");
+    else
+        var table = $("#records-listing");
+    return "[data-occ='"+serviceocc+"']"
+}
+
 function showExtras(serviceid, serviceocc) {
-    $("tr[data-service="+serviceid+"][data-occ='"+serviceocc+"'].servicehead a.expandservice")
+    if (serviceocc) { // no serviceocc in combined view
+        var occspec = getOccSpec(serviceocc);
+    } else {
+        var occspec = "";
+    }
+    $("tr[data-service="+serviceid+"]"+occspec+".servicehead a.expandservice")
         .removeClass("contracted")
         .html("-");
-    $("tr[data-service="+serviceid+"][data-occ='"+serviceocc+"']").show(400);
+    $("tr[data-service="+serviceid+"]"+occspec).show(400);
 }
 
 function hideExtras(serviceid, serviceocc) {
-    var serviceLines = $("#records-listing > tbody > tr[data-service="+serviceid+"][data-occ='"+serviceocc+"']");
+    if (serviceocc) { // no serviceocc in combined view
+        var occspec = getOccSpec(serviceocc);
+    } else {
+        var occspec = "";
+    }
+    var serviceLines = $("#records-listing > tbody > tr[data-service="+serviceid+"]"+occspec);
     if (! serviceLines.length) {
-        serviceLines = $("#modify-listing > tbody > tr[data-service="+serviceid+"][data-occ='"+serviceocc+"']");
+        serviceLines = $("#modify-listing > tbody > tr[data-service="+serviceid+"]"+occspec);
     }
     $(serviceLines).find('a.expandservice')
         .addClass("contracted")

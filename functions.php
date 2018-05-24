@@ -300,7 +300,7 @@ function display_records_table($q) {
 function display_occurrences_separately($q) {
     $auth = authLevel();
     // Show a table of the data in the query $result
-    ?><table id="records-listing"><?
+    ?><table id="records-listing" data-combined="false"><?
     $serviceid = "";
     $occurrence = "";
     $rowcount = 1;
@@ -406,7 +406,7 @@ function display_occurrences_separately($q) {
  **/
 function display_occurrences_together($q) {
     // Show a table of the data in the query $result
-    ?><table id="records-listing"><?
+    ?><table id="records-listing" data-combined="true"><?
     $cfg = getConfig(false);
     $thesehymns = array();
     $rowcount = 1;
@@ -547,7 +547,7 @@ function modify_occurrences_separately($q) {
     $rowcount = 1;
     $thesehymns = array();
     $hymnoccurrence = "";
-    ?> <table id="modify-listing"> <?
+    ?> <table id="modify-listing" data-combined="false"> <?
     while ($row = $q->fetch(PDO::FETCH_ASSOC)) {
         if (! ($row['serviceid'] == $serviceid
             && $row['occurrence'] == $occurrence))
@@ -655,7 +655,7 @@ function modify_occurrences_separately($q) {
 }
 
 function modify_occurrences_together($q) {
-    ?> <table id="modify-listing"> <?
+    ?> <table id="modify-listing" data-combined="true"> <?
     $serviceid = "";
     $rowcount = 1;
     $thesehymns = array();
