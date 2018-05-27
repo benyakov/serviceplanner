@@ -602,7 +602,10 @@ function setupSortableList() {
 
 function setupFlags() {
     $(".flagbutton").click(onFlagButtonClick);
-    $(".service-flags").each(pullFlags);
+    $(".service-flags").on('appear', function(evt) {
+        pullFlags(1, $(this));
+    });
+    $.force_appear();
 }
 
 function flagFormSubmit(evt) {

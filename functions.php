@@ -815,6 +815,7 @@ function html_head($title, $xstylesheets=Array()) {
         $rv[] = "<link href=\"{$jquery_locations->style}\" rel=\"stylesheet\" type=\"text/css\"/>
         <script type=\"text/javascript\" src=\"modernizr/modernizr.js\"></script>
         <script type=\"text/javascript\" src=\"{$jquery_locations->ui}\"></script>
+        <script type=\"text/javascript\" src=\"{$jquery_locations->appear}\"></script>
         <script type=\"text/javascript\" src=\"jquery/jquery.ba-dotimeout.min.js\"></script>";
         $rv[] = "<script type=\"text/javascript\" src=\"{$here}/ecmascript.js\"></script>";
     }

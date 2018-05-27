@@ -1,1 +1,6 @@
-{"jquery":"https:\/\/code.jquery.com\/jquery-3.1.1.min.js","ui":"https:\/\/code.jquery.com\/ui\/1.12.1\/jquery-ui.min.js","style":"https:\/\/code.jquery.com\/ui\/1.12.1\/themes\/base\/jquery-ui.css"}
+{
+    "jquery": "https://code.jquery.com/jquery-3.1.1.min.js",
+    "style": "https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css",
+    "ui": "https://code.jquery.com/ui/1.12.1/jquery-ui.min.js",
+    "appear": "./jquery/appear/jquery.appear.js"
+}
