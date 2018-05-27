@@ -138,7 +138,7 @@ if (checkContentReq()) {
                     setCSSTweaks();
                     setupStyleAdjusterLocs();
                     setupButtons();
-                    $.appear('.service-flags');
+                    $.appear('.service-flags', {"interval":0.1});
                     setupFlags();
                     setupFilterForm();
                     contractAllListings('modify-listing');

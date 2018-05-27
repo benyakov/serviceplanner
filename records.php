@@ -64,7 +64,7 @@ $this_script = $_SERVER['HTTP_HOST'].$_SERVER['SCRIPT_NAME'] ;
         $(document).ready(function() {
             contractAllListings('records-listing');
             setupListingExpansion();
-            $.appear('.service-flags');
+            $.appear('.service-flags', {"interval":0.1);
             setupFlags();
             setupFilterForm();
             setupMasterButtons();
