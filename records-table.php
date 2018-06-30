@@ -96,6 +96,6 @@ unset($options);
 <?php
 if ("Future" == $_SESSION[$sprefix]['modifyorder']) $order = "ASC";
 else $order = "DESC";
-$q = queryServiceDateRange($lowdate, $highdate, (bool)$allfuture, $order);
+$q = queryServiceDateRange($lowdate, $highdate, (int)$allfuture, $order);
 display_records_table($q);
 ?>
