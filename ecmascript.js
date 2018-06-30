@@ -603,7 +603,10 @@ function setupSortableList() {
 function setupFlags() {
     $(".flagbutton").click(onFlagButtonClick);
     $(".service-flags").on('appear', function(evt) {
-        pullFlags(1, $(this));
+        if (! $(this).data('loaded')) {
+            pullFlags(1, $(this));
+        }
+        $(this).data('loaded', true);
     });
     $.force_appear();
 }

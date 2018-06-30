@@ -117,7 +117,7 @@ function querySomeHymns($limit) {
     return $q;
 }
 
-function queryServiceDateRange($lowdate, $highdate, $allfuture=false, $order="DESC") {
+function queryServiceDateRange($lowdate, $highdate, $allfuture=0, $order="DESC") {
     $where = array("d.caldate >= :lowdate");
     if (! $allfuture) $where[] = "d.caldate <= :highdate";
     $options = getOptions();

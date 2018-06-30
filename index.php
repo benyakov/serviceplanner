@@ -61,8 +61,8 @@ if ($jsonp = checkJsonpReq()) {
                 $("#content-container").html(rv);
                 setCSSTweaks();
                 setupStyleAdjusterLocs();
-                $.appear('.service-flags', {interval:0.1, force_process: "t"});
                 setupFlags();
+                $.appear('.service-flags', {interval:0.1, force_process: "t"});
                 setupFilterForm(true);
                 contractAllListings('records-listing');
                 setupListingExpansion();
