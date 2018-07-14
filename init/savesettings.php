@@ -79,6 +79,11 @@ if (isset($_POST["cookie-age"])) {
     setMessage("Config: Set max authorization cookie age.");
 }
 
+if (isset($_POST["flagestalt"])) {
+    $config->set('flagestalt', intval($_POST['flagestalt']));
+    setMessage("Config: Set default service for initial flags");
+}
+
 $config->save();
 unset($config);
 

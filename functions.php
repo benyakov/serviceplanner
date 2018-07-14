@@ -227,6 +227,16 @@ function getFlagsFor($serviceid, $occurrence) {
     return $q;
 }
 
+function getFlagestalt($serviceid) {
+    $config = getConfig(false);
+    $flagestalt = $config->get("flagestalt", "0");
+    if ($flagestalt == $serviceid) {
+        return "flagestalt";
+    } else {
+        return "";
+    }
+}
+
 function findFlagsUpcoming($flag_text, $days_upcoming) {
     $db = new DBConnection();
     $days_upcoming = (int)$days_upcoming;
@@ -319,7 +329,8 @@ function display_occurrences_separately($q) {
                 $datetext = $row['date'];
             }
             $urloccurrence = urlencode($row['occurrence']);
-            echo "<tr data-occ=\"{$row['occurrence']}\" data-service=\"{$row['serviceid']}\" class=\"heading servicehead\">".
+            $flagestalt = getFlagestalt($row['serviceid']);
+            echo "<tr data-occ=\"{$row['occurrence']}\" data-service=\"{$row['serviceid']}\" class=\"heading servicehead {$flagestalt}\">".
                 "<td class=\"heavy\"><a href=\"#\" class=\"expandservice\">+</a> {$datetext} {$row['occurrence']}</td>
                 <td colspan=2><a name=\"service_{$row['serviceid']}\">{$row['dayname']}</a>: {$row['rite']}".
             ((3==$auth)?
@@ -447,7 +458,8 @@ function displayServiceHeaderCombined($thesehymns) {
     }
     // Heading line
     $sid = getIndexOr($row, "serviceid");
-    echo "<tr class=\"heading servicehead\" data-service=\"{$sid}\"><td class=\"heavy\"><a href=\"#\" class=\"expandservice\">+</a> {$datetext}</td>
+    $flagestalt = getFlagestalt($row['serviceid']);
+    echo "<tr class=\"heading servicehead {$flagestalt}\" data-service=\"{$sid}\"><td class=\"heavy\"><a href=\"#\" class=\"expandservice\">+</a> {$datetext}</td>
         <td><a name=\"service_{$sid}\">{$row['dayname']}</a>: {$row['rite']}".
     ((3==$auth)?
     "<a class=\"menulink\" href=\"sermon.php?id={$sid}\">Sermon</a>\n"
@@ -560,7 +572,8 @@ function modify_occurrences_separately($q) {
             }
             $urldate=urlencode($row['browserdate']);
             $urloccurrence=urlencode($row['occurrence']);
-            echo "<tr data-occ=\"{$row['occurrence']}\" data-service=\"{$row['serviceid']}\" class=\"heading servicehead\"><td><a href=\"#\" class=\"expandservice\">+</a>
+            $flagestalt = getFlagestalt($row['serviceid']);
+            echo "<tr data-occ=\"{$row['occurrence']}\" data-service=\"{$row['serviceid']}\" class=\"heading servicehead {$flagestalt}\"><td><a href=\"#\" class=\"expandservice\">+</a>
             <input form=\"delete-service\" type=\"checkbox\" name=\"{$row['serviceid']}_{$row['occurrence']}\" id=\"check_{$row['serviceid']}_{$row['occurrence']}\">
             <span class=\"heavy\">{$datetext} {$row['occurrence']}</span>
             <div class=\"menublock\">";
@@ -699,7 +712,8 @@ function modifyServiceHeaderCombined($thesehymns) {
         $datetext = $row['date'];
     }
     $urldate=urlencode($row['browserdate']);
-    echo "<tr class=\"heading servicehead\" data-service=\"{$row['serviceid']}\"><td>";
+    $flagestalt = getFlagestalt($row['serviceid']);
+    echo "<tr class=\"heading servicehead {$flagestalt}\" data-service=\"{$row['serviceid']}\"><td>";
     echo "<a href=\"#\" class=\"expandservice\">+</a> ";
     echo "<div class=\"deletion-block\">";
     foreach ($occurrences as $occ) {

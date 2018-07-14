@@ -276,6 +276,10 @@ tr.servicehead {
     border-top: thick solid #999;
 }
 
+tr.flagestalt {
+    border-top: thick solid #3A3;
+}
+
 tr.table-topline td {
     border-top: 2px solid #BBB;
     background-color: #E2E2E2;
