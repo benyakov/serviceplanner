@@ -79,11 +79,6 @@ if (isset($_POST["cookie-age"])) {
     setMessage("Config: Set max authorization cookie age.");
 }
 
-if (isset($_POST["flagestalt"])) {
-    $config->set('flagestalt', intval($_POST['flagestalt']));
-    setMessage("Config: Set default service for initial flags");
-}
-
 $config->save();
 unset($config);
 
@@ -129,6 +124,11 @@ if (isset($_POST['nonfestivalskip-option'])) {
 if (isset($_POST['service-flags-option'])) {
     $options->set('addable_service_flags', explode("\n", $_POST['service-flags-option']));
     setMessage("Addable Service Flags option has been set.");
+}
+
+if (isset($_GET["flagestalt"])) {
+    $options->set('flagestalt', intval($_GET['flagestalt']));
+    setMessage("Config: (Re)set default service for initial flags");
 }
 
 $options->save();

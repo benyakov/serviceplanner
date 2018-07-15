@@ -1,5 +1,5 @@
-<? /* Record the version
-    Copyright (C) 2014 Jesse Jacobsen
+<? /* Upgrade from version 0.17 to 0.18
+    Copyright (C) 2018 Jesse Jacobsen
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -23,5 +23,25 @@
     The Dalles, OR 97058
     USA
  */
-$version = array('major' => 0, 'minor' => 18, 'tick' => 1);
+if (! (isset($newversion) && isset($oldversion))) {
+    echo "Error: This upgrade must be run automatically.";
+}
+if ("0.17." != substr($oldversion, 0, 5).'.') {
+    die("Can't upgrade from 0.17.x, since the current db version is {$oldversion}.");
+}
+
+$options = new Configfile("./config.ini", true, true, true);
+$options->set('flagestalt', 0);
+$options->save() or die("Problem saving config.ini file");
+unset($options);
+$rm[] = "Updated options";
+
+$dbstate = getDBState(true);
+$newversion = "{$version['major']}.{$version['minor']}.{$version['tick']}";
+$dbstate->set('dbversion', $newversion);
+$dbstate->save() or die("Problem saving dbstate file.");
+unset($dbstate);
+$rm[] = "Upgraded to {$newversion}";
+setMessage(implode("<br />\n", $rm));
+header("Location: admin.php");
 ?>

@@ -90,6 +90,9 @@ $nonfestival_skip = "Historic";
 // Should we combine service occurrences in the listing?
 $combine_occurrences = 0;
 
+// Service number to use as a template for flags on new services
+$flagestalt = 0;
+
 if (file_exists("./options.php")) {
     require("./options.php");
     @unlink("./options.php");
@@ -107,6 +110,7 @@ $options->set('modifyorder', $modifyorder);
 $options->set('nonfestival-skip', $nonfestival_skip);
 $options->set('addable_service_flags', $addable_service_flags);
 $options->set('combineoccurrences', $combine_occurrences);
+$options->set('flagestalt', $flagestalt);
 $options->save();
 unset($options);
 

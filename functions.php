@@ -228,13 +228,19 @@ function getFlagsFor($serviceid, $occurrence) {
 }
 
 function getFlagestalt($serviceid) {
-    $config = getConfig(false);
-    $flagestalt = $config->get("flagestalt", "0");
+    /* flagestalt is saved in the installation options to indicate the default service
+     * to use as a template for new services, which will receive identical flags. */
+    $options = getOptions(False);
+    $flagestalt = $options->get("flagestalt", "0");
     if ($flagestalt == $serviceid) {
         return "flagestalt";
     } else {
         return "";
     }
+}
+
+function flagestaltLink($serviceid, $text="*") {
+    return "<a title=\"Make this service's flags the default template for new services\" href=\"{$_SERVER["PHP_SELF"]}?flagestalt={$serviceid}\">{$text}</a>";
 }
 
 function findFlagsUpcoming($flag_text, $days_upcoming) {
@@ -342,7 +348,8 @@ function display_occurrences_separately($q) {
             "<a class=\"menulink\" href=\"export.php?service={$row['serviceid']}\">CSV Data</a>\n".
             " <a class=\"menulink\" href=\"print.php?id={$row['serviceid']}\" title=\"print\">Print</a> ".
             "</td></tr>\n";
-            echo "<tr class=\"service-flags\" data-occ=\"{$row['occurrence']}\" data-service=\"{$row['serviceid']}\"><td colspan=3></td></tr>\n";
+            echo "<tr class=\"service-flags\" data-occ=\"{$row['occurrence']}\" data-service=\"{$row['serviceid']}\"><td colspan=3></td>"
+                ."<td>".flagestaltLink($row['serviceid'])."</td></tr>\n";
             echo "<tr data-occ=\"{$row['occurrence']}\" class=\"heading\" data-service=\"{$row['serviceid']}\"><td class=\"propers\" colspan=3>\n";
             echo "<table><tr><td class=\"heavy smaller\">{$row['theme']}</td>";
             echo "<td colspan=2>{$row['color']}</td></tr>";
@@ -469,8 +476,8 @@ function displayServiceHeaderCombined($thesehymns) {
     "</td></tr>\n";
     for ($i=0, $limit=count($occurrences); $i<$limit; $i++) {
     echo "<tr class=\"service-flags\" data-occ=\"{$occurrences[$i]}\" data-service=\"{$sid}\"><td colspan=2></td><td>".
-    (($auth)?
-    " <a class=\"menulink flagbutton\" title=\"Edit flags for this service.\" href=\"flags.php?id={$sid}&occurrence={$urloccurrences[$i]}\">Flags</a> "
+    (($auth)? flagestaltLink($row['serviceid'])
+    ." <a class=\"menulink flagbutton\" title=\"Edit flags for this service.\" href=\"flags.php?id={$sid}&occurrence={$urloccurrences[$i]}\">Flags</a> "
     :"").
         "{$occurrences[$i]}</td></tr>\n";
     }
@@ -592,7 +599,8 @@ function modify_occurrences_separately($q) {
             <td colspan=2>
             <a name=\"service_{$row['serviceid']}\">{$row['dayname']}</a>: {$row['rite']}
             </td></tr>\n";
-            echo "<tr class=\"service-flags\" data-occ=\"{$row['occurrence']}\" data-service=\"{$row['serviceid']}\"><td colspan=3></td></tr>\n";
+            echo "<tr class=\"service-flags\" data-occ=\"{$row['occurrence']}\" data-service=\"{$row['serviceid']}\"><td colspan=3></td><td>"
+                .flagestaltLink($row['serviceid'])."</td></tr>\n";
             echo "<tr data-occ=\"{$row['occurrence']}\" data-service=\"{$row['serviceid']}\" class=\"heading\"><td colspan=3 class=\"propers\">\n";
             echo "<table><tr><td class=\"heavy smaller\">{$row['theme']}</td>";
             echo "<td colspan=2>{$row['color']}</td></tr>";
@@ -738,7 +746,7 @@ function modifyServiceHeaderCombined($thesehymns) {
     </td></tr>\n";
     for ($i=0, $limit=count($occurrences); $i<$limit; $i++) {
         echo "<tr class=\"service-flags\" data-occ=\"{$occurrences[$i]}\" data-service=\"{$row['serviceid']}\"><td colspan=2></td>
-            <td><a class=\"menulink flagbutton\" title=\"Edit flags for this service.\" href=\"flags.php?id={$row['serviceid']}&occurrence={$urloccurrences[$i]}\">Flags</a> {$occurrences[$i]}</td>
+            <td>".flagestaltLink($row['serviceid'])." <a class=\"menulink flagbutton\" title=\"Edit flags for this service.\" href=\"flags.php?id={$row['serviceid']}&occurrence={$urloccurrences[$i]}\">Flags</a> {$occurrences[$i]}</td>
         </tr>\n";
     }
     echo "<tr class=\"heading\" data-service=\"{$row['serviceid']}\"><td colspan=3 class=\"propers\">\n";
@@ -970,6 +978,7 @@ function getUserActions($bare=false) {
             $actions[] = '<a href="useradmin.php"
                 title="User Administration">User Administration</a>';
         }
+        $actions[] = flagestaltLink(0, "Remove Flag Default");
         $actions[] = '<a href="help.php" title="Help">Help</a>';
     } else {
         $actions[] = '<a href="resetpw.php"
