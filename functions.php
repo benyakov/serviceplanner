@@ -227,20 +227,22 @@ function getFlagsFor($serviceid, $occurrence) {
     return $q;
 }
 
-function getFlagestalt($serviceid) {
-    /* flagestalt is saved in the installation options to indicate the default service
+function getFlagestalt($serviceid, $occurrence) {
+    /* flagestalt is saved in the installation options to indicate the default service/occurrence
      * to use as a template for new services, which will receive identical flags. */
     $options = getOptions(False);
-    $flagestalt = $options->get("flagestalt", "0");
-    if ($flagestalt == $serviceid) {
+    $flagestalt = $options->getDefault(0, "flagestalt");
+    unset($options);
+    if ($flagestalt["service"] == $serviceid && $flagestalt["occurrence"] == $occurrence) {
         return "flagestalt";
     } else {
         return "";
     }
 }
 
-function flagestaltLink($serviceid, $text="*") {
-    return "<a title=\"Make this service's flags the default template for new services\" href=\"{$_SERVER["PHP_SELF"]}?flagestalt={$serviceid}\">{$text}</a>";
+function flagestaltLink($serviceid, $occurrence, $text="<b>F</b>") {
+    $occurrence=urlencode($occurrence);
+    return "<a title=\"Default flags template for new services\" href=\"{$_SERVER["PHP_SELF"]}?flagestalt={$serviceid}&occurrence={$occurrence}&flag=savesettings\">{$text}</a>";
 }
 
 function findFlagsUpcoming($flag_text, $days_upcoming) {
@@ -335,7 +337,7 @@ function display_occurrences_separately($q) {
                 $datetext = $row['date'];
             }
             $urloccurrence = urlencode($row['occurrence']);
-            $flagestalt = getFlagestalt($row['serviceid']);
+            $flagestalt = getFlagestalt($row['serviceid'], $row['occurrence']);
             echo "<tr data-occ=\"{$row['occurrence']}\" data-service=\"{$row['serviceid']}\" class=\"heading servicehead {$flagestalt}\">".
                 "<td class=\"heavy\"><a href=\"#\" class=\"expandservice\">+</a> {$datetext} {$row['occurrence']}</td>
                 <td colspan=2><a name=\"service_{$row['serviceid']}\">{$row['dayname']}</a>: {$row['rite']}".
@@ -349,7 +351,7 @@ function display_occurrences_separately($q) {
             " <a class=\"menulink\" href=\"print.php?id={$row['serviceid']}\" title=\"print\">Print</a> ".
             "</td></tr>\n";
             echo "<tr class=\"service-flags\" data-occ=\"{$row['occurrence']}\" data-service=\"{$row['serviceid']}\"><td colspan=3></td>"
-                ."<td>".flagestaltLink($row['serviceid'])."</td></tr>\n";
+                ."<td>".flagestaltLink($row['serviceid'], $row['occurrence'])."</td></tr>\n";
             echo "<tr data-occ=\"{$row['occurrence']}\" class=\"heading\" data-service=\"{$row['serviceid']}\"><td class=\"propers\" colspan=3>\n";
             echo "<table><tr><td class=\"heavy smaller\">{$row['theme']}</td>";
             echo "<td colspan=2>{$row['color']}</td></tr>";
@@ -465,7 +467,7 @@ function displayServiceHeaderCombined($thesehymns) {
     }
     // Heading line
     $sid = getIndexOr($row, "serviceid");
-    $flagestalt = getFlagestalt($row['serviceid']);
+    $flagestalt = getFlagestalt($row['serviceid'], $row['occurrence']);
     echo "<tr class=\"heading servicehead {$flagestalt}\" data-service=\"{$sid}\"><td class=\"heavy\"><a href=\"#\" class=\"expandservice\">+</a> {$datetext}</td>
         <td><a name=\"service_{$sid}\">{$row['dayname']}</a>: {$row['rite']}".
     ((3==$auth)?
@@ -476,7 +478,7 @@ function displayServiceHeaderCombined($thesehymns) {
     "</td></tr>\n";
     for ($i=0, $limit=count($occurrences); $i<$limit; $i++) {
     echo "<tr class=\"service-flags\" data-occ=\"{$occurrences[$i]}\" data-service=\"{$sid}\"><td colspan=2></td><td>".
-    (($auth)? flagestaltLink($row['serviceid'])
+    (($auth)? flagestaltLink($row['serviceid'], $row['occurrence'])
     ." <a class=\"menulink flagbutton\" title=\"Edit flags for this service.\" href=\"flags.php?id={$sid}&occurrence={$urloccurrences[$i]}\">Flags</a> "
     :"").
         "{$occurrences[$i]}</td></tr>\n";
@@ -579,7 +581,7 @@ function modify_occurrences_separately($q) {
             }
             $urldate=urlencode($row['browserdate']);
             $urloccurrence=urlencode($row['occurrence']);
-            $flagestalt = getFlagestalt($row['serviceid']);
+            $flagestalt = getFlagestalt($row['serviceid'], $row['occurrence']);
             echo "<tr data-occ=\"{$row['occurrence']}\" data-service=\"{$row['serviceid']}\" class=\"heading servicehead {$flagestalt}\"><td><a href=\"#\" class=\"expandservice\">+</a>
             <input form=\"delete-service\" type=\"checkbox\" name=\"{$row['serviceid']}_{$row['occurrence']}\" id=\"check_{$row['serviceid']}_{$row['occurrence']}\">
             <span class=\"heavy\">{$datetext} {$row['occurrence']}</span>
@@ -600,7 +602,7 @@ function modify_occurrences_separately($q) {
             <a name=\"service_{$row['serviceid']}\">{$row['dayname']}</a>: {$row['rite']}
             </td></tr>\n";
             echo "<tr class=\"service-flags\" data-occ=\"{$row['occurrence']}\" data-service=\"{$row['serviceid']}\"><td colspan=3></td><td>"
-                .flagestaltLink($row['serviceid'])."</td></tr>\n";
+                .flagestaltLink($row['serviceid'], $row['occurrence'])."</td></tr>\n";
             echo "<tr data-occ=\"{$row['occurrence']}\" data-service=\"{$row['serviceid']}\" class=\"heading\"><td colspan=3 class=\"propers\">\n";
             echo "<table><tr><td class=\"heavy smaller\">{$row['theme']}</td>";
             echo "<td colspan=2>{$row['color']}</td></tr>";
@@ -720,7 +722,7 @@ function modifyServiceHeaderCombined($thesehymns) {
         $datetext = $row['date'];
     }
     $urldate=urlencode($row['browserdate']);
-    $flagestalt = getFlagestalt($row['serviceid']);
+    $flagestalt = getFlagestalt($row['serviceid'], $row['occurrence']);
     echo "<tr class=\"heading servicehead {$flagestalt}\" data-service=\"{$row['serviceid']}\"><td>";
     echo "<a href=\"#\" class=\"expandservice\">+</a> ";
     echo "<div class=\"deletion-block\">";
@@ -746,7 +748,7 @@ function modifyServiceHeaderCombined($thesehymns) {
     </td></tr>\n";
     for ($i=0, $limit=count($occurrences); $i<$limit; $i++) {
         echo "<tr class=\"service-flags\" data-occ=\"{$occurrences[$i]}\" data-service=\"{$row['serviceid']}\"><td colspan=2></td>
-            <td>".flagestaltLink($row['serviceid'])." <a class=\"menulink flagbutton\" title=\"Edit flags for this service.\" href=\"flags.php?id={$row['serviceid']}&occurrence={$urloccurrences[$i]}\">Flags</a> {$occurrences[$i]}</td>
+            <td>".flagestaltLink($row['serviceid'], $row['occurrence'])." <a class=\"menulink flagbutton\" title=\"Edit flags for this service.\" href=\"flags.php?id={$row['serviceid']}&occurrence={$urloccurrences[$i]}\">Flags</a> {$occurrences[$i]}</td>
         </tr>\n";
     }
     echo "<tr class=\"heading\" data-service=\"{$row['serviceid']}\"><td colspan=3 class=\"propers\">\n";
@@ -978,7 +980,7 @@ function getUserActions($bare=false) {
             $actions[] = '<a href="useradmin.php"
                 title="User Administration">User Administration</a>';
         }
-        $actions[] = flagestaltLink(0, "Remove Flag Default");
+        $actions[] = flagestaltLink(0, '', "Remove Flag Default");
         $actions[] = '<a href="help.php" title="Help">Help</a>';
     } else {
         $actions[] = '<a href="resetpw.php"

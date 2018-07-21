@@ -126,8 +126,8 @@ if (isset($_POST['service-flags-option'])) {
     setMessage("Addable Service Flags option has been set.");
 }
 
-if (isset($_GET["flagestalt"])) {
-    $options->set('flagestalt', intval($_GET['flagestalt']));
+if (isset($_GET["flagestalt"]) && isset($_GET["occurrence"])) {
+    $options->set('flagestalt', array("service" => intval($_GET['flagestalt']), "occurrence" => $_GET['occurrence']));
     setMessage("Config: (Re)set default service for initial flags");
 }
 
