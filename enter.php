@@ -355,6 +355,31 @@ function processFormData() {
             $feedback .="<li>Saved hymns: <ol><li>" . implode("</li><li>", $saved) . "</li></ol></li></ol>\n";
         }
     }
+    //// Set up automatic flags, if a flagestalt is set.
+    if ($flagestalt = $options->getDefault(0, "flagestalt")) {
+        $q = $db->prepare("INSERT INTO `{$db->getPrefix()}service_flags`
+            (`service`, `occurrence`, `flag`, `value`, `uid`)
+            VALUES (:service, :occurrence, :flag, :value, :uid)");
+        $q->bindValue(":service", $serviceid);
+        $q->bindValue(":occurrence", $_POST['occurrence']);
+        $qf = $db->prepare("SELECT flag, value, uid
+            FROM `{$db->getPrefix()}service_flags`
+            WHERE service=:service AND occurrence=:occurrence";
+        $qf->bindValue(":service", $flagestalt['service']);
+        $qf->bindValue(":occurrence", $flagestalt['occurrence']);
+        $qf->execute() or dieWithRollback($q, $q->queryString);
+        $flagtext = $flagval = $flaguid = 0;
+        $q->bindParam(":flag", $flagtext;
+        $q->bindParam(":value", $flagval;
+        $q->bindParam(":uid", $flaguid);
+        while ($flag_contents = $qf->fetch(PDO::FETCH_ASSOC)) {
+            $flagtext = $flag_contents["flag"];
+            $flagval = $flag_contents["value"];
+            $flaguid = $flag_cotents["uid"];
+            $q->execute() or dieWithRollback($q, $q->errorString);
+        }
+        unset($q);
+    }
     $dbh->commit();
     setMessage($feedback);
     header("Location: modify.php");
