@@ -251,6 +251,7 @@ function existing($str) {
 function processFormData() {
     // echo "POST:"; print_r($_POST); exit(0);
     //// Add a new service, if needed.
+    $options = getOptions();
     $dbh = new DBConnection();
     $dbp = $dbh->getPrefix();
     $dbh->beginTransaction();
@@ -357,25 +358,25 @@ function processFormData() {
     }
     //// Set up automatic flags, if a flagestalt is set.
     if ($flagestalt = $options->getDefault(0, "flagestalt")) {
-        $q = $db->prepare("INSERT INTO `{$db->getPrefix()}service_flags`
+        $q = $dbh->prepare("INSERT INTO `{$dbh->getPrefix()}service_flags`
             (`service`, `occurrence`, `flag`, `value`, `uid`)
             VALUES (:service, :occurrence, :flag, :value, :uid)");
         $q->bindValue(":service", $serviceid);
         $q->bindValue(":occurrence", $_POST['occurrence']);
-        $qf = $db->prepare("SELECT flag, value, uid
-            FROM `{$db->getPrefix()}service_flags`
-            WHERE service=:service AND occurrence=:occurrence";
+        $qf = $dbh->prepare("SELECT flag, value, uid
+            FROM `{$dbh->getPrefix()}service_flags`
+            WHERE service=:service AND occurrence=:occurrence");
         $qf->bindValue(":service", $flagestalt['service']);
         $qf->bindValue(":occurrence", $flagestalt['occurrence']);
         $qf->execute() or dieWithRollback($q, $q->queryString);
         $flagtext = $flagval = $flaguid = 0;
-        $q->bindParam(":flag", $flagtext;
-        $q->bindParam(":value", $flagval;
+        $q->bindParam(":flag", $flagtext);
+        $q->bindParam(":value", $flagval);
         $q->bindParam(":uid", $flaguid);
         while ($flag_contents = $qf->fetch(PDO::FETCH_ASSOC)) {
             $flagtext = $flag_contents["flag"];
             $flagval = $flag_contents["value"];
-            $flaguid = $flag_cotents["uid"];
+            $flaguid = $flag_contents["uid"];
             $q->execute() or dieWithRollback($q, $q->errorString);
         }
         unset($q);
