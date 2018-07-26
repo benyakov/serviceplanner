@@ -98,11 +98,20 @@ if ((! isset($_GET['stage'])) || $ajax) {
     //// Delete and acknowledge deletion.
     $db->beginTransaction();
     foreach ($_SESSION[$sprefix]['stage1'] as $loc => $deletions) {
-        // Check to see if service has hymns at another occurrence
+        // Set up placeholders and values
         $delphitems = array_map(
             function($n){return ":d".$n;},
             range(0, count($deletions)-1));
         $delplaceholders = implode(",", $delphitems);
+        // Delete flags for this service/occurrence
+        $q = $db->prepare("DELETE FROM `{$db->getPrefix()}service_flags`
+            WHERE service IN ({$delplaceholders}) AND occurrence = :occurence");
+        foreach ($deletions as $k => $v) {
+            $q->bindValue(":d{$k}", $v);
+        }
+        $q->bindValue(":occurrence", $loc);
+        $q->execute();
+        // Check to see if service has hymns at another occurrence
         $q = $db->prepare("SELECT number
                 FROM {$db->getPrefix()}hymns as hymns
                 JOIN {$db->getPrefix()}days as days

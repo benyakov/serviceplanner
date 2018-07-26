@@ -29,17 +29,15 @@ unset($_SESSION[$sprefix]["highdate"]);
 unset($_SESSION[$sprefix]["allfuture"]);
  */
 $this_script = $_SERVER['HTTP_HOST'].$_SERVER['SCRIPT_NAME'] ;
-if ("Apply" == getGET("Submit")) {
+if ("Apply" == getGET('submit')) {
     if (getGET('allfuture')) {
-        $allfuture = "checked";
-        $_SESSION[$sprefix]["allfuture"] = $allfuture;
+        $allfuture = $_SESSION[$sprefix]["allfuture"] = true;
     } else {
-        $allfuture = "";
-        $_SESSION[$sprefix]["allfuture"] = $allfuture;
+        $allfuture = $_SESSION[$sprefix]["allfuture"] = false;
     }
-} elseif (getIndexOr($_SESSION[$sprefix],"allfuture"))
+} elseif (isset($_SESSION[$sprefix]["allfuture"]))
     $allfuture = $_SESSION[$sprefix]["allfuture"];
-else $allfuture = "checked";
+else $allfuture = false;
 if (getGET('lowdate')) {
     $lowdate = new DateTime(getGET('lowdate'));
     $_SESSION[$sprefix]["lowdate"] = $lowdate;
@@ -73,7 +71,8 @@ unset($options);
 <div id="service-filter"></div>
 <form action="<?=$protocol?>://<?=$this_script?>" method="GET">
 <label for="allfuture">Include all future services:</label>
-<input type="checkbox" id="allfuture" name="allfuture" <?=$allfuture?>>
+<input type="checkbox" id="allfuture" name="allfuture"
+    <?=($allfuture)?"checked":""?>>
 <label for="lowdate">From</label>
 <input type="date" id="lowdate" name="lowdate"
     value="<?=$lowdate->format("Y-m-d")?>">
@@ -96,6 +95,6 @@ unset($options);
 <?php
 if ("Future" == $_SESSION[$sprefix]['modifyorder']) $order = "ASC";
 else $order = "DESC";
-$q = queryServiceDateRange($lowdate, $highdate, (int)$allfuture, $order);
+$q = queryServiceDateRange($lowdate, $highdate, $allfuture, $order);
 display_records_table($q);
 ?>

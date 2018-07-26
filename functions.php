@@ -117,10 +117,12 @@ function querySomeHymns($limit) {
     return $q;
 }
 
-function queryServiceDateRange($lowdate, $highdate, $allfuture=0, $order="DESC") {
+function queryServiceDateRange($lowdate, $highdate, $allfuture, $order="DESC") {
     $limited = ! $allfuture;
+    $ld = $lowdate->format("Y-m-d");
+    $hd = $highdate->format("Y-m-d");
     if ($limited) {
-        $where[] = "d.caldate BETWEEN DATE(:lowdate) AND DATE(:highdate)" ;
+        $where[] = "d.caldate BETWEEN :lowdate AND :highdate" ;
     } else {
         $where[] = "d.caldate >= :lowdate";
         $highdate = "";
@@ -133,9 +135,8 @@ function queryServiceDateRange($lowdate, $highdate, $allfuture=0, $order="DESC")
     } else {
         $q = rawQuery($where, $order, "", false);
     }
-    $q->bindValue(":lowdate", $lowdate->format("Y-m-d"));
-    if ($limited) $q->bindValue(":highdate", $highdate->format("Y-m-d"));
-    //die(print_r($q->queryString, true));
+    $q->bindValue(":lowdate", $ld);
+    if ($limited) $q->bindValue(":highdate", $hd);
     if (! $q->execute())
         die("<p>".array_pop($q->errorInfo()).'</p><p style="white-space: pre;">'.$q->queryString."</p>");
     return $q;
@@ -196,11 +197,10 @@ function rawQuery($where=array(), $order="", $limit="", $blend_occurrences=false
     WHERE cci.dayname=d.name AND cci.lectionary=b.colect
     AND cyc.class=b.coclass
     LIMIT 1) AS bcollect
-    FROM `{$dbp}hymns` AS h
-    RIGHT JOIN `{$dbp}days` AS d ON (h.service = d.pkey)
+    FROM `{$dbp}days` AS d
+    LEFT OUTER JOIN `{$dbp}hymns` AS h ON (h.service = d.pkey)
     LEFT OUTER JOIN `{$dbp}sermons` AS smr ON (h.service = smr.service)
-    LEFT OUTER JOIN `{$dbp}names` AS n ON (h.number = n.number)
-        AND (h.book = n.book)
+    LEFT OUTER JOIN `{$dbp}names` AS n ON (h.number=n.number AND h.book=n.book)
     LEFT OUTER JOIN `{$dbp}blocks` AS b ON (b.id = d.block)
     LEFT OUTER JOIN `{$dbp}synpropers` AS cyp ON (cyp.dayname = d.name)
     LEFT JOIN `{$dbp}lesson1selections` AS l1s
@@ -214,7 +214,7 @@ function rawQuery($where=array(), $order="", $limit="", $blend_occurrences=false
     LEFT JOIN `{$dbp}synlessons` AS synl
     ON (synl.dayname=d.name AND synl.lectionary=b.smlect)
     {$wherestr}
-    ORDER BY d.caldate {$order}, h.service {$order},
+    ORDER BY d.caldate {$order}, d.pkey {$order},
         {$occ_seq} {$limitstr}");
     return $q;
 }

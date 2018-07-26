@@ -33,17 +33,13 @@ unset($_SESSION[$sprefix]["allfuture"]);
 $this_script = $_SERVER['HTTP_HOST'].$_SERVER['SCRIPT_NAME'] ;
 if ("Apply" == getGET('submit')) {
     if (getGET('allfuture')) {
-        //echo "Seen true";
-        $allfuture = "checked";
-        $_SESSION[$sprefix]["allfuture"] = $allfuture;
+        $allfuture = $_SESSION[$sprefix]["allfuture"] = true;
     } else {
-        //echo "Seen false";
-        $allfuture = "";
-        unset($_SESSION[$sprefix]["allfuture"]);
+        $allfuture = $_SESSION[$sprefix]["allfuture"] = false;
     }
 } elseif (isset($_SESSION[$sprefix]["allfuture"]))
     $allfuture = $_SESSION[$sprefix]["allfuture"];
-else $allfuture = "checked";
+else $allfuture = false;
 if (getGET('lowdate')) {
     $lowdate = new DateTime(getGET('lowdate'));
     $_SESSION[$sprefix]["lowdate"] = $lowdate;
@@ -75,8 +71,7 @@ unset($options);
 
 if ("Future" == $_SESSION[$sprefix]['modifyorder']) $order = "ASC";
 else $order = "DESC";
-$q = queryServiceDateRange($lowdate, $highdate,
-    ("{$allfuture}"=="checked"), $order);
+$q = queryServiceDateRange($lowdate, $highdate, $allfuture, $order);
 ob_start();
 modify_records_table($q, "delete.php");
 $refreshable = ob_get_clean();
@@ -275,7 +270,8 @@ service to a new date using the "Copy" link. To delete only certain hymns in a
 service occurrence, edit the service using the "Edit" link.</p>
 <div id="service-filter"></div>
 <form action="<?=$protocol?>://<?=$this_script?>" method="GET">
-<input type="checkbox" id="allfuture" name="allfuture" value="checked" <?=$allfuture?>>
+<input type="checkbox" id="allfuture" name="allfuture" value="checked"
+ <?=($allfuture)?"checked":""?>>
 <label for="allfuture">Include all future services.</label>
 <label for="lowdate">From</label>
 <input type="date" id="lowdate" name="lowdate"
