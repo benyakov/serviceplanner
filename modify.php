@@ -32,12 +32,12 @@ unset($_SESSION[$sprefix]["allfuture"]);
  */
 $this_script = $_SERVER['HTTP_HOST'].$_SERVER['SCRIPT_NAME'] ;
 if ("Apply" == getGET('submit')) {
-    print_r(getGET('allfuture'));
     if (getGET('allfuture')) {
-        echo "Seen true";
+        //echo "Seen true";
         $allfuture = "checked";
         $_SESSION[$sprefix]["allfuture"] = $allfuture;
     } else {
+        //echo "Seen false";
         $allfuture = "";
         unset($_SESSION[$sprefix]["allfuture"]);
     }
@@ -75,7 +75,8 @@ unset($options);
 
 if ("Future" == $_SESSION[$sprefix]['modifyorder']) $order = "ASC";
 else $order = "DESC";
-$q = queryServiceDateRange($lowdate, $highdate, (int)$allfuture, $order);
+$q = queryServiceDateRange($lowdate, $highdate,
+    ("{$allfuture}"=="checked"), $order);
 ob_start();
 modify_records_table($q, "delete.php");
 $refreshable = ob_get_clean();

@@ -118,8 +118,13 @@ function querySomeHymns($limit) {
 }
 
 function queryServiceDateRange($lowdate, $highdate, $allfuture=0, $order="DESC") {
-    $where = array("d.caldate >= :lowdate");
-    if (! $allfuture) $where[] = "d.caldate <= :highdate";
+    $limited = ! $allfuture;
+    if ($limited) {
+        $where[] = "d.caldate BETWEEN DATE(:lowdate) AND DATE(:highdate)" ;
+    } else {
+        $where[] = "d.caldate >= :lowdate";
+        $highdate = "";
+    }
     $options = getOptions();
     $combine_occ_option = $options->get("combineoccurrences");
     unset($options);
@@ -129,7 +134,8 @@ function queryServiceDateRange($lowdate, $highdate, $allfuture=0, $order="DESC")
         $q = rawQuery($where, $order, "", false);
     }
     $q->bindValue(":lowdate", $lowdate->format("Y-m-d"));
-    if (! $allfuture) $q->bindValue(":highdate", $highdate->format("Y-m-d"));
+    if ($limited) $q->bindValue(":highdate", $highdate->format("Y-m-d"));
+    //die(print_r($q->queryString, true));
     if (! $q->execute())
         die("<p>".array_pop($q->errorInfo()).'</p><p style="white-space: pre;">'.$q->queryString."</p>");
     return $q;
@@ -191,7 +197,7 @@ function rawQuery($where=array(), $order="", $limit="", $blend_occurrences=false
     AND cyc.class=b.coclass
     LIMIT 1) AS bcollect
     FROM `{$dbp}hymns` AS h
-    RIGHT OUTER JOIN `{$dbp}days` AS d ON (h.service = d.pkey)
+    RIGHT JOIN `{$dbp}days` AS d ON (h.service = d.pkey)
     LEFT OUTER JOIN `{$dbp}sermons` AS smr ON (h.service = smr.service)
     LEFT OUTER JOIN `{$dbp}names` AS n ON (h.number = n.number)
         AND (h.book = n.book)
@@ -231,9 +237,10 @@ function getFlagestalt($serviceid, $occurrence) {
     /* flagestalt is saved in the installation options to indicate the default service/occurrence
      * to use as a template for new services, which will receive identical flags. */
     $options = getOptions(False);
+    $auth = authLevel();
     $flagestalt = $options->getDefault(0, "flagestalt");
     unset($options);
-    if ($flagestalt["service"] == $serviceid && $flagestalt["occurrence"] == $occurrence) {
+    if ($auth >= 3 && $flagestalt["service"] == $serviceid && $flagestalt["occurrence"] == $occurrence) {
         return "flagestalt";
     } else {
         return "";
@@ -242,6 +249,8 @@ function getFlagestalt($serviceid, $occurrence) {
 
 function flagestaltLink($serviceid, $occurrence, $text="<b>F</b>") {
     $occurrence=urlencode($occurrence);
+    $auth = authLevel();
+    if ($auth < 3) { return ""; }
     return "<a title=\"Default flags template for new services\" href=\"{$_SERVER["PHP_SELF"]}?flagestalt={$serviceid}&occurrence={$occurrence}&flag=savesettings\">{$text}</a>";
 }
 
