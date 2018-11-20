@@ -24,7 +24,7 @@
     USA
  */
 require("./init.php");
-requireAuth("index.php", 3);
+requireAuth("index.php", 2, "Access denied. Please log in with sufficient privileges.");
 /** For debugging
 unset($_SESSION[$sprefix]["lowdate"]);
 unset($_SESSION[$sprefix]["highdate"]);

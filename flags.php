@@ -36,7 +36,7 @@ if (! (isset($_POST['step']) || isset($_POST['json']))) {
         $rv = array();
         foreach ($results as $flag) {
             $flag = array_map(function($v) {return htmlspecialchars($v);}, $flag);
-            if (3 == authLevel()) {
+            if (2 <= authLevel()) {
                 $deletelink = "<a class=\"delete-flag\" href=\"#\" data-flagid=\"{$flag['flagid']}\" data-userid=\"{$uid}\"></a>";
             } else { $deletelink = ""; }
             $rv[] = "<div class=\"flag-repr\">
@@ -156,7 +156,7 @@ service and either add to them or change them.</p>
 } elseif ("change_flags" == $_POST["step"]) {
 
     $uid = checkPostUser();
-    requireAuth("index.php", 3);
+    requireAuth("index.php", 2, "Access denied. Please log in with sufficient privileges.");
     unset($_POST['step']); unset($_POST['user']);
     $message = array();
     $matches = array();
@@ -294,7 +294,7 @@ function generateFlagsForm($id, $occurrence) {
 
     $authlevel = authLevel();
     if ($has_flags) {
-        if (3 == $authlevel) { // Is Admin
+        if (2 <= $authlevel) { // Is Admin
         // Display a form of service flags for privileged users to edit
     ?>
             <form id="service_flags" action="<?= $_SERVER['PHP_SELF'] ?>"
@@ -362,7 +362,7 @@ function generateFlagsForm($id, $occurrence) {
         <input type="hidden" name="service" value="<?=$id?>">
         <input type="hidden" name="occurrence" value="<?=$occurrence?>">
         <?
-        if (3 == $authlevel) { ?>
+        if (2 <= $authlevel) { ?>
             <input type="text" name="flag" placeholder="Name of flag">
         <? } else {
             $options = getOptions();

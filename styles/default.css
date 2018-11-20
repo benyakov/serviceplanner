@@ -813,6 +813,7 @@ dl.flags dt {
     font-weight: bold;
     color: green;
     border-bottom: 2px solid black;
+    margin-right: 1em;
 }
 
 dl.flags dd {

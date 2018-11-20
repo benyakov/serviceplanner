@@ -25,7 +25,7 @@
  */
 require("./init.php");
 $options = getOptions();
-requireAuth("index.php", 3);
+requireAuth("index.php", 2, "Access denied. Please log in with sufficient privileges.");
 $this_script = $_SERVER['HTTP_HOST'].$_SERVER['SCRIPT_NAME'] ;
 if (! isset($_GET['stage']))
 {
