@@ -829,6 +829,10 @@ function hideExtras(serviceid, serviceocc) {
     serviceLines.not('tr.servicehead').not('tr.service-flags').hide(400);
 }
 
+function setupMultiPropers() {
+
+}
+
 $(document).ready(function() {
     $("#loginform").submit(function(evt) {
         evt.preventDefault();
@@ -842,4 +846,4 @@ $(document).ready(function() {
 
 
 
-// vim: set ft=javascript :
+// vim: set ft=javascript fdm=indent :

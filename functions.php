@@ -370,9 +370,9 @@ function display_occurrences_separately($q) {
             if ($row['introit'] || $row['gradual']) {
                 echo "<tr class=\"heading propers\"><td colspan=3>";
                 if ($row['introit'])
-                    echo "<p class=\"sbspar maxcolumn smaller\">{$row['introit']}</p>";
+                    echo "<p class=\"sbspar maxcolumn smaller introit\">{$row['introit']}</p>";
                 if ($row['gradual'])
-                    echo "<p class=\"sbspar halfcolumn smaller\">{$row['gradual']}</p>";
+                    echo "<p class=\"sbspar halfcolumn smaller gradual\">{$row['gradual']}</p>";
                 echo "</td></tr>";
             }
             if ($row['propersnote']) {
@@ -397,10 +397,10 @@ function display_occurrences_separately($q) {
             }
     ?>
                     <dl class="blocklessons">
-                    <dt>Lesson 1</dt><dd><?=linkbgw($cfg, $row['blesson1'], $row['l1link'])?></dd>
-                    <dt>Lesson 2</dt><dd><?=linkbgw($cfg, $row['blesson2'], $row['l2link'])?></dd>
-                    <dt>Gospel</dt><dd><?=linkbgw($cfg, $row['bgospel'], $row['golink'])?></dd>
-                    <dt>Psalm</dt><dd><?=linkbgw($cfg, $row['bpsalm']?"Ps ".$row['bpsalm']:'', $row['pslink'])?></dd>
+                    <dt>Lesson 1</dt><dd class="blesson1"><?=linkbgw($cfg, $row['blesson1'], $row['l1link'])?></dd>
+                    <dt>Lesson 2</dt><dd class="blesson2"><?=linkbgw($cfg, $row['blesson2'], $row['l2link'])?></dd>
+                    <dt>Gospel</dt><dd class="bgospel"><?=linkbgw($cfg, $row['bgospel'], $row['golink'])?></dd>
+                    <dt>Psalm</dt><dd class="bpsalm"><?=linkbgw($cfg, $row['bpsalm']?"Ps ".$row['bpsalm']:'', $row['pslink'])?></dd>
                     <dt>Sermon<?=$row['has_sermon']?'*':''?></dt><dd><?=linkbgw($cfg, $row['bsermon'], $row['has_sermon'] || $row['smlink'])?></dd>
                     </dl>
                     <h5>Collect (<?=$row['bcollectclass']?>)</h5>
@@ -501,9 +501,9 @@ function displayServiceHeaderCombined($thesehymns) {
     if (getIndexOr($row,'introit') || getIndexOr($row,'gradual')) {
         echo "<tr class=\"heading propers\"><td colspan=3>";
         if (getIndexOr($row,'introit'))
-            echo "<p class=\"sbspar maxcolumn smaller\">{$row['introit']}</p>";
+            echo "<p class=\"sbspar maxcolumn smaller introit\">{$row['introit']}</p>";
         if (getIndexOr($row,'gradual'))
-            echo "<p class=\"sbspar halfcolumn smaller\">{$row['gradual']}</p>";
+            echo "<p class=\"sbspar halfcolumn smaller gradual\">{$row['gradual']}</p>";
         echo "</td></tr>";
     }
     if (getIndexOr($row,'propersnote')) {
@@ -528,10 +528,10 @@ function displayServiceHeaderCombined($thesehymns) {
     }
     ?>
             <dl class="blocklessons">
-            <dt>Lesson 1</dt><dd><?=linkbgw($cfg, $row['blesson1'], $row['l1link'])?></dd>
-            <dt>Lesson 2</dt><dd><?=linkbgw($cfg, $row['blesson2'], $row['l2link'])?></dd>
-            <dt>Gospel</dt><dd><?=linkbgw($cfg, $row['bgospel'], $row['golink'])?></dd>
-            <dt>Psalm</dt><dd><?=linkbgw($cfg, $row['bpsalm']?"Ps ".$row['bpsalm']:'', $row['pslink'])?></dd>
+            <dt>Lesson 1</dt><dd class="blesson1"><?=linkbgw($cfg, $row['blesson1'], $row['l1link'])?></dd>
+            <dt>Lesson 2</dt><dd class="blesson2"><?=linkbgw($cfg, $row['blesson2'], $row['l2link'])?></dd>
+            <dt>Gospel</dt><dd class="bgospel"><?=linkbgw($cfg, $row['bgospel'], $row['golink'])?></dd>
+            <dt>Psalm</dt><dd class="bpsalm"><?=linkbgw($cfg, $row['bpsalm']?"Ps ".$row['bpsalm']:'', $row['pslink'])?></dd>
             <dt>Sermon<?=$row['has_sermon']?'*':''?></dt><dd><?=linkbgw($cfg, $row['bsermon'], $row['has_sermon'] || $row['smlink'])?></dd>
             </dl>
             <h5>Collect (<?=$row['bcollectclass']?>)</h5>
@@ -621,9 +621,9 @@ function modify_occurrences_separately($q) {
             if ($row['introit'] || $row['gradual']) {
                 echo "<tr><td colspan=3>";
                 if ($row['introit'])
-                    echo "<p class=\"sbspar maxcolumn smaller\">{$row['introit']}</p>";
+                    echo "<p class=\"sbspar maxcolumn smaller introit\">{$row['introit']}</p>";
                 if ($row['gradual'])
-                    echo "<p class=\"sbspar halfcolumn smaller\">{$row['gradual']}</p>";
+                    echo "<p class=\"sbspar halfcolumn smaller gradual\">{$row['gradual']}</p>";
                 echo "</td></tr>";
             }
             if ($row['propersnote']) {
@@ -649,10 +649,10 @@ function modify_occurrences_separately($q) {
     ?>
 
                     <dl class="blocklessons">
-                    <dt>Lesson 1</dt><dd><?=linkbgw($cfg, $row['blesson1'], $row['l1link'])?></dd>
-                    <dt>Lesson 2</dt><dd><?=linkbgw($cfg, $row['blesson2'], $row['l2link'])?></dd>
-                    <dt>Gospel</dt><dd><?=linkbgw($cfg, $row['bgospel'], $row['golink'])?></dd>
-                    <dt>Psalm</dt><dd><?=linkbgw($cfg, $row['bpsalm']?"Ps ".$row['bpsalm']:'', $row['pslink'])?></dd>
+                    <dt>Lesson 1</dt><dd class="blesson1"><?=linkbgw($cfg, $row['blesson1'], $row['l1link'])?></dd>
+                    <dt>Lesson 2</dt><dd class="blesson2"><?=linkbgw($cfg, $row['blesson2'], $row['l2link'])?></dd>
+                    <dt>Gospel</dt><dd class="bgospel"><?=linkbgw($cfg, $row['bgospel'], $row['golink'])?></dd>
+                    <dt>Psalm</dt><dd class="bpsalm"><?=linkbgw($cfg, $row['bpsalm']?"Ps ".$row['bpsalm']:'', $row['pslink'])?></dd>
                     <dt>Sermon<?=$row['has_sermon']?'*':''?></dt><dd><?=linkbgw($cfg, $row['bsermon'], $row['has_sermon'] || $row['smlink'])?></dd>
                     </dl>
                     <h5>Collect (<?=$row['bcollectclass']?>)</h5>
@@ -769,9 +769,9 @@ function modifyServiceHeaderCombined($thesehymns) {
     if ($row['introit'] || $row['gradual']) {
         echo "<tr><td colspan=3>";
         if ($row['introit'])
-            echo "<p class=\"sbspar maxcolumn smaller\">{$row['introit']}</p>";
+            echo "<p class=\"sbspar maxcolumn smaller introit\">{$row['introit']}</p>";
         if ($row['gradual'])
-            echo "<p class=\"sbspar halfcolumn smaller\">{$row['gradual']}</p>";
+            echo "<p class=\"sbspar halfcolumn smaller gradual\">{$row['gradual']}</p>";
         echo "</td></tr>";
     }
     if ($row['propersnote']) {
@@ -797,10 +797,10 @@ function modifyServiceHeaderCombined($thesehymns) {
     ?>
 
             <dl class="blocklessons">
-            <dt>Lesson 1</dt><dd><?=linkbgw($cfg, $row['blesson1'], $row['l1link'])?></dd>
-            <dt>Lesson 2</dt><dd><?=linkbgw($cfg, $row['blesson2'], $row['l2link'])?></dd>
-            <dt>Gospel</dt><dd><?=linkbgw($cfg, $row['bgospel'], $row['golink'])?></dd>
-            <dt>Psalm</dt><dd><?=linkbgw($cfg, $row['bpsalm']?"Ps ".$row['bpsalm']:'', $row['pslink'])?></dd>
+            <dt>Lesson 1</dt><dd class="blesson1"><?=linkbgw($cfg, $row['blesson1'], $row['l1link'])?></dd>
+            <dt>Lesson 2</dt><dd class="blesson2"><?=linkbgw($cfg, $row['blesson2'], $row['l2link'])?></dd>
+            <dt>Gospel</dt><dd class="bgospel"><?=linkbgw($cfg, $row['bgospel'], $row['golink'])?></dd>
+            <dt>Psalm</dt><dd class="bpsalm"><?=linkbgw($cfg, $row['bpsalm']?"Ps ".$row['bpsalm']:'', $row['pslink'])?></dd>
             <dt>Sermon<?=$row['has_sermon']?'*':''?></dt><dd><?=linkbgw($cfg, $row['bsermon'], $row['has_sermon'] || $row['smlink'])?></dd>
             </dl>
             <h5>Collect (<?=$row['bcollectclass']?>)</h5>

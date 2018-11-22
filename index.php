@@ -64,6 +64,7 @@ if ($jsonp = checkJsonpReq()) {
                 setupFlags();
                 $.appear('.service-flags', {interval:0.1, force_process: "t"});
                 setupFilterForm(true);
+                setupMultiPropers();
                 contractAllListings('records-listing');
                 setupListingExpansion();
             });
