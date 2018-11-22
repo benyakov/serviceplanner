@@ -159,30 +159,33 @@ function rawQuery($where=array(), $order="", $limit="", $blend_occurrences=false
     h.book, h.number, h.note, h.occurrence, d.name AS dayname, d.rite,
     d.servicenotes, n.title, d.block,
     b.label AS blabel, b.notes AS bnotes,
-    cyp.color AS color, cyp.theme AS theme, cyp.introit AS introit,
-    (CASE b.weeklygradual
-        WHEN '1' THEN cyp.weeklygradual
-        ELSE cyp.seasonalgradual
-        END)
+    cyp.color AS color, cyp.theme AS theme,
+    COALESCE(d.multichoice_introit, cyp.introit) AS introit,
+    COALESCE(d.multichoice_gradual,
+        (CASE b.weeklygradual
+            WHEN '1' THEN cyp.weeklygradual
+            ELSE cyp.seasonalgradual
+            END))
         AS gradual,
     cyp.note AS propersnote,
     (smr.bibletext IS NOT NULL) AS has_sermon,
-    COALESCE(l1s.lesson1, l1s.l1series) AS blesson1,
-    COALESCE(l2s.lesson2, l2s.l2series) AS blesson2,
-    COALESCE(gos.gospel, gos.goseries) AS bgospel,
+    COALESCE(d.multichoice_lesson1, l1s.lesson1, l1s.l1series) AS blesson1,
+    COALESCE(d.multichoice_lesson2, l2s.lesson2, l2s.l2series) AS blesson2,
+    COALESCE(d.multichoice_gospel, gos.gospel, gos.goseries) AS bgospel,
     COALESCE(smr.bibletext,
              (CASE b.smtype
               WHEN 'gospel' THEN sms.gospel
               WHEN 'lesson1' THEN sms.lesson1
               WHEN 'lesson2' THEN sms.lesson2
              END), sms.smseries) AS bsermon,
-    (CASE b.pslect
-        WHEN 'custom' THEN b.psseries
-        ELSE
-            (SELECT psalm FROM `{$dbp}synlessons` AS cl
-            WHERE cl.dayname=d.name AND cl.lectionary=b.pslect
-            LIMIT 1)
-        END)
+    COALESCE(d.multichoice_psalm, (
+        CASE b.pslect
+            WHEN 'custom' THEN b.psseries
+            ELSE
+                (SELECT psalm FROM `{$dbp}synlessons` AS cl
+                WHERE cl.dayname=d.name AND cl.lectionary=b.pslect
+                LIMIT 1)
+            END))
         AS bpsalm,
     synl.note AS sermonlessonnote,
     b.l1lect != 'custom' AS l1link,

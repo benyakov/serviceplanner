@@ -30,6 +30,12 @@ CREATE TABLE `days` (
   `rite` varchar(50) default NULL,
   `servicenotes` text default NULL,
   `block` integer default NULL,
+  `multichoice_lesson1` varchar(64) default NULL,
+  `multichoice_lesson2` varchar(64) default NULL,
+  `multichoice_gospel` varchar(64) default NULL,
+  `multichoice_psalm` varchar(64) default NULL,
+  `multichoice_introit` text default NULL,
+  `multichoice_gradual` text default NULL,
   KEY `pkey` (`pkey`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
 CREATE TABLE `service_flags` (
