@@ -160,6 +160,12 @@ function rawQuery($where=array(), $order="", $limit="", $blend_occurrences=false
     d.servicenotes, n.title, d.block,
     b.label AS blabel, b.notes AS bnotes,
     cyp.color AS color, cyp.theme AS theme,
+    CONCAT_WS(',', (multichoice_lesson1 IS NOT NULL),
+              (multichoice_lesson2 IS NOT NULL),
+              (multichoice_gospel IS NOT NULL),
+              (multichoice_psalm IS NOT NULL),
+              (multichoice_introit IS NOT NULL),
+              (multichoice_gradual IS NOT NULL)) AS has_multichoice,
     COALESCE(d.multichoice_introit, cyp.introit) AS introit,
     COALESCE(d.multichoice_gradual,
         (CASE b.weeklygradual
@@ -615,7 +621,8 @@ function modify_occurrences_separately($q) {
             </td></tr>\n";
             echo "<tr class=\"service-flags\" data-occ=\"{$row['occurrence']}\" data-service=\"{$row['serviceid']}\"><td colspan=3></td><td>"
                 .flagestaltLink($row['serviceid'], $row['occurrence'])."</td></tr>\n";
-            echo "<tr data-occ=\"{$row['occurrence']}\" data-service=\"{$row['serviceid']}\" class=\"heading\"><td colspan=3 class=\"propers\">\n";
+            echo "<tr data-occ=\"{$row['occurrence']}\" data-service=\"{$row['serviceid']}\" data-hasmultichoice=\"<?={$row['has_multichoice']}">\" class=\"heading\">";
+            echo "<td colspan=3 class=\"propers\">\n";
             echo "<table><tr><td class=\"heavy smaller\">{$row['theme']}</td>";
             echo "<td colspan=2>{$row['color']}</td></tr>";
             if ($row['introit'] || $row['gradual']) {
@@ -634,7 +641,8 @@ function modify_occurrences_separately($q) {
             echo "\n</tr></table></td>\n";
             if ($row['block'])
             { ?>
-                <tr data-occ="<?=$row['occurrence']?>" data-service="<?=$row['serviceid']?>"><td colspan=3 class="blockdisplay">
+                <tr data-occ="<?=$row['occurrence']?>" data-service="<?=$row['serviceid']?>" data-hasmultichoice="<?=$row['has_multichoice']?>">
+                <td colspan=3 class="blockdisplay">
                     <h4>Block: <?=$row['blabel']?></h4>
                     <div class="blocknotes">
                         <?=translate_markup($row['bnotes'])?>

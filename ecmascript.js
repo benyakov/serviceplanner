@@ -830,7 +830,38 @@ function hideExtras(serviceid, serviceocc) {
 }
 
 function setupMultiPropers() {
-
+    var types = [ 'blesson1', 'blesson2', 'bgospel', 'bpsalm' ];
+    var has_multichoice_indexes = {
+        'blesson1': 0,
+        'blesson2': 1,
+        'bgospel' : 3,
+        'bpsalm'  : 4,
+        'introit' : 5,
+        'gradual' : 6};
+    for (var i = 0, len = types.length; i < len; i++) {
+        $('.'+types[i]).each(function(thisType) {
+            $(thisType).each(function(scripRef) {
+                var ds = scripRef.parents("[data-service]").data("data-service").split(",");
+                if (types[i] in [ 'introit', 'gradual' ]) {
+                    if (scripRef.html().indexOf('|') !== -1) {
+                        if (int(ds[has_multichoice_indexes[types[i]]])) {
+                            showDeselectMultichoiceButton(scripRef); // TODO
+                        } else {
+                            showSelectMultichoiceButton(scripRef); // TODO
+                        }
+                    }
+                } else {
+                    if (scripRef.html().find('a').indexOf('|') !== -1) {
+                        if (int(ds[has_multichoice_indexes[types[i]]])) {
+                            showDeselectMultichoiceButton(scripRef); // TODO
+                        } else {
+                            showSelectMultichoiceButton(scripRef); // TODO
+                        }
+                    }
+                }
+            });
+        });
+    }
 }
 
 $(document).ready(function() {
