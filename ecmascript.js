@@ -845,23 +845,53 @@ function setupMultiPropers() {
                 if (types[i] in [ 'introit', 'gradual' ]) {
                     if (scripRef.html().indexOf('|') !== -1) {
                         if (int(ds[has_multichoice_indexes[types[i]]])) {
-                            showDeselectMultichoiceButton(scripRef); // TODO
+                            showDeselectMultichoiceButton(scripRef, thisType,
+                                $(this).parents('tr[data-service]').data("service"));
                         } else {
                             showSelectMultichoiceButton(scripRef); // TODO
                         }
                     }
-                } else {
-                    if (scripRef.html().find('a').indexOf('|') !== -1) {
-                        if (int(ds[has_multichoice_indexes[types[i]]])) {
-                            showDeselectMultichoiceButton(scripRef); // TODO
-                        } else {
-                            showSelectMultichoiceButton(scripRef); // TODO
-                        }
+                } else if (scripRef.find('a').html().indexOf('|') !== -1) {
+                    if (int(ds[has_multichoice_indexes[types[i]]])) {
+                        showDeselectMultichoiceButton(scripRef.find('a'), thisType,
+                                $(this).parents('tr[data-service]').data("service"));
+                    } else {
+                        showSelectMultichoiceButton(scripRef.find('a')); // TODO
                     }
                 }
             });
         });
+        setupMultiChoiceButtons(); // TODO
     }
+}
+
+function showDeselectMultichoiceButton(parentItem, type, serviceid) {
+    parentItem.find('.selectmultichoiceform').remove();
+    var xhr = $.getJSON("proper.php",
+            {
+                getproper: 'type',
+                service: 'serviceid',
+                action: 'deselect'
+            },
+            function(result) {
+                if (result[0]) {
+                    parentItem.
+                    $("#savetitle_new-"+listingord).hide();
+                    parentItem.html(result[1]);
+                    if (type in ["blesson1", "blesson2", "bgospel", "bpsalm"]) {
+                        var href = parentItem.attr('href');
+                        parentItem.attr('href', href.replace(/search=([^&]*)/,
+                            'search='+encodeURIComponent(result[1])));
+                    }
+                    parentItem.append('<form class=".deselectmultichoiceform">'
+                        .'<button class=".deselectmultichoicebutton" data-service="'.serviceid
+                        .'" data-type="'.type.'">||</button></form>');
+                }
+            });
+}
+
+function showSelectMultichoiceButton(parentItem, hreftoo=false) {
+    //TODO
 }
 
 $(document).ready(function() {
