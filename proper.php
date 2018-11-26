@@ -28,16 +28,16 @@ $uid = authUid();
 $this_script = $_SERVER['HTTP_HOST'].$_SERVER['SCRIPT_NAME'] ;
 $db = new DBConnection();
 if (! (isset($_POST['step']) || isset($_POST['json']))) {
-    if ($type = getGET('type', "") &&
+    if ($type = getGET('getproper', "") &&
         is_numeric(getGET('serviceid')))
     {
         if (! in_array($type,
             ['blesson1', 'blesson2', 'bgospel', 'bpsalm', 'introit', 'gradual'])) {
             echo json_encode([false, "Unrecognized type of lesson."]);
             exit(0);
+        }
         $db->beginTransaction();
-        if ("deselect" == getGET('action')) {
-            }
+        if ("deselect" == getGET('button')) {
             $q = $db->prepare("UPDATE `{$db->getPrefix()}days`
                 SET `{$type}` = NULL
                 WHERE `d.pkey` = :serviceid");

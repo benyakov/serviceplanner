@@ -848,7 +848,8 @@ function setupMultiPropers() {
                             showDeselectMultichoiceButton(scripRef, thisType,
                                 $(this).parents('tr[data-service]').data("service"));
                         } else {
-                            showSelectMultichoiceButton(scripRef); // TODO
+                            showSelectMultichoiceButton(scripRef, thisType,
+                                $(this).parents('tr[data-service]').data("service"));
                         }
                     }
                 } else if (scripRef.find('a').html().indexOf('|') !== -1) {
@@ -856,42 +857,71 @@ function setupMultiPropers() {
                         showDeselectMultichoiceButton(scripRef.find('a'), thisType,
                                 $(this).parents('tr[data-service]').data("service"));
                     } else {
-                        showSelectMultichoiceButton(scripRef.find('a')); // TODO
+                        showSelectMultichoiceButton(scripRef.find('a'), thisType,
+                                $(this).parents('tr[data-service]').data("service"));
                     }
                 }
             });
         });
-        setupMultiChoiceButtons(); // TODO
+        setupMultiChoiceButtons();
     }
 }
 
-function showDeselectMultichoiceButton(parentItem, type, serviceid) {
-    parentItem.find('.selectmultichoiceform').remove();
-    var xhr = $.getJSON("proper.php",
+function setupMultiChoiceButtons() {
+    $('.deselectmultichoicebutton').click(function(evt) {
+        event.preventDefault();
+        var xhr = $.getJSON("proper.php",
             {
-                getproper: 'type',
-                service: 'serviceid',
-                action: 'deselect'
+                button:     'deselect',
+                proper:     $(this).data('type'),
+                serviceid:  $(this).data('service')
             },
             function(result) {
-                if (result[0]) {
-                    parentItem.
-                    $("#savetitle_new-"+listingord).hide();
+               if (result[0]) {
                     parentItem.html(result[1]);
                     if (type in ["blesson1", "blesson2", "bgospel", "bpsalm"]) {
                         var href = parentItem.attr('href');
                         parentItem.attr('href', href.replace(/search=([^&]*)/,
                             'search='+encodeURIComponent(result[1])));
                     }
-                    parentItem.append('<form class=".deselectmultichoiceform">'
-                        .'<button class=".deselectmultichoicebutton" data-service="'.serviceid
-                        .'" data-type="'.type.'">||</button></form>');
+               }
+            });
+    });
+    $('.selectmultichoicebutton').click(function(evt) {
+        event.preventDefault();
+        var xhr = $.getJSON("proper.php",
+            {
+                button:     'select',
+                proper:     $(this).data('type'),
+                serviceid:  $(this).data('service')
+            },
+            function(result) {
+                if (result[0]) { // TODO: Can I do this with DOM contents?
+                    $('#dialog').html(result[1]);
+                    // Set up dialog to submit json
+                    $('#dialog').find('#multichoice_submit')
+                        .click(multichoiceSubmit);
                 }
             });
+        $("#dialog").dialog({title: "Alternate Proper Selection",
+            widht: $(window).width()*0.7,
+            position: { my: "top", at: "top", of: window}
+        });
+    });
 }
 
-function showSelectMultichoiceButton(parentItem, hreftoo=false) {
-    //TODO
+function showSelectMultichoiceButton(parentItem, type, serviceid) {
+    parentItem.find('.deselectmultichoiceform').remove();
+    parentItem.append('<form class=".selectmultichoiceform">'
+        .'<button class=".selectmultichoicebutton" data-service="'.serviceid
+        .'" data-type="'.type.'">||</button></form>');
+}
+
+function showDeselectMultichoiceButton(parentItem, type, serviceid) {
+    parentItem.find('.selectmultichoiceform').remove();
+    parentItem.append('<form class=".deselectmultichoiceform">'
+        .'<button class=".deselectmultichoicebutton" data-service="'.serviceid
+        .'" data-type="'.type.'">||</button></form>');
 }
 
 $(document).ready(function() {
