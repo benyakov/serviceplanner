@@ -29,7 +29,7 @@
  * A Series of steps taken in sequence via Javascript, to populate
  * the church year tables with default data.
  */
-if ("churchyeartables" == getGET('action') ) {
+if ("churchyeartables" == $_GET['action'] ) { // Don't use getGET here
     require_once("./init.php");
     $dbstate = getDBState(true);
     $cfilled = $dbstate->getDefault(0, "churchyear-filled");
