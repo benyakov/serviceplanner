@@ -31,16 +31,17 @@ if (is_link($_SERVER['SCRIPT_FILENAME']) || $cors ) {
 } else {
     $displayonly = false;
 }
-// Get the main content
-ob_start();
-?>
-<h1>Upcoming Hymns</h1> <div id="service-filter"></div>
-<?php
-$q = queryFutureHymns();
-display_records_table($q);
-$rawcontent = ob_get_clean();
 // Check for a content-only request.
 if ($contentonly = checkContentReq()) {
+    // Get the main content
+    ob_start();
+    ?>
+    <h1>Upcoming Hymns</h1> <div id="service-filter"></div>
+    <?php
+    $q = queryFutureHymns();
+    display_records_table($q);
+    ?><p id="query_time">Main MySQL query response time: <?=$GLOBALS['query_elapsed_time']?></p><?php
+    $rawcontent = ob_get_clean();
     echo json_encode($rawcontent);
     exit(0);
 }
@@ -80,7 +81,14 @@ if ($jsonp) {
     ob_clean();
 } ?>
 <div id="content-container">
-<? if ($jsonp) echo $rawcontent; ?>
+<?
+if ($jsonp) {
+    echo $rawcontent;
+} else {
+    ?><p id="waiting-for-content">Please wait. Requesting page content...</p><?php
+}
+
+?>
 </div>
 <?  if ($jsonp) {
         $output = json_encode(addcslashes(ob_get_clean(), "'"));

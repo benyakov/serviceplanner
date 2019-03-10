@@ -31,6 +31,7 @@ unset($_SESSION[$sprefix]["highdate"]);
 unset($_SESSION[$sprefix]["allfuture"]);
  */
 $this_script = $_SERVER['HTTP_HOST'].$_SERVER['SCRIPT_NAME'] ;
+
 if ("Apply" == getGET('submit')) {
     if (getGET('allfuture')) {
         $allfuture = $_SESSION[$sprefix]["allfuture"] = true;
@@ -69,14 +70,15 @@ else
     $options->set('modifyorder', $_SESSION[$sprefix]['modifyorder']);
 unset($options);
 
-if ("Future" == $_SESSION[$sprefix]['modifyorder']) $order = "ASC";
-else $order = "DESC";
-$q = queryServiceDateRange($lowdate, $highdate, $allfuture, $order);
-ob_start();
-modify_records_table($q, "delete.php");
-$refreshable = ob_get_clean();
 // Check for a content-only request.
 if (checkContentReq()) {
+    if ("Future" == $_SESSION[$sprefix]['modifyorder']) $order = "ASC";
+    else $order = "DESC";
+    $q = queryServiceDateRange($lowdate, $highdate, $allfuture, $order);
+    ob_start();
+    modify_records_table($q, "delete.php");
+    ?><p id="query_time">Main MySQL query response time: <?=$GLOBALS['query_elapsed_time']?></p><?php
+    $refreshable = ob_get_clean();
     echo json_encode($refreshable);
     exit(0);
 }
@@ -294,6 +296,7 @@ service occurrence, edit the service using the "Edit" link.</p>
 </form>
 <hr>
 <div id="refreshable">
+<p id="waiting-for-content">Please wait. Requesting page content...</p>
 </div>
 </div>
 <div id="dialog"></div>

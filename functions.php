@@ -26,6 +26,7 @@
  */
 
 require_once("authfunctions.php");
+require_once("classes.php");
 
 /**
  * Factory function for a Configfile object.
@@ -90,8 +91,11 @@ function queryService($id) {
         $q = rawQuery($where, "", "", false);
     }
     if ($id) $q->bindParam(":id", $id);
+    $start_time = microtime(true);
     if (! $q->execute())
         die("<p>".array_pop($q->errorInfo()).'</p><p style="white-space: pre;">'.$q->queryString."</p>");
+    $end_time = microtime(true);
+    $GLOBALS['query_elapsed_time'] = $end_time - $start_time;
     return $q;
 }
 
@@ -105,15 +109,21 @@ function queryFutureHymns() {
     } else {
         $q = rawQuery($where, "", "", false);
     }
+    $start_time = microtime(true);
     if (! $q->execute())
         die("<p>".array_pop($q->errorInfo()).'</p><p style="white-space: pre;">'.$q->queryString."</p>");
+    $end_time = microtime(true);
+    $GLOBALS['query_elapsed_time'] = $end_time - $start_time;
     return $q;
 }
 
 function querySomeHymns($limit) {
     $q = rawQuery(array(), "DESC", $limit);
+    $start_time = microtime(true);
     if (! $q->execute())
         die("<p>".array_pop($q->errorInfo()).'</p><p style="white-space: pre;">'.$q->queryString."</p>");
+    $end_time = microtime(true);
+    $GLOBALS['query_elapsed_time'] = $end_time - $start_time;
     return $q;
 }
 
@@ -137,8 +147,11 @@ function queryServiceDateRange($lowdate, $highdate, $allfuture, $order="DESC") {
     }
     $q->bindValue(":lowdate", $ld);
     if ($limited) $q->bindValue(":highdate", $hd);
+    $start_time = microtime(true);
     if (! $q->execute())
         die("<p>".array_pop($q->errorInfo()).'</p><p style="white-space: pre;">'.$q->queryString."</p>");
+    $end_time = microtime(true);
+    $GLOBALS['query_elapsed_time'] = $end_time - $start_time;
     return $q;
 }
 
@@ -219,18 +232,48 @@ function rawQuery($where=array(), $order="", $limit="", $blend_occurrences=false
     return $q;
 }
 
-function getFlagsFor($serviceid, $occurrence) {
-    $db = new DBConnection();
-    $q = $db->prepare("SELECT f.flag, f.value, f.pkey AS flagid,
-        CONCAT(u.fname, ' ', u.lname) AS user
-        FROM `{$db->getPrefix()}service_flags` AS f
-        JOIN `{$db->getPrefix()}users` AS u ON (u.`uid` = f.`uid`)
-        WHERE f.service = :service
-        AND f.occurrence = :occurrence ");
-    $q->bindParam(":service", $serviceid);
-    $q->bindParam(":occurrence", $occurrence);
-    $q->execute() or die("Couldn't get flag for {$serviceid}/{$occurrence}");
-    return $q;
+function getFlagsFor($serviceid, $occurrence, $raw=false) {
+    // Return cached flag list if it exists. Otherwise, pull it from DB, cache and return
+    $lw = new LogWriter('./cache/log');
+    $md5occ = md5($occurrence);
+    $cachename = "./cache/flags/{$serviceid}";
+    if (! file_exists($cachename)) {
+        mkdir($cachename, 0750, true);
+    }
+    if (file_exists("{$cachename}/{$md5occ}")) {
+        $lw->write("HIT: {$serviceid}/{$md5occ} ({$occurrence})\n");
+        $package = file_get_contents("{$cachename}/{$md5occ}");
+    } else {
+        $lw->write("MISS: {$serviceid}/{$md5occ} ({$occurrence})\n");
+        $db = new DBConnection();
+        $q = $db->prepare("SELECT f.flag, f.value, f.pkey AS flagid,
+            CONCAT(u.fname, ' ', u.lname) AS user
+            FROM `{$db->getPrefix()}service_flags` AS f
+            JOIN `{$db->getPrefix()}users` AS u ON (u.`uid` = f.`uid`)
+            WHERE f.service = :service
+            AND f.occurrence = :occurrence ");
+        $q->bindParam(":service", $serviceid);
+        $q->bindParam(":occurrence", $occurrence);
+        $q->execute() or die("Couldn't get flag for {$serviceid}/{$occurrence}");
+        $package = json_encode($q->fetchAll(PDO::FETCH_ASSOC));
+        file_put_contents("{$cachename}/{$md5occ}", $package);
+        $lw->write("ADD: {$serviceid}/{$md5occ} ({$occurrence})\n");
+    }
+    if ($raw) { return $package; }
+    $results = json_decode($package, true);
+    $rv = array();
+    foreach ($results as $flag) {
+        $flag = array_map(function($v) {return htmlspecialchars($v);}, $flag);
+        if (2 <= authLevel()) {
+            $deletelink = "<a class=\"delete-flag\" href=\"#\" data-flagid=\"{$flag['flagid']}\" data-userid=\"{$uid}\"></a>";
+        } else { $deletelink = ""; }
+        $rv[] = "<div class=\"flag-repr\">
+            <div class=\"flag-name\">{$deletelink}{$flag['flag']}<br><span class=\"flag-creator\">{$flag['user']}</span></div>
+            <div class=\"flag-value\">{$flag['value']}</div>
+            </div>";
+    }
+    $formatted = implode("\n", $rv);
+    return json_encode(array(count($results), $formatted));
 }
 
 function getFlagestalt($serviceid, $occurrence) {

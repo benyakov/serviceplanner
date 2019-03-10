@@ -384,8 +384,11 @@ function showServiceListing($config) {
     unset($options);
     $q = rawQuery($where, $order, $config->get("custom view", "limit"),
         $combine_occ_option);
+    $start_time = microtime(true);
     if (! $q->execute())
         die("<p>".array_pop($q->errorInfo()).'</p><p style="white-space: pre;">'.$q->queryString."</p>");
+    $end_time = microtime(true);
+    $GLOBALS['query_elapsed_time'] = $end_time - $start_time;
     // Group by service
     $servicelisting = Array();
     $service = Array();
@@ -411,6 +414,7 @@ function showServiceListing($config) {
         $rv[] = displayService($service, $fieldlist);
     }
     $rv[] = $config->get("custom view", "end");
+    $rv[] = "<p id=\"query_time\">Main MySQL query response time: {$GLOBALS['query_elapsed_time']}</p>";
     return implode("\n", $rv);
 }
 function displayService($service, $fieldlist) {
@@ -467,8 +471,9 @@ function displayService($service, $fieldlist) {
             $allflags = array();
             foreach ($grouped as $sid => $occurrences) {
                 foreach ($occurrences as $o => $v) {
-                    $q = getFlagsFor($sid, $o);
-                    while ($f = $q->fetch(PDO::FETCH_ASSOC)) {
+                    $q = getFlagsFor($sid, $o, true);
+                    $rawlist = json_decode($q, true);
+                    foreach ($rawlist as $f) {
                         if ($f['value']) $ftext = ": {$f['value']}";
                         else $ftext = "";
                         if ($f['user']) $fuser = " [{$f['user']}]";
@@ -490,8 +495,9 @@ function displayService($service, $fieldlist) {
             $allflags = array();
             foreach ($grouped as $sid => $occurrences) {
                 foreach ($occurrences as $o => $v) {
-                    $q = getFlagsFor($sid, $o);
-                    while ($f = $q->fetch(PDO::FETCH_ASSOC)) {
+                    $q = getFlagsFor($sid, $o, true);
+                    $rawlist = json_decode($q, true);
+                    foreach ($rawlist as $f) {
                         if ($f['value']) $ftext = "{$f['value']}";
                         else $ftext = "";
                         if ($f['user']) {

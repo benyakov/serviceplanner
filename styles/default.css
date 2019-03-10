@@ -901,3 +901,7 @@ a.expandservice.contracted {
     background-color: #BBB;
 }
 
+p#query_time {
+    color: #AAA;
+    background-color: transparent;
+}

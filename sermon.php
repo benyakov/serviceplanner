@@ -82,7 +82,7 @@ if (! isset($_GET['stage'])) {
     <? pageHeader();
     siteTabs("sermons"); ?>
         <div id="content-container">
-        <div class="quicklinks"><a href="sermonreport.php?id=<?={$id}?>">Printable Sermon Report</a>
+        <div class="quicklinks"><a href="sermonreport.php?id=<?=$id?>">Printable Sermon Report</a>
         <a href="sermons.php">Browse All Sermon Plans</a></div>
         <h1>Edit a Sermon Plan</h1>
         <p class="explanation">This page is for planning a sermon for a
@@ -127,6 +127,7 @@ if (! isset($_GET['stage'])) {
     $q = queryService($id);
     display_records_table($q, "delete.php");
     ?>
+    <p id="query_time">Main MySQL query response time: <?=$GLOBALS['query_elapsed_time']?></p>
     </div>
     </body>
     </html>

@@ -79,5 +79,6 @@ $this_script = $_SERVER['HTTP_HOST'].$_SERVER['SCRIPT_NAME'] ;
     ?>
     </div>
 <div id="dialog"></div>
+<p id="query_time">Main MySQL query response time: <?=$GLOBALS['query_elapsed_time']?></p>
 </body>
 </html>
