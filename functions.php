@@ -265,7 +265,7 @@ function getFlagsFor($serviceid, $occurrence, $raw=false) {
     foreach ($results as $flag) {
         $flag = array_map(function($v) {return htmlspecialchars($v);}, $flag);
         if (2 <= authLevel()) {
-            $deletelink = "<a class=\"delete-flag\" href=\"#\" data-flagid=\"{$flag['flagid']}\" data-userid=\"{$uid}\"></a>";
+            $deletelink = "<a class=\"delete-flag\" href=\"#\" data-flagid=\"{$flag['flagid']}\" data-userid=\"".authUid()."\"></a>";
         } else { $deletelink = ""; }
         $rv[] = "<div class=\"flag-repr\">
             <div class=\"flag-name\">{$deletelink}{$flag['flag']}<br><span class=\"flag-creator\">{$flag['user']}</span></div>

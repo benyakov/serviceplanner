@@ -673,6 +673,8 @@ function pullFlags(index, row) {
                     var deleteval = flagid + "_delete";
                     var params = { 'step': "change_flags",
                             'json': 1,
+                            'service': $(row).data('service'),
+                            'occurrence': $(row).data('occ'),
                             'user': userid };
                     params[deleteval] = 'on';
                     var these_flags = $(this).parents('tr.service-flags');

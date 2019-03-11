@@ -109,8 +109,6 @@ service and either add to them or change them.</p>
     deleteFlagCache($_POST['service'], $_POST['occurrence']);
     $uid = checkPostUser();
     if ($_POST['delete_flag']) {
-        //print_r($_POST);
-        //exit(0);
         $flag_id = $_POST['delete_flag'];
         // Check that this flag is owned by the current user.
         $q = $db->prepare("DELETE FROM `{$db->getPrefix()}service_flags`
@@ -236,13 +234,15 @@ function deleteFlagCache($service, $occurrence) {
     $lw = new LogWriter('./cache/log');
     $md5occ = md5($occurrence);
     if (! ctype_digit($service)) return; // Check that all chars are digits
-    mkdir("./cache/flags/", 0750, true);
-    $cachefile = "./cache/flags/{$serviceid}/{$md5occ}";
+    if (! file_exists("./cache/flags/")) {
+        mkdir("./cache/flags/", 0750, true);
+    }
+    $cachefile = "./cache/flags/{$service}/{$md5occ}";
     if (file_exists($cachefile)) {
-        $lw->write("DEL: {$serviceid}/{$md5occ} ({$occurrence})\n");
+        $lw->write("DEL: {$service}/{$md5occ} ({$occurrence})\n");
         unlink($cachefile);
     } else {
-        $lw->write("MISS: (delete) {$serviceid}/{$md5occ} ({$occurrence})\n");
+        $lw->write("MISS: (delete) {$service}/{$md5occ} ({$occurrence})\n");
     }
 }
 
@@ -303,6 +303,7 @@ function generateFlagsForm($id, $occurrence) {
             <form id="service_flags" action="<?= $_SERVER['PHP_SELF'] ?>"
                 method="post">
 
+                <input type="hidden" name="writelogs" value="true">
                 <input type="hidden" name="step" value="change_flags">
                 <input type="hidden" name="service" value="<?=$id?>">
                 <input type="hidden" name="occurrence" value="<?=htmlspecialchars($occurrence)?>">
@@ -328,6 +329,7 @@ function generateFlagsForm($id, $occurrence) {
     ?>
             <form id="service_flags" action="<?= $_SERVER['PHP_SELF'] ?>"
                 method="post">
+            <input type="hidden" name="writelogs" value="true">
             <input type="hidden" name="step" value="delete_flag">
             <input type="hidden" name="user" value="<?=$uid?>">
             <input type="hidden" name="service" value="<?=$id?>">
@@ -360,6 +362,7 @@ function generateFlagsForm($id, $occurrence) {
     // Display a form for privileged and less-privileged users to add flags
 ?>
     <form id="add_flag">
+        <input type="hidden" name="writelogs" value="true">
         <input type="hidden" name="step" value="add_flag">
         <input type="hidden" name="user" value="<?=$uid?>">
         <input type="hidden" name="service" value="<?=$id?>">

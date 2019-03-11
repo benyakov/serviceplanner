@@ -29,23 +29,26 @@ class LogWriter
 {
     public $logfh = null;
     private $location = "";
+    private $force = false;
 
-    function __construct($where) {
-        if (array_key_exists('writelogs', $GLOBALS)) {
-            return fopen($where, 'a');
+    function __construct($where, $force=false) {
+        $this->force = $force;
+        if ($this->force or array_key_exists('writelogs', $_REQUEST)) {
+            $this->logfh = fopen($where, 'a');
+            return $this;
         }
     }
 
     function __destruct() {
-        if (array_key_exists('writelogs', $GLOBALS)) {
+        if ($this->force or array_key_exists('writelogs', $_REQUEST)) {
             fclose($this->logfh);
         }
     }
 
 
     function write($message) {
-        if (array_key_exists('writelogs', $GLOBALS)) {
-            fwrite($this->$logfh, $message);
+        if ($this->force or array_key_exists('writelogs', $_REQUEST)) {
+            fwrite($this->logfh, $message);
         }
     }
 }
