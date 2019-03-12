@@ -37,7 +37,7 @@ if (isset($_GET['manuscript'])) {
         header("Location: sermon.php?id={".getGET('id')."}");
         exit(0);
     }
-    $mss = fopen("{$row['manuscript']}", 'rb');
+    $mss = fopen("{$thisdir}/{$row['manuscript']}", 'rb');
     if ($mss !== FALSE) {
         header("Content-type: {$row['mstype']}");
         header("Content-disposition: attachment; filename=sermonmanuscript");
@@ -158,13 +158,14 @@ if (! isset($_GET['stage'])) {
             || $_POST['deletems']) {
         $ft = "";
     } else {
-        $dest1 = substr($service, 0, 2);
-        $dest2 = substr($service, 2, 2);
-        if (! file_exists("{$thisdir}/uploads/{$dest1}/{$dest2}/{$service}"))
-            mkdir("{$thisdir}/uploads/{$dest1}/{$dest2}/{$service}", 0750, TRUE);
-        $dest = "{$thisdir}/uploads/{$dest1}/{$dest2}/{$service}/manuscript";
-        @unlink($dest);
-        rename($msfile, $dest);
+        $msdir = md5(file_get_contents($msfile));
+        $dest1 = substr($msdir, 0, 2);
+        $dest2 = substr($msdir, 2, 2);
+        if (! file_exists("{$thisdir}/uploads/{$dest1}/{$dest2}/{$msdir}"))
+            mkdir("{$thisdir}/uploads/{$dest1}/{$dest2}/{$msdir}", 0750, TRUE);
+        $dest = "uploads/{$dest1}/{$dest2}/{$msdir}/manuscript";
+        @unlink($thisdir.'/'.$dest);
+        rename($msfile, $thisdir.'/'.$dest);
         $ft = $_FILES['manuscript_file']['type'];
     }
     if ($ft || $_POST['deletems']) {
