@@ -126,7 +126,7 @@ if ((! isset($_GET['stage'])) || $ajax) {
         $q->execute();
         if ($q->fetch()) {
             // If so, delete only the hymns.
-            $q = $db->prepare("DELETE FROM `{$db->getPrefix()}hymns`
+            $q = $db->prepare("DELETE FROM hymns
                 USING `{$db->getPrefix()}hymns` as hymns
                 JOIN `{$db->getPrefix()}days` as days
                 ON (hymns.service = days.pkey)
