@@ -1,4 +1,4 @@
-.git
+.git*
 css/custom.css
 vendor
 components

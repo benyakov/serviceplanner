@@ -101,10 +101,19 @@ function reconfigureNonfestival($type) {
         `base` = :base,
         `offset` = :offset
         WHERE `dayname` = :dayname");
-    $base = $offset = $dayname = "";
+    $qbap = $dbh->prepare("UPDATE `{$dbp}churchyear` SET
+        `base` = :base,
+        `offset` = :offset,
+        `season` = :season
+        WHERE `dayname` = :dayname");
+    $base = $offset = $dayname = $season = "";
     $q->bindParam(":base", $base);
     $q->bindParam(":offset", $offset);
     $q->bindParam(":dayname", $dayname);
+    $qbap->bindParam(":base", $base);
+    $qbap->bindParam(":offset", $offset);
+    $qbap->bindParam(":dayname", $dayname);
+    $qbap->bindParam(":season", $season);
     if ("Historic" == $type) {
         $base = "Easter";
         for ($i = 1; $i <= 24; $i++) {
@@ -128,6 +137,11 @@ function reconfigureNonfestival($type) {
             $dayname = "Michaelmas {$i}";
             $q->execute() or die(array_pop($q->errorInfo()));
         }
+        $season = "Pre-lent";
+        $base = "Easter";
+        $offset = -49;
+        $dayname = "Baptism of Jesus";
+        $qbap->execute() or die(array_pop($q->errorInfo()));
     } elseif ("ILCW" == $type) {
         $base = "Easter";
         for ($i = 1; $i < 25; $i++) {
@@ -145,6 +159,11 @@ function reconfigureNonfestival($type) {
         $base = "Christmas 1";
         $dayname = "Last";
         $q->execute() or die(array_pop($q->errorInfo()));
+        $season = "Epiphany";
+        $base = "Epiphany 1";
+        $dayname = "Baptism of Jesus";
+        $offset = 0;
+        $qbap->execute() or die(array_pop($q->errorInfo()));
     } elseif ("RCL" == $type) {
         $base = "Christmas 1";
         $offset = -35;
@@ -160,6 +179,11 @@ function reconfigureNonfestival($type) {
             $dayname = "Trinity {$i}";
             $q->execute() or die(array_pop($q->errorInfo()));
         }
+        $season = "Epiphany";
+        $base = "Epiphany 1";
+        $dayname = "Baptism of Jesus";
+        $offset = 0;
+        $qbap->execute() or die(array_pop($q->errorInfo()));
     }
     $dbh->commit();
 }
