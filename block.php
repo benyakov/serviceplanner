@@ -101,7 +101,20 @@ function blockPlanForm($vals=array()) {
     <div id="overlap-notice"></div>
     </section>
     <section id="block-series">
-    <table>
+    <p>It is possible to select any available lectionary for the lections, but
+not every lectionary is <em>meant</em> to provide lections. This is
+counterintuitive. Most lectionaries are meant only to provide
+preaching texts, despite their label as a "lectionary." This also applies to
+the second and third series of lections provided in the <em>Evangelical
+Lutheran Hymnary</em> (ELH). In practically all services, the lections read should
+come from a reading lectionary in common use, either the so-called "Historic"
+(one-year) lectionary (first series in the ELH), or the so-called
+"Common" (three-year) lectionary popularized among Lutherans in the early
+1970's by the Inter-Lutheran Commission on Worship (ILCW). Variants of
+these exist. In particular, the Historic lectionary did not have Old Testament
+lections for some time, so they have been added in differing ways. Lectionaries
+can be added to the Service Planner on the Housekeeping tab.</p>
+<table>
     <tr><td></td><th>Lectionary</th><th>Series</th><th>Custom Readings</th></tr>
     <tr><td><label>Lesson 1</label></td>
     <td><select name="l1lect" id="l1lect">
