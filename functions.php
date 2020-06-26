@@ -1169,6 +1169,8 @@ function daysForDate($date) {
     return $found;
 }
 
+/*
+ * Unused
 function getLessonField($lesson, $lect, $series) {
     // Return the field name we want in the given circumstances
     if ($lect == 'historic') {
@@ -1183,6 +1185,7 @@ function getLessonField($lesson, $lect, $series) {
         }
     } else return $lesson;
 }
+ */
 
 /* Replace occurrences of {{DBP}} with $prefix or $dbp in text.
  */

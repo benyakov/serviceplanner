@@ -36,7 +36,7 @@ $auth = authLevel();
 /* Show the lesson choice in the block plan display
  */
 function showLesson($lectionary, $series) {
-    if ("historic" == $lectionary) {
+    if (preg_match("/(?i)historic/", $lectionary)) {
         $s = $series;
     } elseif ("custom" == $lectionary) {
         $lectionary = "Custom: ";
@@ -416,7 +416,7 @@ requireAuth("index.php", 3);
     }
     function gencheckHistoric(abbr) {
         return function() {
-            if ("historic" == $('#'+abbr+'lect').val()) {
+            if (/historic/i.test($('#'+abbr+'lect').val())) {
                 $('#'+abbr+'series').attr('disabled', false)
                     .show();
                 $('#'+abbr+'custom').val('')

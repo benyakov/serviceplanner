@@ -104,7 +104,7 @@ function propersForm($dayname) {
     <?
     foreach ($pdata as $lset) {
         $id = $lset['id'];
-        if ($lset['lectionary'] == "historic") {
+        if (preg_match("/historic/i", $lset['lectionary'])) {
     ?>
     <div id="historic-tab">
     <div class="propers">
