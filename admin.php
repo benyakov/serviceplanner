@@ -181,6 +181,13 @@ if ('dellect' == getPOST('action')) {
 service planner here.  Keeping frequent backups is always highly
 recommended!</p>
 
+    <p>You are using Service Planner version
+        <?= "{$version['major']}.{$version['minor']}.{$version['tick']}" ?>.
+        Refer to this version number, and include the address
+    <?=$_SERVER['SERVER_NAME'].$_SERVER['PHP_SELF']?> when writing bug reports.  You may send them via
+    email to <a href="mailto: jesse@ma-amad.com">the author</a>.
+    </p>
+
     <h2>Tips for Web Site Integration</h2>
 
     <a href="javascript:void(0);" id="minimizetips">[-]</a>
@@ -474,12 +481,6 @@ to have a recent backup first, at least of your church year data.</p>
         tried unless needed.</li>
     <li>Manually re-create <a href="admin.php?flag=create-views">synonym coordination views</a> in the database.  This should also happen automatically when needed.</li>
     <li><a href="hymnindex.php?drop=yes">Drop and re-create hymn cross-reference table</a>.  This is needed when the table has been changed in a new version.</li>
-    <li>You are using Service Planner version
-        <?= "{$version['major']}.{$version['minor']}.{$version['tick']}" ?>.
-        Refer to this version number, and include the address
-    <?=$_SERVER['SERVER_NAME'].$_SERVER['PHP_SELF']?> when writing bug reports.  You may send them via
-    email to <a href="mailto: jesse@ma-amad.com">the author</a>.
-    </li>
     </ol>
 
     <? // Use standard lookup function, providing default and returning seconds

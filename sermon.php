@@ -88,7 +88,7 @@ if (! isset($_GET['stage'])) {
         <p class="explanation">This page is for planning a sermon for a
     particular service.  The service is displayed below.  You can also store
     your sermon manuscript file in the system, from this page.</p>
-    <?
+    <?php
     $q = $db->prepare("SELECT bibletext, outline, notes, mstype
         FROM `{$db->getPrefix()}sermons` WHERE service=:id");
     $q->bindParam(":id", $id);
@@ -123,15 +123,49 @@ if (! isset($_GET['stage'])) {
         <button type="submit" id="delete_button" name="delete" value="Delete">Delete this sermon plan</button>
         </form>
         </div>
-    <?
+    <?php
     $q = queryService($id);
     display_records_table($q, "delete.php");
     ?>
+    <h2>Full Set of Lectionary Texts</h2>
+    <?php
+    $q = queryLectionary($id);
+    $raw_lections = $q->fetchAll(PDO::FETCH_ASSOC);
+    $order = array(
+                "lesson1"   => "Lesson 1",
+                "lesson2"   => "Lesson 2",
+                "gospel"    => "Gospel",
+                "psalm"     => "Psalm",
+                "s2lesson"  => "Series 2 Lesson",
+                "s2gospel"  => "Series 2 Gospel",
+                "s3lesson"  => "Series 3 Lesson",
+                "s3gospel"  => "Series 3 Gospel",
+                "hymnabc"   => "Multi-Year Hymn",
+                "hymn"      => "Hymn",
+                "note"      => "Note"
+            );
+    foreach (array_keys($order) as $k) {
+        if (isset($raw_lections[$k])) {
+            $lections[$k] = $raw_lections[$k];
+        }
+    }
+
+    ?>
+    <table id="lectionary_texts">
+    <hr><?php foreach ($order as $k->$field_name) { ?>
+        <th><?=$field_name?></th>
+    <?php } ?>
+    </hr>
+    <hr><?php foreach ($order as $k) { ?>
+        <td><?=$lections[$k]?></td>
+    <?php } ?>
+    </hr>
+    </table>
     <p id="query_time">Main MySQL query response time: <?=$GLOBALS['query_elapsed_time']?></p>
     </div>
     </body>
     </html>
-<?
+<?php
 } elseif (2 == getGET('stage'))
 {
     requireAuth("{$protocol}://{$this_script}?id={$service}", 2);

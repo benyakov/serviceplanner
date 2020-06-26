@@ -80,16 +80,31 @@ function checkContentReq() {
     return getGET('contentonly');
 }
 
+function queryLectionary($id) {
+    $dbh = new DBConnection();
+    $dbp = $dbh->getPrefix();
+    $q = $dbh->prepare("SELECT
+            lesson1, lesson2, gospel, psalm, s2lesson, s2gospel,
+            s3lesson, s3gospel, hymnabc, hymn, note
+        FROM `{$dbp}churchyear_lessons` AS l
+        JOIN `{$dbp}blocks` AS b ON (b.golect = l.lectionary)
+        JOIN `{$dbp}days` AS d ON (d.block = b.id)
+        WHERE d.pkey = :id");
+    if ($id) $q->bindParam(":id", $id);
+    $start_time = microtime(true);
+    if (! $q->execute())
+        die("<p>".array_pop($q->errorInfo()).'</p><p style="white-space: pre;">'.$q->queryString."</p>");
+    $end_time = microtime(true);
+    $GLOBALS['query_elapsed_time'] = $end_time - $start_time;
+    return $q;
+}
+
 function queryService($id) {
     $where = array("d.pkey = :id");
     $options = getOptions();
     $combine_occ_option = $options->get("combineoccurrences");
     unset($options);
-    if (1 == $combine_occ_option) {
-        $q = rawQuery($where, "", "", true);
-    } else {
-        $q = rawQuery($where, "", "", false);
-    }
+    $q = rawQuery($where, "", "", (1 == $combine_occ_option));
     if ($id) $q->bindParam(":id", $id);
     $start_time = microtime(true);
     if (! $q->execute())
