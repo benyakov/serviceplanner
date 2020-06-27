@@ -193,6 +193,8 @@ function blockPlanForm($vals=array()) {
 <?
 }
 
+$dbp = $db->getPrefix();
+
 /* block.php with $_POST
  * Process the submitted block form
  */
@@ -325,34 +327,34 @@ if (getGET('overlapstart') && getGET('overlapend')) {
 if ("blockitems" == getGET('get') && is_numeric(getGET('id')) && getGET('day')) {
     requireAuth("index.php", 2);
     $q = $db->prepare("SELECT b.notes,
-        `{$db->getPrefix()}get_selected_lesson`(b.l1lect, b.l1series,
+        `{$dbp}get_selected_lesson`(b.l1lect, b.l1series,
             'lesson1', :dayname) AS blesson1,
-        `{$db->getPrefix()}get_selected_lesson`(b.l2lect, b.l2series,
+        `{$dbp}get_selected_lesson`(b.l2lect, b.l2series,
             'lesson2', :dayname) AS blesson2,
-        `{$db->getPrefix()}get_selected_lesson`(b.golect, b.goseries,
+        `{$dbp}get_selected_lesson`(b.golect, b.goseries,
             'gospel', :dayname) AS bgospel,
-        `{$db->getPrefix()}get_selected_lesson`(b.smlect, b.smseries,
+        `{$dbp}get_selected_lesson`(b.smlect, b.smseries,
             b.smtype, :dayname) AS bsermon,
         (CASE b.pslect
             WHEN 'custom' THEN b.psseries
             ELSE
-                (SELECT psalm FROM `{$db->getPrefix()}synlessons` AS cl
+                (SELECT psalm FROM `{$dbp}synlessons` AS cl
                 WHERE cl.dayname=:dayname AND cl.lectionary=b.pslect
                 LIMIT 1)
         END) AS bpsalm,
-        (SELECT collect FROM `{$db->getPrefix()}churchyear_collects` AS cyc
-            JOIN `{$db->getPrefix()}churchyear_collect_index` AS cci
+        (SELECT collect FROM `{$dbp}churchyear_collects` AS cyc
+            JOIN `{$dbp}churchyear_collect_index` AS cci
             ON (cyc.id = cci.id)
             WHERE cci.dayname=:dayname AND cci.lectionary=b.colect
             AND cyc.class=b.coclass
         LIMIT 1) AS bcollect,
-        (SELECT note FROM `{$db->getPrefix()}synlessons` AS cl
+        (SELECT note FROM `{$dbp}synlessons` AS cl
             WHERE cl.dayname=:dayname AND cl.lectionary=b.smlect
             LIMIT 1) AS smtextnote,
-        (SELECT hymnabc FROM `{$db->getPrefix()}synlessons` AS cl
+        (SELECT hymnabc FROM `{$dbp}synlessons` AS cl
             WHERE cl.dayname=:dayname AND cl.lectionary=b.smlect
             LIMIT 1) AS smhymnabc,
-        (SELECT hymn FROM `{$db->getPrefix()}synlessons` AS cl
+        (SELECT hymn FROM `{$dbp}synlessons` AS cl
             WHERE cl.dayname=:dayname AND cl.lectionary=b.smlect
             LIMIT 1) AS smhymn,
         b.l1lect != \"custom\" AS l1link,
@@ -360,9 +362,13 @@ if ("blockitems" == getGET('get') && is_numeric(getGET('id')) && getGET('day')) 
         b.golect != \"custom\" AS golink,
         b.pslect != \"custom\" AS pslink,
         b.smlect != \"custom\" AS smlink
-        FROM `{$db->getPrefix()}blocks` as b
+        FROM `{$dbp}blocks` as b
         WHERE id = :block");
-    $q->bindValue(":dayname", getGET('day'));
+    $dayname = getGET('day');
+    if (false !== strpos($dayname, '|')) {
+        $dayname = trim(substr($dayname, 0, strpos($dayname, '|')));
+    }
+    $q->bindValue(":dayname", $dayname);
     $q->bindValue(":block", getGET('id'));
     if ($q->execute() && $row = $q->fetch(PDO::FETCH_ASSOC)) {
         $cfg = getConfig(true);
