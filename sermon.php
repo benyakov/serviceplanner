@@ -151,18 +151,20 @@ if (! isset($_GET['stage'])) {
     }
     $cfg = getConfig(false);
     ?>
-    <table id="lectionary_texts">
-    <tr><?php foreach ($order as $k=>$field_name) { ?>
-        <th><?=$field_name?></th>
+    <dl class="blocklessons">
+    <?php foreach ($order as $k=>$field_name) {
+    if (0<strlen($lections[$k])) { ?>
+        <dt><?=$field_name?></dt><dd><?php
+            if ("psalm"==$k) {
+                echo linkbgw($cfg, "Psalm ".$lections[$k], true);
+            } elseif (in_array($k, ["hymnabc", "hymn", "note"])) {
+                echo $lections[$k];
+            } else {
+                echo linkbgw($cfg, $lections[$k], true);
+            }
+        } ?></dd>
     <?php } ?>
-    </tr>
-    <tr><?php foreach (array_keys($order) as $k) { ?>
-        <td><?=("psalm"==$k)
-        ?linkbgw($cfg, "Psalm ".$lections[$k], true)
-        :linkbgw($cfg, $lections[$k], true)?></td>
-    <?php } ?>
-    </tr>
-    </table>
+    </dl>
     <p id="query_time">Main MySQL query response time: <?=$GLOBALS['query_elapsed_time']?></p>
     </div>
     </body>
