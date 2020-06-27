@@ -420,9 +420,9 @@ function getDayFor(datestr, target) {
             rv = eval(rv);
             if (rv.length) {
                 if (target.is("input")) {
-                    target.val(rv.join(", "));
+                    target.val(rv.join(" | "));
                 } else {
-                    target.html(rv.join(", "));
+                    target.html(rv.join(" | "));
                 }
             }
         });

@@ -208,7 +208,7 @@ function rawQuery($where=array(), $order="", $limit="", $blend_occurrences=false
         WHEN 'custom' THEN b.psseries
         ELSE
             (SELECT psalm FROM `{$dbp}synlessons` AS cl
-            WHERE cl.dayname=d.name AND cl.lectionary=b.pslect
+            WHERE cl.dayname={$dbp}first_dayname(d.name) AND cl.lectionary=b.pslect
             LIMIT 1)
         END)
         AS bpsalm,
@@ -222,7 +222,7 @@ function rawQuery($where=array(), $order="", $limit="", $blend_occurrences=false
     (SELECT collect FROM `{$dbp}churchyear_collects` AS cyc
     JOIN `{$dbp}churchyear_collect_index` AS cci
     ON (cyc.id = cci.id)
-    WHERE cci.dayname=d.name AND cci.lectionary=b.colect
+    WHERE cci.dayname={$dbp}first_dayname(d.name) AND cci.lectionary=b.colect
     AND cyc.class=b.coclass
     LIMIT 1) AS bcollect
     FROM `{$dbp}days` AS d
@@ -230,17 +230,22 @@ function rawQuery($where=array(), $order="", $limit="", $blend_occurrences=false
     LEFT OUTER JOIN `{$dbp}sermons` AS smr ON (h.service = smr.service)
     LEFT OUTER JOIN `{$dbp}names` AS n ON (h.number=n.number AND h.book=n.book)
     LEFT OUTER JOIN `{$dbp}blocks` AS b ON (b.id = d.block)
-    LEFT OUTER JOIN `{$dbp}synpropers` AS cyp ON (cyp.dayname = d.name)
+    LEFT OUTER JOIN `{$dbp}synpropers` AS cyp ON
+        (cyp.dayname = {$dbp}first_dayname(d.name))
     LEFT JOIN `{$dbp}lesson1selections` AS l1s
-    ON (l1s.l1lect=b.l1lect AND l1s.l1series<=>b.l1series AND l1s.dayname=d.name)
+    ON (l1s.l1lect=b.l1lect AND l1s.l1series<=>b.l1series AND
+        l1s.dayname={$dbp}first_dayname(d.name))
     LEFT JOIN `{$dbp}lesson2selections` AS l2s
-    ON (l2s.l2lect=b.l2lect AND l2s.l2series<=>b.l2series AND l2s.dayname=d.name)
+    ON (l2s.l2lect=b.l2lect AND l2s.l2series<=>b.l2series AND
+        l2s.dayname={$dbp}first_dayname(d.name))
     LEFT JOIN `{$dbp}gospelselections` AS gos
-    ON (gos.golect=b.golect AND gos.goseries<=>b.goseries AND gos.dayname=d.name)
+    ON (gos.golect=b.golect AND gos.goseries<=>b.goseries AND
+        gos.dayname={$dbp}first_dayname(d.name))
     LEFT JOIN `{$dbp}sermonselections` AS sms
-    ON (sms.smlect=b.smlect AND sms.smseries<=>b.smseries AND sms.dayname=d.name)
+    ON (sms.smlect=b.smlect AND sms.smseries<=>b.smseries AND
+        sms.dayname={$dbp}first_dayname(d.name))
     LEFT JOIN `{$dbp}synlessons` AS synl
-    ON (synl.dayname=d.name AND synl.lectionary=b.smlect)
+    ON (synl.dayname={$dbp}first_dayname(d.name) AND synl.lectionary=b.smlect)
     {$wherestr}
     ORDER BY d.caldate {$order}, d.pkey {$order},
         {$occ_seq} {$limitstr}");
