@@ -127,7 +127,7 @@ if (! isset($_GET['stage'])) {
     $q = queryService($id);
     display_records_table($q, "delete.php");
     ?>
-    <h2>Full Set of Lectionary Texts</h2>
+    <h2>Full Set of Lectionary Texts With Chosen Gospel</h2>
     <?php
     $q = queryLectionary($id);
     $raw_lections = $q->fetchAll(PDO::FETCH_ASSOC);
@@ -145,27 +145,30 @@ if (! isset($_GET['stage'])) {
                 "note"      => "Note"
             );
     foreach (array_keys($order) as $k) {
-        if (isset($raw_lections[$k])) {
-            $lections[$k] = $raw_lections[$k];
+        if (isset($raw_lections[0][$k])) {
+            $lections[$k] = $raw_lections[0][$k];
         }
     }
-
+    $cfg = getConfig(false);
     ?>
     <table id="lectionary_texts">
-    <hr><?php foreach ($order as $k->$field_name) { ?>
+    <tr><?php foreach ($order as $k=>$field_name) { ?>
         <th><?=$field_name?></th>
     <?php } ?>
-    </hr>
-    <hr><?php foreach ($order as $k) { ?>
-        <td><?=$lections[$k]?></td>
+    </tr>
+    <tr><?php foreach (array_keys($order) as $k) { ?>
+        <td><?=("psalm"==$k)
+        ?linkbgw($cfg, "Psalm ".$lections[$k], true)
+        :linkbgw($cfg, $lections[$k], true)?></td>
     <?php } ?>
-    </hr>
+    </tr>
     </table>
     <p id="query_time">Main MySQL query response time: <?=$GLOBALS['query_elapsed_time']?></p>
     </div>
     </body>
     </html>
 <?php
+    unset($cfg);
 } elseif (2 == getGET('stage'))
 {
     requireAuth("{$protocol}://{$this_script}?id={$service}", 2);

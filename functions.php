@@ -84,11 +84,12 @@ function queryLectionary($id) {
     $dbh = new DBConnection();
     $dbp = $dbh->getPrefix();
     $q = $dbh->prepare("SELECT
-            lesson1, lesson2, gospel, psalm, s2lesson, s2gospel,
-            s3lesson, s3gospel, hymnabc, hymn, note
-        FROM `{$dbp}churchyear_lessons` AS l
-        JOIN `{$dbp}blocks` AS b ON (b.golect = l.lectionary)
-        JOIN `{$dbp}days` AS d ON (d.block = b.id)
+            l.lesson1, l.lesson2, l.gospel, l.psalm, l.s2lesson, l.s2gospel,
+            l.s3lesson, l.s3gospel, l.hymnabc, l.hymn, l.note
+        FROM `{$dbp}days` AS d
+        JOIN `{$dbp}blocks` AS b ON (d.block = b.id)
+        JOIN `{$dbp}churchyear_lessons` AS l
+            ON (l.lectionary=b.golect AND l.dayname={$dbp}first_dayname(d.name))
         WHERE d.pkey = :id");
     if ($id) $q->bindParam(":id", $id);
     $start_time = microtime(true);
