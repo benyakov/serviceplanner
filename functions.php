@@ -384,6 +384,70 @@ function display_records_table($q) {
     unset($options);
 }
 
+/***********
+ * Display the block info in a standard format
+ */
+function display_block_section($row, $cfg) { ?>
+    <td colspan=3 class="blockdisplay">
+    <h4>Block: <?=$row['blabel']?></h4>
+    <div class="blocknotes maxcolumn">
+        <?=translate_markup($row['bnotes'])?>
+    </div>
+<?
+if (! ($row['blesson1'] || $row['blesson2'] || $row['bgospel']
+|| $row['bpsalm'] || $row['bsermon'] || $row['bcollect']) )
+{
+echo "No block data found. "
+."Is the liturgical day name set to a single day?";
+}
+?>
+    <dl class="blocklessons">
+    <dt>Lesson 1</dt><dd><?=linkbgw($cfg, $row['blesson1'], $row['l1link'])?></dd>
+    <dt>Lesson 2</dt><dd><?=linkbgw($cfg, $row['blesson2'], $row['l2link'])?></dd>
+    <dt>Gospel</dt><dd><?=linkbgw($cfg, $row['bgospel'], $row['golink'])?></dd>
+    <dt>Psalm</dt><dd><?=linkbgw($cfg, $row['bpsalm']?"Ps ".$row['bpsalm']:'', $row['pslink'])?></dd>
+    <dt>Sermon<?=$row['has_sermon']?'*':''?></dt><dd><?=linkbgw($cfg, $row['bsermon'], $row['has_sermon'] || $row['smlink'])?></dd>
+    </dl>
+    <h5>Collect (<?=$row['bcollectclass']?>)</h5>
+    <div class="collecttext maxcolumn">
+        <?=$row['bcollect']?>
+    </div>
+    <? if ($row['sermonlessonnote']) { ?>
+    <h5>Sermon Lesson Note</h5>
+    <div class="sermonlessonnote maxcolumn">
+        <?=translate_markup($row['sermonlessonnote'])?>
+    </div>
+    <? }
+}
+
+/*****
+ * A form for selecting which extra block info to display
+ */
+function extra_daynames_selection_form($day, $identifier) {
+    // Get a list of lectionaries and a list of alternative daynames
+    $daynames = array_map('trim', explode("|", $day));
+    array_shift($daynames); // Remove first (default) dayname
+    ob_start();
+    ?>
+    <form id="<?=$identifier?>_extra-dayname-form" class="extra-dayname-form">
+    <label for="alt_lectionary">Choose Lectionary</label>
+    <select name="alt_lectionary" id="<?=$identfier?>_chosen-lect">
+    <? foreach (getLectionaryNames() as $lname) { ?>
+        <option name="<?=$lname?>"><?=$lname?></option>
+    <? } ?>
+    </select>
+    <label for="alt_dayname">Choose Dayname</label>
+    <select name="alt_dayname" id="<?=$identifier?>_chosen-day">
+    <? foreach ($daynames as $day) { ?>
+        <option name="<?=$day?>"><?=$day?></option>
+    <? } ?>
+    </select>
+    <button type="submit">Show</button>
+    </form>
+    <?php
+    return ob_get_clean();
+}
+
 /**
  * Show a table of the data in the query $q,
  * grouping hymns into separate sections for each service occurrence.
@@ -444,41 +508,19 @@ function display_occurrences_separately($q) {
             echo "\n</table></td></tr>\n";
             if ($row['block'])
             { ?>
-                    <tr data-occ="<?=$row['occurrence']?>" data-service="<?=$row['serviceid']?>"><td colspan=3 class="blockdisplay">
-                    <h4>Block: <?=$row['blabel']?></h4>
-                    <div class="blocknotes maxcolumn">
-                        <?=translate_markup($row['bnotes'])?>
-                    </div>
-    <?
-            if (! ($row['blesson1'] || $row['blesson2'] || $row['bgospel']
-                || $row['bpsalm'] || $row['bsermon'] || $row['bcollect']) )
-            {
-                echo "No block data found. "
-                ."Is the liturgical day name set to a single day?";
-            }
-    ?>
-                    <dl class="blocklessons">
-                    <dt>Lesson 1</dt><dd><?=linkbgw($cfg, $row['blesson1'], $row['l1link'])?></dd>
-                    <dt>Lesson 2</dt><dd><?=linkbgw($cfg, $row['blesson2'], $row['l2link'])?></dd>
-                    <dt>Gospel</dt><dd><?=linkbgw($cfg, $row['bgospel'], $row['golink'])?></dd>
-                    <dt>Psalm</dt><dd><?=linkbgw($cfg, $row['bpsalm']?"Ps ".$row['bpsalm']:'', $row['pslink'])?></dd>
-                    <dt>Sermon<?=$row['has_sermon']?'*':''?></dt><dd><?=linkbgw($cfg, $row['bsermon'], $row['has_sermon'] || $row['smlink'])?></dd>
-                    </dl>
-                    <h5>Collect (<?=$row['bcollectclass']?>)</h5>
-                    <div class="collecttext maxcolumn">
-                        <?=$row['bcollect']?>
-                    </div>
-                    <? if ($row['sermonlessonnote']) { ?>
-                    <h5>Sermon Lesson Note</h5>
-                    <div class="sermonlessonnote maxcolumn">
-                        <?=translate_markup($row['sermonlessonnote'])?>
-                    </div>
-                    <? } ?>
+                <tr data-occ="<?=$row['occurrence']?>" data-service="<?=$row['serviceid']?>">
+                <?php display_block_section($row, $cfg); ?>
                 </tr>
             <? }
             if ($row['servicenotes']) {
                 echo "<tr data-occ=\"{$row['occurrence']}\" data-service=\"{$row['serviceid']}\"><td colspan=3 class=\"servicenote\">".
                      translate_markup($row['servicenotes'])."</td></tr>\n";
+            }
+            if (false !== strpos($row['dayname'], '|')) {
+                echo "<tr data-occ=\"{$row['occurrence']}\" data-service=\"{$row['serviceid']}\"><td colspan=3 class=\"extradaynamesctrl\"><h4>Propers for Extra Daynames</h4>".
+                    extra_daynames_selection_form($row['dayname'],
+                        "{$row['serviceid']}-{$row['occurrence']}")."</td></tr>\n";
+                echo "<tr data-occ=\"{$row['occurrence']}\" data-service=\"{$row['serviceid']}\"><td colspan=3><table class=\"extrablockinfo\"></table></td></tr>\n";
             }
             $serviceid = $row['serviceid'];
             $occurrence = $row['occurrence'];
@@ -575,41 +617,19 @@ function displayServiceHeaderCombined($thesehymns) {
     echo "\n</table></td></tr>\n";
     if (getIndexOr($row,'block'))
     { ?>
-        <tr data-service="<?=getIndexOr($row,'serviceid')?>"><td colspan=3 class="blockdisplay">
-            <h4>Block: <?=$row['blabel']?></h4>
-            <div class="blocknotes maxcolumn">
-                <?=translate_markup($row['bnotes'])?>
-            </div>
-    <?
-    if (! ($row['blesson1'] || $row['blesson2'] || $row['bgospel']
-        || $row['bpsalm'] || $row['bsermon'] || $row['bcollect']) )
-    {
-        echo "No block data found. "
-        ."Is the liturgical day name set to a single day?";
-    }
-    ?>
-            <dl class="blocklessons">
-            <dt>Lesson 1</dt><dd><?=linkbgw($cfg, $row['blesson1'], $row['l1link'])?></dd>
-            <dt>Lesson 2</dt><dd><?=linkbgw($cfg, $row['blesson2'], $row['l2link'])?></dd>
-            <dt>Gospel</dt><dd><?=linkbgw($cfg, $row['bgospel'], $row['golink'])?></dd>
-            <dt>Psalm</dt><dd><?=linkbgw($cfg, $row['bpsalm']?"Ps ".$row['bpsalm']:'', $row['pslink'])?></dd>
-            <dt>Sermon<?=$row['has_sermon']?'*':''?></dt><dd><?=linkbgw($cfg, $row['bsermon'], $row['has_sermon'] || $row['smlink'])?></dd>
-            </dl>
-            <h5>Collect (<?=$row['bcollectclass']?>)</h5>
-            <div class="collecttext maxcolumn">
-                <?=$row['bcollect']?>
-            </div>
-            <? if ($row['sermonlessonnote']) { ?>
-            <h5>Sermon Lesson Note</h5>
-            <div class="sermonlessonnote maxcolumn">
-                <?=translate_markup($row['sermonlessonnote'])?>
-            </div>
-            <? } ?>
+        <tr data-service="<?=getIndexOr($row,'serviceid')?>">
+        <?php display_block_section($row, $cfg);?>
         </tr>
     <? }
     if ($row['servicenotes']) {
         echo "<tr data-service=\"{$sid}\"><td colspan=3 class=\"servicenote\">".
              translate_markup($row['servicenotes'])."</td></tr>\n";
+    }
+    if (false !== strpos($row['dayname'], '|')) {
+        echo "<tr data-service=\"{$row['serviceid']}\"><td colspan=3 class=\"extradaynamesctrl\"><h4>Propers for Extra Daynames</h4>".
+                 extra_daynames_selection_form($row['dayname'],
+                        "{$row['serviceid']}")."</td></tr>\n";
+        echo "<tr data-service=\"{$row['serviceid']}\"><td colspan=3><table class=\"extrablockinfo\"></table></td></tr>\n";
     }
     unset($cfg);
 }
@@ -695,42 +715,19 @@ function modify_occurrences_separately($q) {
             echo "\n</tr></table></td>\n";
             if ($row['block'])
             { ?>
-                <tr data-occ="<?=$row['occurrence']?>" data-service="<?=$row['serviceid']?>"><td colspan=3 class="blockdisplay">
-                    <h4>Block: <?=$row['blabel']?></h4>
-                    <div class="blocknotes">
-                        <?=translate_markup($row['bnotes'])?>
-                    </div>
-    <?
-            if (! ($row['blesson1'] || $row['blesson2'] || $row['bgospel']
-                || $row['bpsalm'] || $row['bsermon'] || $row['bcollect']) )
-            {
-                echo "No block data found. "
-                ."Is the liturgical day name set to a single day?";
-            }
-    ?>
-
-                    <dl class="blocklessons">
-                    <dt>Lesson 1</dt><dd><?=linkbgw($cfg, $row['blesson1'], $row['l1link'])?></dd>
-                    <dt>Lesson 2</dt><dd><?=linkbgw($cfg, $row['blesson2'], $row['l2link'])?></dd>
-                    <dt>Gospel</dt><dd><?=linkbgw($cfg, $row['bgospel'], $row['golink'])?></dd>
-                    <dt>Psalm</dt><dd><?=linkbgw($cfg, $row['bpsalm']?"Ps ".$row['bpsalm']:'', $row['pslink'])?></dd>
-                    <dt>Sermon<?=$row['has_sermon']?'*':''?></dt><dd><?=linkbgw($cfg, $row['bsermon'], $row['has_sermon'] || $row['smlink'])?></dd>
-                    </dl>
-                    <h5>Collect (<?=$row['bcollectclass']?>)</h5>
-                    <div class="collecttext maxcolumn">
-                        <?=$row['bcollect']?>
-                    </div>
-                    <? if ($row['sermonlessonnote']) { ?>
-                    <h5>Sermon Lesson Note</h5>
-                    <div class="sermonlessonnote maxcolumn">
-                        <?=translate_markup($row['sermonlessonnote'])?>
-                    </div>
-                    <? } ?>
+                <tr data-occ="<?=$row['occurrence']?>" data-service="<?=$row['serviceid']?>">
+                <?php display_block_section($row, $cfg); ?>
                 </tr>
             <? }
             if ($row['servicenotes']) {
                 echo "<tr data-occ=\"{$row['occurrence']}\" data-service=\"{$row['serviceid']}\"><td colspan=3 class=\"servicenote\">".
                      translate_markup($row['servicenotes'])."</td></tr>\n";
+            }
+            if (false !== strpos($row['dayname'], '|')) {
+                echo "<tr data-occ=\"{$row['occurrence']}\" data-service=\"{$row['serviceid']}\"><td colspan=3 class=\"extradaynamesctrl\"><h4>Propers for Extra Daynames</h4>".
+                         extra_daynames_selection_form($row['dayname'],
+                        "{$row['serviceid']}-{$row['occurrence']}")."</td></tr>\n";
+                echo "<tr data-occ=\"{$row['occurrence']}\" data-service=\"{$row['serviceid']}\"><td colspan=3><table class=\"extrablockinfo\"></table></td></tr>\n";
             }
             $serviceid = $row['serviceid'];
             $occurrence = $row['occurrence'];
@@ -843,42 +840,19 @@ function modifyServiceHeaderCombined($thesehymns) {
     echo "\n</tr></table></td>\n";
     if ($row['block'])
     { ?>
-        <tr data-service="<?=$row['serviceid']?>"><td colspan=3 class="blockdisplay">
-            <h4>Block: <?=$row['blabel']?></h4>
-            <div class="blocknotes">
-                <?=translate_markup($row['bnotes'])?>
-            </div>
-    <?
-    if (! ($row['blesson1'] || $row['blesson2'] || $row['bgospel']
-        || $row['bpsalm'] || $row['bsermon'] || $row['bcollect']) )
-    {
-        echo "No block data found. "
-        ."Is the liturgical day name set to a single day?";
-    }
-    ?>
-
-            <dl class="blocklessons">
-            <dt>Lesson 1</dt><dd><?=linkbgw($cfg, $row['blesson1'], $row['l1link'])?></dd>
-            <dt>Lesson 2</dt><dd><?=linkbgw($cfg, $row['blesson2'], $row['l2link'])?></dd>
-            <dt>Gospel</dt><dd><?=linkbgw($cfg, $row['bgospel'], $row['golink'])?></dd>
-            <dt>Psalm</dt><dd><?=linkbgw($cfg, $row['bpsalm']?"Ps ".$row['bpsalm']:'', $row['pslink'])?></dd>
-            <dt>Sermon<?=$row['has_sermon']?'*':''?></dt><dd><?=linkbgw($cfg, $row['bsermon'], $row['has_sermon'] || $row['smlink'])?></dd>
-            </dl>
-            <h5>Collect (<?=$row['bcollectclass']?>)</h5>
-            <div class="collecttext maxcolumn">
-                <?=$row['bcollect']?>
-            </div>
-            <? if ($row['sermonlessonnote']) { ?>
-            <h5>Sermon Lesson Note</h5>
-            <div class="sermonlessonnote maxcolumn">
-                <?=translate_markup($row['sermonlessonnote'])?>
-            </div>
-            <? } ?>
+        <tr data-service="<?=$row['serviceid']?>">
+        <?php display_block_section($row, $cfg); ?>
         </tr>
     <? }
     if ($row['servicenotes']) {
         echo "<tr data-service=\"{$row['serviceid']}\"><td colspan=3 class=\"servicenote\">".
              translate_markup($row['servicenotes'])."</td></tr>\n";
+    }
+    if (false !== strpos($row['dayname'], '|')) {
+        echo "<tr data-service=\"{$row['serviceid']}\"><td colspan=3 class=\"extradaynamesctrl\"><h4>Propers for Extra Daynames</h4>".
+                 extra_daynames_selection_form($row['dayname'],
+                        "{$row['serviceid']}")."</td></tr>\n";
+        echo "<tr data-service=\"{$row['serviceid']}\"><td colspan=3><table class=\"extrablockinfo\"></table></td></tr>\n";
     }
     unset($cfg);
 }
