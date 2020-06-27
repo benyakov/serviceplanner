@@ -186,7 +186,7 @@ if (array_key_exists("date", $_POST)) {
         value="<?=$options->getDefault("", "defaultoccurrence")?>" >
     </li>
     <li>
-        <label for="liturgical_name">Liturgical Name:</label><br>
+        <label for="liturgicalname">Liturgical Name:</label><br>
         <input tabindex="26" type="text"
             id="liturgicalname" name="liturgicalname" value="">
     </li>
