@@ -228,7 +228,7 @@ function rawQuery($where=array(), $order="", $limit="", $blend_occurrences=false
     LIMIT 1) AS bcollect
     FROM `{$dbp}days` AS d
     LEFT OUTER JOIN `{$dbp}hymns` AS h ON (h.service = d.pkey)
-    LEFT OUTER JOIN `{$dbp}sermons` AS smr ON (h.service = smr.service)
+    LEFT OUTER JOIN `{$dbp}sermons` AS smr ON (d.pkey = smr.service)
     LEFT OUTER JOIN `{$dbp}names` AS n ON (h.number=n.number AND h.book=n.book)
     LEFT OUTER JOIN `{$dbp}blocks` AS b ON (b.id = d.block)
     LEFT OUTER JOIN `{$dbp}synpropers` AS cyp ON
