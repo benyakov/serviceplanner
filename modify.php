@@ -55,6 +55,7 @@ if (getGET('highdate')) {
     $_SESSION[$sprefix]["highdate"] = $highdate;
 } elseif (!getIndexOr($_SESSION[$sprefix],"highdate")) {
     $highdate = new DateTime();
+    $highdate->add(new DateInterval("P2W"));
     $_SESSION[$sprefix]["highdate"] = $highdate;
 } else $highdate = $_SESSION[$sprefix]['highdate'];
 
