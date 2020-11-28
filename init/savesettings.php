@@ -1,4 +1,4 @@
-<?  /* Save settings provided in $_GET or $_POST
+<?php  /* Save settings provided in $_GET or $_POST
     Copyright (C) 2014 Jesse Jacobsen
 
     This program is free software; you can redistribute it and/or modify
@@ -130,6 +130,10 @@ if (isset($_GET["flagestalt"]) && isset($_GET["occurrence"])) {
     $options->set('flagestalt', array("service" => intval($_GET['flagestalt']), "occurrence" => $_GET['occurrence']));
     setMessage("Config: (Re)set default service for initial flags");
 }
+
+if (isset($_POST['default-modify-future-range-option'])) {
+    $options->set('future-range', (int) $_POST['default-modify-future-range-option']);
+    setMessage("Default future range option has been set.");
 
 $options->save();
 unset($options);

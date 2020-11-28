@@ -584,6 +584,15 @@ available for specifying hymns. The first will be the default book.</dd>
         name="service-flags-option"><?
     echo implode("\n", $options->get('addable_service_flags'));
     ?></textarea></dd>
+    <dt><a name="default-modify-future-range">Default Modify Future Range</a></dt>
+    <dd class="explanation">When restarting a new PHP session, how many weeks
+    in the future should the Modify tab display? PHP sessions keep track of
+    information like this while using the website, but they do expire after some
+    time. Though the service planner can remember your login, it will lose anything
+    stored only in the current PHP session.</dd>
+    <dd><input type="number" id="default-modify-future-range-option"
+         name="default-modify-future-range-option"
+         value="<?=$options->getDefault(1, 'future-range')?>"></dd>
     </dl>
     <button type="submit">Submit</button><button type="reset">Reset</button>
     </form>

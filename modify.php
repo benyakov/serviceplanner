@@ -50,12 +50,14 @@ if (getGET('lowdate')) {
     $_SESSION[$sprefix]["lowdate"] = $lowdate;
 } else $lowdate = $_SESSION[$sprefix]['lowdate'];
 
+$options = getOptions(true);
 if (getGET('highdate')) {
     $highdate = new DateTime(getGET('highdate'));
     $_SESSION[$sprefix]["highdate"] = $highdate;
 } elseif (!getIndexOr($_SESSION[$sprefix],"highdate")) {
     $highdate = new DateTime();
-    $highdate->add(new DateInterval("P2W"));
+    $highdate->add(new DateInterval("P".
+        $options->getDefault('1', 'future-range')."W"));
     $_SESSION[$sprefix]["highdate"] = $highdate;
 } else $highdate = $_SESSION[$sprefix]['highdate'];
 
@@ -63,7 +65,6 @@ if ("All" == getGET('submit'))
     $_SESSION[$sprefix]['modifyorder'] = "All";
 elseif ("Future" == getGET('submit'))
     $_SESSION[$sprefix]['modifyorder'] = "Future";
-$options = getOptions(true);
 if (! array_key_exists('modifyorder', $_SESSION[$sprefix]))
     $_SESSION[$sprefix]['modifyorder'] =
         $options->getDefault('All', 'modifyorder');
