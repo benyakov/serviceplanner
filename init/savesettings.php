@@ -134,6 +134,7 @@ if (isset($_GET["flagestalt"]) && isset($_GET["occurrence"])) {
 if (isset($_POST['default-modify-future-range-option'])) {
     $options->set('future-range', (int) $_POST['default-modify-future-range-option']);
     setMessage("Default future range option has been set.");
+}
 
 $options->save();
 unset($options);
