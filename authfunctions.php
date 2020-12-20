@@ -244,7 +244,7 @@ function validateAuth($require) {
 function checkCorsAuth() {
     if (isset($_SERVER['HTTP_ORIGIN'])) {
         $corsfile = explode("\n", file_get_contents("corsfile.txt"));
-        if ($_SERVER['HTTP_HOST'] == $_SERVER['HTTP_ORIGIN']) {
+        if ($_SERVER['HTTP_HOST'] == $_SERVER['HTTP_ORIGIN'] or getGET('flag')=='inituser') {
             return false;
         } elseif ($corsfile && in_array($_SERVER['HTTP_ORIGIN'], $corsfile)) {
             header("Access-Control-Allow-Origin: {$_SERVER['HTTP_ORIGIN']}");
