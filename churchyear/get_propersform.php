@@ -106,7 +106,7 @@ function propersForm($dayname) {
         $id = $lset['id'];
         if (preg_match("/historic/i", $lset['lectionary'])) {
     ?>
-    <div id="historic-tab">
+    <div id="<?=$lset["lectionary"]?>-tab">
     <div class="propers">
     <form class="lessons propersform" method="post">
     <div class="propersbox">
