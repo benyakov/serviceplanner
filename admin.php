@@ -54,7 +54,7 @@ if ('dellect' == getPOST('action')) {
             })
     }
     $(document).ready(function() {
-        var lectionaryUploadName = document.getElementById('lect_replace');
+        var lectionaryUploadName = document.getElementById('lectionary_name');
         lectionaryUploadName.oninvalid = function(event) {
             event.target.setCustomValidity('Use letters, numbers, -, and _ characters in the lectionary name.');
         }
