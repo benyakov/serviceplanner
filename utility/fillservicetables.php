@@ -204,5 +204,5 @@ function getParamType($value, $nonnulltype) {
 }
 
 function paramStrNull($value) {
-    getParamType($value, PDO::PARAM_STR);
+    return getParamType($value, PDO::PARAM_STR);
 }
