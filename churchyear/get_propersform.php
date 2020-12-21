@@ -211,8 +211,8 @@ function propersForm($dayname) {
     <input type="hidden" name="dayname" value="<?=$dayname?>">
     <textarea class="datalist"
     id="lectionaries-for-dayname"><?=implode("\n", $lectionaries)?></textarea>
-    <div class="formblock"><label for="lectionary">Lectionary (letters, numbers, '_' only)</label><br>
-    <input type="text" value="" name="lectionary" id="new-lectionary" required pattern="[A-Za-z0-9_]+"></div>
+    <div class="formblock"><label for="lectionary">Lectionary (letters, numbers, '_', and '-' only)</label><br>
+    <input type="text" value="" name="lectionary" id="new-lectionary" required pattern="[-A-Za-z0-9_]+"></div>
     <div class="formblock"><label for="l1">Lesson 1</label><br>
     <input type="text" value="" name="l1"></div>
     <div class="formblock"><label for="l2">Lesson 2</label><br>
