@@ -54,6 +54,10 @@ if ('dellect' == getPOST('action')) {
             })
     }
     $(document).ready(function() {
+        var lectionaryUploadName = document.getElementById('lect_replace');
+        lectionaryUploadName.oninvalid = function(event) {
+            event.target.setCustomValidity('Use letters, numbers, -, and _ characters in the lectionary name.');
+        }
         $("#corsform").submit(function(evt) {
             saveCorsfile();
             evt.preventDefault();
@@ -360,7 +364,7 @@ to have a recent backup first, at least of your church year data.</p>
             placeholder="Select local file."><br>
         <label for="lectionary_name">Name for imported lectionary</label>
         <input type="text" id="lectionary_name" name="lectionary_name"
-            required placeholder="Enter name."><br>
+            required pattern="[-a-zA-Z0-9_]{1,55}" placeholder="Enter name."><br>
         <input type="checkbox" id="lect_replace" name="replace">
         <label for="lect_replace">Replace all existing records for this lectionary?</label><br>
         <button type="submit">Import Lectionary</button>
