@@ -179,9 +179,9 @@ function setAuthCookie($user, $series, $age) {
     checkAuthCookiesDir($user);
     $token = genCookieAuthString();
     $timestamp = time()+$age;
-    setcookie('auth[series]', $series, $timestamp);
-    setcookie('auth[token]', $token, $timestamp);
-    setcookie('auth[user]', $user, $timestamp);
+    setcookie('auth[series]', $series, ["expires"=>$timestamp, "samesite"=>"Strict"]);
+    setcookie('auth[token]', $token, ["expires"=>$timestamp, "samesite"=>"Strict"]);
+    setcookie('auth[user]', $user, ["expires"=>$timestamp, "samesite"=>"Strict"]);
     file_put_contents("authcookies/{$user}/{$series}", $token);
     setLastAdminLogin($user);
 }
