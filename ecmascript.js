@@ -831,6 +831,12 @@ function hideExtras(serviceid, serviceocc) {
     serviceLines.not('tr.servicehead').not('tr.service-flags').hide(400);
 }
 
+function showExtraDayname(form) {
+    // Get the propers and block info for the dayname in the form.
+    // Modify the DOM near the form to show both.
+    // TODO
+}
+
 $(document).ready(function() {
     $("#loginform").submit(function(evt) {
         evt.preventDefault();
@@ -839,6 +845,10 @@ $(document).ready(function() {
     $("#openstyler").click(openStyler);
     $("#message").delay(8000).slideUp();
     $("#seemessages").click(openMsgViewer);
+    $(".extra-dayname-form").submit(function(evt) {
+        evt.preventDefault();
+        showExtraDayname(this);
+    });
     setCSSTweaks();
 });
 
