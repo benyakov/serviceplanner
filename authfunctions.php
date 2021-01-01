@@ -179,9 +179,9 @@ function setAuthCookie($user, $series, $age) {
     checkAuthCookiesDir($user);
     $token = genCookieAuthString();
     $timestamp = time()+$age;
-    setcookie('auth[series]', $series, $timestamp);
-    setcookie('auth[token]', $token, $timestamp);
-    setcookie('auth[user]', $user, $timestamp);
+    setcookie('auth[series]', $series, ["expires"=>$timestamp, "samesite"=>"Strict"]);
+    setcookie('auth[token]', $token, ["expires"=>$timestamp, "samesite"=>"Strict"]);
+    setcookie('auth[user]', $user, ["expires"=>$timestamp, "samesite"=>"Strict"]);
     file_put_contents("authcookies/{$user}/{$series}", $token);
     setLastAdminLogin($user);
 }
@@ -244,7 +244,7 @@ function validateAuth($require) {
 function checkCorsAuth() {
     if (isset($_SERVER['HTTP_ORIGIN'])) {
         $corsfile = explode("\n", file_get_contents("corsfile.txt"));
-        if ($_SERVER['HTTP_HOST'] == $_SERVER['HTTP_ORIGIN']) {
+        if ($_SERVER['HTTP_HOST'] == $_SERVER['HTTP_ORIGIN'] or getGET('flag')=='inituser') {
             return false;
         } elseif ($corsfile && in_array($_SERVER['HTTP_ORIGIN'], $corsfile)) {
             header("Access-Control-Allow-Origin: {$_SERVER['HTTP_ORIGIN']}");
