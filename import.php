@@ -530,8 +530,8 @@ class HymnNameImporter {
         if (! strpos($_POST['prefix'], ' ') === false)
             throw new HymnTableNameError("Bad prefix: `".htmlentities($_POST['prefix']."'"));
         $db = new DBConnection();
-        $this->namestable = $db->quote("{$_POST['prefix']}names");
-        $q = $db->query("SHOW TABLES LIKE {$this->namestable}");
+        $this->namestable = trim($db->quote("{$_POST['prefix']}names"), "'");
+        $q = $db->query("SHOW TABLES LIKE '{$this->namestable}'");
         if (! count($q->fetchAll()))
             throw new HymnTableNameError("No names table exists with prefix `".htmlentities($_POST['prefix'])."'");
 
