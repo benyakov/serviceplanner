@@ -89,7 +89,7 @@ function queryLectionary($id) {
         FROM `{$dbp}days` AS d
         JOIN `{$dbp}blocks` AS b ON (d.block = b.id)
         JOIN `{$dbp}churchyear_lessons` AS l
-            ON (l.lectionary=b.golect AND l.dayname={$dbp}first_dayname(d.name))
+            ON (l.lectionary=b.golect AND l.dayname=TRIM(SUBSTRING_INDEX(d.name, "|", 1))
         WHERE d.pkey = :id");
     if ($id) $q->bindParam(":id", $id);
     $start_time = microtime(true);
@@ -209,7 +209,7 @@ function rawQuery($where=array(), $order="", $limit="", $blend_occurrences=false
         WHEN 'custom' THEN b.psseries
         ELSE
             (SELECT psalm FROM `{$dbp}synlessons` AS cl
-            WHERE cl.dayname={$dbp}first_dayname(d.name) AND cl.lectionary=b.pslect
+            WHERE cl.dayname=l.dayname=TRIM(SUBSTRING_INDEX(d.name, "|", 1)) AND cl.lectionary=b.pslect
             LIMIT 1)
         END)
         AS bpsalm,
@@ -223,7 +223,7 @@ function rawQuery($where=array(), $order="", $limit="", $blend_occurrences=false
     (SELECT collect FROM `{$dbp}churchyear_collects` AS cyc
     JOIN `{$dbp}churchyear_collect_index` AS cci
     ON (cyc.id = cci.id)
-    WHERE cci.dayname={$dbp}first_dayname(d.name) AND cci.lectionary=b.colect
+    WHERE cci.dayname=TRIM(SUBSTRING_INDEX(d.name, "|", 1)) AND cci.lectionary=b.colect
     AND cyc.class=b.coclass
     LIMIT 1) AS bcollect
     FROM `{$dbp}days` AS d
@@ -232,21 +232,21 @@ function rawQuery($where=array(), $order="", $limit="", $blend_occurrences=false
     LEFT OUTER JOIN `{$dbp}names` AS n ON (h.number=n.number AND h.book=n.book)
     LEFT OUTER JOIN `{$dbp}blocks` AS b ON (b.id = d.block)
     LEFT OUTER JOIN `{$dbp}synpropers` AS cyp ON
-        (cyp.dayname = {$dbp}first_dayname(d.name))
+        (cyp.dayname = TRIM(SUBSTRING_INDEX(d.name, "|", 1))
     LEFT JOIN `{$dbp}lesson1selections` AS l1s
     ON (l1s.l1lect=b.l1lect AND l1s.l1series<=>b.l1series AND
-        l1s.dayname={$dbp}first_dayname(d.name))
+        l1s.dayname=TRIM(SUBSTRING_INDEX(d.name, "|", 1))
     LEFT JOIN `{$dbp}lesson2selections` AS l2s
     ON (l2s.l2lect=b.l2lect AND l2s.l2series<=>b.l2series AND
-        l2s.dayname={$dbp}first_dayname(d.name))
+        l2s.dayname=TRIM(SUBSTRING_INDEX(d.name, "|", 1))
     LEFT JOIN `{$dbp}gospelselections` AS gos
     ON (gos.golect=b.golect AND gos.goseries<=>b.goseries AND
-        gos.dayname={$dbp}first_dayname(d.name))
+        gos.dayname=TRIM(SUBSTRING_INDEX(d.name, "|", 1))
     LEFT JOIN `{$dbp}sermonselections` AS sms
     ON (sms.smlect=b.smlect AND sms.smseries<=>b.smseries AND
-        sms.dayname={$dbp}first_dayname(d.name))
+        sms.dayname=TRIM(SUBSTRING_INDEX(d.name, "|", 1))
     LEFT JOIN `{$dbp}synlessons` AS synl
-    ON (synl.dayname={$dbp}first_dayname(d.name) AND synl.lectionary=b.smlect)
+    ON (synl.dayname=TRIM(SUBSTRING_INDEX(d.name, "|", 1)) AND synl.lectionary=b.smlect)
     {$wherestr}
     ORDER BY d.caldate {$order}, d.pkey {$order},
         {$occ_seq} {$limitstr}");

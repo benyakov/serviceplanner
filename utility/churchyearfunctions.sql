@@ -25,13 +25,6 @@
 
 
 #DELIMITER $$
-DROP FUNCTION IF EXISTS `{{DBP}}first_dayname`;
-CREATE FUNCTION `{{DBP}}first_dayname`(p_full_dayname CHAR(250)) RETURNS CHAR(250)
-DETERMINISTIC
-BEGIN
-    RETURN TRIM(SUBSTRING_INDEX(p_full_dayname, "|", 1));
-END;
-
 DROP FUNCTION IF EXISTS `{{DBP}}easter_in_year`;
 CREATE FUNCTION `{{DBP}}easter_in_year`(p_year INTEGER) RETURNS DATE
 DETERMINISTIC
