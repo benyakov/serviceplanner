@@ -339,74 +339,109 @@ if (getGET('overlapstart') && getGET('overlapend')) {
  */
 if ("blockitems" == getGET('get') && is_numeric(getGET('id')) && getGET('day')) {
     requireAuth("index.php", 2);
-    $q = $db->prepare("SELECT b.notes,
-        `{$dbp}get_selected_lesson`(b.l1lect, b.l1series,
-            'lesson1', :dayname) AS blesson1,
-        `{$dbp}get_selected_lesson`(b.l2lect, b.l2series,
-            'lesson2', :dayname) AS blesson2,
-        `{$dbp}get_selected_lesson`(b.golect, b.goseries,
-            'gospel', :dayname) AS bgospel,
-        `{$dbp}get_selected_lesson`(b.smlect, b.smseries,
-            b.smtype, :dayname) AS bsermon,
-        (CASE b.pslect
-            WHEN 'custom' THEN b.psseries
-            ELSE
-                (SELECT psalm FROM `{$dbp}synlessons` AS cl
-                WHERE cl.dayname=:dayname AND cl.lectionary=b.pslect
-                LIMIT 1)
-        END) AS bpsalm,
-        (SELECT collect FROM `{$dbp}churchyear_collects` AS cyc
-            JOIN `{$dbp}churchyear_collect_index` AS cci
-            ON (cyc.id = cci.id)
-            WHERE cci.dayname=:dayname AND cci.lectionary=b.colect
-            AND cyc.class=b.coclass
-        LIMIT 1) AS bcollect,
-        (SELECT note FROM `{$dbp}synlessons` AS cl
-            WHERE cl.dayname=:dayname AND cl.lectionary=b.smlect
-            LIMIT 1) AS smtextnote,
-        (SELECT hymnabc FROM `{$dbp}synlessons` AS cl
-            WHERE cl.dayname=:dayname AND cl.lectionary=b.smlect
-            LIMIT 1) AS smhymnabc,
-        (SELECT hymn FROM `{$dbp}synlessons` AS cl
-            WHERE cl.dayname=:dayname AND cl.lectionary=b.smlect
-            LIMIT 1) AS smhymn,
-        b.l1lect != \"custom\" AS l1link,
-        b.l2lect != \"custom\" AS l2link,
-        b.golect != \"custom\" AS golink,
-        b.pslect != \"custom\" AS pslink,
-        b.smlect != \"custom\" AS smlink
-        FROM `{$dbp}blocks` as b
+    $q = $db->prepare("SELECT l1lect, l1series, l2lect, l2series,
+        golect, goseries, smlect, smseries, notes, weeklygradual,
+        l1lect != \"custom\" AS l1link,
+        l2lect != \"custom\" AS l2link,
+        golect != \"custom\" AS golink,
+        pslect != \"custom\" AS pslink,
+        smlect != \"custom\" AS smlink
+        FROM `{$dbp}blocks`
         WHERE id = :block");
+    $q->bindValue(":block", getGET('id'));
+    $q->execute() or die("Problem getting blockconfig");
+    $blockconfig = $q->fetch(PDO::FETCH_ASSOC);
+    $q = $db->prepare("SELECT dayname, lectionary, lesson1, lesson2, gospel,
+        psalm, s2lesson, s2gospel, s3lesson, s3gospel, hymnabc, hymn, note
+        FROM `{$dbp}synlessons` as cl
+        WHERE cl.dayname = :dayname");
     $dayname = getGET('day');
     if (false !== strpos($dayname, '|')) {
         $dayname = trim(substr($dayname, 0, strpos($dayname, '|')));
     }
     $q->bindValue(":dayname", $dayname);
-    $q->bindValue(":block", getGET('id'));
-    if ($q->execute() && $row = $q->fetch(PDO::FETCH_ASSOC)) {
-        $cfg = getConfig(true);
-        $rv = array(
-        "Lesson 1"=>bibleLinkOrHelp($row['blesson1'],
-                linkbgw($cfg, $row['blesson1'], $row['l1link'], true)),
-        "Lesson 2"=>bibleLinkOrHelp($row['blesson2'],
-            linkbgw($cfg, $row['blesson2'], $row['l2link'], true)),
-        "Gospel"=>bibleLinkOrHelp($row['bgospel'],
-            linkbgw($cfg, $row['bgospel'], $row['golink'], true)),
-        "Psalm"=>bibleLinkOrHelp($row['bpsalm'],
-            linkbgw($cfg, "Psalm ".$row['bpsalm'], $row['pslink'], true)),
-        "Sermon"=>bibleLinkOrHelp($row['bsermon'],
-            linkbgw($cfg, $row['bsermon'], $row['smlink'], true)),
-        "Collect"=>bibleLinkOrHelp($row['bcollect'], $row['bcollect']),
-        "Sermon Text Note"=>translate_markup($row['smtextnote']),
-        "Sermon Day Hymn"=>$row['smhymnabc'],
-        "Sermon Hymn" =>$row['smhymn']
-    );
-        unset($cfg);
-        if ($row['notes']) $rv["Block Notes"] = $row['notes'];
-        echo json_encode($rv);
-    } else {
-        echo array_pop($q->errorInfo());
+    $q->execute() or die("Problem getting synlessons");
+    $raw_synlessons = $q->fetchAll(PDO::FETCH_ASSOC);
+    $synlessons = array();
+    foreach ($raw_synlessons as $one_set) {
+        $synlessons[$one_set['lectionary']] = $one_set;
     }
+    /******
+     * Select the appropriate lesson
+     */
+    function select_lesson($type, $lectionary, $series, $synlessons) {
+        switch ($lectionary) {
+            case "historic":
+                switch ($series)) {
+                    case "first":
+                        return $synlessons[$lectionary][$type];
+                    case "second":
+                        switch ($type) {
+                        case "gospel":
+                            return $synlessons[$lectionary]["s2gospel"];
+                        default:
+                            return $synlessons[$lectionary]["s2lesson"];
+                    case "third":
+                        case "gospel":
+                            return $synlessons[$lectionary]["s3gospel"];
+                        default:
+                            return $synlessons[$lectionary]["s3lesson"];
+                }
+                die("Unknown series for historic.");
+            case "custom":
+                return $series;
+            default:
+                return $synlessons[$lectionary][$type];
+        }
+    }
+    $blesson1 = select_lesson("lesson1", $blockconfig['l1lect'],
+        $blockconfig['l1series'], $synlessons);
+    $blesson2 = select_lesson("lesson2", $blockconfig['l2lect'],
+        $blockconfig['l2series'], $synlessons);
+    $bgospel = select_lesson("gospel", $blockconfig['golect'],
+        $blockconfig['goseries'], $synlessons];
+    $bsermon = select_lesson[$blockconfig['smtype'], $blockconfig['smlect'],
+        $blockconfig['smseries'], $synlessons];
+    switch ($blockconfig['pslect']) {
+        case "custom":
+            $bpsalm = $blockconfig['psseries'];
+        default:
+            $bpsalm = $synlessons['psalm'];
+    }
+    $bsmtextnote = $synlessons[$blockconfig['smlect']]['note'];
+    $bsmhymnabc = $synlessons[$blockconfig['smlect']]['hymnabc'];
+    $bsmhymn = $synlessons[$blockconfig['smlect']]['hymn'];
+    $q = $db->prepare("SELECT collect FROM `{$dbp}churchyear_collects` AS cyc
+        JOIN `{$dbp}churchyear_collect_index` AS cci
+        ON (cyc.id = cci.id)
+        WHERE cci.dayname=:dayname AND cci.lectionary=:colect
+        AND cyc.class=:coclass LIMIT 1");
+    $q->bindValue(":colect", $blockconfig['colect'];
+    $q->bindValue(":coclass", $blockconfig['coclass'];
+    $q->execute() or die("Problem getting collect");
+    $raw_collect = $q->fetch(PDO::FETCH_ASSOC);
+    $bcollect = $raw_collect['collect'];
+
+    $cfg = getConfig(true);
+    $rv = array(
+    "Lesson 1"=>bibleLinkOrHelp($blesson1,
+            linkbgw($cfg, $blesson1, $blockconfig['l1link'], true)),
+    "Lesson 2"=>bibleLinkOrHelp($blesson2,
+        linkbgw($cfg, $blesson2, $blockconfig['l2link'], true)),
+    "Gospel"=>bibleLinkOrHelp($bgospel,
+        linkbgw($cfg, $bgospel, $blockconfig['golink'], true)),
+    "Psalm"=>bibleLinkOrHelp($bpsalm,
+        linkbgw($cfg, "Psalm {$bpsalm}", $blockconfig['pslink'], true)),
+    "Sermon"=>bibleLinkOrHelp($bsermon,
+        linkbgw($cfg, $bsermon, $blockconfig['smlink'], true)),
+    "Collect"=>bibleLinkOrHelp($bcollect, $bcollect),
+    "Sermon Text Note"=>translate_markup($bsmtextnote),
+    "Sermon Day Hymn"=>$bsmhymnabc,
+    "Sermon Hymn" =>$bsmhymn
+    );
+    unset($cfg);
+    if ($row['notes']) $rv["Block Notes"] = $row['notes'];
+    echo json_encode($rv);
     exit(0);
 }
 
