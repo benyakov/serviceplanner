@@ -38,6 +38,7 @@ if (getGET('request') == 'dropfunctions') {
     DROP FUNCTION IF EXISTS `{$dbp}michaelmas1_in_year`;
     DROP FUNCTION IF EXISTS `{$dbp}epiphany1_in_year`;
     DROP FUNCTION IF EXISTS `{$dbp}calc_date_in_year`;
+    DROP FUNCTION IF EXISTS `{$dbp}advent4_in_year`;
     DROP FUNCTION IF EXISTS `{$dbp}date_in_year`;
     DROP FUNCTION IF EXISTS `{$dbp}calc_observed_date_in_year`;
     DROP FUNCTION IF EXISTS `{$dbp}observed_date_in_year`;
