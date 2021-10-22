@@ -28,7 +28,7 @@
 function bibleLinkOrHelp($text, $output)
 {
     if ($text) return $output;
-    else return "Bible text not found. Have you entered a single day name?";
+    else return "Text not found. Have you entered a single day name?";
 }
 require("init.php");
 $auth = authLevel();
@@ -340,7 +340,8 @@ if (getGET('overlapstart') && getGET('overlapend')) {
 if ("blockitems" == getGET('get') && is_numeric(getGET('id')) && getGET('day')) {
     requireAuth("index.php", 2);
     $q = $db->prepare("SELECT l1lect, l1series, l2lect, l2series,
-        golect, goseries, smlect, smseries, notes, weeklygradual,
+        golect, goseries, smlect, smseries, smtype, notes, pslect, psseries, 
+        weeklygradual, colect, coclass,
         l1lect != \"custom\" AS l1link,
         l2lect != \"custom\" AS l2link,
         golect != \"custom\" AS golink,
@@ -372,15 +373,16 @@ if ("blockitems" == getGET('get') && is_numeric(getGET('id')) && getGET('day')) 
     function select_lesson($type, $lectionary, $series, $synlessons) {
         switch ($lectionary) {
             case "historic":
-                switch ($series)) {
+                switch ($series) {
                     case "first":
                         return $synlessons[$lectionary][$type];
                     case "second":
                         switch ($type) {
-                        case "gospel":
-                            return $synlessons[$lectionary]["s2gospel"];
-                        default:
-                            return $synlessons[$lectionary]["s2lesson"];
+                            case "gospel":
+                                return $synlessons[$lectionary]["s2gospel"];
+                            default:
+                                return $synlessons[$lectionary]["s2lesson"];
+                        }
                     case "third":
                         case "gospel":
                             return $synlessons[$lectionary]["s3gospel"];
@@ -399,14 +401,14 @@ if ("blockitems" == getGET('get') && is_numeric(getGET('id')) && getGET('day')) 
     $blesson2 = select_lesson("lesson2", $blockconfig['l2lect'],
         $blockconfig['l2series'], $synlessons);
     $bgospel = select_lesson("gospel", $blockconfig['golect'],
-        $blockconfig['goseries'], $synlessons];
-    $bsermon = select_lesson[$blockconfig['smtype'], $blockconfig['smlect'],
-        $blockconfig['smseries'], $synlessons];
+        $blockconfig['goseries'], $synlessons);
+    $bsermon = select_lesson($blockconfig['smtype'], $blockconfig['smlect'],
+        $blockconfig['smseries'], $synlessons);
     switch ($blockconfig['pslect']) {
         case "custom":
             $bpsalm = $blockconfig['psseries'];
         default:
-            $bpsalm = $synlessons['psalm'];
+            $bpsalm = $synlessons[$blockconfig['pslect']]['psalm'];
     }
     $bsmtextnote = $synlessons[$blockconfig['smlect']]['note'];
     $bsmhymnabc = $synlessons[$blockconfig['smlect']]['hymnabc'];
@@ -416,8 +418,9 @@ if ("blockitems" == getGET('get') && is_numeric(getGET('id')) && getGET('day')) 
         ON (cyc.id = cci.id)
         WHERE cci.dayname=:dayname AND cci.lectionary=:colect
         AND cyc.class=:coclass LIMIT 1");
-    $q->bindValue(":colect", $blockconfig['colect'];
-    $q->bindValue(":coclass", $blockconfig['coclass'];
+    $q->bindValue(":colect", $blockconfig['colect']);
+    $q->bindValue(":coclass", $blockconfig['coclass']);
+    $q->bindValue(":dayname", $dayname);
     $q->execute() or die("Problem getting collect");
     $raw_collect = $q->fetch(PDO::FETCH_ASSOC);
     $bcollect = $raw_collect['collect'];
@@ -437,10 +440,10 @@ if ("blockitems" == getGET('get') && is_numeric(getGET('id')) && getGET('day')) 
     "Collect"=>bibleLinkOrHelp($bcollect, $bcollect),
     "Sermon Text Note"=>translate_markup($bsmtextnote),
     "Sermon Day Hymn"=>$bsmhymnabc,
-    "Sermon Hymn" =>$bsmhymn
+    "Sermon Hymn" =>$bsmhymn,
+    "Block Notes" =>$blockconfig['notes']
     );
     unset($cfg);
-    if ($row['notes']) $rv["Block Notes"] = $row['notes'];
     echo json_encode($rv);
     exit(0);
 }
