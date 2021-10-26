@@ -187,4 +187,27 @@ function reconfigureNonfestival($type) {
     }
     $dbh->commit();
 }
+
+
+get_easter_in_year($year) {
+
+    $century = $shiftedEpact = $adjustedEpact = 0;
+    $apr19 = new DateTimeImmutable('4/19/{$year}');
+    $century = 1 + intdiv($year, 100);
+    // Age of moon for April 5
+    $shiftedEpact = (14 + (11 * ($year % 19))       // Nicean rule
+        - intdiv(((3 * century), 4)                 // Gregory Century rule
+        + intdiv(((8 * century) + 5), 25)           // Metonic cycle correction
+        + (30 * century)) % 30;                     // To keep the value positive
+    // Adjust for 29.5 day month
+    if (shiftedEpact == 0 or (shiftedEpact == 1 and 10 < ($year % 19))) {
+        $adjustedEpact = $shiftedEpact + 1;
+    } else {
+        $adjustedEpact = $shiftedEpact;
+    }
+    $paschalMoon = $apr19->sub(new DateInterval("p{$adjustedEpact}D");
+    return $paschalMoon->add(new DateInterval("p". (8 - $paschalMoon.format("w"));
+
+    // Check with easter_date() ?
+}
 ?>
