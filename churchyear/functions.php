@@ -75,7 +75,7 @@ function churchyear_listing($rows) {
             data-day="<?=$row['dayname']?>">=</a>
         <a href="" data-day="<?=$row['dayname']?>"
             class="propersname"><?=$row['dayname']?></a></td>
-    <td class="next"><?=next_in_year($row['dayname'])?></td>
+    <td class="next"><?=next_in_year($row['dayname'])->format("M d")?></td>
     <td class="season"><?=$row['season']?></td>
     <td class="base"><?=$row['base']?></td>
     <td class="offset"><?=$row['offset']?></td>
@@ -196,17 +196,17 @@ function get_easter_in_year($year) {
     $century = 1 + intdiv($year, 100);
     // Age of moon for April 5
     $shiftedEpact = (14 + (11 * ($year % 19))       // Nicean rule
-        - intdiv(((3 * century), 4)                 // Gregory Century rule
+        - intdiv((3 * century), 4)                 // Gregory Century rule
         + intdiv(((8 * century) + 5), 25)           // Metonic cycle correction
-        + (30 * century)) % 30;                     // To keep the value positive
+        + (30 * century) % 30);                     // To keep the value positive
     // Adjust for 29.5 day month
     if (shiftedEpact == 0 or (shiftedEpact == 1 and 10 < ($year % 19))) {
         $adjustedEpact = $shiftedEpact + 1;
     } else {
         $adjustedEpact = $shiftedEpact;
     }
-    $paschalMoon = $apr19->sub(new DateInterval("p{$adjustedEpact}D");
-    return $paschalMoon->add(new DateInterval("p". (8 - $paschalMoon.format("w"));
+    $paschalMoon = $apr19->sub(new DateInterval("p{$adjustedEpact}D"));
+    return $paschalMoon->add(new DateInterval("p". (8 - $paschalMoon.format("w")."D")));
 
     // Check with easter_date() ?
 }
@@ -259,10 +259,12 @@ function get_epiphany1_in_year($year) {
 }
 
 function calc_date_in_year($year, $base, $offset, $month, $day) {
-    $interval = new DateInterval("p{$offset}D");
-    if (is_null($base)) {
-        return new DateTimeImmutable("{$month}/{$day},{$year}");
-    } elseif ("Easter" == $base) {
+    if (! $base) { // Base is null, 0, or ""
+        return new DateTimeImmutable("{$month}/{$day}/{$year}");
+    } else {
+        $interval = new DateInterval("p{$offset}D");
+    }
+    if ("Easter" == $base) {
         return get_easter_in_year($year).add($interval);
     } elseif ("Christmas 1" == $base) {
         if ($offset > 0) {
@@ -292,7 +294,7 @@ function date_in_year($year, $dayname) {
     } else {
         $day_params = $q->fetch(PDO::FETCH_ASSOC);
     }
-    return calc_date_in_year($year, $day_params['base',
+    return calc_date_in_year($year, $day_params['base'],
         $day_params['offset'], $day_params['month'], $day_params['day']);
 }
 
@@ -310,7 +312,7 @@ function calc_observed_date_in_year($year, $dayname, $base, $observed_month,
             $firstofmonthwd = $firstofmoth->format("w");
             if (1 < $firstofmonthwd) { // Past Sunday; adjust to Sunday
                 $firstofmonth = $firstofmonth.add(
-                    new DateInterval("p".(8-$firstofmonthwd));
+                    new DateInterval("p".(8-$firstofmonthwd)."D"));
             }
             return $firstofmonth.add(
                 new DateInterval("p".(($observed_sunday-1)*7)."D"));
@@ -385,11 +387,9 @@ function get_days_for_date($date) {
         while ($cy_row = $q->fetch(PDO::FETCH_ASSOC)) {
             if (date_in_year($date->format("y"), $cy_row['dayname']) == $date) {
                 $rv[]=$cy_row['dayname'];
-            } elseif {
-                observed_date_in_year($date->format("y"), $cy_row['dayname']) == $date) {
-                $rv[]=$return $cy_row['dayname'];
-            } elseif
-                calendar_date_in_year($date->format("y"), $cy_row['dayname']) == $date)
+            } elseif (observed_date_in_year($date->format("y"), $cy_row['dayname']) == $date) {
+                $rv[]=$cy_row['dayname'];
+            } elseif (calendar_date_in_year($date->format("y"), $cy_row['dayname']) == $date) {
                 $rv[]=$cy_row['dayame'];
             }
         }
