@@ -228,16 +228,9 @@ function get_christmas1_in_year($year) {
     return $christmas->add(8-new DateInterval("P".$wdchristmas."D"));
 }
 
-function get_michaelmas1_in_year($year) {
-    $dbh = new DBConnection();
-    $dbp = $dbh->getPrefix();
-    $q = $dbh->prepare("SELECT cy.`observed_sunday` FROM `{$dbp}churchyear`
-        WHERE cy.`dayname` = 'Michaelmas'");
-    if (! $q->execute()) {
-        die("Problem getting Michaelmas observed Sunday: ".array_pop($q->errorInfo()));
-    } else {
-        $mike_observed = $q->fetchColumn(0);
-    }
+function get_michaelmas1_in_year($year, $table) {
+    $day_params = churchyear_table_rec($table, "Michaelmas");
+    $mike_observed = $day_params['observed_sunday'];
     $michaelmas = new DateTimeImmutable("9/29/{$year}");
     $wdmichaelmas = $michaelmas->format("w");
     if (1 != $mike_observed and 7 == $wdmichaelmas) {
@@ -258,7 +251,21 @@ function get_epiphany1_in_year($year) {
     return $epiphany->add(new DateInterval("p".(8-$wdepiphany)."D"));
 }
 
-function calc_date_in_year($year, $base, $offset, $month, $day) {
+function churchyear_table_rec($table, $dayname) {
+    // Get the table row where dayname is $dayname
+    // Put the row into $day_params
+    $day_params = array();
+    foreach ($table as $table_row) {
+        if ($table_row["dayname"] == $dayname) {
+            $day_params = $table_row["dayname"];
+        }
+        break;
+    }
+    return $day_params;
+}
+
+function date_in_year($year, $dayname, $table) {
+    $day_params = churchyear_table_rec($table, $dayname);
     if (! $base) { // Base is null, 0, or ""
         return new DateTimeImmutable("{$month}/{$day}/{$year}");
     } else {
@@ -274,7 +281,7 @@ function calc_date_in_year($year, $base, $offset, $month, $day) {
     } elseif ("Advent 4" == $base) {
         return get_advent4_in_year($year).add($interval);
     } elseif ("Michaelmas 1" == $base) {
-        return get_michaelmas1_in_year($year).add($interval);
+        return get_michaelmas1_in_year($year, $table).add($interval);
     } elseif ("Epiphany 1" == $base) {
         return get_epiphany1_in_year($year).add($interval);
     } else {
@@ -282,27 +289,11 @@ function calc_date_in_year($year, $base, $offset, $month, $day) {
     }
 }
 
-function date_in_year($year, $dayname) {
-    $dbh = new DBConnection();
-    $dbp = $dbh->getPrefix();
-    $q = $dbh->prepare("SELECT base, offset, month, day
-        FROM `{$dbp}churchyear`
-        WHERE `dayname`=:dayname");
-    $q->bindValue(":dayname", $dayname);
-    if (! $q->execute()) {
-        die("Problem getting day params: ".array_pop($q->errorInfo()));
-    } else {
-        $day_params = $q->fetch(PDO::FETCH_ASSOC);
-    }
-    return calc_date_in_year($year, $day_params['base'],
-        $day_params['offset'], $day_params['month'], $day_params['day']);
-}
-
-function calc_observed_date_in_year($year, $dayname, $base, $observed_month,
-    $observed_sunday) {
+function observed_date_in_year($year, $dayname, $table) {
+    $day_params = churchyear_table_rec($table, $dayname);
     if (! $base) { // $base is null or ""
         if (0 == $observed_month) { // Observing by date when not Sunday
-            $actual = date_in_year($year, $dayname);
+            $actual = date_in_year($year, $dayname, $table);
             $actualwd = $actual->format("w");
             if ($actualwd > 1) {
                 return $actual.add(new DateInterval("p".(8-$actualwd)."D"));
@@ -331,43 +322,18 @@ function calc_observed_date_in_year($year, $dayname, $base, $observed_month,
     }
 }
 
-function observed_date_in_year($year, $dayname) {
-    $dbh = new DBConnection();
-    $dbp = $dbh->getPrefix();
-    $q = $dbh->prepare("SELECT base, observed_month, observed_sunday
-        FROM `{$dbp}churchyear`
-        WHERE `dayname`=:dayname");
-    $q->bindValue(":dayname", $dayname);
-    if (! $q->execute()) {
-        die("Problem getting day params: ".array_pop($q->errorInfo()));
-    } else {
-        $day_params = $q->fetch(PDO::FETCH_ASSOC);
-    }
-    return calc_observed_date_in_year($year, $dayname, $day_params['base'],
-        $day_params['observed_month'], $day_params['observed_sunday']);
-}
-
 function calendar_date_in_year($year, $dayname) {
-    $dbh = new DBConnection();
-    $dbp = $dbh->getPrefix();
-    $q = $dbh->prepare("SELECT day, month FROM `{$dbp}churchyear`
-        WHERE `dayname` = :dayname");
-    $q->bindValue(":dayname", $dayname);
-    if (! $q->execute()) {
-        die("Problem getting day params: ".array_pop($q->errorInfo()));
-    } else {
-        $day_month = $q->fetch(PDO::FETCH_ASSOC);
-    }
-    return new DateTime("{$day_month['day']}/{$day_month['month']}/{$year}");
+    $day_params = churchyear_table_rec($table, $dayname);
+    return new DateTime("{$day_params['day']}/{$day_params['month']}/{$year}");
 }
 
-function next_in_year($dayname) {
+function next_in_year($dayname, $table) {
     $now = new DateTime();
     $year = $now->format("y");
-    $result = date_in_year($year, $dayname) or
+    $result = date_in_year($year, $dayname, $table) or
         observed_date_in_year($year, $dayname);
     if ($result < $now) {
-        $result = date_in_year(($year+1), $dayname) or
+        $result = date_in_year(($year+1), $dayname, $table) or
             observed_date_in_year(($year+1), $dayname);
     }
     return $result;
@@ -384,12 +350,13 @@ function get_days_for_date($date) {
         die("Problem getting churchyear table: ".array_pop($q->errorInfo()));
     } else {
         $rv = array();
-        while ($cy_row = $q->fetch(PDO::FETCH_ASSOC)) {
-            if (date_in_year($date->format("y"), $cy_row['dayname']) == $date) {
+        $cy_table = $q->fetchAll(PDO::FETCH_ASSOC);
+        foreach ($cy_table as $cy_row) {
+            if (date_in_year($date->format("y"), $cy_row['dayname'], $cy_table) == $date) {
                 $rv[]=$cy_row['dayname'];
-            } elseif (observed_date_in_year($date->format("y"), $cy_row['dayname']) == $date) {
+            } elseif (observed_date_in_year($date->format("y"), $cy_row['dayname'], $cy_table) == $date) {
                 $rv[]=$cy_row['dayname'];
-            } elseif (calendar_date_in_year($date->format("y"), $cy_row['dayname']) == $date) {
+            } elseif (calendar_date_in_year($date->format("y"), $cy_row['dayname'], $cy_table) == $date) {
                 $rv[]=$cy_row['dayame'];
             }
         }
