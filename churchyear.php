@@ -92,7 +92,7 @@ if (getGET('request') == 'purgetables') {
  * Returns a comma-separated list of daynames that match the date given.
  */
 if (getGET('daysfordate')) {
-    echo json_encode(daysForDate(getGET('daysfordate')));
+    echo json_encode(get_days_for_date(new DateTime(getGET('daysfordate'))));
     exit(0);
 }
 

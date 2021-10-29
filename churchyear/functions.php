@@ -1,5 +1,5 @@
 <? /* Church year interface
-    Copyright (C) 2012 Jesse Jacobsen
+    Copyright (C) 2021 Jesse Jacobsen
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -24,6 +24,7 @@
     USA
    */
 
+
 function query_churchyear($json=false) {
     /* Return an executed query for all rows of the churchyear db
      */
@@ -31,8 +32,7 @@ function query_churchyear($json=false) {
     $dbp = $dbh->getPrefix();
     $q = $dbh->prepare("SELECT cy.`dayname`, cy.`season`, cy.`base`,
         cy.`offset`, cy.`month`, cy.`day`,
-        cy.`observed_month`, cy.`observed_sunday`,
-        `{$dbp}next_in_year`(cy.`dayname`) AS next
+        cy.`observed_month`, cy.`observed_sunday`
         FROM `{$dbp}churchyear` AS cy
         LEFT OUTER JOIN `{$dbp}churchyear_order` AS cyo
             ON (cy.season = cyo.name)
@@ -75,7 +75,7 @@ function churchyear_listing($rows) {
             data-day="<?=$row['dayname']?>">=</a>
         <a href="" data-day="<?=$row['dayname']?>"
             class="propersname"><?=$row['dayname']?></a></td>
-    <td class="next"><?=$row['next']?></td>
+    <td class="next"><?=next_in_year($row['dayname'])?></td>
     <td class="season"><?=$row['season']?></td>
     <td class="base"><?=$row['base']?></td>
     <td class="offset"><?=$row['offset']?></td>
@@ -359,6 +359,18 @@ function calendar_date_in_year($year, $dayname) {
     return new DateTime("{$day_month['day']}/{$day_month['month']}/{$year}");
 }
 
+function next_in_year($dayname) {
+    $now = new DateTime();
+    $year = $now->format("y");
+    $result = date_in_year($year, $dayname) or
+        observed_date_in_year($year, $dayname);
+    if ($result < $now) {
+        $result = date_in_year(($year+1), $dayname) or
+            observed_date_in_year(($year+1), $dayname);
+    }
+    return $result;
+}
+
 function get_days_for_date($date) {
     // To do this in PHP (rather than SQL functions, the orig. strategy), we
     // must examine the entire table in PHP and use our PHP functions
@@ -385,16 +397,5 @@ function get_days_for_date($date) {
     }
 }
 
-function next_in_year($dayname) {
-    $now = new DateTime();
-    $year = $now->format("y");
-    $result = date_in_year($year, $dayname) or
-        observed_date_in_year($year, $dayname);
-    if ($result < $now) {
-        $result = date_in_year(($year+1), $dayname) or
-            observed_date_in_year(($year+1), $dayname);
-    }
-    return $result
-}
 
 ?>

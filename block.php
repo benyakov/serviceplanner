@@ -94,10 +94,10 @@ function blockPlanForm($vals=array()) {
     <section id="block-dates">
     <label for="startdate">Start</label>
     <input type="date" id="startdate" name="startdate" <?=ifVal($vals, 'blockstart')?> required>
-    <div id="startday"><?=implode(", ", daysForDate($vals['blockstart']))?></div><br>
+    <div id="startday"><?=implode(", ", get_days_for_date(new DateTime($vals['blockstart'])))?></div><br>
     <label for="enddate">End</label>
     <input type="date" id="enddate" name="enddate" <?=ifVal($vals, 'blockend')?> required>
-    <div id="endday"><?=implode(", ", daysForDate($vals['blockend']))?></div><br>
+    <div id="endday"><?=implode(", ", get_days_for_date(new Datetime($vals['blockend'])))?></div><br>
     <div id="overlap-notice"></div>
     </section>
     <section id="block-series">
@@ -340,7 +340,7 @@ if (getGET('overlapstart') && getGET('overlapend')) {
 if ("blockitems" == getGET('get') && is_numeric(getGET('id')) && getGET('day')) {
     requireAuth("index.php", 2);
     $q = $db->prepare("SELECT l1lect, l1series, l2lect, l2series,
-        golect, goseries, smlect, smseries, smtype, notes, pslect, psseries, 
+        golect, goseries, smlect, smseries, smtype, notes, pslect, psseries,
         weeklygradual, colect, coclass,
         l1lect != \"custom\" AS l1link,
         l2lect != \"custom\" AS l2link,

@@ -1148,22 +1148,6 @@ function ordinal($n) {
     } else return $n;
 }
 
-function daysForDate($date) {
-    // Return an array of day names matching the given English-format date.
-    $dbh = new DBConnection();
-    $dbp = $dbh->getPrefix();
-    if (! $date) return array();
-    $found = array();
-    $date = strtotime($date);
-    $q = $dbh->prepare("call {$dbp}get_days_for_date(:date)");
-    $q->bindValue(':date', strftime('%Y-%m-%d', $date));
-    $result = $q->execute();
-    while ($row = $q->fetch(PDO::FETCH_NUM)) {
-        $found[] = $row[0];
-    }
-    return $found;
-}
-
 /*
  * Unused
 function getLessonField($lesson, $lect, $series) {
