@@ -53,6 +53,7 @@ function churchyear_listing($rows) {
     /* Given an array of matched db rows,
      * list all items in a table with edit/delete links.
      */
+    //echo "<pre> "; print_r($rows); echo "</pre>";
     ob_start();
 ?>
 <table id="churchyear-listing">
@@ -75,7 +76,7 @@ function churchyear_listing($rows) {
             data-day="<?=$row['dayname']?>">=</a>
         <a href="" data-day="<?=$row['dayname']?>"
             class="propersname"><?=$row['dayname']?></a></td>
-    <td class="next"><?=next_in_year($row['dayname'])->format("M d")?></td>
+    <td class="next"><?$next=next_in_year($row['dayname'], $rows); if ($next) {echo $next->format("M d");}?></td>
     <td class="season"><?=$row['season']?></td>
     <td class="base"><?=$row['base']?></td>
     <td class="offset"><?=$row['offset']?></td>
@@ -190,23 +191,22 @@ function reconfigureNonfestival($type) {
 
 
 function get_easter_in_year($year) {
-
     $century = $shiftedEpact = $adjustedEpact = 0;
-    $apr19 = new DateTimeImmutable('4/19/{$year}');
+    $apr19 = new DateTimeImmutable("4/19/{$year}");
     $century = 1 + intdiv($year, 100);
     // Age of moon for April 5
     $shiftedEpact = (14 + (11 * ($year % 19))       // Nicean rule
-        - intdiv((3 * century), 4)                 // Gregory Century rule
-        + intdiv(((8 * century) + 5), 25)           // Metonic cycle correction
-        + (30 * century) % 30);                     // To keep the value positive
+        - intdiv((3 * $century), 4)                 // Gregory Century rule
+        + intdiv(((8 * $century) + 5), 25)           // Metonic cycle correction
+        + (30 * $century) % 30);                     // To keep the value positive
     // Adjust for 29.5 day month
-    if (shiftedEpact == 0 or (shiftedEpact == 1 and 10 < ($year % 19))) {
+    if ($shiftedEpact == 0 or ($shiftedEpact == 1 and 10 < ($year % 19))) {
         $adjustedEpact = $shiftedEpact + 1;
     } else {
         $adjustedEpact = $shiftedEpact;
     }
-    $paschalMoon = $apr19->sub(new DateInterval("p{$adjustedEpact}D"));
-    return $paschalMoon->add(new DateInterval("p". (8 - $paschalMoon.format("w")."D")));
+    $paschalMoon = $apr19->sub(makeInterval("P{$adjustedEpact}D"));
+    return $paschalMoon->add(makeInterval("P". (8 - $paschalMoon->format("w")."D")));
 
     // Check with easter_date() ?
 }
@@ -217,15 +217,15 @@ function get_advent4_in_year($year) {
     if (1 == $wdchristmas) {
         return new DateTimeImmutable("12/18/{$year}");
     } else {
-        return $christmas->sub($wdchristmas - new DateInterval("P1D"));
+        return $christmas->sub(makeInterval("P".($wdchristmas-1)."D"));
     }
-    return $christmas->add(8-new DateInterval("P".$wdchristmas."D"));
+    return $christmas->add(makeInterval("P".(8-$wdchristmas)."D"));
 }
 
 function get_christmas1_in_year($year) {
     $christmas = new DateTimeImmutable("12/25/{$year}");
     $wdchristmas = $christmas->format("w");
-    return $christmas->add(8-new DateInterval("P".$wdchristmas."D"));
+    return $christmas->add(makeInterval("P".(8-$wdchristmas)."D"));
 }
 
 function get_michaelmas1_in_year($year, $table) {
@@ -241,49 +241,64 @@ function get_michaelmas1_in_year($year, $table) {
     if (1 == $oct1wd) {
         return oct1;
     } else {
-        return $oct1->add(new DateInterval("p".(8-oct1wd)."D"));
+        return $oct1->add(makeInterval("P".(8-oct1wd)."D"));
     }
 }
 
 function get_epiphany1_in_year($year) {
     $epiphany = new DateTimeImmutable("1/6/{$year}");
     $wdepiphany = $epiphany->format("w");
-    return $epiphany->add(new DateInterval("p".(8-$wdepiphany)."D"));
+    return $epiphany->add(makeInterval("P".(8-$wdepiphany)."D"));
 }
 
 function churchyear_table_rec($table, $dayname) {
     // Get the table row where dayname is $dayname
     // Put the row into $day_params
-    $day_params = array();
-    foreach ($table as $table_row) {
+    $day_params = "Not Found";
+    foreach ($table as $index=>$table_row) {
         if ($table_row["dayname"] == $dayname) {
-            $day_params = $table_row["dayname"];
+            $day_params = $table_row;
+            break;
         }
-        break;
     }
     return $day_params;
 }
 
+function makeInterval($initstring) {
+    if (strpos($initstring, "-") !== false) {
+        $initstring = str_replace('-', '', $initstring);
+        $invert = 1;
+    } else {
+        $invert = 0;
+    }
+    $interval = new DateInterval($initstring);
+    $interval->invert = $invert;
+    return $interval;
+}
+
 function date_in_year($year, $dayname, $table) {
     $day_params = churchyear_table_rec($table, $dayname);
+    $base = $day_params['base'];
+    $offset = $day_params['offset'];
+    //echo "<pre>"; print_r($day_params); echo "</pre>";
     if (! $base) { // Base is null, 0, or ""
-        return new DateTimeImmutable("{$month}/{$day}/{$year}");
+        return new DateTimeImmutable("{$day_params['month']}/{$day_params['day']}/{$year}");
     } else {
-        $interval = new DateInterval("p{$offset}D");
+        $interval = makeInterval("P{$offset}D");
     }
     if ("Easter" == $base) {
-        return get_easter_in_year($year).add($interval);
+        return get_easter_in_year($year)->add($interval);
     } elseif ("Christmas 1" == $base) {
         if ($offset > 0) {
             $year = $year - 1;
         }
-        return get_christmas1_in_year($year).add($interval);
+        return get_christmas1_in_year($year)->add($interval);
     } elseif ("Advent 4" == $base) {
-        return get_advent4_in_year($year).add($interval);
+        return get_advent4_in_year($year)->add($interval);
     } elseif ("Michaelmas 1" == $base) {
-        return get_michaelmas1_in_year($year, $table).add($interval);
+        return get_michaelmas1_in_year($year, $table)->add($interval);
     } elseif ("Epiphany 1" == $base) {
-        return get_epiphany1_in_year($year).add($interval);
+        return get_epiphany1_in_year($year)->add($interval);
     } else {
         return 0;
     }
@@ -291,31 +306,33 @@ function date_in_year($year, $dayname, $table) {
 
 function observed_date_in_year($year, $dayname, $table) {
     $day_params = churchyear_table_rec($table, $dayname);
+    $base = $day_params['base'];
     if (! $base) { // $base is null or ""
         if (0 == $observed_month) { // Observing by date when not Sunday
             $actual = date_in_year($year, $dayname, $table);
+            //echo "<pre>"; print_r($base); echo "</pre>";
             $actualwd = $actual->format("w");
             if ($actualwd > 1) {
-                return $actual.add(new DateInterval("p".(8-$actualwd)."D"));
+                return $actual.add(makeInterval("P".(8-$actualwd)."D"));
             }
         } elseif (0 < $observed_sunday) {  // Observing by Sunday of month
             $firstofmonth = new DateTimeImmutable("1/{$observed_month}/{$year}");
             $firstofmonthwd = $firstofmoth->format("w");
             if (1 < $firstofmonthwd) { // Past Sunday; adjust to Sunday
                 $firstofmonth = $firstofmonth.add(
-                    new DateInterval("p".(8-$firstofmonthwd)."D"));
+                    makeInterval("P".(8-$firstofmonthwd)."D"));
             }
             return $firstofmonth.add(
-                new DateInterval("p".(($observed_sunday-1)*7)."D"));
+                makeInterval("P".(($observed_sunday-1)*7)."D"));
         } else {  // Observing by Sunday counting from end of month (negative)
             $first_of_month = new DateTimeImmutable("1/{$observed_month}/{$year}");
-            $next_month = $first_of_month.add(new DateInterval("p1m"));
-            $last_day_of_month = $next_month.sub(new DateInterval("p1d"));
+            $next_month = $first_of_month.add(makeInterval("P1M"));
+            $last_day_of_month = $next_month.sub(makeInterval("P1D"));
             $last_day_of_monthwd = $last_day_of_month->format("w");
             $last_sunday_of_month = $last_day_of_month.sub(
-                new DateInterval("p{$last_day_of_monthwd}D"));
+                makeInterval("P{$last_day_of_monthwd}D"));
             return $last_sunday_of_month.add(
-                new DateInterval("p".(($observed_sunday+1)*7)."D"));
+                makeInterval("P".(($observed_sunday+1)*7)."D"));
         }
     } else {
         return 0;
@@ -331,10 +348,10 @@ function next_in_year($dayname, $table) {
     $now = new DateTime();
     $year = $now->format("y");
     $result = date_in_year($year, $dayname, $table) or
-        observed_date_in_year($year, $dayname);
+        observed_date_in_year($year, $dayname, $table);
     if ($result < $now) {
         $result = date_in_year(($year+1), $dayname, $table) or
-            observed_date_in_year(($year+1), $dayname);
+            observed_date_in_year(($year+1), $dayname, $table);
     }
     return $result;
 }
