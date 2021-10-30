@@ -76,7 +76,7 @@ function churchyear_listing($rows) {
             data-day="<?=$row['dayname']?>">=</a>
         <a href="" data-day="<?=$row['dayname']?>"
             class="propersname"><?=$row['dayname']?></a></td>
-    <td class="next"><?$next=next_in_year($row['dayname'], $rows); if ($next) {echo $next->format("M d");}?></td>
+    <td class="next"><?$next=next_in_year($row['dayname'], $rows); if ($next) {echo $next->format("d M y");}?></td>
     <td class="season"><?=$row['season']?></td>
     <td class="base"><?=$row['base']?></td>
     <td class="offset"><?=$row['offset']?></td>
@@ -219,36 +219,30 @@ function get_advent4_in_year($year) {
     } else {
         return $christmas->sub(makeInterval("P".($wdchristmas-1)."D"));
     }
-    return $christmas->add(makeInterval("P".(8-$wdchristmas)."D"));
+    return $christmas->add(makeInterval("P{$wdchristmas}D"));
 }
 
 function get_christmas1_in_year($year) {
     $christmas = new DateTimeImmutable("12/25/{$year}");
     $wdchristmas = $christmas->format("w");
-    return $christmas->add(makeInterval("P".(8-$wdchristmas)."D"));
+    return $christmas->add(makeInterval("P{$wdchristmas}D"));
 }
 
 function get_michaelmas1_in_year($year, $table) {
     $day_params = churchyear_table_rec($table, "Michaelmas");
-    $mike_observed = $day_params['observed_sunday'];
-    $michaelmas = new DateTimeImmutable("9/29/{$year}");
-    $wdmichaelmas = $michaelmas->format("w");
-    if (1 != $mike_observed and 7 == $wdmichaelmas) {
-        return new DateTimeImmutable("9/30{$year}");
-    }
-    $oct1 = new DateTimeImmutable("10/1/{$year}");
-    $oct1wd = $oct1->format("w");
-    if (1 == $oct1wd) {
-        return oct1;
+    $sep30 = new DateTimeImmutable("9/30/{$year}");
+    $sep30wd = $sep30->format("w"); // One=Sunday
+    if (0 == $sep30wd) {
+        return $sep30;
     } else {
-        return $oct1->add(makeInterval("P".(8-oct1wd)."D"));
+        return $sep30->sub(makeInterval("P{$sep30wd}D"));
     }
 }
 
 function get_epiphany1_in_year($year) {
     $epiphany = new DateTimeImmutable("1/6/{$year}");
     $wdepiphany = $epiphany->format("w");
-    return $epiphany->add(makeInterval("P".(8-$wdepiphany)."D"));
+    return $epiphany->add(makeInterval("P{$wdepiphany}D"));
 }
 
 function churchyear_table_rec($table, $dayname) {
@@ -313,14 +307,14 @@ function observed_date_in_year($year, $dayname, $table) {
             //echo "<pre>"; print_r($base); echo "</pre>";
             $actualwd = $actual->format("w");
             if ($actualwd > 1) {
-                return $actual.add(makeInterval("P".(8-$actualwd)."D"));
+                return $actual.add(makeInterval("P{$actualwd}D"));
             }
         } elseif (0 < $observed_sunday) {  // Observing by Sunday of month
             $firstofmonth = new DateTimeImmutable("1/{$observed_month}/{$year}");
             $firstofmonthwd = $firstofmoth->format("w");
             if (1 < $firstofmonthwd) { // Past Sunday; adjust to Sunday
                 $firstofmonth = $firstofmonth.add(
-                    makeInterval("P".(8-$firstofmonthwd)."D"));
+                    makeInterval("P{$firstofmonthwd}D"));
             }
             return $firstofmonth.add(
                 makeInterval("P".(($observed_sunday-1)*7)."D"));
