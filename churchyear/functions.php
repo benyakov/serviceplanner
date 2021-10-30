@@ -191,24 +191,28 @@ function reconfigureNonfestival($type) {
 
 
 function get_easter_in_year($year) {
-    $century = $shiftedEpact = $adjustedEpact = 0;
-    $apr19 = new DateTimeImmutable("4/19/{$year}");
-    $century = 1 + intdiv($year, 100);
-    // Age of moon for April 5
-    $shiftedEpact = (14 + (11 * ($year % 19))       // Nicean rule
-        - intdiv((3 * $century), 4)                 // Gregory Century rule
-        + intdiv(((8 * $century) + 5), 25)           // Metonic cycle correction
-        + (30 * $century) % 30);                     // To keep the value positive
-    // Adjust for 29.5 day month
-    if ($shiftedEpact == 0 or ($shiftedEpact == 1 and 10 < ($year % 19))) {
-        $adjustedEpact = $shiftedEpact + 1;
-    } else {
-        $adjustedEpact = $shiftedEpact;
-    }
-    $paschalMoon = $apr19->sub(makeInterval("P{$adjustedEpact}D"));
-    return $paschalMoon->add(makeInterval("P". (8 - $paschalMoon->format("w")."D")));
-
-    // Check with easter_date() ?
+    if (2 == strlen("{$year}")) $year = "20{$year}";
+    $dtobject = new DateTime();
+    $dtobject->setTimestamp(easter_date($year));
+    return $dtobject;
+    /******* Manual calculation (date arithmetic untested in PHP)
+    * $century = $shiftedEpact = $adjustedEpact = 0;
+    * $apr19 = new DateTimeImmutable("4/19/{$year}");
+    * $century = 1 + intdiv($year, 100);
+    * // Age of moon for April 5
+    * $shiftedEpact = (14 + (11 * ($year % 19))       // Nicean rule
+    *     - intdiv((3 * $century), 4)                 // Gregory Century rule
+    *     + intdiv(((8 * $century) + 5), 25)           // Metonic cycle correction
+    *     + (30 * $century) % 30);                     // To keep the value positive
+    * // Adjust for 29.5 day month
+    * if ($shiftedEpact == 0 or ($shiftedEpact == 1 and 10 < ($year % 19))) {
+    *     $adjustedEpact = $shiftedEpact + 1;
+    * } else {
+    *     $adjustedEpact = $shiftedEpact;
+    * }
+    * $paschalMoon = $apr19->sub(makeInterval("P{$adjustedEpact}D"));
+    * return $paschalMoon->add(makeInterval("P". (8 - $paschalMoon->format("w")."D")));
+    */
 }
 
 function get_advent4_in_year($year) {
@@ -225,7 +229,7 @@ function get_advent4_in_year($year) {
 function get_christmas1_in_year($year) {
     $christmas = new DateTimeImmutable("12/25/{$year}");
     $wdchristmas = $christmas->format("w");
-    return $christmas->add(makeInterval("P{$wdchristmas}D"));
+    return $christmas->add(makeInterval("P".(7-$wdchristmas)."D"));
 }
 
 function get_michaelmas1_in_year($year, $table) {
@@ -242,7 +246,7 @@ function get_michaelmas1_in_year($year, $table) {
 function get_epiphany1_in_year($year) {
     $epiphany = new DateTimeImmutable("1/6/{$year}");
     $wdepiphany = $epiphany->format("w");
-    return $epiphany->add(makeInterval("P{$wdepiphany}D"));
+    return $epiphany->add(makeInterval("P".(7-$wdepiphany)."D"));
 }
 
 function churchyear_table_rec($table, $dayname) {
