@@ -57,7 +57,7 @@ function churchyear_listing($rows) {
     ob_start();
 ?>
 <table id="churchyear-listing">
-<tr><td></td><th>Name</th><th>Next</th><th>Season</th><th>Base Day</th>
+<tr><td></td><th>Name</th><th>Next<br>Observed</th><th>Season</th><th>Base Day</th>
     <th>Days Offset</th><th>Month</th>
     <th>Day</th><th>Observed Month</th><th>Observed Sunday</th></tr>
 <? $even = "";
@@ -76,7 +76,7 @@ function churchyear_listing($rows) {
             data-day="<?=$row['dayname']?>">=</a>
         <a href="" data-day="<?=$row['dayname']?>"
             class="propersname"><?=$row['dayname']?></a></td>
-    <td class="next"><?$next=next_in_year($row['dayname'], $rows); if ($next) {echo $next->format("d M y");}?></td>
+    <td class="next"><?$next=next_in_year($row['dayname'], $rows); if ($next) {echo $next->format("d M Y");} else { print_r($next); }?></td>
     <td class="season"><?=$row['season']?></td>
     <td class="base"><?=$row['base']?></td>
     <td class="offset"><?=$row['offset']?></td>
@@ -278,7 +278,8 @@ function date_in_year($year, $dayname, $table) {
     $base = $day_params['base'];
     $offset = $day_params['offset'];
     //echo "<pre>"; print_r($day_params); echo "</pre>";
-    if (! $base) { // Base is null, 0, or ""
+    if ((! $base) // Base is null, 0, or ""
+        and ($day_params['month'] and $day_params['day'])) {
         return new DateTimeImmutable("{$day_params['month']}/{$day_params['day']}/{$year}");
     } else {
         $interval = makeInterval("P{$offset}D");
@@ -301,38 +302,66 @@ function date_in_year($year, $dayname, $table) {
     }
 }
 
+/******
+* Return a DateTimeImmutable for the observed (Nth Sunday of month) or 0 if not specified
+*/
+function get_observed($day_params, $year) {
+        if ($day_params['observed_sunday'] > 0) {  // By Sunday from beginning
+            $firstofmonth = new DateTimeImmutable("{$day_params['observed_month']}/1/{$year}");
+            $firstofmonthwd = $firstofmonth->format("w");
+            if (1 < $firstofmonthwd) { // Not Sunday; adjust to Sunday
+                $firstofmonth = $firstofmonth->add(
+                    makeInterval("P".(7-$firstofmonthwd)."D"));
+            }
+            return $firstofmonth->add(
+                makeInterval("P".(($day_params['observed_sunday']-1)*7)."D"));
+        } elseif ($day_params['observed_sunday'] < 0) {  // By Sunday from end of month (negative)
+            $first_of_month = new DateTimeImmutable("{$day_params['observed_month']}/1/{$year}");
+            $next_month = $first_of_month->add(makeInterval("P1M"));
+            $last_day_of_month = $next_month->sub(makeInterval("P1D"));
+            $last_day_of_monthwd = $last_day_of_month->format("w");
+            $last_sunday_of_month = $last_day_of_month->sub(
+                makeInterval("P{$last_day_of_monthwd}D"));
+            $rv = $last_sunday_of_month->add(
+                makeInterval("P".(($day_params['observed_sunday']+1)*7)."D"));
+            return $rv;
+        } else {
+            return 0;
+        }
+}
+
 function observed_date_in_year($year, $dayname, $table) {
     $day_params = churchyear_table_rec($table, $dayname);
     $base = $day_params['base'];
     if (! $base) { // $base is null or ""
-        if (0 == $day_params['observed_month']) { // Observing by date when not Sunday
-            $actual = date_in_year($year, $dayname, $table);
-            //echo "<pre>"; print_r($base); echo "</pre>";
-            $actualwd = $actual->format("w");
-            if ($actualwd > 1) {
-                return $actual.sub(makeInterval("P{$actualwd}D"));
-            }
-        } elseif (0 < $day_params['observed_sunday']) {  // Observing by Sunday of month
-            $firstofmonth = new DateTimeImmutable("1/{$observed_month}/{$year}");
-            $firstofmonthwd = $firstofmoth->format("w");
-            if (1 < $firstofmonthwd) { // Past Sunday; adjust to Sunday
-                $firstofmonth = $firstofmonth.sub(
-                    makeInterval("P{$firstofmonthwd}D"));
-            }
-            return $firstofmonth.add(
-                makeInterval("P".(($day_params['observed_sunday']-1)*7)."D"));
-        } else {  // Observing by Sunday counting from end of month (negative)
-            $first_of_month = new DateTimeImmutable("1/{$observed_month}/{$year}");
-            $next_month = $first_of_month.add(makeInterval("P1M"));
-            $last_day_of_month = $next_month.sub(makeInterval("P1D"));
-            $last_day_of_monthwd = $last_day_of_month->format("w");
-            $last_sunday_of_month = $last_day_of_month.sub(
-                makeInterval("P{$last_day_of_monthwd}D"));
-            return $last_sunday_of_month.add(
-                makeInterval("P".(($observed_sunday+1)*7)."D"));
+        // Check for actual date
+        $actual = date_in_year($year, $dayname, $table);
+        if (! $actual)  {  // No date specified. 
+            if ($observed = get_observed($day_params, $year)) {
+                return $observed;
+            } else { // No actual or observed, just return today's date.
+                return new DateTimeImmutable("now");
+            } 
+        } else {
+            $actualwd = $actual->format("w");            // Check if actual is a Sunday
+            if ($actualwd == 1) { 
+                return $actual;
+            } else {
+                if ($day_params['observed_sunday'] != 0) { // If not, check if there is an observed Sunday
+                    //echo "Getting observed month.";
+                    return get_observed($day_params, $year);
+                } else {                                 
+                    if ($day_params['season']) {        // If it has a season, use actual
+                        return $actual;
+                    } else {                            // Otherwise, rewind to Sunday
+                        //echo "Rewinding.";
+                        return $actual->sub(makeInterval("P{$actualwd}D"));
+                    }
+                }
+            } 
         }
     } else {
-        return 0;
+        return date_in_year($year, $dayname, $table);
     }
 }
 
@@ -343,14 +372,13 @@ function calendar_date_in_year($year, $dayname) {
 
 function next_in_year($dayname, $table) {
     $now = new DateTime();
-    $year = $now->format("y");
-    $result = date_in_year($year, $dayname, $table) or
-        observed_date_in_year($year, $dayname, $table);
-    if ($result < $now) {
-        $result = date_in_year(($year+1), $dayname, $table) or
-            observed_date_in_year(($year+1), $dayname, $table);
+    $year = $now->format("Y");
+    $date = observed_date_in_year($year, $dayname, $table);
+    if ($date < $now) {
+        $date = observed_date_in_year(($year+1), $dayname, $table);
     }
-    return $result;
+    //echo "<pre>".print_r($date)."</pre>"; 
+    return $date;
 }
 
 function get_days_for_date($date) {
