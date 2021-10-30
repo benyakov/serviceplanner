@@ -72,7 +72,7 @@
             value="<?=$specifics['observed_month']?>"></dd>
         <dt><label for="observed-sunday">Observed Sunday</label></dt>
         <dd><input name="observed-sunday" id="observed-sunday"
-            type="number" min="0" max="31"
+            type="number" min="-5" max="5"
             value="<?=$specifics['observed_sunday']?>"></dd>
         </dl>
         <button class="dayform_submit" type="submit" name="submit">Submit</button>
