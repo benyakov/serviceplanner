@@ -218,12 +218,11 @@ function get_easter_in_year($year) {
 function get_advent4_in_year($year) {
     $christmas = new DateTimeImmutable("12/25/{$year}");
     $wdchristmas = $christmas->format("w");
-    if (1 == $wdchristmas) {
+    if (1 == $wdchristmas) { // Christmas is a Sunday
         return new DateTimeImmutable("12/18/{$year}");
     } else {
-        return $christmas->sub(makeInterval("P".($wdchristmas-1)."D"));
+        return $christmas->sub(makeInterval("P".($wdchristmas)."D"));
     }
-    return $christmas->add(makeInterval("P{$wdchristmas}D"));
 }
 
 function get_christmas1_in_year($year) {
@@ -306,22 +305,22 @@ function observed_date_in_year($year, $dayname, $table) {
     $day_params = churchyear_table_rec($table, $dayname);
     $base = $day_params['base'];
     if (! $base) { // $base is null or ""
-        if (0 == $observed_month) { // Observing by date when not Sunday
+        if (0 == $day_params['observed_month']) { // Observing by date when not Sunday
             $actual = date_in_year($year, $dayname, $table);
             //echo "<pre>"; print_r($base); echo "</pre>";
             $actualwd = $actual->format("w");
             if ($actualwd > 1) {
-                return $actual.add(makeInterval("P{$actualwd}D"));
+                return $actual.sub(makeInterval("P{$actualwd}D"));
             }
-        } elseif (0 < $observed_sunday) {  // Observing by Sunday of month
+        } elseif (0 < $day_params['observed_sunday']) {  // Observing by Sunday of month
             $firstofmonth = new DateTimeImmutable("1/{$observed_month}/{$year}");
             $firstofmonthwd = $firstofmoth->format("w");
             if (1 < $firstofmonthwd) { // Past Sunday; adjust to Sunday
-                $firstofmonth = $firstofmonth.add(
+                $firstofmonth = $firstofmonth.sub(
                     makeInterval("P{$firstofmonthwd}D"));
             }
             return $firstofmonth.add(
-                makeInterval("P".(($observed_sunday-1)*7)."D"));
+                makeInterval("P".(($day_params['observed_sunday']-1)*7)."D"));
         } else {  // Observing by Sunday counting from end of month (negative)
             $first_of_month = new DateTimeImmutable("1/{$observed_month}/{$year}");
             $next_month = $first_of_month.add(makeInterval("P1M"));
@@ -367,11 +366,11 @@ function get_days_for_date($date) {
         $rv = array();
         $cy_table = $q->fetchAll(PDO::FETCH_ASSOC);
         foreach ($cy_table as $cy_row) {
-            if (date_in_year($date->format("y"), $cy_row['dayname'], $cy_table) == $date) {
+            if (date_in_year($date->format("Y"), $cy_row['dayname'], $cy_table) == $date) {
                 $rv[]=$cy_row['dayname'];
-            } elseif (observed_date_in_year($date->format("y"), $cy_row['dayname'], $cy_table) == $date) {
+            } elseif (observed_date_in_year($date->format("Y"), $cy_row['dayname'], $cy_table) == $date) {
                 $rv[]=$cy_row['dayname'];
-            } elseif (calendar_date_in_year($date->format("y"), $cy_row['dayname'], $cy_table) == $date) {
+            } elseif (calendar_date_in_year($date->format("Y"), $cy_row['dayname'], $cy_table) == $date) {
                 $rv[]=$cy_row['dayame'];
             }
         }
