@@ -72,7 +72,7 @@ if (touch(".my.cnf") && chmod(".my.cnf", 0600)) {
     password=\"{$db->getPassword()}\"\n") ;
     fclose($fp);
     $rv = 0;
-    passthru("mysqldump --defaults-file=.my.cnf -h {$db->getHost()} {$db->getName()} {$tablenamestring}", $rv);
+    passthru("mysqldump --no-tablespaces --defaults-file=.my.cnf -h {$db->getHost()} {$db->getName()} {$tablenamestring}", $rv);
     @unlink("./.my.cnf");
     if ($rv != 0) {
         echo "mysqldump returned {$rv}";
