@@ -89,7 +89,7 @@ function queryLectionary($id) {
         FROM `{$dbp}days` AS d
         JOIN `{$dbp}blocks` AS b ON (d.block = b.id)
         JOIN `{$dbp}churchyear_lessons` AS l
-            ON (l.lectionary=b.golect AND l.dayname=TRIM(SUBSTRING_INDEX(d.name, "|", 1))
+            ON (l.lectionary=b.golect AND l.dayname=TRIM(SUBSTRING_INDEX(d.name, '|', 1)))
         WHERE d.pkey = :id");
     if ($id) $q->bindParam(":id", $id);
     $start_time = microtime(true);
