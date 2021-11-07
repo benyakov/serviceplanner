@@ -22,3 +22,28 @@
   font-weight: bold;
   src: local('Heros'), local('Heros-Bold-Italic'), url('texgyreheros-bolditalic.otf') format('opentype');
 }
+
+@font-face {
+  font-family: 'Noto';
+  font-style: normal;
+  font-weight: normal;
+  src: local('Noto'), local('Noto-Regular'), url('NotoSans-Regular.ttf') format('truetype');
+}
+@font-face {
+  font-family: 'Noto';
+  font-style: normal;
+  font-weight: bold;
+  src: local('Noto-Bold'), url('NotoSans-Bold.ttf') format('truetype');
+}
+@font-face {
+  font-family: 'Noto';
+  font-style: italic;
+  font-weight: normal;
+  src: local('Noto-Italic'), url('NotoSans-Italic.ttf') format('truetype');
+}
+@font-face {
+  font-family: 'Noto';
+  font-style: italic;
+  font-weight: bold;
+  src: local('Noto-Bold-Italic'), url('NotoSans-BoldItalic.ttf') format('truetype');
+}
