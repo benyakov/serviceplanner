@@ -611,7 +611,7 @@ available for specifying hymns. The first will be the default book.</dd>
     Sundays/propers in the non-festival half of the year. Note: This will
     reconfigure the affected days listed on the Church Year tab. "Historic" means
     the season will observe Michaelmas on the last Sunday of September, then skip
-    to Trinity 19 as Michaelmas 1, and afterward skip remaining Sundays after the
+    to Trinity 19 as Michaelmas 2, and afterward skip remaining Sundays after the
     fourth-last Sunday to observe Trinity 25, 26, and 27 at the end. "ILCW" means
     the season will not skip any Sundays until just before the last Sunday of the
     Church Year (Pentecost 28 or Trinity 27). "RCL" means the season will skip a
