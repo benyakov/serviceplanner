@@ -365,9 +365,9 @@ function observed_date_in_year($year, $dayname, $table) {
     }
 }
 
-function calendar_date_in_year($year, $dayname) {
+function calendar_date_in_year($year, $dayname, $table) {
     $day_params = churchyear_table_rec($table, $dayname);
-    return new DateTime("{$day_params['day']}/{$day_params['month']}/{$year}");
+    return new DateTime("{$day_params['month']}/{$day_params['day']}/{$year}");
 }
 
 function next_in_year($dayname, $table) {
