@@ -86,6 +86,7 @@ function blockPlanForm($vals=array()) {
     if (!$vals['pslect']) $vals['pslect'] = 'historic';
     if (!$vals['colect']) $vals['colect'] = 'historic';
     if (!$vals['smlect']) $vals['smlect'] = 'historic';
+    require_once("./churchyear/functions.php");
 ?>
     <form id="block-plan-form" action="block.php" method="post">
     <input type="hidden" name="id" value="<?=$vals['id']?>">
