@@ -508,8 +508,8 @@ function displayService($service, $fieldlist) {
                                 }, explode(" ", $f['user'])));
                             $fuser = " {$initials}.";
                         } else $fuser = "";
-                        $occurrence = substr($o, 0, 2);
-                        $allflags[] = "<tr><th>{$f['flag']}</th><td>{$fuser}/{$ftext}</td><td>{$occurrence}</td></tr>";
+                        $occurrence = substr($o, 0, 5);
+                        $allflags[] = "<tr><td align=\"right\">{$f['flag']}</td><td>{$ftext}</td><td>@{$occurrence}</td></tr>";
                     }
                 }
             }
