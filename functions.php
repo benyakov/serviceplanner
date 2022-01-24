@@ -459,6 +459,7 @@ function display_occurrences_separately($q) {
     $serviceid = "";
     $occurrence = "";
     $rowcount = 1;
+    $servicecount = 0;
     $thesehymns = array();
     $hymnoccurrence = "";
     $cfg = getConfig(false);
@@ -467,6 +468,7 @@ function display_occurrences_separately($q) {
             && $row['occurrence'] == $occurrence))
         {
             $rowcount += listthesehymns($thesehymns, $rowcount);
+            $servicecount++;
             // Display the heading line
             if (is_within_week($row['date'])) {
                 $datetext = "<a name=\"now\">{$row['date']}</a>";
@@ -486,7 +488,7 @@ function display_occurrences_separately($q) {
             :"").
             "<a class=\"menulink\" href=\"export.php?service={$row['serviceid']}\">CSV Data</a>\n".
             " <a class=\"menulink\" href=\"print.php?id={$row['serviceid']}\" title=\"print\">Print</a> ".
-            "</td></tr>\n";
+            "</td><td>({$servicecount})</td></tr>\n";
             echo "<tr class=\"service-flags\" data-occ=\"{$row['occurrence']}\" data-service=\"{$row['serviceid']}\"><td colspan=3></td>"
                 ."<td>".flagestaltLink($row['serviceid'], $row['occurrence'])."</td></tr>\n";
             echo "<tr data-occ=\"{$row['occurrence']}\" class=\"heading\" data-service=\"{$row['serviceid']}\"><td class=\"propers\" colspan=3>\n";
@@ -545,11 +547,13 @@ function display_occurrences_together($q) {
     $cfg = getConfig(false);
     $thesehymns = array();
     $rowcount = 1;
+    $servicecount = 0;
     $serviceid = "";
     while ($row = $q->fetch(PDO::FETCH_ASSOC)) {
         if ($serviceid && $row['serviceid'] != $serviceid)
         {
-            displayServiceHeaderCombined($thesehymns);
+            $servicecount++;
+            displayServiceHeaderCombined($thesehymns, $servicecount);
             $rowcount += listthesehymns($thesehymns, $rowcount, true);
         }
         // Collect hymns
@@ -557,14 +561,14 @@ function display_occurrences_together($q) {
         $serviceid = getIndexOr($row,'serviceid');
     }
     if ($thesehymns) {
-        displayServiceHeaderCombined($thesehymns);
+        displayServiceHeaderCombined($thesehymns, $servicecount);
         listthesehymns($thesehymns, $rowcount, true);
     }
     echo "</article>\n";
     echo "</table>\n";
 }
 
-function displayServiceHeaderCombined($thesehymns) {
+function displayServiceHeaderCombined($thesehymns, $servicecount) {
     $auth = authLevel();
     $cfg = getConfig(false);
     $occurrences = array();
@@ -590,7 +594,7 @@ function displayServiceHeaderCombined($thesehymns) {
     :"").
     "<a class=\"menulink\" href=\"export.php?service={$sid}\">CSV Data</a>\n".
     " <a class=\"menulink\" href=\"print.php?id={$sid}\" title=\"print\">Print</a> ".
-    "</td></tr>\n";
+    "</td><td>({$servicecount})</td></tr>\n";
     for ($i=0, $limit=count($occurrences); $i<$limit; $i++) {
     echo "<tr class=\"service-flags\" data-occ=\"{$occurrences[$i]}\" data-service=\"{$sid}\"><td colspan=2></td><td>".
     (($auth)? flagestaltLink($row['serviceid'], $row['occurrence'])
@@ -659,6 +663,7 @@ function modify_occurrences_separately($q) {
     $serviceid = "";
     $occurrence = "";
     $rowcount = 1;
+    $servicecount = 0;
     $thesehymns = array();
     $hymnoccurrence = "";
     ?> <table id="modify-listing" data-combined="false"> <?
@@ -667,6 +672,7 @@ function modify_occurrences_separately($q) {
             && $row['occurrence'] == $occurrence))
         { // Create Service Block
             $rowcount += listthesehymns($thesehymns, $rowcount);
+            $servicecount++;
             if (is_within_week($row['date'])) {
                 $datetext = "<a name=\"now\">{$row['date']}</a>";
             } else {
@@ -693,7 +699,7 @@ function modify_occurrences_separately($q) {
             </td>
             <td colspan=2>
             <a name=\"service_{$row['serviceid']}\">{$row['dayname']}</a>: {$row['rite']}
-            </td></tr>\n";
+            </td><td>({$servicecount})</td></tr>\n";
             echo "<tr class=\"service-flags\" data-occ=\"{$row['occurrence']}\" data-service=\"{$row['serviceid']}\"><td colspan=3></td><td>"
                 .flagestaltLink($row['serviceid'], $row['occurrence'])."</td></tr>\n";
             echo "<tr data-occ=\"{$row['occurrence']}\" data-service=\"{$row['serviceid']}\" class=\"heading\"><td colspan=3 class=\"propers\">\n";
@@ -751,11 +757,13 @@ function modify_occurrences_together($q) {
     ?> <table id="modify-listing" data-combined="true"> <?
     $serviceid = "";
     $rowcount = 1;
+    $servicecount = 0;
     $thesehymns = array();
     while ($row = $q->fetch(PDO::FETCH_ASSOC)) {
         if ($serviceid && $row['serviceid'] != $serviceid)
         {
-            modifyServiceHeaderCombined($thesehymns);
+            $servicecount++;
+            modifyServiceHeaderCombined($thesehymns,$servicecount);
             listthesehymns($thesehymns, $rowcount, true);
         }
         // Collect hymns
@@ -763,7 +771,7 @@ function modify_occurrences_together($q) {
         $serviceid = $row['serviceid'];
     }
     if ($thesehymns) {
-        modifyServiceHeaderCombined($thesehymns);
+        modifyServiceHeaderCombined($thesehymns,$servicecount);
         listthesehymns($thesehymns, $rowcount, true);
     }
     ?>
@@ -775,7 +783,7 @@ function modify_occurrences_together($q) {
     <?
 }
 
-function modifyServiceHeaderCombined($thesehymns) {
+function modifyServiceHeaderCombined($thesehymns,$servicecount) {
     $auth = authLevel();
     $cfg = getConfig(false);
     $occurrences = array();
@@ -815,7 +823,7 @@ function modifyServiceHeaderCombined($thesehymns) {
     </td>
     <td>
     <a name=\"service_{$row['serviceid']}\">{$row['dayname']}</a>: {$row['rite']}
-    </td></tr>\n";
+    </td><td>({$servicecount})</td></tr>\n";
     for ($i=0, $limit=count($occurrences); $i<$limit; $i++) {
         echo "<tr class=\"service-flags\" data-occ=\"{$occurrences[$i]}\" data-service=\"{$row['serviceid']}\"><td colspan=2></td>
             <td>".flagestaltLink($row['serviceid'], $row['occurrence'])." <a class=\"menulink flagbutton\" title=\"Edit flags for this service.\" href=\"flags.php?id={$row['serviceid']}&occurrence={$urloccurrences[$i]}\">Flags</a> {$occurrences[$i]}</td>
