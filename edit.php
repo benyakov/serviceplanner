@@ -58,7 +58,8 @@ if (! isset($_GET['stage']))
             <dt>Day Name</dt>
             <dd>
                 <input type="text" id="dayname" name="dayname"
-                 value="<?=$row['dayname']?>" size="50" maxlength="50">
+                 value="<?=$row['dayname']?>" size="255" maxlength="255"
+                 style="width:75%">
             </dd>
             <dt>Order/Rite</dt>
             <dd>

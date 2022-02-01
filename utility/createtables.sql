@@ -26,7 +26,7 @@
 CREATE TABLE `days` (
   `pkey` int(10) unsigned NOT NULL auto_increment,
   `caldate` date default NULL,
-  `name` varchar(50) default NULL,
+  `name` varchar(255) default NULL,
   `rite` varchar(50) default NULL,
   `servicenotes` text default NULL,
   `block` integer default NULL,
