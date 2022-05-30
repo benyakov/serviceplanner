@@ -907,31 +907,31 @@ function html_head($title, $xstylesheets=Array()) {
 }
 
 function linkbgw($config, $ref, $linked, $other=true) {
-    // Return a link to BibleGateway for the given reference,
+    // Return an html <a> entity using biblelinktemplate, or if blank,
+    // return an html <a> to BibleGateway for the given reference,
     // or if the version is not set, just the ref.
     if (! $linked) {
         return $ref;
     }
-    try { // The config value may not be set.
-        try { // Checking for biblelinktemplate being set.
-            $blt = $config->get("biblelinktemplate");
-            $merged_link = "<a href=\"".str_replace('{{}}', urlencode($ref), $blt);
-        } catch(ConfigfileUnknownKey $e) {
-            return "Unknown key: biblelinktemplate";
-            $merged_link = "";
-        }
-        if ("" != $merged_link) {
-            $bgwversion = urlencode($config->get("biblegwversion"));
-            $merged_link = "<a href=\"http://biblegateway.com/passage?search=".
-                urlencode($ref)."&version={$bgwversion}&interface=print\"";
-        }
-        if ($other) $other = " target=\"bgmain\" ";
-        else $other = "";
-        return  "$merged_link${other}>".
-            htmlspecialchars($ref)."</a>";
+    try { // biblelinktemplate may not be set.
+        $blt = $config->get("biblelinktemplate");
+        $merged_link = "<a href=\"".str_replace('{{}}', rawurlencode($ref), $blt).'"';
     } catch(ConfigfileUnknownKey $e) {
-        return $ref;
+        $merged_link = "";
     }
+    if ("" == $merged_link) {
+        try { // biblegwversion may not be set.
+            $bgwversion = urlencode($config->get("biblegwversion"));
+        } catch(ConfigfileUnknownKey $e) {
+            return $ref;
+        }
+        $merged_link = "<a href=\"http://biblegateway.com/passage?search=".
+            urlencode($ref)."&version={$bgwversion}&interface=print\"";
+    }
+    if ($other) $other = " target=\"bgmain\" ";
+    else $other = "";
+    return  "$merged_link{$other}>".
+        htmlspecialchars($ref)."</a>";
 }
 
 function quote_array($ary) {
