@@ -915,7 +915,11 @@ function linkbgw($config, $ref, $linked, $other=true) {
     }
     try { // biblelinktemplate may not be set.
         $blt = $config->get("biblelinktemplate");
-        $merged_link = "<a href=\"".str_replace('{{}}', rawurlencode($ref), $blt).'"';
+        if ("" == $blt) {
+            $merged_link = "";
+        } else {
+            $merged_link = "<a href=\"".str_replace('{{}}', rawurlencode($ref), $blt).'"';
+        }
     } catch(ConfigfileUnknownKey $e) {
         $merged_link = "";
     }
