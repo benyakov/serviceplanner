@@ -913,12 +913,22 @@ function linkbgw($config, $ref, $linked, $other=true) {
         return $ref;
     }
     try { // The config value may not be set.
-        $bgwversion = urlencode($config->get("biblegwversion"));
+        try { // Checking for biblelinktemplate being set.
+            $blt = $config->get("biblelinktemplate");
+            if ("" != $blt) {
+                $merged_link = "<a href=\"".str_replace('{{}}', urlencode($ref));
+            }
+        } catch(ConfigfileUnknownKey $e) {
+            $merged_link = "";
+        }
+        if ("" != $merged_link) {
+            $bgwversion = urlencode($config->get("biblegwversion"));
+            $merged_link = "<a href=\"http://biblegateway.com/passage?search=".
+                urlencode($ref)."&version={$bgwversion}&interface=print\"";
+        }
         if ($other) $other = " target=\"bgmain\" ";
         else $other = "";
-        return "<a href=\"http://biblegateway.com/passage?search=".
-            rawurlencode($ref).
-            "&version={$bgwversion}&interface=print\" ${other}>".
+        return  "$merged_link${other}>".
             htmlspecialchars($ref)."</a>";
     } catch(ConfigfileUnknownKey $e) {
         return $ref;

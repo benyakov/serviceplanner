@@ -496,6 +496,11 @@ to have a recent backup first, at least of your church year data.</p>
     <div id="configsettings">
     <form id="configsettings" action="<?=$_SERVER['PHP_SELF']?>?flag=savesettings" method="post">
     <dl>
+    <dt><a name="bible-link-template">Bible Link Template</a></dt>
+    <dd class="explanation">To use a Bible lookup website other that Bible Gateway, write the url here, with the text "{{}}" (double braces)
+    where the Bible reference should be inserted. Leave this blank to use Bible Gateway instead.</dd>
+    <dd><input type="text" id="biblelinktemplate" name="biblelinktemplate"
+        value="<?=$config->getDefault("", "biblelinktemplate")?>" placeholder="Use Bible Gateway">
     <dt><a name="biblegateway-abbreviation">Preferred Bible Abbreviation</a> from <a href="http://www.biblegateway.com/versions/" title="BibleGateway.com">Bible Gateway</a></dt>
     <dd class="explanation">All-caps version abbreviations as used by the Bible Gateway web site. This is used to generate links for lectionary texts.
 Multiple abbreviations may be separated by a semicolon, like "SBLGNT;WLC;NKJV",

@@ -29,6 +29,12 @@ if (3 != authLevel()) {
 }
 
 $config = getConfig(true);
+
+if (isset($_POST["biblelinktemplate"])) {
+    $config->set("biblelinktemplate", $_POST['biblelinktemplate']);
+    setMessage("Config: Bible link template has been set.");
+}
+
 if (isset($_POST["biblegwversion"])) {
     $config->set("biblegwversion", $_POST['biblegwversion']);
     setMessage("Config: Bible Gateway version has been set.");

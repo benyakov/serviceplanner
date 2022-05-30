@@ -36,22 +36,6 @@ if (($dbstate->getDefault(0, "churchyear-filled") < 6) or
     fillServiceTables();
 }
 
-// Churchyear db functions
-if ((! $dbstate->getDefault(false, "has-churchyear-functions")) or
-    ('create-churchyear-functions' == getGET('flag')))
-{
-    $functionsfile = "./utility/churchyearfunctions.sql";
-    $functionsfh = fopen($functionsfile, "rb");
-    $functionstext = fread($functionsfh, filesize($functionsfile));
-    fclose($functionsfh);
-    $q = $db->prepare(replaceDBP($functionstext));
-    $q->execute() or die("Problem creating functions<br>".
-        array_pop($q->errorInfo()));
-    $q->closeCursor();
-    $dbstate->set('has-churchyear-functions', 1);
-    $dbstate->save() or die("Problem saving dbstate file.");
-}
-
 // Churchyear table views
 if ((! $dbstate->getDefault(false, "has-views")) or
         ('create-views' == getGET('flag')))
