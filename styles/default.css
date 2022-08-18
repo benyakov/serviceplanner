@@ -560,8 +560,13 @@ section#existing-services,
 div#block-info {
     float: right;
     display: block;
-    width: 350px;
+    width: 50%;
     background-color: rgb(239,239,253);
+}
+section#existing-services,
+li.block-info {
+    border-top, border-left: thin solid grey;
+    border-right, border-bottom: thin solid black;
 }
 div#block-info div {
     border: thin solid green;

@@ -199,7 +199,7 @@ if (array_key_exists("date", $_POST)) {
         <textarea tabindex="29" id="servicenotes"
             name="servicenotes"></textarea>
     </li>
-    <li>
+    <li class="block-info">
         <div id="block-info"> </div>
         <label for="block">Block Plan:</label><br>
         <select tabindex="30" id="block" name="block">
