@@ -565,8 +565,10 @@ div#block-info {
 }
 section#existing-services,
 li.block-info {
-    border-top, border-left: thin solid grey;
-    border-right, border-bottom: thin solid black;
+    border-left: thin solid gray;
+    border-top: thin solid gray;
+    border-right: thin solid black;
+    border-bottom: thin solid black;
 }
 div#block-info div {
     border: thin solid green;
