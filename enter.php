@@ -200,7 +200,7 @@ if (array_key_exists("date", $_POST)) {
             name="servicenotes"></textarea>
     </li>
     <li class="block-info">
-        <div id="block-info"> </div>
+        <table><tr><td>
         <label for="block">Block Plan:</label><br>
         <select tabindex="30" id="block" name="block">
             <option value="None" selected>None</option>
@@ -211,6 +211,10 @@ if (array_key_exists("date", $_POST)) {
             <option value="None" selected>None</option>
         </select>
         </div>
+        </td><td>
+        <div id="block-info"> </div>
+        </td></tr></table>
+    </li>
     </ul>
     </section>
     <h2>Hymns to Enter (Book, Number, Note)</h2>
