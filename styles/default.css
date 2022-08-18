@@ -570,6 +570,7 @@ li.block-info {
 }
 div#block-info div {
     border: thin solid green;
+    padding: 0.5em;
 }
 section#existing-services ul {
     margin: 0;
