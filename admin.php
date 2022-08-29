@@ -593,6 +593,13 @@ available for specifying hymns. The first will be the default book.</dd>
         name="service-flags-option"><?
     echo implode("\n", $options->get('addable_service_flags'));
     ?></textarea></dd>
+    <dt><a name="default-modify-past-range">Default Modify Past Range</a></dt>
+    <dd class="explanation">When restarting a new PHP session, how many weeks in
+    the past should the Modify tab display? See the next item for a note about
+    PHP sessions.</dd>
+    <dd><input type="number" id="default-modify-past-range-option"
+         name="default-modify-future-range-option"
+         value="<?=$options->getDefault(1, 'past-range')?>"></dd>
     <dt><a name="default-modify-future-range">Default Modify Future Range</a></dt>
     <dd class="explanation">When restarting a new PHP session, how many weeks
     in the future should the Modify tab display? PHP sessions keep track of

@@ -137,6 +137,11 @@ if (isset($_GET["flagestalt"]) && isset($_GET["occurrence"])) {
     setMessage("Config: (Re)set default service for initial flags");
 }
 
+if (isset($_POST['default-modify-past-range-option'])) {
+    $options->set('past-range', (int) $_POST['default-modify-past-range-option']);
+    setMessage("Default past range option has been set.");
+}
+
 if (isset($_POST['default-modify-future-range-option'])) {
     $options->set('future-range', (int) $_POST['default-modify-future-range-option']);
     setMessage("Default future range option has been set.");

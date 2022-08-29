@@ -41,16 +41,19 @@ if ("Apply" == getGET('submit')) {
 } elseif (isset($_SESSION[$sprefix]["allfuture"]))
     $allfuture = $_SESSION[$sprefix]["allfuture"];
 else $allfuture = false;
+
+$options = getOptions(true);
 if (getGET('lowdate')) {
     $lowdate = new DateTime(getGET('lowdate'));
     $_SESSION[$sprefix]["lowdate"] = $lowdate;
 } elseif (!$_SESSION[$sprefix]["lowdate"]) {
     $lowdate = new DateTime();
-    $lowdate->sub(new DateInterval("P1M"));
+    $lowdate->sub(new DateInterval("P".
+        $options->getDefault('1', 'past-range')."W"));
+    //$lowdate->sub(new DateInterval("P1M"));
     $_SESSION[$sprefix]["lowdate"] = $lowdate;
 } else $lowdate = $_SESSION[$sprefix]['lowdate'];
 
-$options = getOptions(true);
 if (getGET('highdate')) {
     $highdate = new DateTime(getGET('highdate'));
     $_SESSION[$sprefix]["highdate"] = $highdate;
