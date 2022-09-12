@@ -143,7 +143,28 @@ function querySomeHymns($limit) {
     return $q;
 }
 
+/* This seems to work, but something else breaks when you use it. The code is 
+   therefore duplicated in records-table.php and modify.php.
 function setupDateRange($options) {
+    # Determine the sort direction of the listing
+    if ("All" == getGET('submit'))
+        $_SESSION[$sprefix]['modifyorder'] = "All";
+    elseif ("Future" == getGET('submit'))
+        $_SESSION[$sprefix]['modifyorder'] = "Future";
+    if (! array_key_exists('modifyorder', $_SESSION[$sprefix]))
+        $_SESSION[$sprefix]['modifyorder'] =
+            $options->getDefault('All', 'modifyorder');
+    else
+        $options->set('modifyorder', $_SESSION[$sprefix]['modifyorder']);
+    if ("Apply" == getGET('submit')) {
+        if (getGET('allfuture')) {
+            $allfuture = $_SESSION[$sprefix]["allfuture"] = true;
+        } else {
+            $allfuture = $_SESSION[$sprefix]["allfuture"] = false;
+        }
+    } elseif (isset($_SESSION[$sprefix]["allfuture"]))
+        $allfuture = $_SESSION[$sprefix]["allfuture"];
+    else $allfuture = false;
     # Determine the date range to be used in the current view
     if (getGET('lowdate')) {
         $lowdate = new DateTime(getGET('lowdate'));
@@ -165,17 +186,9 @@ function setupDateRange($options) {
         $_SESSION[$sprefix]["highdate"] = $highdate;
     } else $highdate = $_SESSION[$sprefix]['highdate'];
 
-    if ("All" == getGET('submit'))
-        $_SESSION[$sprefix]['modifyorder'] = "All";
-    elseif ("Future" == getGET('submit'))
-        $_SESSION[$sprefix]['modifyorder'] = "Future";
-    if (! array_key_exists('modifyorder', $_SESSION[$sprefix]))
-        $_SESSION[$sprefix]['modifyorder'] =
-            $options->getDefault('All', 'modifyorder');
-    else
-        $options->set('modifyorder', $_SESSION[$sprefix]['modifyorder']);
-    return [ $lowdate, $highdate ];
+    return [ $lowdate, $highdate, $allfuture ];
 }
+*/
 
 function queryServiceDateRange($lowdate, $highdate, $allfuture, $order="DESC") {
     $limited = ! $allfuture;
