@@ -38,33 +38,9 @@ if ("Apply" == getGET('submit')) {
 } elseif (isset($_SESSION[$sprefix]["allfuture"]))
     $allfuture = $_SESSION[$sprefix]["allfuture"];
 else $allfuture = false;
-if (getGET('lowdate')) {
-    $lowdate = new DateTime(getGET('lowdate'));
-    $_SESSION[$sprefix]["lowdate"] = $lowdate;
-} elseif (!$_SESSION[$sprefix]["lowdate"]) {
-    $lowdate = new DateTime();
-    $lowdate->sub(new DateInterval("P1M"));
-    $_SESSION[$sprefix]["lowdate"] = $lowdate;
-} else $lowdate = $_SESSION[$sprefix]['lowdate'];
-
-if (getGET('highdate')) {
-    $highdate = new DateTime(getGET('highdate'));
-    $_SESSION[$sprefix]["highdate"] = $highdate;
-} elseif (!getIndexOr($_SESSION[$sprefix], "highdate")) {
-    $highdate = new DateTime();
-    $_SESSION[$sprefix]["highdate"] = $highdate;
-} else $highdate = $_SESSION[$sprefix]['highdate'];
-
-if ("All" == getGET('submit'))
-    $_SESSION[$sprefix]['modifyorder'] = "All";
-elseif ("Future" == getGET('submit'))
-    $_SESSION[$sprefix]['modifyorder'] = "Future";
 $options = getOptions(true);
-if (! array_key_exists('modifyorder', $_SESSION[$sprefix]))
-    $_SESSION[$sprefix]['modifyorder'] =
-        $options->getDefault('All', 'modifyorder');
-else
-    $options->set('modifyorder', $_SESSION[$sprefix]['modifyorder']);
+$date_range = setupDateRange($options);
+$lowdate = $date_range[0]; $highdate = $date_range[1];
 unset($options);
 ?>
 <h1>Service Planning Records</h1>

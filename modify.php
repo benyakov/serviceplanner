@@ -43,37 +43,9 @@ if ("Apply" == getGET('submit')) {
 else $allfuture = false;
 
 $options = getOptions(true);
-if (getGET('lowdate')) {
-    $lowdate = new DateTime(getGET('lowdate'));
-    $_SESSION[$sprefix]["lowdate"] = $lowdate;
-} elseif (!$_SESSION[$sprefix]["lowdate"]) {
-    $lowdate = new DateTime();
-    $lowdate->sub(new DateInterval("P".
-        $options->getDefault('1', 'past-range')."W"));
-    //$lowdate->sub(new DateInterval("P1M"));
-    $_SESSION[$sprefix]["lowdate"] = $lowdate;
-} else $lowdate = $_SESSION[$sprefix]['lowdate'];
-
-if (getGET('highdate')) {
-    $highdate = new DateTime(getGET('highdate'));
-    $_SESSION[$sprefix]["highdate"] = $highdate;
-} elseif (!getIndexOr($_SESSION[$sprefix],"highdate")) {
-    $highdate = new DateTime();
-    $highdate->add(new DateInterval("P".
-        $options->getDefault('1', 'future-range')."W"));
-    $_SESSION[$sprefix]["highdate"] = $highdate;
-} else $highdate = $_SESSION[$sprefix]['highdate'];
-
-if ("All" == getGET('submit'))
-    $_SESSION[$sprefix]['modifyorder'] = "All";
-elseif ("Future" == getGET('submit'))
-    $_SESSION[$sprefix]['modifyorder'] = "Future";
-if (! array_key_exists('modifyorder', $_SESSION[$sprefix]))
-    $_SESSION[$sprefix]['modifyorder'] =
-        $options->getDefault('All', 'modifyorder');
-else
-    $options->set('modifyorder', $_SESSION[$sprefix]['modifyorder']);
+$display_date_range = setupDateRange($options);
 unset($options);
+$lowdate = $display_date_range[0]; $highdate = $display_date_range[1];
 
 // Check for a content-only request.
 if (checkContentReq()) {
