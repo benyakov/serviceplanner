@@ -218,7 +218,7 @@ function get_easter_in_year($year) {
 function get_advent4_in_year($year) {
     $christmas = new DateTimeImmutable("12/25/{$year}");
     $wdchristmas = $christmas->format("w");
-    if (1 == $wdchristmas) { // Christmas is a Sunday
+    if (0 == $wdchristmas) { // Christmas is a Sunday
         return new DateTimeImmutable("12/18/{$year}");
     } else {
         return $christmas->sub(makeInterval("P".($wdchristmas)."D"));
@@ -336,21 +336,21 @@ function observed_date_in_year($year, $dayname, $table) {
     if (! $base) { // $base is null or ""
         // Check for actual date
         $actual = date_in_year($year, $dayname, $table);
-        if (! $actual)  {  // No date specified. 
+        if (! $actual)  {  // No date specified.
             if ($observed = get_observed($day_params, $year)) {
                 return $observed;
             } else { // No actual or observed, just return today's date.
                 return new DateTimeImmutable("now");
-            } 
+            }
         } else {
             $actualwd = $actual->format("w");            // Check if actual is a Sunday
-            if ($actualwd == 1) { 
+            if ($actualwd == 1) {
                 return $actual;
             } else {
                 if ($day_params['observed_sunday'] != 0) { // If not, check if there is an observed Sunday
                     //echo "Getting observed month.";
                     return get_observed($day_params, $year);
-                } else {                                 
+                } else {
                     if ($day_params['season']) {        // If it has a season, use actual
                         return $actual;
                     } else {                            // Otherwise, rewind to Sunday
@@ -358,7 +358,7 @@ function observed_date_in_year($year, $dayname, $table) {
                         return $actual->sub(makeInterval("P{$actualwd}D"));
                     }
                 }
-            } 
+            }
         }
     } else {
         return date_in_year($year, $dayname, $table);
@@ -377,7 +377,7 @@ function next_in_year($dayname, $table) {
     if ($date < $now) {
         $date = observed_date_in_year(($year+1), $dayname, $table);
     }
-    //echo "<pre>".print_r($date)."</pre>"; 
+    //echo "<pre>".print_r($date)."</pre>";
     return $date;
 }
 
