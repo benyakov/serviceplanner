@@ -121,7 +121,7 @@ if (array_key_exists("date", $_POST)) {
                 }});
         }
         updateFromDate($("#date"));
-        $(".edit-number").keyup(function(evt){
+        $(".edit-number").change(function(evt){
             if (evt.which != 9 &&
                 evt.which != 17) {
                 $(this).doTimeout('fetch-hymn-title', 250, fetchHymnTitle);

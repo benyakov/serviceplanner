@@ -62,7 +62,7 @@ function addHymnToTable() {
         .attr("id", "number_new-"+indexStart)
         .attr("name", "number_new-"+indexStart)
         .val("")
-        .keyup(function(evt) {
+        .change(function(evt) {
             if (evt.which == 9 ||
                 evt.which == 17) return;
             $(this).doTimeout('fetch-hymn-title', 250, fetchHymnTitle)
@@ -122,7 +122,7 @@ function addHymnToList() {
         .attr("id", "number_"+hymnIndex)
         .attr("name", "number_"+hymnIndex)
         .attr("tabindex", tabindexStart+5)
-        .keyup(function(evt) {
+        .change(function(evt) {
             if (evt.which == 9 ||
                 evt.which == 17) return;
             $(this).doTimeout('fetch-hymn-title', 250, fetchHymnTitle)
