@@ -55,6 +55,9 @@ class DBConnection {
             $cf->get("prefix"));
         self::$handle = new PDO("mysql:host={$dbhost};dbname={$dbname}",
             "{$dbuser}", "{$dbpassword}");
+        // This was the default behavior prior to PHP 8. After that DBO assumes
+        // an exception-handling style of programming, which is generally not used here.
+        self::$handle->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_SILENT);
     }
     public function getHost() {
         return self::$connection['host'];

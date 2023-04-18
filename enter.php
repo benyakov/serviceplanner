@@ -177,7 +177,7 @@ if (array_key_exists("date", $_POST)) {
     <li>
         <label for="date">Date:</label><br>
         <input tabindex="1" type="date" id="date"
-            name="date" value="<?=$date?>" autofocus required>
+            name="date" value="" autofocus required>
     </li>
     <li>
         <label for="occurrence">Occurrence:</label><br>
@@ -304,7 +304,7 @@ function processFormData() {
         }
     }
     // Remove blank hymn entries
-    $hymns = array_filter($hymns, create_function('$s','return ($s["number"] or $s["number"]==0);'));
+    $hymns = array_filter($hymns, function ($s) { return ($s["number"] or $s["number"]==0); });
     // Insert each hymn title
     foreach ($hymns as $h) {
         if (! $h['title']) { continue; }

@@ -51,7 +51,7 @@ foreach ($tabledescfiles as $tabledescfile) {
 }
 $tablenamelines = array_filter($tabledesclines, 'gettablename');
 $tablenames = array_map('gettablename', $tablenamelines);
-$realtablenames = array_map(adddbpfix, $tablenames);
+$realtablenames = array_map('adddbpfix', $tablenames);
 $dbstate = getDBState(false);
 $dbversion = $dbstate->get('dbversion');
 $timestamp = date("dMY-Hi");

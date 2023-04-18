@@ -143,7 +143,7 @@ function querySomeHymns($limit) {
     return $q;
 }
 
-/* This seems to work, but something else breaks when you use it. The code is 
+/* This seems to work, but something else breaks when you use it. The code is
    therefore duplicated in records-table.php and modify.php.
 function setupDateRange($options) {
     # Determine the sort direction of the listing
@@ -478,7 +478,7 @@ function extra_daynames_selection_form($day, $identifier) {
     ?>
     <form id="<?=$identifier?>_extra-dayname-form" class="extra-dayname-form">
     <label for="alt_lectionary">Choose Lectionary</label>
-    <select name="alt_lectionary" id="<?=$identfier?>_chosen-lect">
+    <select name="alt_lectionary" id="<?=$identifier?>_chosen-lect">
     <? foreach (getLectionaryNames() as $lname) { ?>
         <option name="<?=$lname?>"><?=$lname?></option>
     <? } ?>
@@ -1015,6 +1015,7 @@ function gensitetabs($sitetabs, $action, $bare=false) {
 
 function translate_markup($text) {
     require_once('markdown/Michelf/MarkdownExtra.inc.php');
+    if (is_null($text)) { return ""; }
     return \Michelf\MarkdownExtra::defaultTransform($text);
 }
 

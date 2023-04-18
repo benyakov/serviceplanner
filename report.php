@@ -23,7 +23,7 @@
     USA
  */
 require("./init.php");
-
+$this_script = $_SERVER['HTTP_HOST'].$_SERVER['SCRIPT_NAME'] ;
 if ("customfields" == getGET('action')) {
     // Expecting JSON array of objects {order: X, name: Y}
     $config = getConfig(true);
@@ -334,6 +334,7 @@ echo "</div>";
 
 <?
 function customViewConfig($cfg) {
+    global $this_script;
     ob_start();
     $limit = $cfg->get("custom view", "limit");
     if ((bool) $cfg->get("custom view", "future"))

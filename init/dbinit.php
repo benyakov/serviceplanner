@@ -31,6 +31,7 @@ if ('dbinit' == getGET('flag')) {
     try {
         $handle = new PDO("mysql:host={$post['dbhost']};dbname={$post['dbname']}",
             "{$post['dbuser']}", "{$post['dbpassword']}");
+        $handle->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_SILENT);
         unset($handle);
     } catch (PDOException $e) {
         header("Location: {$_SERVER['PHP_SELF']}?connectionerror=1");

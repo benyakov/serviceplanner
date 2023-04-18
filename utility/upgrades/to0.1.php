@@ -46,6 +46,8 @@ try {
 try{
 \$dbh = new PDO('mysql:host={$dbhost};dbname={$dbname}',
     '{$dbuser}', '{$dbpw}');
+// Reserving exceptions for serious problems. Hopefully.
+$handle->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_SILENT);
 } catch (PDOException \$e) {
 die(\"Database Error: {\$e->getMessage()} </br>\");
 }
