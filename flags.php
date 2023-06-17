@@ -191,7 +191,7 @@ service and either add to them or change them.</p>
     // Check what's actually changed
     $unchanged = array();
     foreach ($flags as $fid => $data) {
-        if ($pairs[$data['flag']] == $data['value']) {
+        if (isset($pairs[$data['flag']]) and $pairs[$data['flag']] == $data['value']) {
             $unchanged[] = $fid;
         }
     }
