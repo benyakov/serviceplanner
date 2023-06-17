@@ -22,7 +22,7 @@
     10202 112th St. SW
     Lakewood, WA 98498
     USA
- */
+*/
 
 if (3 != authLevel()) {
     return; // Nothing to see here, execution resumes in prior script.
