@@ -1,4 +1,4 @@
-<? /* Initialization used by all entry points
+<?php /* Initialization used by all entry points
     Copyright (C) 2023 Jesse Jacobsen
 
     This program is free software; you can redistribute it and/or modify

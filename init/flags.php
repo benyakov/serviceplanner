@@ -1,4 +1,4 @@
-<? /* Make sure churchyear data, functions, and views are in place
+<?php /* Make sure churchyear data, functions, and views are in place
     Copyright (C) 2023 Jesse Jacobsen
 
     This program is free software; you can redistribute it and/or modify
@@ -27,9 +27,8 @@
 if (3 != authLevel()) {
     return; // Nothing to see here, execution resumes in prior script.
 }
-/*
+
 if ('reset-flag-cache' == getGET('flag')) {
-    require_once("./flags.php");
     $lw = new LogWriter('./cache/log');
     if (! file_exists("./cache/flags/")) {
         mkdir("./cache/flags/", 0750, true);
