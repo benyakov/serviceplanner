@@ -319,7 +319,8 @@ function getFlagsFor($serviceid, $occurrence, $raw=false) {
             FROM `{$db->getPrefix()}service_flags` AS f
             JOIN `{$db->getPrefix()}users` AS u ON (u.`uid` = f.`uid`)
             WHERE f.service = :service
-            AND f.occurrence = :occurrence ");
+            AND f.occurrence = :occurrence
+            ORDER BY flag ");
         $q->bindParam(":service", $serviceid);
         $q->bindParam(":occurrence", $occurrence);
         $q->execute() or die("Couldn't get flag for {$serviceid}/{$occurrence}");
