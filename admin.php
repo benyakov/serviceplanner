@@ -1,5 +1,5 @@
 <? /* Administrative interface
-    Copyright (C) 2016 Jesse Jacobsen
+    Copyright (C) 2023 Jesse Jacobsen
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -18,9 +18,9 @@
     Send feedback or donations to: Jesse Jacobsen <jmatjac@gmail.com>
 
     Mailed donation may be sent to:
-    Bethany Lutheran Church
-    2323 E. 12th St.
-    The Dalles, OR 97058
+    Lakewood Lutheran Church
+    10202 112th St. SW
+    Lakewood, WA 98498
     USA
  */
 
@@ -485,6 +485,8 @@ to have a recent backup first, at least of your church year data.</p>
         tried unless needed.</li>
     <li>Manually re-create <a href="admin.php?flag=create-views">synonym coordination views</a> in the database.  This should also happen automatically when needed.</li>
     <li><a href="hymnindex.php?drop=yes">Drop and re-create hymn cross-reference table</a>.  This is needed when the table has been changed in a new version.</li>
+    <li><a href="admin.php?flag=reset-flag-cache">Reset (delete) the cache for service flags</a>. This is almost never needed, but can be convenient.
+        For debugging purposes, you can <a href="./cache/log">see the flag cache log here</a>.</li>
     </ol>
 
     <? // Use standard lookup function, providing default and returning seconds

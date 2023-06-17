@@ -75,4 +75,7 @@ if ('savesettings' == getGET('flag')) {
 // Check churchyear data and functions
 require("./init/checkchurchyear.php");
 
+// Check for flag cache adjustments
+require("./init/flags.php");
+
 ?>
