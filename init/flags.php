@@ -27,7 +27,7 @@
 if (3 != authLevel()) {
     return; // Nothing to see here, execution resumes in prior script.
 }
-
+/*
 if ('reset-flag-cache' == getGET('flag')) {
     require_once("./flags.php");
     $lw = new LogWriter('./cache/log');
@@ -46,4 +46,3 @@ if ('reset-flag-cache' == getGET('flag')) {
     setMessage("Flag cache has been reset (deleted).");
 }
 
-?>

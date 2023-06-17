@@ -1,5 +1,5 @@
 <? /* Initialization used by all entry points
-    Copyright (C) 2014 Jesse Jacobsen
+    Copyright (C) 2023 Jesse Jacobsen
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -18,9 +18,9 @@
     Send feedback or donations to: Jesse Jacobsen <jmatjac@gmail.com>
 
     Mailed donation may be sent to:
-    Bethany Lutheran Church
-    2323 E. 12th St.
-    The Dalles, OR 97058
+    Lakewood Lutheran Church
+    10202 112th St. SW
+    Lakewood, WA 98498
     USA
  */
 if (empty($_SERVER['HTTPS']) || 'off' == $_SERVER['HTTPS']) {
