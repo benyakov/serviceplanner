@@ -485,8 +485,7 @@ to have a recent backup first, at least of your church year data.</p>
         tried unless needed.</li>
     <li>Manually re-create <a href="admin.php?flag=create-views">synonym coordination views</a> in the database.  This should also happen automatically when needed.</li>
     <li><a href="hymnindex.php?drop=yes">Drop and re-create hymn cross-reference table</a>.  This is needed when the table has been changed in a new version.</li>
-    <li><a href="admin.php?flag=reset-flag-cache">Reset (delete) the cache for service flags</a>. This is almost never needed, but can be convenient.
-        For debugging purposes, you can <a href="./cache/log">see the flag cache log here</a>.</li>
+    <li><a href="admin.php?flag=reset-flag-cache">Reset (delete) the cache for service flags</a>. This is almost never needed, but can be convenient.</li>
     </ol>
 
     <? // Use standard lookup function, providing default and returning seconds
