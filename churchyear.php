@@ -208,7 +208,7 @@ function updateSynonyms($oldlist, $newlist, $canonical, $confirmed=array()) {
     $extra = array();
     for ($i=0, $len=count($newlist); $i<=$len; $i++) {
         if (! array_key_exists($i, $oldlist)) { // Insert a new synonym
-            if ("" == $newlist[$i]) continue;       // filter out unintended blanks
+            if (isset($newlist[$i]) and "" == $newlist[$i]) continue;       // filter out unintended blanks
             $q = $db->prepare("INSERT INTO `{$dbp}churchyear_synonyms`
                 (canonical, synonym) VALUES (?, ?)");
             $q->bindValue(1, $canonical);

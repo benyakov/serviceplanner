@@ -216,6 +216,7 @@ class LectionaryImporter extends FormImporter {
             WHERE `synonym` = :check");
         $check_day = NULL;
         $qcheck->bindParam(":check", $check_day);
+        $unknowns = array();
         while ($record = $this->getRecord()) {
             foreach ($thisrec as $key=>&$value) {
                 $value = $record[$key];
