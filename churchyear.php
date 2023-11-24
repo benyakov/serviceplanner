@@ -263,7 +263,7 @@ if (getPOST('commitsynonyms')) {
         WHERE `canonical` = ? ORDER BY `synonym` ASC");
     $q->bindValue(1, $canonical);
     $q->execute();
-    $old = array_map(array_pop, $q->fetchAll(PDO::FETCH_NUM));
+    $old = array_map("array_pop", $q->fetchAll(PDO::FETCH_NUM));
     if (updateSynonyms($old, $new, $canonical, $del)) {
         $db->commit();
         echo json_encode(array(true, "Synonyms successfully changed."));
@@ -291,7 +291,7 @@ if (getPOST('submitsynonyms')) {
         WHERE `canonical` = ? ORDER BY `synonym` ASC");
     $q->bindValue(1, $canonical);
     $q->execute();
-    $olddblist = array_map(array_pop, $q->fetchAll(PDO::FETCH_NUM));
+    $olddblist = array_map("array_pop", $q->fetchAll(PDO::FETCH_NUM));
     if (count($olddblist) > count($synonyms)) {
         echo json_encode(array(false, "If you wish to delete synonyms, ".
             "change each one into ".
