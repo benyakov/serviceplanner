@@ -31,7 +31,7 @@
  * require() this file with $selective set to true, then call the function.
  */
 
-if (! isset($selective) && $selective) {
+if (! (isset($selective) && $selective)) {
     fill_historic($db);
     fill_order($db);
     fill_synonyms($db);
