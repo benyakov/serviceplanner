@@ -45,7 +45,7 @@ if (! (isset($selective) && $selective)) {
 function fill_historic($db) {
     $fh = fopen("./utility/churchyear/historictable.csv", "r");
     $headings = fgetcsv($fh);
-    $q = $db->prepare("INSERT INTO {$db->getPrefix()}churchyear
+    $q = $db->prepare("INSERT INTO `{$db->getPrefix()}churchyear`
         (season, dayname, base, offset, month, day,
             observed_month, observed_sunday)
         VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
@@ -100,7 +100,7 @@ function fill_synonyms($db) {
 function fill_propers($db) {
     $fh = fopen("./utility/churchyear/propers.csv", "r");
     $headings = fgetcsv($fh);
-    $qp = $db->prepare("INSERT INTO {$db->getPrefix()}churchyear_propers
+    $qp = $db->prepare("INSERT INTO `{$db->getPrefix()}churchyear_propers`
         (dayname, color, theme, introit, gradual)
         VALUES (?, ?, ?, ?, ?)");
     $hcount = count($headings);
@@ -123,7 +123,7 @@ function fill_propers($db) {
 function fill_lessons($db) {
     $fh = fopen("./utility/churchyear/lessons.csv", "r");
     $headings = fgetcsv($fh);
-    $ql = $db->prepare("INSERT INTO {$db->getPrefix()}churchyear_lessons
+    $ql = $db->prepare("INSERT INTO `{$db->getPrefix()}churchyear_lessons`
         (dayname, lectionary, lesson1, lesson2, gospel, psalm,
         s2lesson, s2gospel, s3lesson, s3gospel, hymnabc, hymn, note)
         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
@@ -150,7 +150,7 @@ function fill_lessons($db) {
 function fill_collect_texts($db) {
     $fh = fopen("./utility/churchyear/collecttext.csv", "r");
     $headings = fgetcsv($fh);
-    $ql = $db->prepare("INSERT INTO {$db->getPrefix()}churchyear_collects
+    $ql = $db->prepare("INSERT INTO `{$db->getPrefix()}churchyear_collects`
         (id, class, collect)
         VALUES (?, ?, ?)");
     while (($record = fgetcsv($fh)) != FALSE) {
