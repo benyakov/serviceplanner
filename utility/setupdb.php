@@ -58,7 +58,7 @@ if ($_GET['drop'] = "first") {
     }
 }
 // Execute each SQL query.
-$db->beginTransaction();
+// $db->beginTransaction(); // Removing because MySQL does an implicit commit on creating and dropping tables anyway.
 foreach ($queries as $query) {
     $q = $db->prepare($query);
     if (! $q->execute()) {
@@ -76,7 +76,7 @@ foreach ($queries as $query) {
         exit(1);
     }
 }
-$db->commit();
+// $db->commit();
 // Write database version to dbstate file.
 $dbstate->set('dbversion',
     "{$version['major']}.{$version['minor']}.{$version['tick']}");
