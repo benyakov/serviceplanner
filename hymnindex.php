@@ -46,7 +46,7 @@ if (getGET('drop') == 'yes' && 3 == authLevel()) {
     setMessage("Cross-reference table repopulated.");
 }
 
-if (! $db->query("SELECT 1 FROM {$db->getPrefix()}xref")) {
+if (! $db->query("SELECT 1 FROM `{$db->getPrefix()}xref`")) {
     /**** To create the cross reference table ****/
 
     $q = $db->prepare("CREATE TABLE `{$db->getPrefix()}xref` (
