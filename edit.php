@@ -236,7 +236,7 @@ if (! isset($_GET['stage']))
     $q->bindValue(":servicenotes", $todays['servicenotes']);
     $q->bindValue(":block", getIndexOr($todays,'block'));
     $q->bindValue(":id", getPOST('id'));
-    $q->execute() or dieWithRollback($q, $q->queryString);
+    $q->execute() or die($q->queryString);
 
     // Update hymns
     $q = $db->prepare("UPDATE {$db->getPrefix()}hymns
@@ -256,9 +256,9 @@ if (! isset($_GET['stage']))
         }
         if (is_numeric($hymnid)) {
             $q->bindValue(":hymnid", $hymnid);
-            $q->execute() or dieWithRollback($q, "Couldn't update hymn.");
+            $q->execute() or die("Couldn't update hymn.");
         } else {
-            $qi->execute() or dieWithRollback($q, "Couldn't insert new hymn.");
+            $qi->execute() or die("Couldn't insert new hymn.");
         }
     }
 
@@ -269,7 +269,7 @@ if (! isset($_GET['stage']))
     $q->bindParam(":hymnid", $hymnid);
     foreach ($todelete as $id) {
         $hymnid = $id;
-        $q->execute() or dieWithRollback($q, $q->queryString);
+        $q->execute() or die($q->queryString);
     }
     $db->commit();
     setMessage("Edit complete.");

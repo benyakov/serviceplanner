@@ -82,7 +82,7 @@ if (! $db->query("SELECT 1 FROM {$db->getPrefix()}xref")) {
         }
         $q = $db->prepare("INSERT INTO {$db->getPrefix()}xref (title, text, lsb, tlh, lw, lbw, elh, cw, wov, hs98)
             VALUES ({$r[0]}, {$r[1]}, {$r[2]}, {$r[3]}, {$r[4]}, {$r[5]}, {$r[6]}, {$r[7]}, {$r[8]}, {$r[9]})");
-        $q->execute() or dieWithRollback($q, "\n".__FILE__.":".__LINE__);
+        $q->execute() or die("\n".__FILE__.":".__LINE__);
     }
     $db->commit();
 }

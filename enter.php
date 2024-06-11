@@ -322,7 +322,7 @@ function processFormData() {
             $q->bindParam(':title', $h["title"]);
             $q->bindParam(':book', $h["book"]);
             $q->bindParam(':number', $h["number"]);
-            $q->execute() or dieWithRollback($q, ".");
+            $q->execute() or die(".");
             if ($q->rowCount()) {
                 $feedback .="<li>Updated name '{$h["title"]}' for {$h["book"]} {$h["number"]}.</li>";
             } else {
@@ -339,7 +339,7 @@ function processFormData() {
             AND `occurrence`=:occurrence");
         $q->bindParam(':occurrence', $_POST['occurrence']);
         $q->bindParam(':serviceid', $serviceid);
-        $q->execute() or dieWithRollback($q, ".");
+        $q->execute() or die(".");
         $sequenceMax = (int) array_slice($q->fetch(), -1);
         $q = $dbh->prepare("INSERT INTO `{$dbp}hymns`
             (service, occurrence, book, number, note, sequence)
@@ -353,7 +353,7 @@ function processFormData() {
             $q->bindValue(":number", $ahymn['number']);
             $q->bindValue(":note", $ahymn['note']);
             $q->bindValue(":sequence", $realsequence);
-            $q->execute() or dieWithRollback($q, $q->queryString);
+            $q->execute() or die($q->queryString);
             $saved[] = "{$ahymn['book']} {$ahymn['number']}";
         }
         if ($q->rowCount()) {
@@ -372,7 +372,7 @@ function processFormData() {
             WHERE service=:service AND occurrence=:occurrence");
         $qf->bindValue(":service", $flagestalt['service']);
         $qf->bindValue(":occurrence", $flagestalt['occurrence']);
-        $qf->execute() or dieWithRollback($q, $q->queryString);
+        $qf->execute() or die($q->queryString);
         $flagtext = $flagval = $flaguid = 0;
         $q->bindParam(":flag", $flagtext);
         $q->bindParam(":value", $flagval);
@@ -381,7 +381,7 @@ function processFormData() {
             $flagtext = $flag_contents["flag"];
             $flagval = $flag_contents["value"];
             $flaguid = $flag_contents["uid"];
-            $q->execute() or dieWithRollback($q, $q->errorString);
+            $q->execute() or die($q->errorString);
         }
         unset($q);
     }
