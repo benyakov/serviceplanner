@@ -243,6 +243,7 @@ function validateAuth($require) {
 
 function checkCorsAuth() {
     if (isset($_SERVER['HTTP_ORIGIN'])) {
+        if (! file_exists("corsfile.txt")) { touch("corsfile.txt"); }
         $corsfile = explode("\n", file_get_contents("corsfile.txt"));
         if ($_SERVER['HTTP_HOST'] == $_SERVER['HTTP_ORIGIN'] or getGET('flag')=='inituser') {
             return false;
