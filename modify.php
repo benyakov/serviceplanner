@@ -40,7 +40,7 @@ $options = getOptions(true);
     if (getGET('lowdate')) {
         $lowdate = new DateTime(getGET('lowdate'));
         $_SESSION[$sprefix]["lowdate"] = $lowdate;
-    } elseif (!array_key_exists($_SESSION[$sprefix], "lowdate")) {
+    } elseif (!array_key_exists("lowdate", $_SESSION[$sprefix])) {
         $lowdate = new DateTime();
         $lowdate->sub(new DateInterval("P".
             $options->getDefault('1', 'past-range')."W"));
