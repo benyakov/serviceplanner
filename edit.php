@@ -205,12 +205,12 @@ if (! isset($_GET['stage']))
     }
     // Update hymn names
     $ititle = $inumber = $ibook = 0;
-    $q = $db->prepare("INSERT INTO {$db->getPrefix()}names (title, number, book)
+    $q = $db->prepare("INSERT INTO `{$db->getPrefix()}names` (title, number, book)
         VALUES (:title, :number, :book)");
     $q->bindParam(":title", $ititle);
     $q->bindParam(":number", $inumber);
     $q->bindParam(":book", $ibook);
-    $qu = $db->prepare("UPDATE {$db->getPrefix()}names SET title = :title
+    $qu = $db->prepare("UPDATE `{$db->getPrefix()}names` SET title = :title
         WHERE number = :number
         AND book = :book");
     $qu->bindParam(":title", $ititle);
@@ -239,12 +239,12 @@ if (! isset($_GET['stage']))
     $q->execute() or die($q->queryString);
 
     // Update hymns
-    $q = $db->prepare("UPDATE {$db->getPrefix()}hymns
+    $q = $db->prepare("UPDATE `{$db->getPrefix()}hymns`
         SET number=:number,
         note=:note, occurrence=:occurrence,
         book=:book, sequence=:sequence
         WHERE pkey=:hymnid");
-    $qi = $db->prepare("INSERT INTO {$db->getPrefix()}hymns
+    $qi = $db->prepare("INSERT INTO `{$db->getPrefix()}hymns`
         (service, occurrence, book, number, note, sequence)
         VALUES (:service, :occurrence, :book, :number, :note, :sequence)");
     $qi->bindValue(":service", $_POST['id']);
@@ -263,7 +263,7 @@ if (! isset($_GET['stage']))
     }
 
     // Delete tagged hymns
-    $q = $db->prepare("DELETE FROM {$db->getPrefix()}hymns
+    $q = $db->prepare("DELETE FROM `{$db->getPrefix()}hymns`
         WHERE pkey = :hymnid");
     $hymnid = 0;
     $q->bindParam(":hymnid", $hymnid);
