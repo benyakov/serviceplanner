@@ -61,7 +61,7 @@ if ($title || getGET('xref')=="off") {
 }
 $bookname = strtolower(getGET('book'));
 $q = $db->prepare("SELECT `title` from `{$db->getPrefix()}xref`
-    WHERE `{getGET('book')}` = :number LIMIT 1");
+    WHERE `{$bookname}` = :number LIMIT 1");
 $q->bindParam(':number', getGET('number'));
 if ($q->execute() && ($row = $q->fetch())) {
     $title = $row[0];
