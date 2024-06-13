@@ -168,7 +168,7 @@ unset($config);
 <body>
 <script type="text/javascript">
 function loadFieldContainer() {
-    var xhr = $.getJSON("<?=$this_script?>",
+    var xhr = $.getJSON("<?=$protocol?>://<?=$this_script?>",
         { "action": "customfields" },
         fillFieldContainer);
 }
@@ -183,7 +183,7 @@ function fillFieldContainer(result) {
 }
 
 function loadServiceListing() {
-    var xhr = $.getJSON("<?=$this_script?>",
+    var xhr = $.getJSON("<?=$protocol?>://<?=$this_script?>",
         { "action": "servicelisting" },
         fillServiceListing);
 }
@@ -209,7 +209,7 @@ function setupFields() {
     $("a.field-left").click(function(evt) {
         evt.preventDefault();
         var order = $(this).parent().data("order");
-        $.getJSON("<?=$this_script?>",
+        $.getJSON("<?=$protocol?>://<?=$this_script?>",
             { "move-field": "left",
             "index": order },
             function(rv) {
@@ -222,7 +222,7 @@ function setupFields() {
     $("a.field-right").click(function(evt) {
         evt.preventDefault();
         var order = $(this).parent().data("order");
-        $.getJSON("<?=$this_script?>",
+        $.getJSON("<?=$protocol?>://<?=$this_script?>",
             { "move-field": "right",
             "index": order },
             function(rv) {
@@ -235,7 +235,7 @@ function setupFields() {
     $("a.field-delete").click(function(evt) {
         evt.preventDefault();
         var order = $(this).parent().data("order");
-        $.getJSON("<?=$this_script?>",
+        $.getJSON("<?=$protocol?>://<?=$this_script?>",
             { "delete-field": order },
             function(rv) {
                 if (rv[0]) {
@@ -272,7 +272,7 @@ function setupFields() {
 function setupInsertDialog(order) {
     $("#selectfieldform").submit(function(evt) {
         evt.preventDefault();
-        $.post("<?=$this_script?>?insert="+order,
+        $.post("<?=$protocol?>://<?=$this_script?>?insert="+order,
             { selection: $("#fieldselector").val(),
               width: $("#fieldwidth").val() },
             function(rv) {
@@ -301,7 +301,7 @@ function generateFieldOptionList(selected) {
 }
 
 function loadAvailableFields() {
-    var xhr = $.get("<?=$this_script?>",
+    var xhr = $.get("<?=$protocol?>://<?=$this_script?>",
         { "action": "available" },
         function(rv) {
             sessionStorage.setItem("customfields", rv);
@@ -336,7 +336,7 @@ echo "</div>";
 
 <?
 function customViewConfig($cfg) {
-    global $this_script;
+    global $this_script, $protocol;
     ob_start();
     $limit = $cfg->get("custom view", "limit");
     if ((bool) $cfg->get("custom view", "future"))
@@ -358,10 +358,11 @@ End HTML: <input type="text" id="end" required value="<?=htmlspecialchars($endht
 <script type="text/javascript">
     $("#customviewsetup").submit(function(evt) {
         evt.preventDefault();
-        $.post("<?=$this_script?>", { limit: $("#limit").val(),
-            future: $("#future:checked").val(),
-            start: $("#start").val(),
-            end: $("#end").val() },
+        $.post("<?=$protocol?>://<?=$this_script?>", 
+            { limit: $("#limit").val(),
+              future: $("#future:checked").val(),
+              start: $("#start").val(),
+              end: $("#end").val() },
             function(rv) {
                 rv = $.parseJSON(rv);
                 setMessage(rv[1]);

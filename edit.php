@@ -162,7 +162,7 @@ if (! isset($_GET['stage']))
             </td>
             <td><input type="text" id="title_new" size="50"
                  maxlength="50" name="title_new" class="edit-title">
-                <a href="#" data-hymn="<?=$i?>"
+                <a href="#" data-hymn=""
                  class="hidden save-title command-link"
                  id="savetitle_new">Save</a>
             </td>

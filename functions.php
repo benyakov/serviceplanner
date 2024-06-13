@@ -220,6 +220,7 @@ function queryServiceDateRange($lowdate, $highdate, $allfuture, $order="DESC") {
 
 function rawQuery($where=array(), $order="", $limit="", $blend_occurrences=false) {
     if ($where) $wherestr = "WHERE ".implode(" AND ", $where);
+    else $wherestr = "";
     if ($limit) $limitstr = "LIMIT {$limit}";
     else $limitstr = "";
     if ($blend_occurrences) {
