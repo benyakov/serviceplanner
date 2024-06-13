@@ -352,6 +352,7 @@ function getFlagestalt($serviceid, $occurrence) {
     $auth = authLevel();
     $flagestalt = $options->getDefault(0, "flagestalt");
     unset($options);
+    if ("0" == $flagestalt) { return ""; }
     if ($auth >= 3 && $flagestalt["service"] == $serviceid && $flagestalt["occurrence"] == $occurrence) {
         return "flagestalt";
     } else {
