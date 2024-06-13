@@ -309,7 +309,7 @@ function processFormData() {
     foreach ($hymns as $h) {
         if (! $h['title']) { continue; }
         // Check to see if the hymn is already entered.
-        $q = $dbh->prepare("INSERT INTO {$dbp}names (book, number, title)
+        $q = $dbh->prepare("INSERT INTO `{$dbp}names` (book, number, title)
             VALUES (:book, :number, :title)");
         $q->bindParam(":book", $h["book"]);
         $q->bindParam(":number",$h["number"]);
@@ -317,7 +317,7 @@ function processFormData() {
         if ($q->execute()) {
             $feedback .= "<li>Saved name '{$h["title"]}' for {$h["book"]} {$h["number"]}.</li>";
         } else {
-            $q = $dbh->prepare("UPDATE {$dbp}names SET title=:title
+            $q = $dbh->prepare("UPDATE `{$dbp}names` SET title=:title
                 WHERE book=:book AND number=:number");
             $q->bindParam(':title', $h["title"]);
             $q->bindParam(':book', $h["book"]);
@@ -399,9 +399,9 @@ function setHymnTitle() {
     $q->bindValue(':number', getGET('number'));
     $q->execute() or die(end($q->errorInfo()));
     $row = $q->fetch(PDO::FETCH_ASSOC);
-    $oldtitle = $row['title'];
     if ($row && $row['number']) {
         //Update
+        $oldtitle = $row['title'];
         $q = $dbh->prepare("UPDATE `{$dbp}names` SET `title` = :title
             WHERE `book` = :book AND `number` = :number");
         $message = "Hymn title for {$_GET['book']} {$_GET['number']} updated "

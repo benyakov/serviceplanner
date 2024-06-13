@@ -55,7 +55,7 @@ while ($row = $q->fetch(PDO::FETCH_ASSOC)) {
 if (0 == getGET('number')) {
     $lastusedary = array();
 }
-if ($title || getGET('xref')=="off") {
+if (isset($title) || getGET('xref')=="off") {
     echo json_encode(array($title, $lastusedary, false));
     exit(0);
 }
