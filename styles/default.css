@@ -24,6 +24,11 @@
     USA
 */
 
+tr > td.extradaynamesctrl {
+    /* This is an unfinished addition. */
+    display: none;
+}
+
 body {
     padding-top: 0;
     background-color: black;
