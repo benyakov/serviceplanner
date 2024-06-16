@@ -42,7 +42,7 @@ $backlink = "index.php";
         <dt>Order/Rite</dt> <dd><?=$row['rite']?> </dd>
         <dt>Service Notes</dt> <dd> <?=translate_markup(trim($row['servicenotes']))?> </dd>
         <? if ($row['introit']) { ?>
-        <dt>Introit</dt> <dd class="introittext maxcolumn"><?=$row['introit']?></dd>
+        <dt>Introit</dt> <dd class="introittext maxcolumn"><?=translate_markup($row['introit'])?></dd>
         <? }
         if ($row['gradual']) { ?>
         <dt>Gradual</dt> <dd class="smaller maxcolumn"><?=$row['gradual']?></dd>

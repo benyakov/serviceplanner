@@ -547,9 +547,9 @@ function display_occurrences_separately($q) {
             if ($row['introit'] || $row['gradual']) {
                 echo "<tr class=\"heading propers\"><td colspan=3>";
                 if ($row['introit'])
-                    echo "<p class=\"sbspar maxcolumn smaller\">{$row['introit']}</p>";
+                    echo "<p class=\"sbspar maxcolumn smaller\">".translate_markup($row['introit'])."</p>";
                 if ($row['gradual'])
-                    echo "<p class=\"sbspar halfcolumn smaller\">{$row['gradual']}</p>";
+                    echo "<p class=\"sbspar halfcolumn smaller\">".translate_markup($row['gradual'])."</p>";
                 echo "</td></tr>";
             }
             if ($row['propersnote']) {
@@ -658,9 +658,9 @@ function displayServiceHeaderCombined($thesehymns, $servicecount) {
     if (getIndexOr($row,'introit') || getIndexOr($row,'gradual')) {
         echo "<tr class=\"heading propers\"><td colspan=3>";
         if (getIndexOr($row,'introit'))
-            echo "<p class=\"sbspar maxcolumn smaller\">{$row['introit']}</p>";
+            echo "<p class=\"sbspar maxcolumn smaller\">".translate_markup($row['introit'])."</p>";
         if (getIndexOr($row,'gradual'))
-            echo "<p class=\"sbspar halfcolumn smaller\">{$row['gradual']}</p>";
+            echo "<p class=\"sbspar halfcolumn smaller\">".translate_markup($row['gradual'])."</p>";
         echo "</td></tr>";
     }
     if (getIndexOr($row,'propersnote')) {
@@ -758,9 +758,9 @@ function modify_occurrences_separately($q) {
             if ($row['introit'] || $row['gradual']) {
                 echo "<tr><td colspan=3>";
                 if ($row['introit'])
-                    echo "<p class=\"sbspar maxcolumn smaller\">{$row['introit']}</p>";
+                    echo "<p class=\"sbspar maxcolumn smaller\">".translate_markup($row['introit'])."</p>";
                 if ($row['gradual'])
-                    echo "<p class=\"sbspar halfcolumn smaller\">{$row['gradual']}</p>";
+                    echo "<p class=\"sbspar halfcolumn smaller\">".translate_markup($row['gradual']."</p>";
                 echo "</td></tr>";
             }
             if ($row['propersnote']) {
@@ -885,9 +885,9 @@ function modifyServiceHeaderCombined($thesehymns,$servicecount) {
     if ($row['introit'] || $row['gradual']) {
         echo "<tr><td colspan=3>";
         if ($row['introit'])
-            echo "<p class=\"sbspar maxcolumn smaller\">{$row['introit']}</p>";
+            echo "<p class=\"sbspar maxcolumn smaller\">".translate_markup($row['introit'])."</p>";
         if ($row['gradual'])
-            echo "<p class=\"sbspar halfcolumn smaller\">{$row['gradual']}</p>";
+            echo "<p class=\"sbspar halfcolumn smaller\">".traslate_markup($row['gradual'])."</p>";
         echo "</td></tr>";
     }
     if ($row['propersnote']) {
