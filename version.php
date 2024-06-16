@@ -23,5 +23,5 @@
     Lakewood, WA 98498
     USA
  */
-$version = array('major' => 0, 'minor' => 20, 'tick' => 22);
+$version = array('major' => 0, 'minor' => 20, 'tick' => 23);
 ?>

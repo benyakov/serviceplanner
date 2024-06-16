@@ -700,7 +700,7 @@ dl.blocklessons dt {
     width: 30em;
 }
 
-p.sbspar {
+div.sbspar {
     display: inline-block;
     padding: .5em;
 }

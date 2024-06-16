@@ -541,23 +541,26 @@ function display_occurrences_separately($q) {
             "</td><td>({$servicecount})</td></tr>\n";
             echo "<tr class=\"service-flags\" data-occ=\"{$row['occurrence']}\" data-service=\"{$row['serviceid']}\"><td colspan=3></td>"
                 ."<td>".flagestaltLink($row['serviceid'], $row['occurrence'])."</td></tr>\n";
-            echo "<tr data-occ=\"{$row['occurrence']}\" class=\"heading\" data-service=\"{$row['serviceid']}\"><td class=\"propers\" colspan=3>\n";
-            echo "<table><tr><td class=\"heavy smaller\">{$row['theme']}</td>";
-            echo "<td colspan=2>{$row['color']}</td></tr>";
-            if ($row['introit'] || $row['gradual']) {
-                echo "<tr class=\"heading propers\"><td colspan=3>";
-                if ($row['introit'])
-                    echo "<p class=\"sbspar maxcolumn smaller\">".translate_markup($row['introit'])."</p>";
-                if ($row['gradual'])
-                    echo "<p class=\"sbspar halfcolumn smaller\">".translate_markup($row['gradual'])."</p>";
-                echo "</td></tr>";
+            // Propers
+            ?>
+            <tr class="propers heading" data-occ="<?=$row['occurrence']?>" data-service="<?=$row['serviceid']?>">
+            <td class="heavy smaller"><?=$row['theme']?></td> <td><?=$row['color']?></td></tr>
+            <?
+            if (getIndexOr($row,'introit') || getIndexOr($row,'gradual')) {
+                ?> <tr class="propers heading" data-occ="<?=$row['occurrence']?>" data-service="<?=$row['serviceid']?>"> <?
+                if (getIndexOr($row,'introit')) {
+                    ?> <td><div class="sbspar maxcolumn smaller"><?=translate_markup($row['introit'])?></div></td> <?
+                }
+                if (getIndexOr($row,'gradual')) {
+                    ?> <td><div class="sbspar maxcolumn smaller"><?=translate_markup($row['gradual'])?></div></td> <?
+                }
+            ?> </tr> <?
             }
-            if ($row['propersnote']) {
-                echo "<tr class=\"heading propers\"><td colspan=3>
-                    <p class=\"maxcolumn\">".
-                    translate_markup($row['propersnote'])."</p></td></tr>";
+            if (getIndexOr($row,'propersnote')) {
+                ?> <tr class="propers heading" data-occ="<?=$row['occurrence']?>" data-service="<?=$row['serviceid']?>"><td> 
+                    <div class="maxcolumn"><?=translate_markup($row['propersnote'])?></div></td></tr> <?
             }
-            echo "\n</table></td></tr>\n";
+            // Block
             if ($row['block'])
             { ?>
                 <tr data-occ="<?=$row['occurrence']?>" data-service="<?=$row['serviceid']?>">
@@ -652,23 +655,25 @@ function displayServiceHeaderCombined($thesehymns, $servicecount) {
     :"").
         "{$occurrences[$i]}</td></tr>\n";
     }
-    echo "<tr class=\"heading\" data-service=\"{$sid}\"><td class=\"propers\" colspan=3>\n";
-    echo "<table><tr><td class=\"heavy smaller\">".getIndexOr($row,'theme')."</td>";
-    echo "<td colspan=2>".getIndexOr($row,'color')."</td></tr>";
-    if (getIndexOr($row,'introit') || getIndexOr($row,'gradual')) {
-        echo "<tr class=\"heading propers\"><td colspan=3>";
-        if (getIndexOr($row,'introit'))
-            echo "<p class=\"sbspar maxcolumn smaller\">".translate_markup($row['introit'])."</p>";
-        if (getIndexOr($row,'gradual'))
-            echo "<p class=\"sbspar halfcolumn smaller\">".translate_markup($row['gradual'])."</p>";
-        echo "</td></tr>";
+    // Propers
+    ?>
+    <tr class="heading" data-service="<?=$row['serviceid']?>">
+    <td class="propers heavy smaller"><?=$row['theme']?></td><td><?=$row['color']?></td></tr>
+    <?
+    if ($row['introit'] || $row['gradual']) {
+        ?> <tr class="propers heading" data-occ="<?=$row['occurrence']?>" data-service="<?=$row['serviceid']?>"> <?
+        if ($row['introit']) {
+            ?> <td><div class="sbspar maxcolumn smaller"><?=translate_markup($row['introit'])?></div></td> <?
+        }
+        if ($row['gradual']) {
+            ?> <td><div class="sbspar maxcolumn smaller"><?=translate_markup($row['gradual'])?></div></td> <?
+        }
+    ?> </tr> <?
     }
-    if (getIndexOr($row,'propersnote')) {
-        echo "<tr class=\"heading propers\"><td colspan=3>
-            <p class=\"maxcolumn\">".
-            translate_markup($row['propersnote'])."</p></td></tr>";
+    if ($row['propersnote']) {
+        ?> <tr class="propers heading" data-occ="<?=$row['occurrence']?>" data-service="<?=$row['serviceid']?>"><td> 
+            <div class="maxcolumn"><?=translate_markup($row['propersnote'])?></div></td></tr> <?
     }
-    echo "\n</table></td></tr>\n";
     if (getIndexOr($row,'block'))
     { ?>
         <tr data-service="<?=getIndexOr($row,'serviceid')?>">
@@ -750,31 +755,36 @@ function modify_occurrences_separately($q) {
             <td colspan=2>
             <a name=\"service_{$row['serviceid']}\">{$row['dayname']}</a>: {$row['rite']}
             </td><td>({$servicecount})</td></tr>\n";
+            // Flags Row
             echo "<tr class=\"service-flags\" data-occ=\"{$row['occurrence']}\" data-service=\"{$row['serviceid']}\"><td colspan=3></td><td>"
                 .flagestaltLink($row['serviceid'], $row['occurrence'])."</td></tr>\n";
-            echo "<tr data-occ=\"{$row['occurrence']}\" data-service=\"{$row['serviceid']}\" class=\"heading\"><td colspan=3 class=\"propers\">\n";
-            echo "<table><tr><td class=\"heavy smaller\">{$row['theme']}</td>";
-            echo "<td colspan=2>{$row['color']}</td></tr>";
-            if ($row['introit'] || $row['gradual']) {
-                echo "<tr><td colspan=3>";
-                if ($row['introit'])
-                    echo "<p class=\"sbspar maxcolumn smaller\">".translate_markup($row['introit'])."</p>";
-                if ($row['gradual'])
-                    echo "<p class=\"sbspar halfcolumn smaller\">".translate_markup($row['gradual']."</p>";
-                echo "</td></tr>";
+            // Propers Row
+            ?>
+            <tr class="propers heading" data-occ="<?=$row['occurrence']?>" data-service="<?=$row['serviceid']?>">
+            <td class="heavy smaller"><?=$row['theme']?></td> <td><?=$row['color']?></td></tr>
+            <?
+            if (getIndexOr($row,'introit') || getIndexOr($row,'gradual')) {
+                ?> <tr class="propers heading" data-occ="<?=$row['occurrence']?>" data-service="<?=$row['serviceid']?>"> <?
+                if (getIndexOr($row,'introit')) {
+                    ?> <td><div class="sbspar maxcolumn smaller"><?=translate_markup($row['introit'])?></div></td> <?
+                }
+                if (getIndexOr($row,'gradual')) {
+                    ?> <td><div class="sbspar maxcolumn smaller"><?=translate_markup($row['gradual'])?></div></td> <?
+                }
+            ?> </tr> <?
             }
-            if ($row['propersnote']) {
-                echo "<tr><td colspan=3>
-                    <p class=\"maxcolumn\">".
-                    translate_markup($row['propersnote'])."</p></td></tr>";
+            if (getIndexOr($row,'propersnote')) {
+                ?> <tr class="propers heading" data-occ="<?=$row['occurrence']?>" data-service="<?=$row['serviceid']?>"><td> 
+                    <div class="maxcolumn"><?=translate_markup($row['propersnote'])?></div></td></tr> <?
             }
-            echo "\n</tr></table></td>\n";
+            // Block Row
             if ($row['block'])
             { ?>
                 <tr data-occ="<?=$row['occurrence']?>" data-service="<?=$row['serviceid']?>">
                 <?php display_block_section($row, $cfg); ?>
                 </tr>
             <? }
+            // Notes Row
             if ($row['servicenotes']) {
                 echo "<tr data-occ=\"{$row['occurrence']}\" data-service=\"{$row['serviceid']}\"><td colspan=3 class=\"servicenote\">".
                      translate_markup($row['servicenotes'])."</td></tr>\n";
@@ -879,30 +889,32 @@ function modifyServiceHeaderCombined($thesehymns,$servicecount) {
             <td>".flagestaltLink($row['serviceid'], $row['occurrence'])." <a class=\"menulink flagbutton\" title=\"Edit flags for this service.\" href=\"flags.php?id={$row['serviceid']}&occurrence={$urloccurrences[$i]}\">Flags</a> {$occurrences[$i]}</td>
         </tr>\n";
     }
-    echo "<tr class=\"heading\" data-service=\"{$row['serviceid']}\"><td colspan=3 class=\"propers\">\n";
-    echo "<table><tr><td class=\"heavy smaller\">{$row['theme']}</td>";
-    echo "<td colspan=2>{$row['color']}</td></tr>";
-    if ($row['introit'] || $row['gradual']) {
-        echo "<tr><td colspan=3>";
-        if ($row['introit'])
-            echo "<p class=\"sbspar maxcolumn smaller\">".translate_markup($row['introit'])."</p>";
-        if ($row['gradual'])
-            echo "<p class=\"sbspar halfcolumn smaller\">".traslate_markup($row['gradual'])."</p>";
-        echo "</td></tr>";
+    // Propers 
+    ?>
+    <tr class="heading" data-service="<?=$row['serviceid']?>">
+    <td class="propers heavy smaller"><?=$row['theme']?></td><td><?=$row['color']?></td></tr>
+    <?
+    if (getIndexOr($row,'introit') || getIndexOr($row,'gradual')) {
+        ?> <tr class="propers heading" data-occ="<?=$row['occurrence']?>" data-service="<?=$row['serviceid']?>"> <?
+        if (getIndexOr($row,'introit')) {
+            ?> <td><div class="sbspar maxcolumn smaller"><?=translate_markup($row['introit'])?></div></td> <?
+        }
+        if (getIndexOr($row,'gradual')) {
+            ?> <td><div class="sbspar maxcolumn smaller"><?=translate_markup($row['gradual'])?></div></td> <?
+        }
+    ?> </tr> <?
     }
-    if ($row['propersnote']) {
-        echo "<tr class=\"propersnote\"><td colspan=3>
-            <p class=\"maxcolumn\">".
-            translate_markup($row['propersnote'])."</p></td></tr>";
+    if (getIndexOr($row,'propersnote')) {
+        ?> <tr class="propers heading" data-occ="<?=$row['occurrence']?>" data-service="<?=$row['serviceid']?>"><td> 
+            <div class="maxcolumn"><?=translate_markup($row['propersnote'])?></div></td></tr> <?
     }
-    echo "\n</tr></table></td>\n";
-    if ($row['block'])
+    if (getIndexOr($row,'block'))
     { ?>
         <tr data-service="<?=$row['serviceid']?>">
         <?php display_block_section($row, $cfg); ?>
         </tr>
     <? }
-    if ($row['servicenotes']) {
+    if (getIndexOr($row,'servicenotes')) {
         echo "<tr data-service=\"{$row['serviceid']}\"><td colspan=3 class=\"servicenote\">".
              translate_markup($row['servicenotes'])."</td></tr>\n";
     }
