@@ -130,7 +130,7 @@ if ( $flag=="edit" ) {
         $elementValues = array("", "", "", $fname, $lname, $ulevel, $email);
         editUserForm($elementValues, "Add", $unameerror, $emailerror);
     } else {
-        $q = $db->prepare("INSERT INTO {$db->getPrefix()}users
+        $q = $db->prepare("INSERT INTO `{$db->getPrefix()}users`
             SET `username`=:uname, `password`=:pw, `fname`=:fname,
             `lname`=:lname, `userlevel`=:ulevel, `email`=:email");
         $q->bindParam(":uname", $uname);
@@ -321,7 +321,7 @@ function editUserForm($elementValues="", $mode="Add",
     <table>
     <form id="userform" action="useradmin.php?flag=<?=$flag?>"
         method="post" autocomplete="off">
-    <input type="hidden" name="uid" value="<?=$uid?>">
+    <input type="hidden" name="uid" value="<?=isset($uid)?$uid:''?>">
     <tr>
         <td align="right"><label for="username">User name</label></td>
         <td><input type="text" maxlength="15" name="username"

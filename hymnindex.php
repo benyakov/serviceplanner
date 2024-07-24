@@ -90,15 +90,14 @@ if (! $db->query("SELECT 1 FROM `{$db->getPrefix()}xref`")) {
 
 
 if (isset($_GET['sort']) && strpos($_GET['sort'], ';') == False) {
-    $sanitized_sort_field = "`{$_GET['sort']}`";
-    $sort_by = " ORDER BY ({$sanitized_sort_field} = \"\") DESC, ".
-        " {$sanitized_sort_field}";
     $sorted_on = $_GET['sort'];
+    $sanitized_sort_field = "`{$sorted_on}`";
+    $sort_by = " ORDER BY (-{$sorted_on}) DESC";
 } else {
     $sort_by = "";
     $sorted_on = "";
 }
-$q = $db->prepare("SELECT * FROM `{$db->getPrefix()}xref{$sort_by}`") ;
+$q = $db->prepare("SELECT * FROM `{$db->getPrefix()}xref` {$sort_by}") ;
 if (!$q->execute()) die(array_pop($q->errorInfo()));
 ?><!DOCTYPE html>
 <html lang="en">

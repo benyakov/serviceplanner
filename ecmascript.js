@@ -602,7 +602,7 @@ function setupSortableList() {
 
 function setupFlags() {
     $(".flagbutton").click(onFlagButtonClick);
-    $(".service-flags").on('appear', function(evt) {
+    $(".service-flags").on('appear dblclick', function(evt) {
         if (! $(this).data('loaded')) {
             pullFlags(1, $(this));
         }
