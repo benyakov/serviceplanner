@@ -261,6 +261,8 @@ function rawQuery($where=array(), $order="", $limit="", $blend_occurrences=false
             LIMIT 1)
         END)
         AS bpsalm,
+    synl.hymnabc AS sermonhymn,
+    synl.hymn AS hymn,
     synl.note AS sermonlessonnote,
     b.l1lect != 'custom' AS l1link,
     b.l2lect != 'custom' AS l2link,
@@ -457,6 +459,8 @@ echo "No block data found. "
     <dt>Gospel</dt><dd><?=linkbgw($cfg, $row['bgospel'], $row['golink'])?></dd>
     <dt>Psalm</dt><dd><?=linkbgw($cfg, $row['bpsalm']?"Ps ".$row['bpsalm']:'', $row['pslink'])?></dd>
     <dt>Sermon<?=$row['has_sermon']?'*':''?></dt><dd><?=linkbgw($cfg, $row['bsermon'], $row['has_sermon'] || $row['smlink'])?></dd>
+    <dt>Weekly Hymn</dt><dd><?=$row['hymnabc']?></dd>
+    <dt>Hymn</dt><dd><?=$row['hymn']?></dd>
     </dl>
     <h5>Collect (<?=$row['bcollectclass']?>)</h5>
     <div class="collecttext maxcolumn">
