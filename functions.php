@@ -247,6 +247,8 @@ function rawQuery($where=array(), $order="", $limit="", $blend_occurrences=false
     COALESCE(l1s.lesson1, l1s.l1series) AS blesson1,
     COALESCE(l2s.lesson2, l2s.l2series) AS blesson2,
     COALESCE(gos.gospel, gos.goseries) AS bgospel,
+    COALESCE(gos.hymnabc, l2s.hymnabc, l1s.hymnabc, synl.hymnabc) as hymnabc,
+    COALESCE(gos.hymn, l2s.hymn, l1s.hymn, synl.hymn) as hymn,
     COALESCE(smr.bibletext,
              (CASE b.smtype
               WHEN 'gospel' THEN sms.gospel
@@ -261,8 +263,6 @@ function rawQuery($where=array(), $order="", $limit="", $blend_occurrences=false
             LIMIT 1)
         END)
         AS bpsalm,
-    synl.hymnabc AS sermonhymn,
-    synl.hymn AS hymn,
     synl.note AS sermonlessonnote,
     b.l1lect != 'custom' AS l1link,
     b.l2lect != 'custom' AS l2link,
