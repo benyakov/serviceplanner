@@ -557,7 +557,7 @@ function display_occurrences_separately($q) {
             ?> </tr> <?
             }
             if (getIndexOr($row,'propersnote')) {
-                ?> <tr class="propers heading" data-occ="<?=$row['occurrence']?>" data-service="<?=$row['serviceid']?>"><td> 
+                ?> <tr class="propers heading" data-occ="<?=$row['occurrence']?>" data-service="<?=$row['serviceid']?>"><td>
                     <div class="maxcolumn"><?=translate_markup($row['propersnote'])?></div></td></tr> <?
             }
             // Block
@@ -671,7 +671,7 @@ function displayServiceHeaderCombined($thesehymns, $servicecount) {
     ?> </tr> <?
     }
     if ($row['propersnote']) {
-        ?> <tr class="propers heading" data-occ="<?=$row['occurrence']?>" data-service="<?=$row['serviceid']?>"><td> 
+        ?> <tr class="propers heading" data-occ="<?=$row['occurrence']?>" data-service="<?=$row['serviceid']?>"><td>
             <div class="maxcolumn"><?=translate_markup($row['propersnote'])?></div></td></tr> <?
     }
     if (getIndexOr($row,'block'))
@@ -774,7 +774,7 @@ function modify_occurrences_separately($q) {
             ?> </tr> <?
             }
             if (getIndexOr($row,'propersnote')) {
-                ?> <tr class="propers heading" data-occ="<?=$row['occurrence']?>" data-service="<?=$row['serviceid']?>"><td> 
+                ?> <tr class="propers heading" data-occ="<?=$row['occurrence']?>" data-service="<?=$row['serviceid']?>"><td>
                     <div class="maxcolumn"><?=translate_markup($row['propersnote'])?></div></td></tr> <?
             }
             // Block Row
@@ -889,7 +889,7 @@ function modifyServiceHeaderCombined($thesehymns,$servicecount) {
             <td>".flagestaltLink($row['serviceid'], $row['occurrence'])." <a class=\"menulink flagbutton\" title=\"Edit flags for this service.\" href=\"flags.php?id={$row['serviceid']}&occurrence={$urloccurrences[$i]}\">Flags</a> {$occurrences[$i]}</td>
         </tr>\n";
     }
-    // Propers 
+    // Propers
     ?>
     <tr class="heading" data-service="<?=$row['serviceid']?>">
     <td class="propers heavy smaller"><?=$row['theme']?></td><td><?=$row['color']?></td></tr>
@@ -905,7 +905,7 @@ function modifyServiceHeaderCombined($thesehymns,$servicecount) {
     ?> </tr> <?
     }
     if (getIndexOr($row,'propersnote')) {
-        ?> <tr class="propers heading" data-occ="<?=$row['occurrence']?>" data-service="<?=$row['serviceid']?>"><td> 
+        ?> <tr class="propers heading" data-occ="<?=$row['occurrence']?>" data-service="<?=$row['serviceid']?>"><td>
             <div class="maxcolumn"><?=translate_markup($row['propersnote'])?></div></td></tr> <?
     }
     if (getIndexOr($row,'block'))
