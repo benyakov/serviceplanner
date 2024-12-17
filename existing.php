@@ -24,6 +24,7 @@
     USA
  */
 require("./init.php");
+date_default_timezone_set('UTC');
 $date = date("Y-m-d", getGET('date'));
 $db->beginTransaction();
 $q = $db->prepare("SELECT d.name AS dayname, d.rite, d.pkey AS service,
