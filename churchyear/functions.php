@@ -231,15 +231,8 @@ function get_christmas1_in_year($year) {
     return $christmas->add(makeInterval("P".(7-$wdchristmas)."D"));
 }
 
-function get_michaelmas1_in_year($year, $table) {
-    $day_params = churchyear_table_rec($table, "Michaelmas");
-    $sep30 = new DateTimeImmutable("9/30/{$year}");
-    $sep30wd = $sep30->format("w"); // One=Sunday
-    if (0 == $sep30wd) {
-        return $sep30;
-    } else {
-        return $sep30->sub(makeInterval("P{$sep30wd}D"));
-    }
+function get_michaelmas_sunday_in_year($year, $table) {
+    return new DateTimeImmutable("last Sunday of September $year");
 }
 
 function get_epiphany1_in_year($year) {
@@ -262,6 +255,7 @@ function churchyear_table_rec($table, $dayname) {
 }
 
 function makeInterval($initstring) {
+    // The presence of "-" indicates a backward (inverted) interval
     if (strpos($initstring, "-") !== false) {
         $initstring = str_replace('-', '', $initstring);
         $invert = 1;
@@ -293,8 +287,8 @@ function date_in_year($year, $dayname, $table) {
         return get_christmas1_in_year($year)->add($interval);
     } elseif ("Advent 4" == $base) {
         return get_advent4_in_year($year)->add($interval);
-    } elseif ("Michaelmas 1" == $base) {
-        return get_michaelmas1_in_year($year, $table)->add($interval);
+    } elseif ("Michaelmas Sunday" == $base) {
+        return get_michaelmas_sunday_in_year($year, $table)->add($interval);
     } elseif ("Epiphany 1" == $base) {
         return get_epiphany1_in_year($year)->add($interval);
     } else {
