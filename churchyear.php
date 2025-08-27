@@ -321,9 +321,13 @@ if (getPOST('submitsynonyms')) {
         echo json_encode(array('confirm', $confirm));
         exit();
     } else {
-        updateSynonyms($olddblist, $synonyms, $canonical);
-        $db->commit();
-        echo json_encode(array('true', "Synonyms updated."));
+        if (updateSynonyms($olddblist, $synonyms, $canonical)) {
+            $db->commit();
+            echo json_encode(array('true', "Synonyms updated."));
+        } else {
+            $db->rollback();
+            echo json_encode(array('false', "Problem updating synonyms."));
+        }
         exit(0);
     }
 }
