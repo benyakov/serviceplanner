@@ -205,15 +205,19 @@ if ("nonfestivalskip" == getPOST('reconfigure')) {
 function updateSynonyms($oldlist, $newlist, $canonical, $confirmed=array()) {
     $db = new DBConnection();
     $dbp = $db->getPrefix();
-    $extra = array();
-    for ($i=0, $len=count($newlist); $i<=$len; $i++) {
+    $extra = array(); $successlog = array();
+    for ($i=0, $len=count($newlist); $i<$len; $i++) {
         if (! array_key_exists($i, $oldlist)) { // Insert a new synonym
             if (isset($newlist[$i]) and "" == $newlist[$i]) continue;       // filter out unintended blanks
             $q = $db->prepare("INSERT INTO `{$dbp}churchyear_synonyms`
                 (canonical, synonym) VALUES (?, ?)");
             $q->bindValue(1, $canonical);
             $q->bindValue(2, $newlist[$i]);
-            $q->execute();
+            if (! $q->execute()) {
+                return array(false, "Problem inserting a synonym: ".array_pop($q->errorInfo())." for ({$canonical}, {$newlist[$i]})");
+            } else {
+                $successlog[] = "Inserted {$newlist[$i]} for {$canonical}.";
+            }
         } else { // Update an existing synonym
             if ("" == $newlist[$i]) { // Delete this one
                 $extra[] = $oldlist[$i];
@@ -226,13 +230,17 @@ function updateSynonyms($oldlist, $newlist, $canonical, $confirmed=array()) {
             $q->bindValue(1, $newlist[$i]);
             $q->bindValue(2, $canonical);
             $q->bindValue(3, $oldlist[$i]);
-            $q->execute();
+            if (! $q->execute()) {
+                return array(false, "Problem updating a synonym: ".array_pop($q->errorInfo()));
+            } else {
+                $successlog[] = "Updated {$oldlist[$i]} as {$newlist[$i]} for {$canonical}";
+            }
         }
     }
     if ($extra) {
         if ($extra != $confirmed) {  // Check the extra are still extra
             // Abort
-            return false;
+            return array(false, "Attempted to delete extra synonyms without confirming first.");
         }
         $placeholders = implode(',', array_fill(0, count($extra), '?'));
         $q = $db->prepare("DELETE FROM `{$dbp}churchyear_propers`
@@ -248,7 +256,7 @@ function updateSynonyms($oldlist, $newlist, $canonical, $confirmed=array()) {
             WHERE `synonym` IN({$placeholders})");
         $q->execute($extra);
     }
-    return true;
+    return array(true, implode(";", $successlog));
 }
 
 /* churchyear.php with $_POST of commitsynonyms (canonical dayname)
@@ -264,15 +272,16 @@ if (getPOST('commitsynonyms')) {
     $q->bindValue(1, $canonical);
     $q->execute();
     $old = array_map("array_pop", $q->fetchAll(PDO::FETCH_NUM));
-    if (updateSynonyms($old, $new, $canonical, $del)) {
+    $rv = updateSynonyms($old, $new, $canonical, $del);
+    if ($rv[0]) {
         $db->commit();
-        echo json_encode(array(true, "Synonyms successfully changed."));
+        echo json_encode(array(true, $rv[1]));
     } else {
         $db->rollback();
         echo json_encode(array(false, "A problem occurred. ".
             "Someone else may have changed the database ".
             "between your submission and your confirmation of deletions. ".
-            "You can try again or try to diagnose the problem."));
+            "You can try again or try to diagnose the problem:\n{$rv[1]}"));
     }
     unset($_SESSION[$sprefix]['commitsynonyms']);
     exit(0);
@@ -321,12 +330,13 @@ if (getPOST('submitsynonyms')) {
         echo json_encode(array('confirm', $confirm));
         exit();
     } else {
-        if (updateSynonyms($olddblist, $synonyms, $canonical)) {
+        $rv = updateSynonyms($olddblist, $synonyms, $canonical);
+        if ($rv[0]) {
             $db->commit();
             echo json_encode(array('true', "Synonyms updated."));
         } else {
             $db->rollback();
-            echo json_encode(array('false', "Problem updating synonyms."));
+            echo json_encode(array('false', "Problem updating synonyms: {$rv[1]}"));
         }
         exit(0);
     }
