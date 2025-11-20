@@ -599,8 +599,8 @@ if (getPOST('lessontype') == "historic") {
        s2lesson=?, s2gospel=?, s3lesson=?, s3gospel=?, hymnabc='', hymn=''
        WHERE id=?");
     if (! $q->execute(array(getPOST('l1'), getPOST('l2'), getPOST('go'),
-        getPOST('ps'), getPOST('s2l'), getPOST('s2g'), getPOST('s3l'),
-        getPOST('s3g'), getPOST('lessons'))))
+        getPOST('ps'), getPOST('s2l'), getPOST('s2go'), getPOST('s3l'),
+        getPOST('s3go'), getPOST('lessons'))))
     {
         $rv = array(false, "Problem updating propers: ".
             array_pop($q->errorInfo()));
