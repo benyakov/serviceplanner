@@ -112,7 +112,7 @@ function propersForm($dayname) {
     <div class="propersbox">
     <input type="hidden" name="lessons" value="<?=$id?>">
     <input type="hidden" name="lessontype" value="historic">
-    <input type="hidden" name="lect_name" value="<?=$lset['lectionary']">
+    <input type="hidden" name="lect_name" value="<?=$lset['lectionary']?>">
     <div class="formblock"><label for="l1">Lesson 1</label><br>
     <input type="text" value="<?=$lset['lesson1']?>" name="l1"></div>
     <div class="formblock"><label for="l2">Lesson 2</label><br>
