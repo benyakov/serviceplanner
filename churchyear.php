@@ -595,10 +595,10 @@ if (getPOST('propers')) {
 if (getPOST('lessontype') == "historic") {
     requireAuthJSON(3, array(false, "Access denied.  Please log in."));
     $q = $db->prepare("UPDATE `{$dbp}churchyear_lessons` SET
-       lectionary='historic', lesson1=?, lesson2=?, gospel=?, psalm=?,
+       lectionary=?, lesson1=?, lesson2=?, gospel=?, psalm=?,
        s2lesson=?, s2gospel=?, s3lesson=?, s3gospel=?, hymnabc='', hymn=''
        WHERE id=?");
-    if (! $q->execute(array(getPOST('l1'), getPOST('l2'), getPOST('go'),
+    if (! $q->execute(array(getPOST('lect_name'), getPOST('l1'), getPOST('l2'), getPOST('go'),
         getPOST('ps'), getPOST('s2l'), getPOST('s2go'), getPOST('s3l'),
         getPOST('s3go'), getPOST('lessons'))))
     {
