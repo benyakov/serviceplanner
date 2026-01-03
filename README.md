@@ -32,7 +32,7 @@ available on the web server.
 
 More docs inside.
 
-Copyright (C) 2017 Jesse Jacobsen
+Copyright (C) 2026 Jesse Jacobsen
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -51,7 +51,7 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 Send feedback or donations to: Jesse Jacobsen <jmatjac@gmail.com>
 
 Mailed donation may be sent to:
-Columbia Lutheran School
-2323 E. 12th St.
-The Dalles, OR 97058
+Christ Lutheran Church and School
+1592 SE Floresta Dr.
+Port St. Lucie, FL 34983
 USA
