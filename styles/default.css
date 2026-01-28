@@ -688,7 +688,7 @@ dl.blocklessons dt {
 }
 
 .maxcolumn {
-    width: 42em;
+    width: auto;
 }
 
 .centered {
