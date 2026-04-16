@@ -600,15 +600,38 @@ function setupSortableList() {
     });
 }
 
+
+// Source - https://stackoverflow.com/a/40658647
+// Posted by Tom Pažourek, modified by community. See post 'Timeline' for change history
+// Retrieved 2026-04-15, License - CC BY-SA 3.0
+$.fn.isInViewport = function() {
+    var elementTop = $(this).offset().top;
+    var elementBottom = elementTop + $(this).outerHeight();
+
+    var viewportTop = $(window).scrollTop();
+    var viewportBottom = viewportTop + $(window).height();
+
+    return elementBottom > viewportTop && elementTop < viewportBottom;
+};
+
 function setupFlags() {
     $(".flagbutton").click(onFlagButtonClick);
-    $(".service-flags").on('appear dblclick', function(evt) {
-        if (! $(this).data('loaded')) {
-            pullFlags(1, $(this));
-        }
-        $(this).data('loaded', true);
+    $(window).on('resize scroll', function() {
+        checkFlags();
     });
+    checkFlags();
     $.force_appear();
+}
+
+function checkFlags() {
+    $(".service-flags").filter(function(flag) {
+        return $(flag).isInViewport();
+    }).forEach(function(index, flag) {
+        if (! $(flag).data('loaded')) {
+            pullFlags(1, $(flag));
+            $(flag).data('loaded', true);
+        }
+    });
 }
 
 function flagFormSubmit(evt) {
