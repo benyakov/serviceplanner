@@ -837,11 +837,11 @@ dl.flags dd {
 }
 
 div.flag-repr {
-    margin: 2px 1em 0;
+    margin: 2px 1ex 0;
     display: block;
     float: left;
     border: 1px solid black;
-    font-size: 90%;
+    font-size: 85%;
 }
 
 div.flag-name {
