@@ -150,11 +150,11 @@ if (checkContentReq()) {
                     setCSSTweaks();
                     setupStyleAdjusterLocs();
                     setupButtons();
-                    setupFlags();
                     $.appear('.service-flags', {"interval":0.1});
                     setupFilterForm();
                     contractAllListings('modify-listing');
                     setupListingExpansion('modify-listing');
+                    setupFlags();
                 });
         }
         function setupButtons() {

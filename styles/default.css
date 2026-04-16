@@ -281,6 +281,10 @@ tr.servicehead {
     border-top: thick solid #999;
 }
 
+tr.servicehead td:first-child {
+    width: 20em;
+}
+
 tr.flagestalt {
     border-top: thick solid #3A3;
 }

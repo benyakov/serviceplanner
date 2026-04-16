@@ -624,12 +624,10 @@ function setupFlags() {
 }
 
 function checkFlags() {
-    $(".service-flags").filter(function(flag) {
-        return $(flag).isInViewport();
-    }).forEach(function(index, flag) {
-        if (! $(flag).data('loaded')) {
-            pullFlags(1, $(flag));
-            $(flag).data('loaded', true);
+    $(".service-flags").each(function(index, flagbank) {
+        if ($(flagbank).isInViewport() && ! $(flagbank).data('loaded')) {
+            pullFlags(1, $(flagbank));
+            $(flagbank).data('loaded', true);
         }
     });
 }

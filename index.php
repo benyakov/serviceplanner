@@ -62,11 +62,11 @@ if ($jsonp = checkJsonpReq()) {
                 $("#content-container").html(rv);
                 setCSSTweaks();
                 setupStyleAdjusterLocs();
-                setupFlags();
                 $.appear('.service-flags', {interval:0.1, force_process: "t"});
-                setupFilterForm(true);
                 contractAllListings('records-listing');
                 setupListingExpansion();
+                setupFilterForm(true);
+                setupFlags();
             });
     }
     $(document).ready(function() {
