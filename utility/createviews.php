@@ -18,9 +18,9 @@
     Send feedback or donations to: Jesse Jacobsen <jmatjac@gmail.com>
 
     Mailed donation may be sent to:
-    Lakewood Lutheran Church
-    10202 112th St. SW
-    Lakewood, WA 98498
+    Christ Lutheran Church
+    1592 SE Floresta Dr.
+    Port St. Lucie, FL 34983
     USA
  */
 $dbh = new DBConnection();

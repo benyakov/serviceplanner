@@ -18,9 +18,9 @@
     Send feedback or donations to: Jesse Jacobsen <jmatjac@gmail.com>
 
     Mailed donation may be sent to:
-    Lakewood Lutheran Church
-    10202 112th St. SW
-    Lakewood, WA 98498
+    Christ Lutheran Church
+    1592 SE Floresta Dr.
+    Port St. Lucie, FL 34983
     USA
  */
 
@@ -179,9 +179,9 @@ can be added to the Service Planner on the Housekeeping tab.</p>
     </tr>
     <tr><td><label>Sermon</label><br>
         <select name="smtype" id="smtype">
-        <option value="lesson1">Lesson 1 (OT)</option>
-        <option value="lesson2">Lesson 2 (Ep)</option>
-        <option value="gospel">Gospel</option>
+        <option value="lesson1" <?="lesson1"==$vals['smtype']?"selected=\"selected\"":""?>>Lesson 1 (OT)</option>
+        <option value="lesson2" <?="lesson2"==$vals['smtype']?"selected=\"selected\"":""?>>Lesson 2 (Ep)</option>
+        <option value="gospel" <?="gospel"==$vals['smtype']?"selected=\"selected\"":""?>>Gospel</option>
         </select></td>
     <td><select name="smlect" id="smlect">
 <? foreach ($lects as $l) { ?>
@@ -271,7 +271,7 @@ if (getGET('action') == "edit" && getGET('id')) {
         DATE_FORMAT(blockstart, '%Y-%m-%d') AS blockstart,
         DATE_FORMAT(blockend, '%Y-%m-%d') AS blockend, label, notes, weeklygradual,
         l1lect, l1series, l2lect, l2series, golect, goseries, pslect, psseries,
-        colect, coclass, smlect, smseries, id FROM `{$db->getPrefix()}blocks`
+        colect, coclass, smtype, smlect, smseries, id FROM `{$db->getPrefix()}blocks`
         WHERE id = ?");
     if ($q->execute(array(getGET('id'))) && $row = $q->fetch(PDO::FETCH_ASSOC)) {
         blockPlanForm($row);
